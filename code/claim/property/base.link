@@ -1,0 +1,164 @@
+
+theme equality
+  start start
+  start front
+
+theme left-distributivity
+  start set, field set
+  start bop-a, field binary-operation
+  start bop-b, field binary-operation
+
+  drive x, batch set
+  drive y, batch set
+  drive z, batch set
+
+  theme equality
+    mount start
+      shift share bop-a
+        mount start, share x
+        mount front
+          shift share bop-b
+            mount start, share y
+            mount front, share z
+    mount front
+      shift share bop-b
+        mount start
+          shift share bop-a
+            mount start, share x
+            mount front, share y
+        mount front
+          shift share bop-a
+            mount start, share x
+            mount front, share z
+
+theme right-distributivity
+  start set, field set
+  start bop-a, field binary-operation
+  start bop-b, field binary-operation
+
+  drive x, batch set
+  drive y, batch set
+  drive z, batch set
+
+  theme equality
+    mount start
+      shift share bop-a
+        mount start
+          shift share bop-b
+            mount start, share y
+            mount front, share z
+        mount front, share x
+    mount front
+      shift share bop-b
+        mount start
+          shift share bop-a
+            mount start, share y
+            mount front, share x
+        mount front
+          shift share bop-a
+            mount start, share z
+            mount front, share x
+
+theme distributivity
+  start set, field set
+  start bop-a, field binary-operation
+  start bop-b, field binary-operation
+
+  theme left-distributivity
+    mount set, share set
+    mount bop-a, share bop-a
+    mount bop-b, share bop-b
+  theme right-distributivity
+    mount set, share set
+    mount bop-a, share bop-a
+    mount bop-b, share bop-b
+
+theme associativity
+
+theme left-identity-element
+  start set, field set
+  start op, field binary-operation
+
+  fetch e, batch set
+  drive a, batch set
+  theme equality
+    mount start
+      shift share op
+        mount start, share e
+        mount front, share a
+    mount front, share a
+
+theme right-identity-element
+  start set, field set
+  start op, field binary-operation
+
+  fetch e, batch set
+  drive a, batch set
+  theme equality
+    mount start
+      shift share op
+        mount start, share a
+        mount front, share e
+    mount front, share a
+
+theme identity-element
+  start set, field set
+  start op, field binary-operation
+
+  theme left-identity-element
+    mount set, share set
+    mount op, share op
+  theme right-identity-element
+    mount set, share set
+    mount op, share op
+
+theme zero-element
+
+theme pseudoinverse-element
+
+theme inverse-element
+
+theme dual-element
+
+theme isomorphic
+
+force homomorphic-map
+  start a
+    field algebraic-structure
+      chain bop
+  front b, field algebraic-structure
+
+  check equality
+    mount start, share a/class
+    mount front, share b/class
+
+  clear cause
+
+theme homomorphism
+  start force, class force homomorphic-map
+
+  theme equality
+    mount start
+      shift share force
+
+theme locality
+
+theme gluing
+
+theme associative
+
+theme commutative
+
+theme closure
+
+theme transitive
+
+theme canonical-homomorphism
+
+theme reflexive
+
+theme archimedean
+
+theme contact
+
+theme involution

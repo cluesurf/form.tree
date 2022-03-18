@@ -1,0 +1,44 @@
+
+fetch @mount/vault/object
+  catch theme idempotence
+    store theme object-idempotence
+
+field set
+  start field, field field
+  front chain, chain share field
+
+field union
+  start a
+  start b
+
+  bound set, field set
+
+  drive x, share set
+
+  check logical-disjunction
+    chain block
+      check containment
+        mount element, share x
+        mount set, share a
+    chain block
+      check containment
+        mount element, share x
+        mount set, share b
+
+field intersection
+  start a
+  start b
+
+  bound set, field set
+
+  drive x, share set
+
+  check logical-conjunction
+    chain block
+      check set-containment
+        mount element, share x
+        mount set, share a
+    chain block
+      check set-containment
+        mount element, share x
+        mount set, share b

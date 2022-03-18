@@ -1,0 +1,25 @@
+
+field finite-state-automaton
+  start symbol
+  start state
+  start start
+  start transition, field force
+  start end
+
+  check subset-or-empty
+    mount set, share state
+    mount subset, share end
+  check element
+    mount set, share state
+    mount element, share start
+  check input-domain
+    mount force, share transition
+    mount brand, brand a
+    mount domain, share state
+  check input-domain
+    mount force, share transition
+    mount brand, brand b
+    mount domain, share symbol
+  check output-domain
+    mount force, share transition
+    mount domain, share state

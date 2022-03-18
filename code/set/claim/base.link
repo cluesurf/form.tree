@@ -1,0 +1,13 @@
+
+claim empty-intersection-domination
+  start a, field set
+
+  build set, share e
+
+  cause intersect
+    mount a, share a
+    mount b, share e
+    store x
+  theme equality
+    mount a, share x
+    mount b, share e

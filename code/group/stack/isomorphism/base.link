@@ -1,0 +1,11 @@
+
+theme isomorphism
+  start g, field group
+  start h, field group
+
+  check homomorphism
+    mount g, share g
+    mount h, share h
+  check bijectivity
+    mount g, share g
+    mount h, share h

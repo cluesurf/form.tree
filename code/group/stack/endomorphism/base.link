@@ -1,0 +1,11 @@
+
+field endomorphism
+  front g, field group
+  front h, field group
+
+  check homomorphism
+    mount g, share g
+    mount h, share h
+  check match
+    mount g, share g
+    mount h, share h

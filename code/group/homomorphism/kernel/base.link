@@ -1,0 +1,17 @@
+
+field kernel
+  start h, check homomorphism
+  front set, field set
+
+  build set, store set
+
+  drive g, share h/a
+    shift share h
+      mount a, share g
+      store x
+    check equality
+      mount a, share x
+      mount b, share eH
+    shift store-set
+      mount set, share set
+      mount element, share g

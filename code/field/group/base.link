@@ -1,0 +1,227 @@
+
+fetch @mount/vault/theme/relationship
+  catch field associativity
+  catch field commutativity
+  catch field identity-element-exists
+  catch field inverse-elements-exist
+
+class force product
+  start set
+  start a
+  start b
+  front c
+
+  check set-element
+    mount element, share a
+    mount set, share set
+  check set-element
+    mount element, share b
+    mount set, share set
+  check set-element
+    mount element, share c
+    mount set, share set
+
+field group
+  front set, field set
+  front product
+    match product
+      mount set, share set
+
+  check associativity
+    mount set, share set
+    mount operation, share product
+  check identity-element-exists
+    mount set, share set
+    mount operation, share product
+  check inverse-elements-exist
+    mount set, share set
+    mount operation, share product
+
+field left-neutral
+  front set, field set
+  front operation, field force
+
+  check binary-operation-with-same-input-output-type
+    mount operation, share operation
+  drive s, share set
+  fetch e, share set
+
+  shift share operation
+    mount a, share e
+    mount b, share a
+    store x
+  check equality
+    mount a, share x
+    mount b, share s
+
+field right-neutral
+  start set, field set
+  start operation, field force
+
+  match check
+    theme binary-operation-with-same-input-output-type
+      mount operation, share operation
+
+  match check
+    drive s, share set
+    fetch e, share set
+
+    cause share operation
+      mount a, share a
+      mount b, share e
+      store x
+    theme equality
+      mount a, share x
+      mount b, share s
+
+theme neutral
+  start set, field set
+  start operation, field force
+
+  match check
+    theme left-neutral
+      mount set, share set
+      mount operation, share force
+  match check
+    theme right-neutral
+      mount set, share set
+      mount operation, share force
+
+theme abelianness
+  start group, field group
+
+  check commutativity
+    mount set, share group/set
+    mount operation, share group/product
+
+theme symmetric-group
+  start set
+  start group
+
+  drive e, batch group/set
+  theme permutation
+    mount example, share e
+    mount original, share set
+
+theme left-inverse
+  start set, field set
+  start operation, field force
+  start inverse
+  start a
+  start b
+
+  match check
+    theme set-element
+      mount set, share set
+      mount element, share inverse
+  match check
+    cause share operation
+      mount a, share b
+      mount b, share a
+      store x
+    theme equality
+      mount a, share x
+      mount b, share inverse
+
+theme right-inverse
+  start set, field set
+  start operation, field force
+  start inverse
+  start a
+  start b
+
+  match check
+    theme set-element
+      mount set, share set
+      mount element, share inverse
+  match check
+    cause share operation
+      mount a, share a
+      mount b, share b
+      store x
+    theme equality
+      mount a, share x
+      mount b, share inverse
+
+theme inverse
+  start set, field set
+  start operation, field force
+  start inverse
+  start a
+  start b
+
+  match check
+    theme left-inverse
+      mount set, share set
+      mount operation, share operation
+      mount inverse, share inverse
+      mount a, share a
+      mount b, share b
+  match check
+    theme right-inverse
+      mount set, share set
+      mount operation, share operation
+      mount inverse, share inverse
+      mount a, share a
+      mount b, share b
+
+theme homomorphism
+  start a, field group
+  start b, field group
+  start map, field force
+
+  theme homomorphism-force
+    start input, share a
+    front output, share b
+
+theme every-element-has-inverse
+  start group
+
+  drive e, share group
+  fetch a, share group
+  fetch i, share group
+
+  theme inverse
+    mount set, share group/set
+    mount operation, share group/product
+    mount inverse, share i
+    mount a, share e
+    mount b, share a
+
+theme subgroup
+  start child, field group
+  start parent, field group
+
+  theme every-product-in-group
+    mount group, share child
+  theme child-maintains-parent-identity-element
+    mount child, share child
+    mount parent, share parent
+  theme every-element-has-inverse
+    mount group, share child
+
+theme every-product-in-group
+  start group, field group
+
+  drive a, share group/set
+  drive b, share group/set
+
+  cause share group/product
+    mount a, share a
+    mount b, share b
+    store x
+
+  theme set-element
+    mount element, share x
+    mount set, share group/set
+
+theme child-maintains-parent-identity-element
+  start child, field group
+  start parent, field group
+
+  cause get-identity-element
+    mount group, share parent
+    store identity
+  theme set-contains-element
+    mount set, share child
+    mount element, share identity

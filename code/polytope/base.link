@@ -1,0 +1,96 @@
+
+class polytope
+
+class set
+  scope convex
+
+  think s, class space, scope affine
+
+  class subset
+    strap x, think s
+    yield y
+
+  where y closed under convex combinations
+
+class space
+  scope affine
+
+class euclidean space
+
+class realization
+
+class flag
+  scope polytope
+
+  A flag is a maximal chain of faces, i.e. a (totally) ordered set Ψ of faces, each a subface of the next (if any), and such that Ψ is not a subset of any larger chain. Given any two distinct faces F, G in a flag, either F < G or F > G.
+
+class section
+  scope polytope
+
+  Any subset P' of a poset P is a poset (with the same relation <, restricted to P'). In an abstract polytope, given any two faces F, H of P with F ≤ H, the set {G | F ≤ G ≤ H} is called a section of P, and denoted H/F.
+
+class connected
+  scope polytope
+
+  A poset P is connected if P has rank ≤ 1, or, given any two proper faces F and G, there is a sequence of proper faces
+
+  H1, H2, ... ,Hk
+  such that F = H1, G = Hk, and each Hi, i < k, is incident with its successor.
+
+class connected
+  scope strongly
+  scope polytope
+
+  A poset P is strongly connected if every section of P (including P itself) is connected.
+
+class figure
+  scope vertex
+  scope polytope
+
+  The vertex figure at a given vertex V is the (n−1)-section Fn/V, where Fn is the greatest face.
+
+class polytope
+  scope convex
+
+  additional property that it is also a convex set of points in the n-dimensional space Rn
+
+class polytope
+  scope abstract
+
+class face
+
+class face
+  scope least
+  In an abstract polytope this is known as the least or null face and is a subface of all the others. Since the least face is one level below the vertices or 0-faces, its rank is −1 and may be denoted as F−1. It is not usually realized.
+
+  The faces are ranked according to their associated real dimension: vertices have rank = 0, edges rank = 1 and so on.
+
+class face
+  scope greatest
+
+class set
+  scope empty
+
+class vertex
+  scope polytope
+
+  class face
+    strap dimension, 0
+
+class edge
+  scope polytope
+
+  class face
+    strap dimension, 1
+
+class diagram
+  scope hasse
+
+class poset
+  class set
+
+class rank
+  scope polytope
+  scope abstract
+
+  The rank of a face F is defined as (m − 2), where m is the maximum number of faces in any chain (F', F", ... , F) satisfying F' < F" < ... < F. F' is always the least face, F−1.

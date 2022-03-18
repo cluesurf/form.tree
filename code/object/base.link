@@ -1,0 +1,18 @@
+
+theme idempotence
+  start object
+  start operation, field binary-operation
+
+  match start
+    theme binary-operation-argument-type
+      mount operation, share operation
+      mount type, object/field
+
+  match front
+    cause share operation
+      mount a, share object
+      mount b, share object
+      store x
+    theme equality
+      mount a, share x
+      mount b, share object

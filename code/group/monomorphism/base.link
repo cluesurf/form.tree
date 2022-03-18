@@ -1,0 +1,11 @@
+
+field monomorphism
+  front g, field group
+  front h, field group
+
+  check homomorphism
+    mount g, share g
+    mount h, share h
+  check injectivity
+    mount g, share g
+    mount h, share h

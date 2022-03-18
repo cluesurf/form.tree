@@ -1,0 +1,17 @@
+
+field lattice
+
+claim upper-bound
+  strap group
+  strap joint
+  strap chunk, chunk strap group
+  strap piece, piece strap group
+
+  march s, strap chunk
+    check
+      strap joint, strap joint
+      strap chief, strap s
+      strap child, strap piece
+
+  sense piece, upper bound
+    on group

@@ -1,0 +1,85 @@
+
+theme ternary-operation
+theme unary-operation
+theme addition
+theme subtraction
+theme multiplication
+theme division
+theme homomorphism
+theme bijection
+theme injection
+theme surjection
+theme group-homomorphism
+theme smooth
+theme compact-support
+
+shift homeomorphism
+  start a, field topological-space
+  front b, field topological-space
+
+shift single-input-single-output
+  start a
+  front b
+
+theme surjection
+  start force, shift single-input-single-output
+  start a, field set
+  start b, field set
+
+  drive b-i, batch b
+  fetch a-i, batch a
+  cause share force
+    mount a, share a-i
+    store x
+  theme equality
+    mount a, share x
+    mount b, share b-i
+
+theme each-a-paired-with-at-least-one-b
+  start force, shift single-input-single-output
+  start a, field set
+  start b, field set
+
+  drive a-i, batch a
+  fetch b-i, batch b
+  cause share force
+    mount a, share a-i
+    store x
+  theme equality
+    mount a, share x
+    mount b, share b-i
+
+theme no-a-paired-with-more-than-one-b
+  start force, shift single-input-single-output
+  start a, field set
+  start b, field set
+
+theme bijection
+  start force, shift single-input-single-output
+  start a, field set
+  start b, field set
+
+  theme injection
+    mount force, share force
+    mount a, share a
+    mount b, share b
+  theme surjection
+    mount force, share force
+    mount a, share a
+    mount b, share b
+
+theme continuous
+
+theme homeomorphism
+  start force, shift homeomorphism
+
+  cause get-force-inverse
+    mount force, share force
+    store inverse
+
+  theme bijection
+    mount force, share force
+  theme continuous
+    mount force, share force
+  theme continuous
+    mount force, share inverse

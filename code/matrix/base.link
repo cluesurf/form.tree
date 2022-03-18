@@ -1,0 +1,13 @@
+
+field matrix
+  start row-count, field count
+  start column-count, field count
+  start data, field chain
+
+  shift multiply
+    mount start, share row-count
+    mount front, share column-count
+    store x
+  check match
+    mount start, share data/length
+    mount front, share x

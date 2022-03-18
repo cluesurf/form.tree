@@ -1,0 +1,16 @@
+
+check disjunction
+  start block, field set
+
+  fetch x, share block
+
+  check truth
+    mount value, share x
+
+check conjunction
+  start block, field set
+
+  drive x, share block
+
+  check truth
+    mount value, share x

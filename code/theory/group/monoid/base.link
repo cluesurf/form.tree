@@ -1,0 +1,13 @@
+
+class monoid
+  strap x, class set
+  strap a, class trade
+  strap b, class trade
+
+  class associative
+    strap x, think x
+    strap a, think a
+    strap b, think b
+
+  class identity element
+    strap x, think x

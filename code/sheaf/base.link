@@ -1,0 +1,28 @@
+
+class presheaf
+  strap t, class space, scope topological
+  strap o, class category
+  strap f, class functor
+    strap start range, think t
+    strap cease range, think o
+
+  march u, think t, whole class set, scope open
+    state joint
+      f(u) # section
+      o
+    # restriction morphisms
+    march v, think u, class inclusion
+      state
+        strap d, class morphism
+          strap start, think u
+          strap cease, think v
+
+class sheaf
+  class presheaf
+
+  # If (Ui) is an open covering of an open set U, and if s,t ∈ F(U) are such that s|Ui = t|Ui for each set Ui of the covering, then s = t
+  class locality
+    strap f, think f
+
+  # (Gluing) If (Ui) is an open covering of an open set U, and if for each i a section si ∈ F(Ui) is given such that for each pair Ui,Uj of the covering sets the restrictions of si and sj agree on the overlaps: si|Ui∩Uj = sj|Ui∩Uj, then there is a section s ∈ F(U) such that s|Ui = si for each i.
+  class gluing

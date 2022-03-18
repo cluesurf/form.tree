@@ -1,0 +1,373 @@
+
+quirk absorbing element
+  strap z, class trade
+
+quirk stack 1 (group theory group)
+
+quirk extension
+
+
+A _slice_ is a dimension.
+A _vague_ is _n_. A _vague count slice space_ is an n-dimensional space.
+
+(quirks)
+blank: with blank, without blank
+trade: types of operations
+  scale (arity)
+
+(themes)
+homology theory
+group theory
+polytope theory
+algebraic topology
+category theory
+
+class coset
+  strap g, class group
+  strap h, class subgroup
+    strap g, stage g
+  strap a, piece g
+  strap r, class chasm, prose Right coset
+
+  strap x, class set
+
+  march p, stage h
+    strap x
+      check r
+        truth
+          p times a
+        false
+          a times p
+
+  yield x
+
+class normal subgroup
+  scope group
+
+class quotient group
+  scope group
+
+  strap g, class group
+  strap n, class normal subgroup
+    strap g, stage g
+
+  strap x, class set
+  strap a, class trade binary
+    strap a, piece in x
+    strap b, piece in x
+
+  march i, in g
+    strap x
+      coset
+        strap g, stage n
+        strap i, stage i
+        strap r, stage false
+
+  yield x
+
+(stacks)
+magma
+semigroup
+monoid
+group
+ring
+strap
+algebra
+
+(trades)
+
+(pieces)
+magnitude (a norm on a euclidean space)
+norm
+  function assigning positive size/length to every vector in a space, except zero
+  seminorm assigns to zero
+space
+  topological space (no operations)
+  metric space
+  normed vector space
+    vector space over R or C over which a norm is defined
+      (a vector space, is an additive abelian group)
+  inner product space
+  affine space
+  hausdorff space
+  euclidean space
+  moduli space
+  measure space
+  locally compact space
+  ringed space
+set
+category
+lattice
+functor
+polyhedron
+polytope
+simplex
+simplical complex
+simplical set
+sheaf
+module
+bundle
+topology
+root system
+polynomial
+span
+group action
+ideal
+scheme
+variety
+integer
+stack (2-sheaf, sheaf that takes values as categories rather than sets)
+morphism
+pullback
+limit
+domain
+codomain
+hyperplane
+hull
+semigroupoid
+groupoid
+loop
+quasigroup
+semigroup
+semilattice
+lie rings
+jordan rings
+semirings
+nearrings
+*-rings
+latticoid
+skew lattice
+algebras
+group
+  homology group
+  abelian group
+abstract polytope
+abstract simplical complex
+kernel
+image
+sum
+product
+tensor
+quotient
+filtration
+freegroup
+free monoid
+syntactic monoid
+coset
+wreath
+conjugacy
+stabilizer
+orbit
+lemma
+theorem
+proof
+representation
+class
+torsion
+determinant
+inclusion (subset)
+restriction
+contravariant functor
+cover
+kan complex
+open set
+monad
+manifold
+fiber bundle
+fibration
+cover
+set
+
+(relational elements or groups, things defined in relation to something else)
+closure
+inverse
+
+(blends/combinations)
+linear combination
+convex combination
+
+(joints/relations)
+distance
+angle
+transitive
+subset
+superset
+commutative
+antisymmetric
+symmetric
+associative
+union
+intersection
+
+(joint pieces)
+upper bound
+lower bound
+
+https://en.wikipedia.org/wiki/Outline_of_algebraic_structures
+https://en.wikipedia.org/wiki/Lists_of_mathematics_topics#Algebra
+
+
+a presheaf is a category is a functor F:C^{op}\to\mathbb{Set}
+
+Closed sets contain their supremum and infimum but open sets do not contain them
+
+quirk neighborhood
+
+
+Everything is a quirk. Defining relations between objects.
+
+check trade
+  strap trade
+  strap chief
+  strap child
+
+An equation is just a relation. Equating two things.
+
+Ax = b
+
+- figure out how to convert non-planar graph to planar graph
+- figure out how to tell if something is a lattice
+- figure out how to create a lattice
+- figure out how to write mathematical properties
+
+a * (b * c) = (a * b) * c (bunch)
+a * b = b * a (twist)
+a * b and b * c -> a * c (shift)
+a * b = a (stark)
+a * blank = blank
+check joint (and)
+check merge (or)
+mount (add)
+moult (subtract)
+strap (multiply)
+strip (divide)
+-a =
+brick (matrix)
+range (order)
+group
+graph
+point
+joint
+a \subset b = chunk
+a \in b = piece
+if R(a,b) and R(b,a), then a = b (antisymmetric) joint match
+$\forall a,b\in X,\ (aRb\land bRa\;\Rightarrow \;a=b)$
+
+Symmetry, along with reflexivity and transitivity, are the three defining properties of an equivalence relation.
+
+quirk joint match
+  march
+    strap piece, strap a
+    strap group, strap group
+    march
+      strap
+
+stack group theory
+  quirk
+    check associative
+      strap trade, strap trade
+  quirk
+
+stack order theory
+
+stack polytope theory
+
+stack graph theory
+
+block stack group
+  trade mould
+  braid a
+
+group float (set of real numbers)
+group share (set of fractions)
+group count (set of integers)
+
+sense (definition)
+claim (theorem)
+proof
+
+
+think/throw
+sieve/bloom
+mount/moult
+strap/strip
+place/pluck
+march/march^-1
+match/flunk
+
+ring:
+  mount/moult
+  strap/strip
+  blank
+  stark
+module
+  think/throw
+  blank
+
+class cover
+
+class cover
+  scope open
+
+class set
+  scope open
+
+class category
+  strap x, class class
+  strap m, class morphism
+
+class variety
+
+class trade
+  scope binary
+
+class zariski topology
+
+class commutative ring
+
+latex polynomial ring
+  strap k
+  strap x
+  strap i
+  strap n
+  k[x_{0},\dots ,x_{n}]
+
+latex projective space
+  strap p
+  strap n
+  prose \mathbb{[think p]}^{[think n]}
+
+abelian varieties (the 'projective' theory) and linear algebraic groups (the 'affine' theory).
+
+clone (multiply)
+clean (divide)
+
+
+class variety
+
+https://en.wikipedia.org/wiki/Incidence_structure
+
+class homogenous coordinates
+
+class point in projective space
+
+class algebraic variety
+
+class vector space
+
+class space
+
+class strap
+
+class natural quotient map
+  class canonical homomorphism
+
+class quotient space
+
+class irreducible
+
+class affine space
+
+class biregular map
+  class regular map
+    where inverse is also regular map

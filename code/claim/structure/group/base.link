@@ -1,0 +1,65 @@
+
+class subgroup
+  strap stack, class stack 1
+  strap subset, class subset of stack
+  strap op, class op from stack
+
+  check restriction of op
+    to subset x subset
+    is group operation on h
+    yield subset
+
+class quotient group
+  strap stack, strap class stack 1
+
+class algebraic group
+  class group
+  class algebraic variety
+
+  mount v, class algebraic variety
+  mount g, class group
+
+class special liear group
+  mount x, class matrix, group truth
+  mount m, class matrix
+
+  group piece m, x
+    state match 1, det m
+
+class group
+  mount a, class trade
+  mount b, class trade, inverse of a
+  mount set, class set
+
+algebraic group
+  example Finite groups
+  example GL(n, C), the general linear group of invertible matrices over C
+  example Jet group
+  example Elliptic curves.
+
+class algebraic subgroup
+  strap a, class algebraic group
+  strap x, class zariski-closed subgroup
+    strap a, think a
+  yield x
+
+class group
+  strap x, class set
+  strap p, class trade, blink q
+  strap q, class trade, blink p
+
+  class associative
+
+  class closure
+
+  class identity element
+
+  class inverse element
+
+class group
+  scope abelian
+  class group
+
+  class commutativity
+
+class quotient group

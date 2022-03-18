@@ -1,0 +1,10 @@
+
+check containment
+  start element
+  start set, field set
+
+  fetch x, share set
+
+  check equality
+    mount a, share element
+    mount b, share x

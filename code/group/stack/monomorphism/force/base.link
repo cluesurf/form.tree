@@ -1,0 +1,21 @@
+
+class force monomorphism
+  start g, field group
+  start h, field group
+
+  check monomorphism
+    mount g, share g
+    mount h, share h
+
+  force build
+    start a
+    start b
+
+    check element-monomorphism
+      mount g, share g
+      mount h, share h
+      mount p, share a
+      mount q, share b
+
+  raise build
+    share force build

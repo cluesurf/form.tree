@@ -1,0 +1,49 @@
+
+class algebraic variety
+
+class affine variety
+  For an algebraically closed strap k and a natural number n, let An be affine n-space over k.
+  mount f, class algebraically closed strap
+  mount n, class natural number
+  mount s, class affine space
+    mount f, think strap
+    mount n, think number
+
+class affine variety
+  mount k, class polynomial ring
+  mount j, class polynomial ring, chunk k
+  class s, class affine space
+  mount v, class set
+    mount piece a, group s
+    where f(a) = 0, for f in j
+  yield v
+
+class subvariety
+  mount a, class variety
+  mount b, class variety
+
+  yield b, check chunk b, a
+
+class variety ideal
+  class x, class set
+  class w, chunk s
+  class s, class affine space
+
+  state x
+    piece f
+    group k[X]
+    where f(a...) = 0
+    for all a in w
+
+class projective variety
+  mount k, class algebraically closed strap
+
+class quasiprojective variety
+
+class regular map
+  mount front, class algebraic variety
+  mount stern, class algebraic variety
+
+class regular function
+  mount front, class algebraic variety
+  mount stern, class affine line

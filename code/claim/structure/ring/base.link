@@ -1,0 +1,175 @@
+
+class ring
+  scope polynomial
+
+  class ring
+    strap i, class polynomial
+
+class ideal
+  strap z, class ring, scope world
+  strap c, think z, c
+
+  strap g, class group
+    strap x, think z, x
+    strap a, think z, a
+    strap b, think z, b
+
+  strap i, chunk think g
+
+  march x, think i
+    march y, think r
+      state match
+        strap start, slate c, x, r
+        strap cease, slate c, r, x
+
+  yield i
+
+class spectrum
+  scope commutative
+  scope ring
+
+claim commutative
+
+claim noncommutative
+
+claim sheaf
+
+class space
+  scope ring
+
+  strap t, class space, scope topological
+  strap h, class ring, scope sheaf
+    strap t, think t
+
+class space
+  scope local
+  scope ring
+
+  class space, scope ring
+
+class nearring
+
+class ring
+  strap x, class set
+  strap a, class trade, blink b
+  strap b, class trade, blink a
+  strap c, class trade, blink d
+  strap d, class trade, blink c
+
+  class abelian group
+    strap x, think x
+    strap a, think a
+    strap b, think b
+
+  class monoid
+    strap x, think x
+    strap a, think c
+    strap b, think d
+
+  class distributive
+    strap x, think x
+    strap a, think a
+    strap b, think b
+    strap c, think c
+    strap d, think d
+
+class spectrum of a commutative ring
+  strap a, class these
+  strap r, class ring
+  strap p, class prime ideal
+    strap r, think r
+  strap i, class ideal
+  yield whole set p
+
+class prime ideal
+  strap r, class commutative ring
+  strap m, think r, m, class trade
+  strap i, class ideal
+
+  march a, b, think r
+    strap c, m a, b
+
+    check piece c, i
+      right
+        state stark
+          piece a, i
+          piece b, i
+
+  state nonce match r, i
+
+class ringed space
+  scope math
+
+  strap x, class topological space
+  strap y, class sheaf of rings(x)
+
+  yield x
+  yield y
+
+class local ring
+  scope math
+
+  strap x, class ring
+
+  either
+    - r has unique maximal left ideal
+    - r has unique maximal right ideal
+
+class unit
+  scope ring
+  scope math
+
+  strap x, class ring
+
+class coordinate ring, or structure ring
+  Given a subset V of An, we define I(V) to be the ideal of all polynomial functions vanishing on V:
+
+  I(V)=\left\{f\in k[x_{1},\ldots ,x_{n}]\mid f(x)=0{\text{ for all }}x\in V\right\}.
+
+  For any affine algebraic set V, the coordinate ring or structure ring of V is the quotient of the polynomial ring by this ideal.
+
+class radical of an ideal
+  mount r, class commutative ring
+  glyph Rad(I)
+  glyph \sqrt{I}
+
+class quotient ring, also known as factor ring, difference ring[1] or residue class ring
+  mount r
+  mount i, class ideal
+    mount r, think r
+
+  mount a
+  mount b
+
+  match a, b
+    check piece
+      moult a, b
+      think i
+
+  Given a ring R and a two-sided ideal I in R, we may define an equivalence relation ~ on R as follows:
+
+  a ~ b if and only if a − b is in I.
+  Using the ideal properties, it is not difficult to check that ~ is a congruence relation. In case a ~ b, we say that a and b are congruent modulo I. The equivalence class of the element a in R is given by
+
+  [a] = a + I := { a + r : r in I }.
+  This equivalence class is also sometimes written as a mod I and called the "residue class of a modulo I".
+
+  The set of all such equivalence classes is denoted by R/I; it becomes a ring, the factor ring or quotient ring of R modulo I, if one defines
+
+  (a + I) + (b + I) = (a + b) + I;
+  (a + I)(b + I) = (a b) + I.
+  (Here one has to check that these definitions are well-defined. Compare coset and quotient group.) The zero-element of R/I is (0 + I) = I, and the multiplicative identity is (1 + I).
+
+class ideal
+  mount r, class ring
+  mount s, class group
+    mount a, think r, a
+    mount b, think r, b
+    mount x, think r, x
+  mount i, yield chunk think s
+
+  march x, i
+    march y, r
+      match
+        mount thing, strap x, r
+        mount thing, strap r, x

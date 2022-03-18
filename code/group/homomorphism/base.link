@@ -1,0 +1,43 @@
+
+field homomorphism
+  front g, field group
+  front h, field group
+
+  drive u, share g/set
+    drive v, share g/set
+      shift share g/product
+        mount a, share u
+        mount b, share v
+        store x
+      shift build
+        mount p, share x
+        store r
+      shift build
+        mount p, share u
+        store y
+      shift build
+        mount p, share v
+        store z
+      shift share h/product
+        mount a, share y
+        mount b, share z
+        store s
+      check equality
+        mount a, share r
+        mount b, share s
+
+field element-homomorphism
+  start g, field group
+  start h, field group
+  start p
+  start q
+
+  check homomorphism
+    mount g, share g
+    mount h, share h
+  check containment
+    mount set, share g/set
+    mount element, share p
+  check containment
+    mount set, share h/set
+    mount element, share q

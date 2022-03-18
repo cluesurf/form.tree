@@ -1,0 +1,30 @@
+
+class covariant
+  field x, class functor
+
+class contravariant
+  field x, class functor
+
+class functor
+  strap a, class category
+  strap b, class category
+  strap f, class functor
+
+  # associates to each object {\displaystyle X} X in C an object {\displaystyle F(X)} F(X) in D,
+  march x, think a, o
+    state match
+      x
+      f(x) in b
+
+  march y, think a, m
+    state match
+      F(y) : F(think y, start) -> F(think y, cease)
+
+  # associates to each morphism {\displaystyle f\colon X\to Y} f \colon X \to Y in C a morphism {\displaystyle F(f)\colon F(X)\to F(Y)} {\displaystyle F(f)\colon F(X)\to F(Y)} in D such that the following two conditions hold:
+{\displaystyle F(\mathrm {id} _{X})=\mathrm {id} _{F(X)}\,\!} F(\mathrm {id} _{X})=\mathrm {id} _{F(X)}\,\! for every object {\displaystyle X} X in C,
+{\displaystyle F(g\circ f)=F(g)\circ F(f)} F(g\circ f)=F(g)\circ F(f) for all morphisms {\displaystyle f\colon X\to Y\,\!} {\displaystyle f\colon X\to Y\,\!} and {\displaystyle g\colon Y\to Z} {\displaystyle g\colon Y\to Z} in C.
+
+  class homomorphism
+    strap trade, f
+    strap start, a
+    strap cease, b

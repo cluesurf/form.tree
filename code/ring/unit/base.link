@@ -1,0 +1,37 @@
+
+fetch @mount/math/field/ring
+  catch field ring
+fetch @mount/math/field/set
+  catch field set
+  fetch /identity
+    catch field identity
+fetch @mount/math/check/commutativity
+  catch check commutativity
+
+field unit
+  start ring, field ring
+  front set, field set
+
+  build set, store set
+
+  shift identity
+    mount set, share ring/set
+    mount operation, share ring/product
+    store multiplicative-identity-element
+
+  drive u, share ring/set
+    fetch v, share ring/set
+      check commutativity
+        mount operation, share ring/product
+        mount a, share u
+        mount b, share v
+      shift share ring/product
+        mount a, share u
+        mount b, share v
+        store x
+      check equality
+        mount a, share x
+        mount b, share multiplicative-identity-element
+      shift store-set
+        mount set, share set
+        mount element, share u

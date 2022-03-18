@@ -1,0 +1,27 @@
+
+shift turing-machine-transition
+  start state
+  start tape-symbol
+  front share state
+  front share tape-symbol
+  front l-r
+
+field turing-machine
+  front state-set, field set state
+  front input-symbol-set
+    field set symbol
+      except blank
+  front tape-symbol-set
+    field set symbol
+      include blank
+  front transition
+    shift turing-machine-transition
+      mount state, share state-set
+      mount tape-symbol, share tape-symbol-set
+  front start-state, container share input-symbol-set
+  front accept-state, container share input-symbol-set
+  front reject-state, container share input-symbol-set
+
+  check inequality
+    mount a, share accept-state
+    mount b, share reject-state

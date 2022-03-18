@@ -1,0 +1,11 @@
+
+field automorphism
+  front g, field group
+  front h, field group
+
+  check endomorphism
+    mount g, share g
+    mount h, share h
+  check isomorphism
+    mount g, share g
+    mount h, share h
