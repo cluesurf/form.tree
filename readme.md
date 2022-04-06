@@ -7,6 +7,10 @@
 <br/>
 <br/>
 
+<p align='center'>
+  <img src='https://github.com/drumworkteam/rock/blob/make/view/view.svg?raw=true' height='256'>
+</p>
+
 <h3 align='center'>rock</h3>
 <p align='center'>
   Link Text Math Structures and Definitions
