@@ -22,6 +22,8 @@
 
 ### Welcome
 
+This is the start to collecting mathematical structures from around the web and modeling them in Link Text.
+
 ### License
 
 Copyright 2021-2022 <a href='https://drum.work'>DrumWork</a>
