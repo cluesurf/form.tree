@@ -25,7 +25,7 @@ This is the start to collecting mathematical structures from around the web and 
 
 ### License
 
-Copyright 2021-2022 <a href='https://tree.surf'>TreeSurf</a>
+Copyright 2021-2023 <a href='https://tree.surf'>TreeSurf</a>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
