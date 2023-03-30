@@ -12,7 +12,7 @@
 
 <h3 align='center'>seed.link</h3>
 <p align='center'>
-  Link Text Math Structures and Definitions
+  Base Link Math Structures and Definitions
 </p>
 
 <br/>
