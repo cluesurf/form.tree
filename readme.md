@@ -12,7 +12,7 @@
 
 <h3 align='center'>seed.link</h3>
 <p align='center'>
-  The Base Link Math Library
+  The BaseLink Math Library
 </p>
 
 <br/>
