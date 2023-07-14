@@ -21,7 +21,7 @@
 
 ## Welcome
 
-This is the start to collecting mathematical structures from around the web and modeling them in Link Text.
+This is the start to collecting mathematical structures from around the web and modeling them in LinkText.
 
 ## License
 
