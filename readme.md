@@ -7,7 +7,7 @@
 <br/>
 
 <p align='center'>
-  <img src='https://github.com/textsurf/seed.link/blob/make/view/seed.svg?raw=true' height='256'>
+  <img src='https://github.com/termsurf/seed.link/blob/make/view/seed.svg?raw=true' height='256'>
 </p>
 
 <h3 align='center'>seed.link</h3>
@@ -25,7 +25,7 @@ This is the start to collecting mathematical structures from around the web and 
 
 ## License
 
-Copyright 2021-2023 <a href='https://text.surf'>TextSurf</a>
+Copyright 2021-2023 <a href='https://term.surf'>TermSurf</a>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,6 +39,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-## TextSurf
+## TermSurf
 
-This is being developed by the folks at [TextSurf](https://text.surf), a California-based project for helping humanity master information and computation. Find us on [Twitter](https://twitter.com/textsurfcode), [LinkedIn](https://www.linkedin.com/company/textsurf), and [Facebook](https://www.facebook.com/textsurfcodecode). Check out our other [GitHub projects](https://github.com/textsurf) as well!
+This is being developed by the folks at [TermSurf](https://term.surf), a California-based project for helping humanity master information and computation. Find us on [Twitter](https://twitter.com/termsurfcode), [LinkedIn](https://www.linkedin.com/company/termsurf), and [Facebook](https://www.facebook.com/termsurfcodecode). Check out our other [GitHub projects](https://github.com/termsurf) as well!
