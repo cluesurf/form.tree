@@ -12,7 +12,7 @@
 
 <h3 align='center'>seed.note</h3>
 <p align='center'>
-  The BaseLink Math Library
+  The BaseNote Math Library
 </p>
 
 <br/>
