@@ -7,10 +7,10 @@
 <br/>
 
 <p align='center'>
-  <img src='https://github.com/termsurf/seed.link/blob/make/view/seed.svg?raw=true' height='256'>
+  <img src='https://github.com/termsurf/seed.note/blob/make/view/seed.svg?raw=true' height='256'>
 </p>
 
-<h3 align='center'>seed.link</h3>
+<h3 align='center'>seed.note</h3>
 <p align='center'>
   The BaseLink Math Library
 </p>
