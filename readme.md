@@ -7,10 +7,10 @@
 <br/>
 
 <p align='center'>
-  <img src='https://github.com/termsurf/seed.note/blob/make/view/seed.svg?raw=true' height='256'>
+  <img src='https://github.com/termsurf/rock.note/blob/make/view/view.gif?raw=true' height='256'>
 </p>
 
-<h3 align='center'>seed.note</h3>
+<h3 align='center'>rock.note</h3>
 <p align='center'>
   The BaseNote Math Library
 </p>
@@ -21,7 +21,7 @@
 
 ## Welcome
 
-This is the start to collecting mathematical structures from around the web and modeling them in NoteText.
+This is the start to collecting mathematical structures from around the web and modeling them in BaseNote.
 
 ## License
 
