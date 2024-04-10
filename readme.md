@@ -7,12 +7,12 @@
 <br/>
 
 <p align='center'>
-  <img src='https://github.com/termsurf/rock.star/blob/make/view/view.gif?raw=true' height='256'>
+  <img src='https://github.com/termsurf/rock.tree/blob/make/view/view.gif?raw=true' height='256'>
 </p>
 
-<h3 align='center'>rock.star</h3>
+<h3 align='center'>rock.tree</h3>
 <p align='center'>
-  The Star Math Library
+  The BaseTree Math Library
 </p>
 
 <br/>
