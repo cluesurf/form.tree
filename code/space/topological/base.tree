@@ -1,2 +1,36 @@
 
-claim Compact-open topology
+structure topological-space
+  head type
+
+  link set, like set, have type
+  link topology, like set, have type
+
+  # Topology properties
+  assert contains-empty-and-full
+    head type, have type
+    have set
+    have topology
+
+  assert closed-under-unions
+    head type, have type
+    have set
+    have topology
+
+  assert closed-under-intersections
+    head type, have type
+    have set
+    have topology
+
+property contains-empty-and-full
+  head type
+
+  take set, like set, have type
+  take topology, like set, have type
+
+  assert in
+    item empty-set
+    item topology
+
+  assert in
+    item set
+    item topology

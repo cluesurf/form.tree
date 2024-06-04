@@ -1,0 +1,67 @@
+
+structure normed-vector-space
+  head type
+
+  link vector-space, like vector-space, have type
+  link norm, like unary-function, have type
+
+  # Norm properties
+  assert set-non-negativity
+    head type, have type
+    have vector-space/set
+    have norm
+
+  assert definiteness
+    head type, have type
+    have vector-space
+    have norm
+
+  assert scalability
+    head type, have type
+    have vector-space
+    have norm
+
+  assert triangle-inequality
+    head type, have type
+    have vector-space
+    have norm
+
+property set-non-negativity
+  head type
+
+  take set, like set, have type
+  take norm, like unary-function, have type
+
+  all a, in set
+    assert non-negativity
+      have a
+      have norm
+
+property non-negativity
+  head type
+
+  take a, like type
+  take norm, like unary-function, have type
+
+  assert greater-or-equal
+    do norm
+      item a
+    item 0
+
+property triangle-inequality
+  head type
+
+  take vector-space, like vector-space, have type
+  take norm, like unary-function, have type
+
+  all u, v, in vector-space/set
+    assert less-or-equal
+      do norm
+        do vector-space/operation
+          item u
+          item v
+      do vector-space/operation
+        do norm
+          item u
+        do norm
+          item v

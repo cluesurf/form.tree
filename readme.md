@@ -23,6 +23,18 @@
 
 This is the start to collecting mathematical structures from around the web and modeling them in BaseTree.
 
+```
+# General linear GL(n)
+# Special linear SL(n)
+# Orthogonal O(n)
+# Euclidean E(n)
+# Special orthogonal SO(n)
+# Unitary U(n)
+# Special unitary SU(n)
+# Symplectic Sp(n)
+# https://en.wikipedia.org/wiki/List_of_finite_simple_groups
+```
+
 ## License
 
 Copyright 2021-2024 <a href='https://term.surf'>TermSurf</a>

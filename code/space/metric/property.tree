@@ -1,0 +1,46 @@
+
+property non-negativity
+  head type
+
+  take set, like set, have type
+  take metric, like binary-function, have type
+
+  all x, y, in set
+    assert greater-or-equal
+      do metric
+        item x
+        item y
+      item 0
+
+property symmetry
+  head type
+
+  take set, like set, have type
+  take metric, like binary-function, have type
+
+  all x, y, in set
+    assert equal
+      do metric
+        item x
+        item y
+      do metric
+        item y
+        item x
+
+property triangle-inequality
+  head type
+
+  take set, like set, have type
+  take metric, like binary-function, have type
+
+  all x, y, z, in set
+    assert element-triangle-inequality
+      do metric
+        item x
+        item z
+      do metric
+        item x
+        item y
+      do metric
+        item y
+        item z

@@ -1,0 +1,41 @@
+structure special-unitary-group
+  link n, like integer
+
+  base group
+    bind type
+      like matrix
+        have n
+        have n
+
+  # Special unitary properties
+  assert unitarity
+    head type, have type
+    have set
+
+  assert determinant-one
+    head type, have type
+    have set
+
+property unitarity
+  head type
+
+  take set, like set, have type
+
+  all u, in set
+    assert equal
+      do matrix-multiplication
+        item u
+        do matrix-conjugate-transpose
+          item u
+      item identity-matrix
+
+property determinant-one
+  head type
+
+  take set, like set, have type
+
+  all u, in set
+    assert equal
+      do determinant
+        item u
+      item 1

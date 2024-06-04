@@ -1,0 +1,27 @@
+
+structure metric-space
+  head type
+
+  link set, like set, have type
+  link metric, like binary-function, have type
+
+  # Metric properties
+  assert non-negativity
+    head type, have type
+    have set
+    have metric
+
+  assert identity-of-indiscernibles
+    head type, have type
+    have set
+    have metric
+
+  assert symmetry
+    head type, have type
+    have set
+    have metric
+
+  assert triangle-inequality
+    head type, have type
+    have set
+    have metric
