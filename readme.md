@@ -6,13 +6,9 @@
 <br/>
 <br/>
 
+<h3 align='center'>form.tree</h3>
 <p align='center'>
-  <img src='https://github.com/termsurf/rock.tree/blob/make/view/rock.gif?raw=true' height='256'>
-</p>
-
-<h3 align='center'>rock.tree</h3>
-<p align='center'>
-  The BaseTree Math Definition Library
+  The NoteTree Math Definition Library
 </p>
 
 <br/>
@@ -21,19 +17,7 @@
 
 ## Welcome
 
-This is the start to collecting mathematical structures from around the web and modeling them in BaseTree.
-
-```
-# General linear GL(n)
-# Special linear SL(n)
-# Orthogonal O(n)
-# Euclidean E(n)
-# Special orthogonal SO(n)
-# Unitary U(n)
-# Special unitary SU(n)
-# Symplectic Sp(n)
-# https://en.wikipedia.org/wiki/List_of_finite_simple_groups
-```
+This is the start to collecting mathematical structures from around the web and modeling them in NoteTree.
 
 ## License
 

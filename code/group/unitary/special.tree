@@ -1,5 +1,6 @@
+
 structure special-unitary-group
-  link n, like integer
+  head n, like integer
 
   base group
     bind type
