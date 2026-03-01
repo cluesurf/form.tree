@@ -8,7 +8,7 @@
 
 <h3 align='center'>form.tree</h3>
 <p align='center'>
-  The TextTree Math Definition Library
+  The TreeCode Math Definition Library
 </p>
 
 <br/>
@@ -17,7 +17,7 @@
 
 ## Welcome
 
-This is the start to collecting mathematical structures from around the web and modeling them in TextTree.
+This is the start to collecting mathematical structures from around the web and modeling them in TreeCode.
 
 ## License
 
