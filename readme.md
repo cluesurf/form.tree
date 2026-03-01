@@ -8,7 +8,7 @@
 
 <h3 align='center'>form.tree</h3>
 <p align='center'>
-  The TreeCode Math Definition Library
+  The TermTree Math Definition Library
 </p>
 
 <br/>
