@@ -1,4 +1,3 @@
-note <A set, the carrier an algebraic structure is built on. The bare collection of elements, before any operation or axiom is added.>
-
+# A set, the carrier an algebraic structure is built on. The bare collection of elements, before any operation or axiom is added.
 form set
   case opaque

@@ -4,8 +4,7 @@ load @/code/algebra/lie/d4
 load @/code/group/binary-tetrahedral
   find binary-tetrahedral
 
-note <The 24-cell, the unique self-dual regular polytope in four dimensions, with twenty-four vertices and twenty-four cells. Four independent constructions arrive at the same twenty-four points, which is how you know the figure is forced and not chosen. It is the self-dual shell of the ternary alphabet in four slots, the words with exactly two nonzero letters. It is the root system of the rotation algebra of eight-dimensional space. It is the unit Hurwitz quaternions, the binary tetrahedral group. And it is the kissing configuration of the densest four-dimensional lattice. These are the twenty-four directions a tone may step, the sites of every dock, pairing into the twelve lines the law acts on.>
-
+# The 24-cell, the unique self-dual regular polytope in four dimensions, with twenty-four vertices and twenty-four cells. Four independent constructions arrive at the same twenty-four points, which is how you know the figure is forced and not chosen. It is the self-dual shell of the ternary alphabet in four slots, the words with exactly two nonzero letters. It is the root system of the rotation algebra of eight-dimensional space. It is the unit Hurwitz quaternions, the binary tetrahedral group. And it is the kissing configuration of the densest four-dimensional lattice. These are the twenty-four directions a tone may step, the sites of every dock, pairing into the twelve lines the law acts on.
 form cell-24
   link roots, like d4
   link group, like binary-tetrahedral

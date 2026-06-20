@@ -1,7 +1,6 @@
 load @/code/vibe/tone
   find tone
 
-note <The site, one of the twenty-four directions out of a dock, the third base element. Each site points out through one face to the neighbor on the other side, and one tone lives at each site. The twenty-four sites pair into twelve lines, and the line, not the single site, is what the law acts on.>
-
+# The site, one of the twenty-four directions out of a dock, the third base element. Each site points out through one face to the neighbor on the other side, and one tone lives at each site. The twenty-four sites pair into twelve lines, and the line, not the single site, is what the law acts on.
 form site
   link tone, like tone

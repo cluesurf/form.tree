@@ -1,7 +1,6 @@
 load @/code/vibe/mesh
   find mesh
 
-note <The wake, the law of space, the seventh base element. While the knit moves tones on existing docks, the wake makes new docks at the open edge, born quiet at the middle value, pushing the boundary outward beat by beat. The mesh only ever grows, never shrinks, and that one-way growth is where the arrow of time lives.>
-
+# The wake, the law of space, the seventh base element. While the knit moves tones on existing docks, the wake makes new docks at the open edge, born quiet at the middle value, pushing the boundary outward beat by beat. The mesh only ever grows, never shrinks, and that one-way growth is where the arrow of time lives.
 form wake
   link mesh, like mesh

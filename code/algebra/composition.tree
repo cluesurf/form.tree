@@ -10,8 +10,7 @@ load @/code/structure/function/binary
 load @/code/structure/function/unary
   find unary-function
 
-note <A composition algebra: an algebra over a field carrying a norm that multiplies through the product, so the norm of a product is the product of the norms. The norm is the length that never lies, and demanding it multiply is demanding that combining lose nothing, the reversibility condition. By Hurwitz there are only four, the reals, complex numbers, quaternions, and octonions.>
-
+# A composition algebra: an algebra over a field carrying a norm that multiplies through the product, so the norm of a product is the product of the norms. The norm is the length that never lies, and demanding it multiply is demanding that combining lose nothing, the reversibility condition. By Hurwitz there are only four, the reals, complex numbers, quaternions, and octonions.
 form composition-algebra
   link field, like field
   link set, like set

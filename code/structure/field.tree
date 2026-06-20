@@ -4,8 +4,7 @@ load @/code/structure/set
 load @/code/structure/function/binary
   find binary-function
 
-note <A field, a set with addition and multiplication, both invertible, where multiplication distributes over addition. The reals, the complex numbers, and the rationals are fields. It is the scalars an algebra is built over.>
-
+# A field, a set with addition and multiplication, both invertible, where multiplication distributes over addition. The reals, the complex numbers, and the rationals are fields. It is the scalars an algebra is built over.
 form field
   link set, like set
   link add, like binary-function

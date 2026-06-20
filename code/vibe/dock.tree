@@ -1,7 +1,6 @@
 load @/code/vibe/site
   find site
 
-note <The dock, one cell of the mesh, a single here and now, the fourth base element. Its shape is the 24-cell, twenty-four sites and twenty-four faces, equal to its own dual. It meets twenty-four neighbors, one across each face. The dock is the tile the whole mesh is built from, and its outward sites are why it cannot stand alone.>
-
+# The dock, one cell of the mesh, a single here and now, the fourth base element. Its shape is the 24-cell, twenty-four sites and twenty-four faces, equal to its own dual. It meets twenty-four neighbors, one across each face. The dock is the tile the whole mesh is built from, and its outward sites are why it cannot stand alone.
 form dock
   link sites, like list, like site

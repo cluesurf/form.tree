@@ -1,7 +1,6 @@
 load @/code/vibe/tone
   find tone
 
-note <The lean, the order on the tone, the second base element. It puts the low value below the middle below the high. The order turns a tone into a signed charge and gives growth its direction, outward from the middle. It is the same one-way order the integers carry, the source of the arrow of time.>
-
+# The lean, the order on the tone, the second base element. It puts the low value below the middle below the high. The order turns a tone into a signed charge and gives growth its direction, outward from the middle. It is the same one-way order the integers carry, the source of the arrow of time.
 form lean
   link tone, like tone

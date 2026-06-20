@@ -7,8 +7,7 @@ load @/code/structure/function/binary
 load @/code/structure/function/unary
   find unary-function
 
-note <The Cayley-Dickson construction doubles a star-algebra. Given an algebra with a conjugation, the double is the set of ordered pairs of its elements, with a product that mixes the two parts through the conjugation and a conjugation that flips the sign of the second part. The double has twice the dimension of the input. It keeps the norm exactly when the input is associative, the Hurwitz condition, so the norm survives through the octonions and dies at the sedenions. That is why the reversible ceiling is eight.>
-
+# The Cayley-Dickson construction doubles a star-algebra. Given an algebra with a conjugation, the double is the set of ordered pairs of its elements, with a product that mixes the two parts through the conjugation and a conjugation that flips the sign of the second part. The double has twice the dimension of the input. It keeps the norm exactly when the input is associative, the Hurwitz condition, so the norm survives through the octonions and dies at the sedenions. That is why the reversible ceiling is eight.
 form cayley-dickson-double
   link base, like set
   link multiply, like binary-function

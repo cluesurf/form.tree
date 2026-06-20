@@ -4,8 +4,7 @@ load @/code/algebra/cayley-dickson
 load @/code/algebra/normed-division
   find normed-division-algebra
 
-note <The quaternions, the Cayley-Dickson double of the complex numbers, dimension four. A normed division algebra, still associative, but losing commutativity: the product of two quaternions depends on the order. This is the second loss of the tower. The unit quaternions of integer coordinates are the twenty-four points of the 24-cell, the binary tetrahedral group, which is why the directions of the substrate compose exactly and associatively.>
-
+# The quaternions, the Cayley-Dickson double of the complex numbers, dimension four. A normed division algebra, still associative, but losing commutativity: the product of two quaternions depends on the order. This is the second loss of the tower. The unit quaternions of integer coordinates are the twenty-four points of the 24-cell, the binary tetrahedral group, which is why the directions of the substrate compose exactly and associatively.
 form quaternion
   link source, like cayley-dickson-double
   link algebra, like normed-division-algebra

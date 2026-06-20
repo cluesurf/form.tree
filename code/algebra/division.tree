@@ -10,8 +10,7 @@ load @/code/structure/function/binary
 load @/code/structure/function/unary
   find unary-function
 
-note <A division algebra: an algebra in which every nonzero element is invertible, equivalently in which no two nonzero elements multiply to zero. No zero divisors means the product never collapses information, so it can be run backward and recovered. This is the same reversibility the composition norm expresses, seen from the side of inverses.>
-
+# A division algebra: an algebra in which every nonzero element is invertible, equivalently in which no two nonzero elements multiply to zero. No zero divisors means the product never collapses information, so it can be run backward and recovered. This is the same reversibility the composition norm expresses, seen from the side of inverses.
 form division-algebra
   link field, like field
   link set, like set

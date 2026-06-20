@@ -1,7 +1,6 @@
 load @/code/quaternion
   find quaternion
 
-note <The binary tetrahedral group, the twenty-four unit Hurwitz quaternions, the double cover of the rotational symmetry of the tetrahedron. It is one of the four faces of the 24-cell: read as quaternions the cell's twenty-four vertices form exactly this group. It splits into three cosets of eight, and multiplication by a fixed cube root of unity cycles the three octets, which is triality made concrete in the lattice. Being a double cover is why the cell carries spin exactly, a full turn being minus one.>
-
+# The binary tetrahedral group, the twenty-four unit Hurwitz quaternions, the double cover of the rotational symmetry of the tetrahedron. It is one of the four faces of the 24-cell: read as quaternions the cell's twenty-four vertices form exactly this group. It splits into three cosets of eight, and multiplication by a fixed cube root of unity cycles the three octets, which is triality made concrete in the lattice. Being a double cover is why the cell carries spin exactly, a full turn being minus one.
 form binary-tetrahedral
   link quaternion, like quaternion

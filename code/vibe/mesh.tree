@@ -1,7 +1,6 @@
 load @/code/vibe/dock
   find dock
 
-note <The mesh, the whole of space, the fifth base element. One growing hyperbolic honeycomb of identical docks joined face to face, whose cells are 24-cells. It is discrete, hyperbolic so that room opens up faster than flat space, and it grows at its open edge. Its flat boundary is the three-dimensional space we live in.>
-
+# The mesh, the whole of space, the fifth base element. One growing hyperbolic honeycomb of identical docks joined face to face, whose cells are 24-cells. It is discrete, hyperbolic so that room opens up faster than flat space, and it grows at its open edge. Its flat boundary is the three-dimensional space we live in.
 form mesh
   link docks, like list, like dock

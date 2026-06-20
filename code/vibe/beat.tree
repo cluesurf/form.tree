@@ -1,4 +1,3 @@
-note <The beat, the eighth base element, one discrete tick of time. The knit and the wake each act once a beat. Time is the count of beats, and its one-way order, set by the lean and the wake, is the arrow.>
-
+# The beat, the eighth base element, one discrete tick of time. The knit and the wake each act once a beat. Time is the count of beats, and its one-way order, set by the lean and the wake, is the arrow.
 form beat
   case tick
