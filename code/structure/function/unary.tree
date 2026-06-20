@@ -1,7 +1,8 @@
-# A unary function takes one element of a set and returns one.
-# It is the shape of conjugation, negation, and the norm.
-structure unary-function
-  head type
-  link domain, like set, have type
-  link codomain, like set, have type
-  link map, like type
+load @/code/structure/set
+  find set
+
+note <A unary function takes one element of a set and returns one. It is the shape of conjugation, negation, and the norm.>
+
+form unary-function
+  link domain, like set
+  link codomain, like set

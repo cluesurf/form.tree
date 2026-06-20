@@ -1,15 +1,4 @@
-load @/code/number/natural
-  find natural
+note <The beat, the eighth base element, one discrete tick of time. The knit and the wake each act once a beat. Time is the count of beats, and its one-way order, set by the lean and the wake, is the arrow.>
 
-# The beat, the eighth base element, one discrete tick of time. The knit and
-# the wake both act once a beat. Time is counted in beats, the same discrete
-# count the naturals carry, and its one-way order, set by the lean and the
-# wake, is the arrow.
-structure beat
-  head type
-  # Beats are counted by the naturals, one discrete tick at a time.
-  link count, like natural, have type
-  # Each beat, the knit acts once and the wake acts once.
-  assert one-tick
-    head type, have type
-    have count
+form beat
+  case tick

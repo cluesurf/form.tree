@@ -1,40 +1,11 @@
-load @/code/quaternion
-  find quaternion
-
 load @/code/algebra/cayley-dickson
   find cayley-dickson-double
 
 load @/code/algebra/normed-division
   find normed-division-algebra
 
-load @/code/property/set
-  find set-associativity
+note <The octonions are the Cayley-Dickson double of the quaternions, the eight-dimensional normed division algebra. They are the last rung of the tower. The input quaternions are associative, so the double keeps the norm, but the octonions are themselves the first non-associative algebra, so doubling once more, to the sedenions, loses the norm. So the octonions are the maximal reversible algebra, the upper jaw of the pinch-point.>
 
-# The octonions are the Cayley-Dickson double of the quaternions, the
-# eight-dimensional normed division algebra. They are the last rung of the
-# tower: the input H is associative, so the double keeps the norm, but the
-# octonions are themselves the first non-associative algebra, so doubling once
-# more (to the sedenions) loses the norm. So the octonions are the maximal
-# reversible algebra, the upper jaw of the pinch-point.
-structure octonion
-  head type
-  # Built as the double of the quaternions.
-  link source, like cayley-dickson-double, have type
-  link base, like quaternion, have type
-  # The octonions are a normed division algebra, dimension eight.
-  link algebra, like normed-division-algebra, have type
-  assert dimension-eight
-    head type, have type
-    have algebra
-  # The first non-associative rung. This is the floor side of the story too:
-  # the non-associativity is triality, which lives only in eight-dimensional
-  # rotation, so eight is also forced from below.
-  assert not-set-associativity
-    head type, have type
-    have algebra
-  # Doubling once more loses the norm. The sedenions have zero divisors, so
-  # the octonions are the last reversible rung before the cliff.
-  assert last-composition-rung
-    head type, have type
-    have source
-    have base
+form octonion
+  link source, like cayley-dickson-double
+  link algebra, like normed-division-algebra

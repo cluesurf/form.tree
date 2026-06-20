@@ -1,7 +1,8 @@
-# A binary function takes two elements of a set and returns one.
-# It is the shape of every algebraic operation, addition, multiplication, the knit.
-structure binary-function
-  head type
-  link domain, like set, have type
-  link codomain, like set, have type
-  link map, like type
+load @/code/structure/set
+  find set
+
+note <A binary function takes two elements of a set and returns one. It is the shape of every algebraic operation, addition, multiplication, the knit.>
+
+form binary-function
+  link domain, like set
+  link codomain, like set

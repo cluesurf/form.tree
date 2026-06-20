@@ -4,34 +4,8 @@ load @/code/algebra/lie/d4
 load @/code/group/binary-tetrahedral
   find binary-tetrahedral
 
-# The 24-cell, the unique self-dual regular polytope in four dimensions, with
-# twenty-four vertices and twenty-four cells. Four independent constructions
-# arrive at the same twenty-four points, which is how you know the figure is
-# forced and not chosen. It is the self-dual shell of the ternary alphabet in
-# four slots, the words with exactly two nonzero letters. It is the root system
-# of the rotation algebra of eight-dimensional space. It is the unit Hurwitz
-# quaternions, the binary tetrahedral group. And it is the kissing
-# configuration of the densest four-dimensional lattice. These are the
-# twenty-four directions a tone may step on the substrate, the twenty-four
-# neighbors of every cell, pairing into the twelve lines the law acts on.
-structure cell-24
-  head type
-  link vertices, like set, have type
-  # Self-dual: the vertices match the faces one for one, twenty-four each. This
-  # is the property that forces it, since a direction must exit through a face.
-  assert self-dual
-    head type, have type
-    have vertices
-  # The vertices are the roots of the rotation algebra of eight-space.
-  assert is-d4-roots
-    head type, have type
-    have vertices
-  # The vertices are the binary tetrahedral group of unit Hurwitz quaternions.
-  assert is-binary-tetrahedral
-    head type, have type
-    have vertices
-  # The vertices are the squared-length-two shell of the ternary alphabet in
-  # four slots, the geometry written as the tone four times over.
-  assert is-ternary-shell
-    head type, have type
-    have vertices
+note <The 24-cell, the unique self-dual regular polytope in four dimensions, with twenty-four vertices and twenty-four cells. Four independent constructions arrive at the same twenty-four points, which is how you know the figure is forced and not chosen. It is the self-dual shell of the ternary alphabet in four slots, the words with exactly two nonzero letters. It is the root system of the rotation algebra of eight-dimensional space. It is the unit Hurwitz quaternions, the binary tetrahedral group. And it is the kissing configuration of the densest four-dimensional lattice. These are the twenty-four directions a tone may step, the sites of every dock, pairing into the twelve lines the law acts on.>
+
+form cell-24
+  link roots, like d4
+  link group, like binary-tetrahedral

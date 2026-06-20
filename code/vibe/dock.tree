@@ -1,30 +1,7 @@
 load @/code/vibe/site
   find site
 
-load @/code/polytope/cell-24
-  find cell-24
+note <The dock, one cell of the mesh, a single here and now, the fourth base element. Its shape is the 24-cell, twenty-four sites and twenty-four faces, equal to its own dual. It meets twenty-four neighbors, one across each face. The dock is the tile the whole mesh is built from, and its outward sites are why it cannot stand alone.>
 
-# The dock, one cell of the mesh, a single here and now, the fourth base
-# element. Its shape is the 24-cell, with twenty-four sites and twenty-four
-# faces, equal to its own dual. Each dock meets twenty-four neighbors, one
-# across each face. The dock is the unit of place, the symmetric closure of a
-# single direction under the forced symmetry, and it is the tile the whole mesh
-# is built from.
-structure dock
-  head type
-  link cell, like cell-24, have type
-  link sites, like set, have type
-  # A dock has twenty-four sites, the directions of the 24-cell.
-  assert twenty-four-sites
-    head type, have type
-    have cell
-    have sites
-  # The sites pair into twelve lines, each a direction and its opposite.
-  assert twelve-lines
-    head type, have type
-    have sites
-  # A dock meets twenty-four neighbors, one across each face. Its outward sites
-  # require neighbors, so a dock cannot stand alone.
-  assert twenty-four-neighbors
-    head type, have type
-    have cell
+form dock
+  link sites, like list, like site

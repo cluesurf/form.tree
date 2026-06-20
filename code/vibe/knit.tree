@@ -1,29 +1,7 @@
 load @/code/vibe/dock
   find dock
 
-load @/code/property/set
-  find set-symmetry
+note <The knit, the law of motion, the sixth base element. Each beat it has two steps. Collide, the two tones meeting head on in each line rearrange by a fixed permutation. Then stream, each site hands its tone one dock onward to the matching site of its neighbor. The knit is the unique local reversible rule symmetric under the full symmetry of the cell, forced not chosen.>
 
-# The knit, the law of motion, the sixth base element. Each beat it has two
-# steps. First collide: inside each line the two tones meeting head on
-# rearrange by a fixed permutation. Then stream: each site hands its tone one
-# dock onward to the matching site of its neighbor. The knit is unique. Demand
-# that the law be local, reversible, and symmetric under the full symmetry of
-# the cell, and out of the ten thousand three hundred ninety-five ways to pair
-# the directions exactly one survives. So the law is forced, not chosen.
-structure knit
-  head type
-  link dock, like dock, have type
-  # Collide then stream, once a beat.
-  assert collide-then-stream
-    head type, have type
-    have dock
-  # Reversible: from the result of a beat the state before it can be recovered,
-  # so no information is lost.
-  assert reversible
-    head type, have type
-    have dock
-  # Symmetric under the full symmetry of the cell, which singles out one rule.
-  assert cell-symmetric
-    head type, have type
-    have dock
+form knit
+  link dock, like dock

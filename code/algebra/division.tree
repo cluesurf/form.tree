@@ -1,55 +1,19 @@
 load @/code/structure/field
   find field
 
+load @/code/structure/set
+  find set
+
 load @/code/structure/function/binary
   find binary-function
 
 load @/code/structure/function/unary
   find unary-function
 
-load @/code/property/set
-  find set-closure
-  find set-distributivity
-  find set-inverse-element
+note <A division algebra: an algebra in which every nonzero element is invertible, equivalently in which no two nonzero elements multiply to zero. No zero divisors means the product never collapses information, so it can be run backward and recovered. This is the same reversibility the composition norm expresses, seen from the side of inverses.>
 
-load @/code/property/algebra
-  find set-no-zero-divisor
-
-# A division algebra is an algebra in which every nonzero element is
-# invertible, equivalently in which no two nonzero elements multiply to zero.
-# No zero divisors means the product never collapses information, so it can be
-# run backward and recovered. This is the same reversibility the composition
-# norm expresses, seen from the side of inverses.
-structure division-algebra
-  head type
-  link field, like field, have type
-  link set, like set, have type
-  link addition, like binary-function, have type
-  link multiplication, like binary-function, have type
-  link zero, like type
-  link multiplicative-identity, like type
-  link multiplicative-inverse, like unary-function, have type
-  # Closure under the product.
-  assume set-closure
-    head type, have type
-    have set
-    have multiplication
-  # The product distributes over addition.
-  assume set-distributivity
-    head type, have type
-    have set
-    have addition
-    have multiplication
-  # No two nonzero elements multiply to zero.
-  assert set-no-zero-divisor
-    head type, have type
-    have set
-    have multiplication
-    have zero
-  # Every nonzero element has a multiplicative inverse.
-  assert set-inverse-element
-    head type, have type
-    have set
-    have multiplication
-    have multiplicative-identity
-    have multiplicative-inverse
+form division-algebra
+  link field, like field
+  link set, like set
+  link multiply, like binary-function
+  link invert, like unary-function

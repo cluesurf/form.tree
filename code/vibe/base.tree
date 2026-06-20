@@ -22,40 +22,14 @@ load @/code/vibe/wake
 load @/code/vibe/beat
   find beat
 
-load @/code/octonion
-  find octonion
+note <The base of Vibe Theory: the eight elements that make up the whole model, and nothing else. Three give the where, the mesh and its docks and their sites. Two give the what, the tone and its lean. Two give the how, the knit that moves the state and the wake that grows the space. One gives the when, the beat. The keystone is the pinch-point. Reversibility caps the dimension at eight from above, the one-substance demand fixes it at eight from below, the octonions are forced, their rotation gives four-dimensional spacetime and the 24-cell, and the 24-cell is the dock. The base is forced from one premise.>
 
-# The base of Vibe Theory: the eight elements that make up the whole model, and
-# nothing else. Three give the where, the mesh and its docks and their sites.
-# Two give the what, the tone and its lean. Two give the how, the knit that
-# moves the state and the wake that grows the space. One gives the when, the
-# beat. Everything in the theory is a pattern made of these eight.
-# The keystone is the pinch-point. Two pressures fix the dimension at eight.
-# From above, reversibility caps it at eight, because the norm multiplies only
-# through the octonions and breaks at the sedenions. From below, the one
-# substance demand fixes it at eight, because the directions and the matter
-# that moves are the same stuff and so the same size, which happens only at
-# eight. The two meet, the octonions are forced, their rotation gives
-# four-dimensional spacetime and the 24-cell, and the 24-cell is the dock. So
-# the eight base elements are not chosen. They are forced from one premise.
-structure vibe
-  head type
-  # The where: a growing space, its cells, and their directions.
-  link mesh, like mesh, have type
-  link dock, like dock, have type
-  link site, like site, have type
-  # The what: a value and its order.
-  link tone, like tone, have type
-  link lean, like lean, have type
-  # The how: one law for the state, one for the space.
-  link knit, like knit, have type
-  link wake, like wake, have type
-  # The when: one discrete tick.
-  link beat, like beat, have type
-  # The keystone. Reversibility caps the dimension at eight from above, the one
-  # substance demand fixes it at eight from below, and the two meet at the
-  # octonions, which give the 24-cell that is the dock. The base is forced.
-  assert pinch-point
-    head type, have type
-    have octonion
-    have dock
+form vibe
+  link mesh, like mesh
+  link docks, like list, like dock
+  link sites, like list, like site
+  link tone, like tone
+  link lean, like lean
+  link knit, like knit
+  link wake, like wake
+  link beat, like beat

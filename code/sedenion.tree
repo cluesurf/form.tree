@@ -4,28 +4,8 @@ load @/code/octonion
 load @/code/algebra/cayley-dickson
   find cayley-dickson-double
 
-load @/code/property/algebra
-  find set-no-zero-divisor
+note <The sedenions, the Cayley-Dickson double of the octonions, dimension sixteen. They are the cliff. Because the octonions are not associative, doubling them loses the norm, so the sedenions are not a composition algebra and they have zero divisors, two nonzero sedenions whose product is zero. So reversibility fails here, which is why the reversible tower stops one rung below, at the octonions. This is the lower wall the pinch-point sits just above.>
 
-# The sedenions, the Cayley-Dickson double of the octonions, dimension sixteen.
-# They are the cliff. Because the octonions are not associative, doubling them
-# loses the norm, so the sedenions are not a composition algebra and they have
-# zero divisors: two nonzero sedenions whose product is zero. So reversibility
-# fails here. The sedenions exist as an algebra, but combining in them loses
-# information, which is why the reversible tower stops one rung below, at the
-# octonions. This is the lower wall the pinch-point sits just above.
-structure sedenion
-  head type
-  # Built as the double of the octonions.
-  link source, like cayley-dickson-double, have type
-  link base, like octonion, have type
-  assert dimension-sixteen
-    head type, have type
-    have source
-    have base
-  # Two nonzero elements can multiply to zero. The norm no longer multiplies,
-  # so the product is not reversible. This is the failure that caps the tower.
-  assert has-zero-divisor
-    head type, have type
-    have source
-    have base
+form sedenion
+  link source, like cayley-dickson-double
+  link base, like octonion
