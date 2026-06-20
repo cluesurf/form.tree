@@ -1,0 +1,21 @@
+load @/code/type/self
+  find self-type
+
+load @/code/type/equal
+  find equality
+
+# The booleans, the simplest inductive type, encoded by a self type whose body
+# is its own eliminator. This is the template every inductive type follows. A
+# self type carries its induction principle, there are two introductions, true
+# and false, and a dependent eliminator that uses a boolean by giving a result
+# for each value. The naturals and everything after follow the same shape.
+structure boolean
+  head type
+  # The two values.
+  link true, like type
+  link false, like type
+  # The dependent eliminator: to use a boolean, give a result for each value.
+  assert induction
+    head type, have type
+    have true
+    have false

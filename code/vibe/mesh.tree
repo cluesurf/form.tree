@@ -1,0 +1,24 @@
+load @/code/vibe/dock
+  find dock
+
+# The mesh, the whole of space, the fifth base element. It is one growing
+# honeycomb of identical docks joined face to face, the four-dimensional
+# hyperbolic honeycomb whose cells are 24-cells. It is discrete, a countable
+# weave of identical docks. It is hyperbolic, curved so that room opens up
+# faster than in flat space. And it grows at its open edge. Its flat boundary
+# is the ordinary three-dimensional space we live in.
+structure mesh
+  head type
+  link docks, like set, have type
+  # The mesh is a honeycomb of docks joined face to face.
+  assert honeycomb-of-docks
+    head type, have type
+    have docks
+  # It is hyperbolic, with room that opens up faster than flat space.
+  assert hyperbolic
+    head type, have type
+    have docks
+  # Its flat boundary is three-dimensional, the physical space we live in.
+  assert three-dimensional-boundary
+    head type, have type
+    have docks

@@ -1,0 +1,27 @@
+load @/code/type/self
+  find self-type
+
+load @/code/type/equal
+  find equality
+
+load @/code/structure/function/unary
+  find unary-function
+
+# The natural numbers, the first counting structure, encoded by a self type
+# carrying its induction principle, in the same shape as the booleans. The two
+# constructors are zero and successor, and the induction principle says that a
+# predicate holding at zero and across successor holds for every natural.
+# Counting the distinctions gives the naturals, and ordering them gives the
+# integers in the next step, the unique totally ordered rung, whose one-way
+# order is the arrow of time. This is the first object Vibe Theory rests on.
+structure natural
+  head type
+  # The two constructors.
+  link zero, like type
+  link successor, like unary-function, have type
+  # The induction principle: prove a predicate at zero and across successor,
+  # and it holds for every natural.
+  assert induction
+    head type, have type
+    have zero
+    have successor

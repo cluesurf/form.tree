@@ -1,0 +1,46 @@
+load @/code/structure/field
+  find field
+
+load @/code/structure/function/binary
+  find binary-function
+
+load @/code/structure/function/unary
+  find unary-function
+
+load @/code/property/set
+  find set-closure
+  find set-distributivity
+
+load @/code/property/algebra
+  find set-norm-multiplicativity
+
+# A composition algebra is an algebra over a field carrying a nondegenerate
+# quadratic norm that multiplies through the product. The norm is the length
+# that never lies. Demanding it multiply is demanding that combining lose
+# nothing, the reversibility condition. By Hurwitz the only composition
+# algebras over the reals are R, C, H, O, of dimensions one, two, four, eight.
+structure composition-algebra
+  head type
+  link field, like field, have type
+  link set, like set, have type
+  link addition, like binary-function, have type
+  link multiplication, like binary-function, have type
+  link conjugation, like unary-function, have type
+  link norm, like unary-function, have type
+  # Closure under the product.
+  assume set-closure
+    head type, have type
+    have set
+    have multiplication
+  # The product distributes over addition (it is an algebra).
+  assume set-distributivity
+    head type, have type
+    have set
+    have addition
+    have multiplication
+  # The defining law: the norm multiplies through the product.
+  assert set-norm-multiplicativity
+    head type, have type
+    have set
+    have multiplication
+    have norm

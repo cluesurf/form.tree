@@ -1,0 +1,31 @@
+load @/code/type/natural
+  find natural
+
+load @/code/structure/ring
+  find ring
+
+load @/code/property/set
+  find set-total-order
+
+# The integers, built from the naturals as signed counts, and the unique
+# totally ordered rung of the whole tower. In any ordered ring every square is
+# at least zero, because a positive times a positive and a negative times a
+# negative are both positive. The integers satisfy this and lie on a line. The
+# moment the tower builds outward a square root of minus one appears, its
+# square is below zero, and no order can place it, so every higher rung is
+# unorderable and stays so. An order runs one way, and that one-wayness, the
+# count having a before and an after that cannot be reversed, is the arrow of
+# time. This is the first object Vibe Theory rests on.
+structure integer
+  head type
+  # The integers form a commutative ring with unit.
+  link ring, like ring, have type
+  # They carry a total order compatible with the ring operations.
+  assert set-total-order
+    head type, have type
+    have ring
+  # Every square is non-negative. This single law is what no higher rung
+  # satisfies, so the integers are the unique orderable rung, the arrow.
+  assert square-non-negative
+    head type, have type
+    have ring

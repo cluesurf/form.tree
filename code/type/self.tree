@@ -1,0 +1,16 @@
+# The self type, the one primitive under all inductive types, and the bottom of
+# the shared foundation with the Seed kernel. A self type binds a value to its
+# own type, so its members are the terms that inhabit a family applied to
+# themselves. The self combinator names the fixed point of a family. The
+# universe, the type of types, is the self-type identity. Every later type, the
+# booleans, the naturals, the integers, the algebra tower, is a self type whose
+# body states its own induction principle. Nothing else is added as a primitive.
+structure self-type
+  head type
+  # The family whose fixed point this self type names.
+  link family, like type
+  # A value belongs to the self type when it inhabits the family applied to
+  # itself. This is the rule the kernel checks by normalization.
+  assert self-membership
+    head type, have type
+    have family

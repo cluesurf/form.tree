@@ -1,0 +1,26 @@
+load @/code/algebra/composition
+  find composition-algebra
+
+load @/code/algebra/division
+  find division-algebra
+
+# A normed division algebra is at once a composition algebra and a division
+# algebra: it carries a multiplicative norm AND every nonzero element is
+# invertible. The two conditions coincide here, both say the product loses
+# nothing. By Hurwitz's theorem there are exactly four, the reals, the complex
+# numbers, the quaternions, and the octonions, of dimensions one, two, four,
+# and eight, and nothing larger. The octonions are the last rung. This ceiling
+# at eight is the upper jaw of the Vibe Theory pinch-point.
+structure normed-division-algebra
+  head type
+  link composition, like composition-algebra, have type
+  link division, like division-algebra, have type
+  # The carrier, product, and norm are shared between the two readings.
+  assert same-set
+    head type, have type
+    have composition
+    have division
+  assert same-multiplication
+    head type, have type
+    have composition
+    have division

@@ -1,0 +1,32 @@
+load @/code/algebra/root-system
+  find root-system
+
+load @/code/octonion
+  find octonion
+
+# The rotation algebra of eight-dimensional space, the algebra called D four.
+# It is the home of triality, and it is forced from the octonions two ways at
+# once. From above, it is the rotation structure of the dimension where the
+# reversible tower tops out. From below, it is the unique rank where the vector
+# and the half-spinor have the same size, eight against two cubed, the one
+# substance demand. Its rank is four, which is the dimension of spacetime, one
+# ordered direction and three unordered. Its root system is the 24-cell.
+structure d4
+  head type
+  link algebra, like type
+  link roots, like root-system, have type
+  # The rank is four. This is where four-dimensional spacetime comes from, as
+  # the count of independent planes of rotation in eight-dimensional space.
+  assert rank-four
+    head type, have type
+    have algebra
+  # The root system has twenty-four roots, the vertices of the 24-cell.
+  assert twenty-four-roots
+    head type, have type
+    have roots
+  # Triality: a threefold symmetry of the algebra cycling its three
+  # eight-dimensional pieces, the vector and the two half-spinors. It lives
+  # only here, because only this diagram has a threefold symmetry.
+  assert triality
+    head type, have type
+    have algebra

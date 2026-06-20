@@ -1,0 +1,29 @@
+load @/code/structure/group
+  find group
+
+load @/code/quaternion
+  find quaternion
+
+# The binary tetrahedral group, the twenty-four unit Hurwitz quaternions, the
+# double cover of the rotational symmetry of the tetrahedron. It is one of the
+# four faces of the 24-cell: read as quaternions the cell's twenty-four
+# vertices form exactly this group. It splits into three cosets of eight, and
+# multiplication by a fixed cube root of unity cycles the three octets, which
+# is triality made concrete in the lattice.
+structure binary-tetrahedral
+  head type
+  link group, like group, have type
+  # The group has order twenty-four.
+  assert order-twenty-four
+    head type, have type
+    have group
+  # Its elements are the unit quaternions of integer coordinates, the unit
+  # Hurwitz quaternions.
+  assert unit-hurwitz-quaternions
+    head type, have type
+    have group
+  # It is the double cover of the tetrahedral rotation group, which is why the
+  # cell carries spin exactly: a full turn is minus one.
+  assert double-cover
+    head type, have type
+    have group

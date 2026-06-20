@@ -1,0 +1,23 @@
+load @/code/vibe/mesh
+  find mesh
+
+load @/code/number/integer
+  find integer
+
+# The wake, the law of space, the seventh base element. While the knit moves
+# tones on existing docks, the wake makes new docks at the open edge, born
+# quiet at the middle value, pushing the boundary outward beat by beat. The
+# wake is where the arrow of time lives. The knit alone runs the same forward
+# and backward, but the mesh as a whole only ever grows, because the wake adds
+# docks and never removes any, the same one-way order the integers carry.
+structure wake
+  head type
+  link mesh, like mesh, have type
+  # New docks are born at the open growing edge.
+  assert births-at-edge
+    head type, have type
+    have mesh
+  # The mesh only grows, never shrinks, which is the arrow of time.
+  assert one-way-growth
+    head type, have type
+    have mesh

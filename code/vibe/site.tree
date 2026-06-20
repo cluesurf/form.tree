@@ -1,0 +1,24 @@
+load @/code/polytope/cell-24
+  find cell-24
+
+load @/code/vibe/tone
+  find tone
+
+# The site, one of the twenty-four directions out of a cell, the third base
+# element. Each site is a root of the rotation algebra of eight-space, and it
+# points out through one face of the cell to the neighbor on the other side.
+# One tone lives at each site. The twenty-four sites pair into twelve opposite
+# pairs, the lines, and the line, not the single site, is what the law of
+# motion acts on.
+structure site
+  head type
+  link cell, like cell-24, have type
+  link tone, like tone, have type
+  # A site is a vertex of the 24-cell, one of the twenty-four directions.
+  assert is-cell-direction
+    head type, have type
+    have cell
+  # One tone lives at each site.
+  assert holds-one-tone
+    head type, have type
+    have tone

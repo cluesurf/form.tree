@@ -1,0 +1,19 @@
+# Leibniz equality, the kernel's equality, on which observational equality is
+# built. Two values are equal when every predicate true of one is true of the
+# other, and reflexivity witnesses that every value equals itself. This is the
+# bottom equality. The committed foundation extends it to observational
+# equality, adding function extensionality and quotients while staying
+# decidable. The integers and the reals are quotients, so the math library
+# needs that extension, but every equality reduces to this core.
+structure equality
+  head type
+  link set, like set, have type
+  # Reflexivity: every value equals itself, witnessed by refl.
+  assert reflexivity
+    head type, have type
+    have set
+  # Indiscernibility: equals satisfy the same predicates. This is the
+  # defining content of Leibniz equality.
+  assert indiscernibility
+    head type, have type
+    have set
