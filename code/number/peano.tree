@@ -1,0 +1,99 @@
+# The Peano natural numbers as a self-type, with addition defined by structural recursion, and arithmetic facts PROVED
+# BY THE KERNEL (judge.ts) computing normal forms. Unlike the integer-literal facts elsewhere (checked by the decision
+# procedures), these reduce `plus one one` to `two` through the derived computing eliminator and the termination-gated
+# transparent definition of `plus`, then `calm` (definitional equality / reflexivity) discharges the equation. This is
+# the dependent-proof path: a proof is the kernel checking two terms share a normal form. See
+# note/library/seed/proof-checking/05-recommendation.md and 09-math-dsl-cheatsheet.md.
+
+# A natural number: zero, or the successor of a natural.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition by recursion on the first argument: 0 + b = b, and (succ a) + b = succ (a + b). The recursion descends on
+# the matched predecessor, so it is verified terminating and registered transparent (the kernel unfolds it).
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# The small numerals, as successor towers.
+task one
+  like natural
+  send back
+    make succ
+      bind prior
+        make zero
+
+task two
+  like natural
+  send back
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make zero
+
+task three
+  like natural
+  send back
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+
+# one plus one is two: the kernel reduces plus one one through the eliminator and recursion, and checks it equals two.
+rule one-plus-one-is-two
+  show hold
+    call is-equal
+      call plus
+        call one
+        call one
+      call two
+  calm
+
+# two plus one is three.
+rule two-plus-one-is-three
+  show hold
+    call is-equal
+      call plus
+        call two
+        call one
+      call three
+  calm
+
+# one plus two is three: addition reduces on the FIRST argument, so this exercises a different reduction path than
+# two-plus-one, and still lands on three.
+rule one-plus-two-is-three
+  show hold
+    call is-equal
+      call plus
+        call one
+        call two
+      call three
+  calm
+
+# zero is a left identity, concretely: zero plus three is three (the base case of the recursion).
+rule zero-plus-three-is-three
+  show hold
+    call is-equal
+      call plus
+        make zero
+        call three
+      call three
+  calm
