@@ -1,0 +1,67 @@
+# The sign, positive or negative. This is the shared two-value sign used across the algebras (quaternions, octonions,
+# Clifford blades) and the geometry (the D4 roots and the 24-cell). It is DEFINED ONCE here and imported everywhere it is
+# needed, never redefined, so the whole library agrees on one sign type. Flipping a sign twice returns it.
+form sign
+  case positive
+  case negative
+
+# The flip of a sign: positive becomes negative and back.
+task flip-sign
+  take s, like sign
+  like sign
+  fork case, read s
+    case positive
+      send back
+        make negative
+    case negative
+      send back
+        make positive
+
+# FLIPPING IS AN INVOLUTION: flip-sign (flip-sign s) = s, the order-two symmetry of the sign.
+rule flip-sign-is-an-involution
+  mark s, like sign
+  show hold
+    call is-equal
+      call flip-sign
+        call flip-sign
+          read s
+      read s
+  fold s
+
+# A truth value, for sign equality (defined in atom/flag, imported there). Are two signs equal?
+load @cluesurf/form/code/atom/flag
+  find flag
+
+task same-sign
+  take a, like sign
+  take b, like sign
+  like flag
+  fork case, read a
+    case positive
+      fork case, read b
+        case positive
+          send back
+            make yes
+        case negative
+          send back
+            make no
+    case negative
+      fork case, read b
+        case positive
+          send back
+            make no
+        case negative
+          send back
+            make yes
+
+# A SIGN AND ITS FLIP ALWAYS DIFFER: same-sign s (flip-sign s) = no.
+rule flip-sign-differs
+  mark s, like sign
+  show hold
+    call is-equal
+      call same-sign
+        read s
+        call flip-sign
+          read s
+      make no
+  fold s

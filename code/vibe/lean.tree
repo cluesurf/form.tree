@@ -8,16 +8,15 @@
 # ranks are kept local because cross-file casing on an imported inductive type is not yet supported, so the order's proof
 # must live where its constructors do; this is the lean's own statement of the same order tone carries.
 
+load @cluesurf/form/code/atom/flag
+  find flag
+  find either
+
 # A pole, one of the three signed ranks the lean orders: the low value below the middle below the high.
 form pole
   case minus
   case zero
   case plus
-
-# A truth value, to carry the order relation.
-form flag
-  case yes
-  case no
 
 # below a b is yes when a sits no higher than b in the lean: minus below zero below plus.
 task below
@@ -65,19 +64,6 @@ task flip
     case plus
       send back
         make minus
-
-# disjunction, to state totality.
-task either
-  take a, like flag
-  take b, like flag
-  like flag
-  fork case, read a
-    case yes
-      send back
-        make yes
-    case no
-      send back
-        read b
 
 # REFLEXIVE: every rank sits no higher than itself, below a a = yes.
 rule below-is-reflexive

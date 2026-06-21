@@ -1,0 +1,43 @@
+# The spinor double cover, modeled by the kernel, importing the shared `sign` atom. A SPINOR is a state that needs a full
+# DOUBLE turn (4 pi) to return to itself: a single 2 pi rotation does not bring it back, it flips its sign to negative.
+# This is the defining mark of half-integer spin, and the rotation group is doubly covered by the spin group exactly this
+# way. The unit quaternions realize it: i squared is minus one, so a 2 pi turn about any axis is the element minus one,
+# and minus one squared is plus one, so 4 pi returns. Here it is modeled on the sign a spinor carries: a 2 pi turn flips
+# the sign, two of them return, and a 2 pi turn is genuinely NOT the identity (the spinor sign distinguishes them).
+
+load @cluesurf/form/code/atom/sign
+  find sign
+  find flip-sign
+  find positive
+  find negative
+
+# A 2 pi (full) turn flips the spinor's sign: positive becomes negative. A spinor rotated once is minus itself.
+rule full-turn-flips-the-sign
+  show hold
+    call is-equal
+      call flip-sign
+        make positive
+      make negative
+  calm hold
+
+# A 4 pi (double) turn returns the spinor to itself: flipping the sign twice is the identity, for every sign. Only after
+# two full turns is a spinor back where it started, the hallmark of spin one-half.
+rule double-turn-returns
+  mark s, like sign
+  show hold
+    call is-equal
+      call flip-sign
+        call flip-sign
+          read s
+      read s
+  fold s
+
+# A 2 pi turn is NOT the identity: positive and negative are genuinely different, so a single full rotation changes the
+# spinor's state. This distinguishes a spinor from an ordinary vector (which 2 pi returns), the topological fact behind
+# the electron's minus sign under a full turn. Shown by refutation.
+rule full-turn-is-not-trivial
+  show miss
+    call is-equal
+      make positive
+      make negative
+  calm miss

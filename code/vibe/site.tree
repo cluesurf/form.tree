@@ -2,27 +2,19 @@
 # neighbor on the other side, where a single tone lives. The twenty-four sites pair into twelve lines, a site and its
 # opposite, and the line, not the single site, is what the knit's collision acts on.
 #
-# This file MODELS the pairing. A direction's orientation is its two signs (a D4 root has two nonzero slots, each plus or
-# minus). The opposite direction flips both signs. The opposite map is proved an INVOLUTION (opposite of opposite is the
-# original) and FIXED-POINT-FREE (no direction is its own opposite), which is exactly what makes the twenty-four sites
-# pair cleanly into twelve lines with none left over. The geometry's count 24 = 6*4 lives in `forced-dock-24-cell`.
+# This file MODELS the pairing using the shared `sign` and `flag` atoms (imported, not redefined). A direction's
+# orientation is its two signs (a D4 root has two nonzero slots, each positive or negative). The opposite direction flips
+# both signs. The opposite map is proved an INVOLUTION and FIXED-POINT-FREE (no direction is its own opposite), which is
+# what makes the twenty-four sites pair cleanly into twelve lines with none left over.
 
-# A sign, the orientation of one nonzero slot of a direction.
-form sign
-  case plus
-  case minus
+load @cluesurf/form/code/atom/sign
+  find sign
+  find flip-sign
+  find same-sign
 
-# The flip of a sign.
-task flip-sign
-  take s, like sign
-  like sign
-  fork case, read s
-    case plus
-      send back
-        make minus
-    case minus
-      send back
-        make plus
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
 
 # A way, a direction's orientation: the two signs of its two nonzero slots.
 form way
@@ -47,35 +39,7 @@ task opposite
             call flip-sign
               read two
 
-# A truth value, to test whether two ways are the same.
-form flag
-  case yes
-  case no
-
-# Are two signs equal?
-task same-sign
-  take a, like sign
-  take b, like sign
-  like flag
-  fork case, read a
-    case plus
-      fork case, read b
-        case plus
-          send back
-            make yes
-        case minus
-          send back
-            make no
-    case minus
-      fork case, read b
-        case plus
-          send back
-            make no
-        case minus
-          send back
-            make yes
-
-# Does a way equal another way? Equal on both signs.
+# Are two ways the same? Equal on both signs.
 task same-way
   take a, like way
   take b, like way
@@ -89,7 +53,7 @@ task same-way
           link three
           link four
           send back
-            call meet-flag
+            call both
               call same-sign
                 read one
                 read three
@@ -97,33 +61,7 @@ task same-way
                 read two
                 read four
 
-# conjunction on flags.
-task meet-flag
-  take a, like flag
-  take b, like flag
-  like flag
-  fork case, read a
-    case yes
-      send back
-        read b
-    case no
-      send back
-        make no
-
-# The flip of a sign is never the sign itself: a sign and its flip differ. The seed of fixed-point-freeness.
-rule flip-sign-differs
-  mark s, like sign
-  show hold
-    call is-equal
-      call same-sign
-        read s
-        call flip-sign
-          read s
-      make no
-  fold s
-
-# The opposite map is an INVOLUTION: opposite (opposite w) = w, for every direction. The other end of the line points
-# back. Proved by case analysis, using that flipping a sign twice returns it.
+# THE OPPOSITE MAP IS AN INVOLUTION: opposite (opposite w) = w. The other end of the line points back.
 rule opposite-is-an-involution
   mark w, like way
   show hold
@@ -134,9 +72,8 @@ rule opposite-is-an-involution
       read w
   fold w
 
-# The opposite is FIXED-POINT-FREE: no direction is its own opposite, same-way w (opposite w) = no, for every direction.
-# Because the opposite flips both signs and a flipped sign always differs. This is what guarantees the twenty-four sites
-# pair into twelve genuine lines, with none its own partner.
+# THE OPPOSITE IS FIXED-POINT-FREE: no direction is its own opposite, same-way w (opposite w) = no, because the opposite
+# flips both signs and a flipped sign always differs. This makes the twenty-four sites pair into twelve genuine lines.
 rule opposite-has-no-fixed-point
   mark w, like way
   show hold

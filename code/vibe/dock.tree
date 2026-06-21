@@ -4,18 +4,9 @@
 # two tones, a value the law never creates or destroys. The vacuum dock (all sites at peace) is proved neutral, and the
 # charge is proved symmetric (independent of which way the line is read), the seed of the dock's charge conservation.
 
-form tone
-  case low
-  case middle
-  case high
-
-# The signed charge sum of a line, ranging over minus two to plus two.
-form tally
-  case sink-two
-  case sink-one
-  case flat
-  case lift-one
-  case lift-two
+load @cluesurf/form/code/vibe/tone
+  find tone
+  find tally
 
 # The charge of a line: the signed sum of its two site tones.
 task line-charge

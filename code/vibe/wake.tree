@@ -6,15 +6,14 @@
 # The grown count is proved STRICTLY GREATER than before (the mesh always grows) and the growth NEVER RETURNS (the count
 # is never below where it was, the mesh never shrinks). These are the laws behind "the mesh only grows", not an assertion.
 
+load @cluesurf/form/code/atom/flag
+  find flag
+
 # The count of docks in the mesh: none, or one more.
 form count
   case none
   case more
     link prior, like count
-
-form flag
-  case yes
-  case no
 
 # Addition of counts, recursion on the first.
 task add-count
@@ -35,7 +34,7 @@ task add-count
               read b
 
 # below a b is yes when count a is strictly less than count b.
-task below
+task below-count
   take a, like count
   take b, like count
   like flag
@@ -52,7 +51,7 @@ task below
         case more
           link ap
           send back
-            call below
+            call below-count
               read ap
               read bp
 
@@ -75,7 +74,7 @@ rule grow-strictly-increases
   mark e, like count
   show hold
     call is-equal
-      call below
+      call below-count
         read d
         call grow
           read d
@@ -90,7 +89,7 @@ rule grow-never-returns
   mark e, like count
   show hold
     call is-equal
-      call below
+      call below-count
         call grow
           read d
           read e

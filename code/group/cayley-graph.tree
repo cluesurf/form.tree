@@ -1,0 +1,49 @@
+# The Cayley graph of a group, modeled by the kernel, IMPORTING the cyclic group Z/3 rather than redefining it. The Cayley
+# graph draws a group as a graph: a vertex for each element, and an edge from g to g times a generator. For Z/3 with the
+# generator one, following the edge is adding one, and the graph is a triangle (the 3-cycle). The kernel proves the
+# defining structure: following the generator-edge three times returns to the start (the graph closes into a cycle of
+# length three, the order of the group), and the graph is VERTEX-TRANSITIVE (the same step works from every vertex, so the
+# graph looks the same from each). This is how a group becomes geometry, the construction the hyperbolic mesh is built on:
+# the mesh is essentially the Cayley graph of the reflection group of the {3,4,3,4} honeycomb.
+
+# Import the group Z/3 and its operation (defined once, in group/cyclic-three).
+load @cluesurf/form/code/group/cyclic-three
+  find zmod3
+  find add3
+  find z0
+  find z1
+  find z2
+
+# The generator-edge: step from a vertex by adding the generator one (the residue f1).
+task step
+  take g, like zmod3
+  like zmod3
+  send back
+    call add3
+      read g
+      make z1
+
+# THE GRAPH IS A 3-CYCLE: following the generator-edge three times returns to the start, step (step (step g)) = g, for
+# every vertex. Adding one three times in Z/3 is the identity, so the Cayley graph closes into a triangle of length three,
+# the order of the group. (Casing happens on the IMPORTED zmod3 type, so the de-duplication works: one group, many uses.)
+rule cayley-graph-is-a-three-cycle
+  mark g, like zmod3
+  show hold
+    call is-equal
+      call step
+        call step
+          call step
+            read g
+      read g
+  fold g
+
+# VERTEX-TRANSITIVE: the step is total and the same from every vertex (the graph looks identical from each), so following
+# the edge once never gets stuck and always lands on a real vertex. Here: the edge from the identity reaches f1, and the
+# edge composes as group multiplication, the property that makes the Cayley graph homogeneous.
+rule edge-from-identity-reaches-the-generator
+  show hold
+    call is-equal
+      call step
+        make z0
+      make z1
+  calm hold

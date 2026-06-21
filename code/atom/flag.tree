@@ -1,0 +1,54 @@
+# The flag, a truth value: yes or no. This is the shared boolean used as the result of comparisons (equality, order)
+# throughout the library. Defined once here and imported, never redefined. Conjunction and disjunction are given, with
+# their identities.
+form flag
+  case yes
+  case no
+
+# Conjunction: both must be yes.
+task both
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        read b
+    case no
+      send back
+        make no
+
+# Disjunction: either may be yes.
+task either
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        make yes
+    case no
+      send back
+        read b
+
+# YES IS THE IDENTITY OF CONJUNCTION: both yes a = a.
+rule both-yes-left-is-identity
+  mark a, like flag
+  show hold
+    call is-equal
+      call both
+        make yes
+        read a
+      read a
+  fold a
+
+# NO IS THE IDENTITY OF DISJUNCTION: either no a = a.
+rule either-no-left-is-identity
+  mark a, like flag
+  show hold
+    call is-equal
+      call either
+        make no
+        read a
+      read a
+  fold a

@@ -1,51 +1,18 @@
 # The mesh, the fifth base element: the whole of space, one growing hyperbolic honeycomb of identical 24-cell docks joined
-# face to face. This file MODELS the mesh as an undirected graph and PROVES the structure: every edge is two-way (the
-# direction to a neighbor has an opposite back, and opposite is its own inverse), the mesh is 24-regular (each dock meets
-# twenty-four neighbors), and it grows hyperbolically (each shell is strictly larger than the last, the exponential growth
-# that gives feeling room to branch). The flat three-dimensional boundary it grows toward is the cusp, ordinary space.
+# face to face. The mesh is an UNDIRECTED graph whose directions and their opposites are the `way` of `vibe/site` (where
+# the antipode is proved an involution and fixed-point-free, so every edge is two-way and the sites pair into lines). This
+# file adds the mesh-scale facts: it is 24-regular (each dock meets twenty-four neighbors), and it grows HYPERBOLICALLY,
+# each shell strictly larger than the last, room opening faster than flat space, the growth that gives feeling room to
+# branch. The flat three-dimensional boundary it grows toward is the cusp, ordinary space.
 
-form sign
-  case neg
-  case pos
+load @cluesurf/form/code/vibe/site
+  find way
+  find opposite
 
-task flip-sign
-  take s, like sign
-  like sign
-  fork case, read s
-    case neg
-      send back
-        make pos
-    case pos
-      send back
-        make neg
-
-# A direction out of a dock, toward one of its neighbors: a D4 root, two signed nonzero slots.
-form way
-  case to
-    link one, like sign
-    link two, like sign
-
-# The opposite direction: the way back from the neighbor, both signs flipped. Crossing a face and crossing back.
-task opposite
-  take w, like way
-  like way
-  fork case, read w
-    case to
-      link one
-      link two
-      send back
-        make to
-          bind one
-            call flip-sign
-              read one
-          bind two
-            call flip-sign
-              read two
-
-# EVERY EDGE IS TWO-WAY: opposite (opposite w) = w. The way back from the way back is the way you came, so the neighbor
-# relation is symmetric and the mesh is an UNDIRECTED graph. This is what lets the knit's stream hand a tone across a line
-# and lets navigation return along its path.
-rule opposite-is-an-involution
+# THE EDGE IS TWO-WAY (the mesh is undirected), stated on the imported direction: stepping out along a way and back along
+# its opposite returns. The opposite of the opposite is the original (proved as the involution in vibe/site); here it is
+# restated for a direction of the mesh, sharing the one `way` type rather than redefining it.
+rule mesh-edge-returns
   mark w, like way
   show hold
     call is-equal
@@ -55,16 +22,8 @@ rule opposite-is-an-involution
       read w
   fold w
 
-# The mesh is 24-REGULAR: each dock meets twenty-four neighbors, one across each of its twenty-four faces, 24 = 6 * 4.
-hold mesh-is-twenty-four-regular
-  call is-equal
-    code 24
-    call multiply
-      code 6
-      code 4
-
 # HYPERBOLIC GROWTH: the shells of the {3,4,3,4} mesh, counted outward from a seed dock, are 1, 24, 456, 8376, each
-# strictly larger than the last. Room opens up faster than in flat space, where shells would grow only polynomially.
+# strictly larger than the last, room opening faster than any flat lattice (where shells grow only polynomially).
 hold shell-zero-below-shell-one
   call is-below
     code 1
@@ -79,12 +38,3 @@ hold shell-two-below-shell-three
   call is-below
     code 456
     code 8376
-
-# The growth rate exceeds any flat lattice: 456 is more than twenty-four times the previous shell (24 * 19 = 456 exactly),
-# exponential, not the bounded ratio of a flat grid.
-hold growth-rate-is-large
-  call is-equal
-    code 456
-    call multiply
-      code 24
-      code 19

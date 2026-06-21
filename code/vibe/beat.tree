@@ -6,15 +6,14 @@
 # not before a, the one-wayness that is the arrow), and TRANSITIVE, and each tick strictly advances. These are the laws
 # that make the arrow an arrow, not a single asserted inequality.
 
+load @cluesurf/form/code/atom/flag
+  find flag
+
 # The count of beats: zero, or one tick later.
 form time
   case start
   case tick
     link prior, like time
-
-form flag
-  case yes
-  case no
 
 # before a b is yes when beat a happens strictly before beat b.
 task before
