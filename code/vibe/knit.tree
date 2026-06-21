@@ -5,7 +5,10 @@ load @/code/vibe/dock
 form knit
   link dock, like dock
 
-# The knit, proof-checked by `seed test`: the law of motion, two steps each beat, collide then stream, 2 = 1 + 1.
+# The knit, proof-checked by `seed test`: the law of motion, two steps each beat, collide then stream, 2 = 1 + 1. The
+# claim that the knit is REVERSIBLE is proved in `code/vibe/tone`: the collide step on a line is an involution
+# (`collide-is-reversible`, collide twice returns the original), built from the tone mirror being order two, so the law
+# can run either way locally and the arrow comes only from the wake's one-way growth, not from the motion.
 hold knit-has-two-steps-beat
   call is-equal
     code 2

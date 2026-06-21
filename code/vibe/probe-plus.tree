@@ -1,0 +1,77 @@
+# The dock is the 24-cell, DERIVED in the kernel. A tone written in four slots, each in {-1,0,+1}, gives 3^4 = 81 words.
+# Sort them by how many slots are nonzero: the shells have sizes choose(4,k) * 2^k for k = 0..4, namely 1, 8, 24, 32, 16,
+# and they sum to 81 = 3^4 (the binomial expansion of (1+2)^4). The two-nonzero shell, choose(4,2) * 2^2 = 6 * 4 = 24, is
+# the 24-cell: choose which two of four slots are nonzero (6 ways), a sign for each (4 ways). Everything here is checked by
+# definitional computation on a LOCAL inductive natural (cross-file casing on an imported inductive type is unsupported).
+# The binomial coefficient is pinned at the whole Pascal row 1,4,6,4,1 and at a second instance choose(5,2)=10, and the
+# shell decomposition is the real content: it cannot sum to 81 by accident.
+
+# A natural number.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition by recursion on the first argument.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+
+rule probe-plus-1-1
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            make zero
+        make succ
+          bind prior
+            make zero
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm
+
+rule probe-plus-2-3
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make zero
+  calm

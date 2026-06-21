@@ -1,0 +1,25 @@
+load @/code/vibe/tone
+  find tone
+
+# does casing on an IMPORTED tone resolve its constructors?
+task echo-tone
+  take t, like tone
+  like tone
+  fork case, read t
+    case low
+      send back
+        make low
+    case middle
+      send back
+        make middle
+    case high
+      send back
+        make high
+
+rule probe-echo-low
+  show hold
+    call is-equal
+      call echo-tone
+        make low
+      make low
+  calm

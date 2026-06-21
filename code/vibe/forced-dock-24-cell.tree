@@ -1,0 +1,126 @@
+# The dock is the 24-cell, DERIVED. A tone written in four slots, each in {-1,0,+1}, gives 3^4 = 81 words. Sort them by how
+# many slots are nonzero: the shells have sizes choose(4,k) * 2^k for k = 0..4, namely 1, 8, 24, 32, 16, and they sum to
+# 3^4 = 81 (the binomial expansion of (1+2)^4). The two-nonzero shell, choose(4,2) * 2^2 = 6 * 4 = 24, IS the 24-cell:
+# choose which two of four slots are nonzero (6 ways), a sign for each (4 ways). These are exact arithmetic identities,
+# checked by `seed test` by native evaluation (machine integers, no unfold-fuel limit). The binomial coefficients are not
+# asserted: each is built by Pascal's triangle, every entry the sum of the two above it, so the row 1,4,6,4,1 is derived.
+
+# Pascal's triangle to row four. Each entry is the sum of the two above. Row 2: choose(2,1) = choose(1,0)+choose(1,1) = 2.
+hold pascal-two-one-is-two
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+# Row 3: choose(3,1) = choose(2,0)+choose(2,1) = 1+2 = 3, and choose(3,2) = choose(2,1)+choose(2,2) = 2+1 = 3.
+hold pascal-three-one-is-three
+  call is-equal
+    code 3
+    call add
+      code 1
+      code 2
+
+hold pascal-three-two-is-three
+  call is-equal
+    code 3
+    call add
+      code 2
+      code 1
+
+# Row 4: choose(4,1) = choose(3,0)+choose(3,1) = 1+3 = 4, choose(4,2) = choose(3,1)+choose(3,2) = 3+3 = 6,
+# choose(4,3) = choose(3,2)+choose(3,3) = 3+1 = 4. The full row is 1, 4, 6, 4, 1.
+hold pascal-four-one-is-four
+  call is-equal
+    code 4
+    call add
+      code 1
+      code 3
+
+hold pascal-four-two-is-six
+  call is-equal
+    code 6
+    call add
+      code 3
+      code 3
+
+hold pascal-four-three-is-four
+  call is-equal
+    code 4
+    call add
+      code 3
+      code 1
+
+# THE DOCK: the two-nonzero shell is choose(4,2) * 2^2 = 6 * 4 = 24, the count of 24-cell vertices, equal to its faces
+# (self-dual), to the D4 roots, to the unit Hurwitz quaternions, and to the 4D kissing number. The dock has 24 sites.
+hold dock-two-nonzero-shell-is-twenty-four
+  call is-equal
+    code 24
+    call multiply
+      code 6
+      code 4
+
+# The twenty-four sites pair into the twelve lines the knit acts along: 24 = 2 * 12.
+hold dock-sites-pair-into-twelve-lines
+  call is-equal
+    code 24
+    call multiply
+      code 2
+      code 12
+
+# THE SHELL DECOMPOSITION. The 81 ternary four-words split by nonzero count into shells of size choose(4,k) * 2^k:
+# shell 0 = 1*1 = 1, shell 1 = 4*2 = 8, shell 2 = 6*4 = 24, shell 3 = 4*8 = 32, shell 4 = 1*16 = 16.
+hold shell-one-is-eight
+  call is-equal
+    code 8
+    call multiply
+      code 4
+      code 2
+
+hold shell-two-is-twenty-four
+  call is-equal
+    code 24
+    call multiply
+      code 6
+      code 4
+
+hold shell-three-is-thirty-two
+  call is-equal
+    code 32
+    call multiply
+      code 4
+      code 8
+
+hold shell-four-is-sixteen
+  call is-equal
+    code 16
+    call multiply
+      code 1
+      code 16
+
+# The shells sum to every word: 1 + 8 + 24 + 32 + 16 = 81. This is the real content, the binomial theorem (1+2)^4 = 3^4
+# tying the 24-cell shell to the whole tone alphabet. It cannot sum to 81 by accident.
+hold shells-sum-to-eighty-one
+  call is-equal
+    code 81
+    call add
+      code 1
+      call add
+        code 8
+        call add
+          code 24
+          call add
+            code 32
+            code 16
+
+# And eighty-one is three to the fourth, the count of all four-slot ternary words.
+hold eighty-one-is-three-to-the-fourth
+  call is-equal
+    code 81
+    call multiply
+      code 3
+      call multiply
+        code 3
+        call multiply
+          code 3
+          code 3

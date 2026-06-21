@@ -12,3 +12,465 @@ hold tone-has-three-cases
     call add
       code 1
       code 2
+
+# mirror swaps the two outer values around the resting middle: low and high trade places, middle is fixed. This is the
+# reflection that, with the ternary set, makes three the smallest alphabet carrying both a center and a symmetry.
+task mirror
+  take t, like tone
+  like tone
+  fork case, read t
+    case low
+      send back
+        make high
+    case middle
+      send back
+        make middle
+    case high
+      send back
+        make low
+
+# The mirror is an INVOLUTION: mirror (mirror t) = t, for every tone. Reflecting twice returns the original value, so the
+# symmetry is its own inverse, an order-two operation. Proved by case analysis on the three tones, each closing by
+# computation. A reversible rule is built from order-two pieces, and this is the first of them.
+rule mirror-tone-is-involution
+  mark t, like tone
+  show hold
+    call is-equal
+      call mirror
+        call mirror
+          read t
+      read t
+  fold t
+
+# The middle is the unique FIXED POINT of the mirror: mirror middle = middle. The resting value reflects to itself, which
+# is why it is the neutral charge.
+rule mirror-fixes-middle
+  show hold
+    call is-equal
+      call mirror
+        make middle
+      make middle
+  calm
+
+# The two outer tones are genuinely SWAPPED, not fixed: mirror low = high. With the fixed middle, this shows the mirror is
+# the transposition of the outer pair, the order-two symmetry of the ternary set.
+rule mirror-swaps-low-to-high
+  show hold
+    call is-equal
+      call mirror
+        make low
+      make high
+  calm
+
+# The charge sign: a tone reads as a signed value through the lean. The low value is negative, the middle is neutral, the
+# high value is positive. This is the smallest signed group, the integers modulo their order: minus, naught, plus.
+form spin
+  case minus
+  case naught
+  case plus
+
+# Negation of a sign flips minus and plus and fixes naught, exactly mirroring the tone reflection.
+task flip-spin
+  take s, like spin
+  like spin
+  fork case, read s
+    case minus
+      send back
+        make plus
+    case naught
+      send back
+        make naught
+    case plus
+      send back
+        make minus
+
+# The charge of a tone: low is minus, middle is naught, high is plus. This is how the lean turns a tone into a signed
+# charge, the second base element acting on the first.
+task charge
+  take t, like tone
+  like spin
+  fork case, read t
+    case low
+      send back
+        make minus
+    case middle
+      send back
+        make naught
+    case high
+      send back
+        make plus
+
+# The mirror NEGATES charge: charge (mirror t) = flip-spin (charge t), for every tone. Reflecting a tone flips the sign of
+# its charge, so the tone reflection IS sign negation carried back to the ternary value. The first base element and its
+# order on the second are bound: the mirror is an order-two symmetry precisely because sign negation is.
+rule mirror-negates-charge
+  mark t, like tone
+  show hold
+    call is-equal
+      call charge
+        call mirror
+          read t
+      call flip-spin
+        call charge
+          read t
+  fold t
+
+# Sign negation is itself an INVOLUTION: flip-spin (flip-spin s) = s. The signed-charge group is order two, the same shape
+# as the tone reflection, confirming the bridge above is an isomorphism of order-two symmetries.
+rule flip-spin-is-involution
+  mark s, like spin
+  show hold
+    call is-equal
+      call flip-spin
+        call flip-spin
+          read s
+      read s
+  fold s
+
+# A line, the unit the law acts on: two opposite sites of a dock, each carrying one tone, meeting head on. The knit's
+# collide step rearranges the pair, and the stream step is the exchange across the line. Modelling the line here, where
+# the tone constructors live, lets the law's reversibility and charge conservation be proved. It is a pairing of two tones.
+form line
+  case pair
+    link head, like tone
+    link tail, like tone
+
+# The collide step, the actual knit collision table from the model: a fixed permutation of the nine line states that
+# preserves the pair's signed sum. The two equal-pole pairs are inert. A pole meeting peace hops past it. A pole meeting
+# its opposite annihilates to two peaces, peace meeting peace creates an opposite pole pair, and a pole pair flips, the
+# neutral three-cycle peace-peace, high-low, low-high. Charge-conserving and reversible, with no adjustable parts.
+task collide
+  take l, like line
+  like line
+  fork case, read l
+    case pair
+      link head
+      link tail
+      fork case, read head
+        case low
+          fork case, read tail
+            case low
+              send back
+                make pair
+                  bind head
+                    make low
+                  bind tail
+                    make low
+            case middle
+              send back
+                make pair
+                  bind head
+                    make middle
+                  bind tail
+                    make low
+            case high
+              send back
+                make pair
+                  bind head
+                    make middle
+                  bind tail
+                    make middle
+        case middle
+          fork case, read tail
+            case low
+              send back
+                make pair
+                  bind head
+                    make low
+                  bind tail
+                    make middle
+            case middle
+              send back
+                make pair
+                  bind head
+                    make high
+                  bind tail
+                    make low
+            case high
+              send back
+                make pair
+                  bind head
+                    make high
+                  bind tail
+                    make middle
+        case high
+          fork case, read tail
+            case low
+              send back
+                make pair
+                  bind head
+                    make low
+                  bind tail
+                    make high
+            case middle
+              send back
+                make pair
+                  bind head
+                    make middle
+                  bind tail
+                    make high
+            case high
+              send back
+                make pair
+                  bind head
+                    make high
+                  bind tail
+                    make high
+
+# The inverse collision, the permutation run backward. Since the neutral three-cycle is not order two, reversibility is
+# shown by an explicit inverse rather than by self-composition. Every other line state is fixed or in a two-cycle.
+task uncollide
+  take l, like line
+  like line
+  fork case, read l
+    case pair
+      link head
+      link tail
+      fork case, read head
+        case low
+          fork case, read tail
+            case low
+              send back
+                make pair
+                  bind head
+                    make low
+                  bind tail
+                    make low
+            case middle
+              send back
+                make pair
+                  bind head
+                    make middle
+                  bind tail
+                    make low
+            case high
+              send back
+                make pair
+                  bind head
+                    make high
+                  bind tail
+                    make low
+        case middle
+          fork case, read tail
+            case low
+              send back
+                make pair
+                  bind head
+                    make low
+                  bind tail
+                    make middle
+            case middle
+              send back
+                make pair
+                  bind head
+                    make low
+                  bind tail
+                    make high
+            case high
+              send back
+                make pair
+                  bind head
+                    make high
+                  bind tail
+                    make middle
+        case high
+          fork case, read tail
+            case low
+              send back
+                make pair
+                  bind head
+                    make middle
+                  bind tail
+                    make middle
+            case middle
+              send back
+                make pair
+                  bind head
+                    make middle
+                  bind tail
+                    make high
+            case high
+              send back
+                make pair
+                  bind head
+                    make high
+                  bind tail
+                    make high
+
+# The signed charge of a line: the sum of its two tone charges, a value in minus two to plus two. This is the quantity the
+# collision must conserve, the discrete charge the law never creates or destroys.
+form tally
+  case sink-two
+  case sink-one
+  case flat
+  case lift-one
+  case lift-two
+
+# The pair charge, tone plus tone read as a tally: the signed sum the lean assigns to a whole line.
+task pair-charge
+  take l, like line
+  like tally
+  fork case, read l
+    case pair
+      link head
+      link tail
+      fork case, read head
+        case low
+          fork case, read tail
+            case low
+              send back
+                make sink-two
+            case middle
+              send back
+                make sink-one
+            case high
+              send back
+                make flat
+        case middle
+          fork case, read tail
+            case low
+              send back
+                make sink-one
+            case middle
+              send back
+                make flat
+            case high
+              send back
+                make lift-one
+        case high
+          fork case, read tail
+            case low
+              send back
+                make flat
+            case middle
+              send back
+                make lift-one
+            case high
+              send back
+                make lift-two
+
+# The collide step is REVERSIBLE: uncollide (collide (pair a b)) = pair a b, for every pair of tones. The law of motion is
+# invertible, so from the result of a beat the state before it is recovered and no information is lost. Proved by
+# simultaneous case analysis on the two tones, all nine line states resolving by computation. This is the knit's first
+# hard constraint, the reason any arrow of time must come from the growing edge and not from the local law.
+rule collide-is-reversible
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call uncollide
+        call collide
+          make pair
+            bind head
+              read a
+            bind tail
+              read b
+      make pair
+        bind head
+          read a
+        bind tail
+          read b
+  fold a, b
+
+# The collide step CONSERVES CHARGE: pair-charge (collide (pair a b)) = pair-charge (pair a b). The signed sum of the two
+# tones is the same before and after the collision, across all nine line states. This is the knit's second hard
+# constraint, the discrete conservation law from which the gauge charge and its current later emerge.
+rule collide-conserves-charge
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call pair-charge
+        call collide
+          make pair
+            bind head
+              read a
+            bind tail
+              read b
+      call pair-charge
+        make pair
+          bind head
+            read a
+          bind tail
+            read b
+  fold a, b
+
+# A truth value, to carry the lean's order relation. The order on the ternary tone is a function into yes-or-no.
+form flag
+  case yes
+  case no
+
+# Disjunction on truth values, for stating that the order is total: at least one of two comparisons holds.
+task either
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        make yes
+    case no
+      send back
+        read b
+
+# The lean's order: low at the bottom, middle in the middle, high at the top. at-most a b is yes when a sits no higher
+# than b. This is the order that turns a tone into a signed charge and gives growth its outward direction.
+task at-most
+  take a, like tone
+  take b, like tone
+  like flag
+  fork case, read a
+    case low
+      send back
+        make yes
+    case middle
+      fork case, read b
+        case low
+          send back
+            make no
+        case middle
+          send back
+            make yes
+        case high
+          send back
+            make yes
+    case high
+      fork case, read b
+        case low
+          send back
+            make no
+        case middle
+          send back
+            make no
+        case high
+          send back
+            make yes
+
+# The order is REFLEXIVE: at-most t t = yes, every tone sits no higher than itself. By case on t.
+rule at-most-is-reflexive
+  mark t, like tone
+  show hold
+    call is-equal
+      call at-most
+        read t
+        read t
+      make yes
+  fold t
+
+# The order is TOTAL: either (at-most a b) (at-most b a) = yes, any two tones are comparable one way or the other. By
+# simultaneous case analysis on both tones, the nine pairs each resolving by computation. With reflexivity this makes the
+# lean a genuine total order on the ternary value.
+rule at-most-is-total
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call either
+        call at-most
+          read a
+          read b
+        call at-most
+          read b
+          read a
+      make yes
+  fold a, b

@@ -6,7 +6,9 @@ form lean
   link tone, like tone
 
 # The lean, proof-checked by `seed test`: the order on the ternary tone, low below middle below high. It is the same
-# one-way order the integers carry, so its witnesses agree with the integer order: the low end is below the high.
+# one-way order the integers carry, so its witnesses agree with the integer order: the low end is below the high. The
+# order itself, as a relation on the tone, is built and proved REFLEXIVE and TOTAL in `code/vibe/tone` (`at-most`), and
+# the lean's signed charge is the `charge` map there, whose sign the tone mirror flips.
 hold low-tone-is-below-high-tone
   call is-below
     code 0
