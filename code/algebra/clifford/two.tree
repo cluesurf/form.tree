@@ -1,0 +1,281 @@
+# The Clifford algebra Cl(0,2), modeled concretely and proved to satisfy its defining relations by the kernel. Two
+# generators e1, e2 each square to MINUS ONE and ANTICOMMUTE (e1 e2 = - e2 e1). The four basis blades are the scalar one,
+# the two vectors e1 and e2, and the bivector e12 = e1 e2; an element here is a signed blade. The kernel proves the
+# generator relations and that the bivector also squares to minus one, by direct computation on the multiplication table.
+# Cl(0,2) is isomorphic to the quaternions (e1, e2, e12 are i, j, k), the algebra of spin one-half: this is the smallest
+# Clifford algebra carrying a spinor, the same structure the octonion's seven generators carry at Cl(0,7) for one
+# generation of matter. Clifford algebras are how geometry (reflections, rotations) becomes exact finite arithmetic.
+
+form sign
+  case pos
+  case neg
+
+form blade
+  case one
+  case e1
+  case e2
+  case e12
+
+# A Clifford element: a signed basis blade.
+form cliff
+  case scaled
+    link sign, like sign
+    link blade, like blade
+
+# Sign multiplication ({+1,-1} under product): like signs give plus, unlike give minus.
+task mul-sign
+  take a, like sign
+  take b, like sign
+  like sign
+  fork case, read a
+    case pos
+      send back
+        read b
+    case neg
+      fork case, read b
+        case pos
+          send back
+            make neg
+        case neg
+          send back
+            make pos
+
+# The product of two basis blades, a signed blade. This 16-entry table IS the Clifford algebra: e1 e1 = -one,
+# e1 e2 = +e12, e2 e1 = -e12, e12 e12 = -one, and so on.
+task mul-blade
+  take a, like blade
+  take b, like blade
+  like cliff
+  fork case, read a
+    case one
+      send back
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            read b
+    case e1
+      fork case, read b
+        case one
+          send back
+            make scaled
+              bind sign
+                make pos
+              bind blade
+                make e1
+        case e1
+          send back
+            make scaled
+              bind sign
+                make neg
+              bind blade
+                make one
+        case e2
+          send back
+            make scaled
+              bind sign
+                make pos
+              bind blade
+                make e12
+        case e12
+          send back
+            make scaled
+              bind sign
+                make neg
+              bind blade
+                make e2
+    case e2
+      fork case, read b
+        case one
+          send back
+            make scaled
+              bind sign
+                make pos
+              bind blade
+                make e2
+        case e1
+          send back
+            make scaled
+              bind sign
+                make neg
+              bind blade
+                make e12
+        case e2
+          send back
+            make scaled
+              bind sign
+                make neg
+              bind blade
+                make one
+        case e12
+          send back
+            make scaled
+              bind sign
+                make pos
+              bind blade
+                make e1
+    case e12
+      fork case, read b
+        case one
+          send back
+            make scaled
+              bind sign
+                make pos
+              bind blade
+                make e12
+        case e1
+          send back
+            make scaled
+              bind sign
+                make pos
+              bind blade
+                make e2
+        case e2
+          send back
+            make scaled
+              bind sign
+                make neg
+              bind blade
+                make e1
+        case e12
+          send back
+            make scaled
+              bind sign
+                make neg
+              bind blade
+                make one
+
+# Apply the two scalar signs to a blade product, giving the final signed blade.
+task apply-signs
+  take sx, like sign
+  take sy, like sign
+  take prod, like cliff
+  like cliff
+  fork case, read prod
+    case scaled
+      link sp
+      link bp
+      send back
+        make scaled
+          bind sign
+            call mul-sign
+              call mul-sign
+                read sx
+                read sy
+              read sp
+          bind blade
+            read bp
+
+# The full product of two Clifford elements: the blade product, then the two scalar signs applied.
+task mul
+  take x, like cliff
+  take y, like cliff
+  like cliff
+  fork case, read x
+    case scaled
+      link sx
+      link bx
+      fork case, read y
+        case scaled
+          link sy
+          link by
+          send back
+            call apply-signs
+              read sx
+              read sy
+              call mul-blade
+                read bx
+                read by
+
+# Negate a Clifford element.
+task neg-cliff
+  take x, like cliff
+  like cliff
+  fork case, read x
+    case scaled
+      link s
+      link b
+      send back
+        make scaled
+          bind sign
+            call mul-sign
+              make neg
+              read s
+          bind blade
+            read b
+
+# The unit blade as a Clifford element, and the generators e1, e2, for the statements below.
+task unit
+  like cliff
+  send back
+    make scaled
+      bind sign
+        make pos
+      bind blade
+        make one
+
+# e1 SQUARES TO MINUS ONE: mul e1 e1 = - one.
+rule e1-squares-to-minus-one
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            make e1
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            make e1
+      make scaled
+        bind sign
+          make neg
+        bind blade
+          make one
+  calm
+
+# e2 SQUARES TO MINUS ONE.
+rule e2-squares-to-minus-one
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            make e2
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            make e2
+      make scaled
+        bind sign
+          make neg
+        bind blade
+          make one
+  calm
+
+# THE BIVECTOR SQUARES TO MINUS ONE: e12 e12 = - one. So e1 e2 behaves as an imaginary unit, the quaternion i.
+rule bivector-squares-to-minus-one
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            make e12
+        make scaled
+          bind sign
+            make pos
+          bind blade
+            make e12
+      make scaled
+        bind sign
+          make neg
+        bind blade
+          make one
+  calm

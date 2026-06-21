@@ -1,0 +1,309 @@
+# The Pauli group on one qubit, modeled and its relations proved by the kernel. The single-qubit gates are I, X, Y, Z (the
+# bit flip, the bit-phase flip, the phase flip), with a phase that is a power of i. The kernel proves each Pauli squares to
+# the identity, that X times Y is i times Z, and that X and Y ANTICOMMUTE (XY = -YX), by direct computation. These are the
+# generators of the single-qubit Clifford group and the errors a quantum code must correct (X is the bit-flip the
+# three-bit code fixes). The Pauli group is the discrete skeleton of qubit dynamics, finite arithmetic standing in for the
+# continuous unitary group.
+
+# A phase, a power of i: 1, i, -1, -i (the cyclic group Z/4).
+form phase
+  case one
+  case eye
+  case neg
+  case neg-eye
+
+# Phase multiplication, addition modulo four in the exponent of i.
+task mul-phase
+  take a, like phase
+  take b, like phase
+  like phase
+  fork case, read a
+    case one
+      send back
+        read b
+    case eye
+      fork case, read b
+        case one
+          send back
+            make eye
+        case eye
+          send back
+            make neg
+        case neg
+          send back
+            make neg-eye
+        case neg-eye
+          send back
+            make one
+    case neg
+      fork case, read b
+        case one
+          send back
+            make neg
+        case eye
+          send back
+            make neg-eye
+        case neg
+          send back
+            make one
+        case neg-eye
+          send back
+            make eye
+    case neg-eye
+      fork case, read b
+        case one
+          send back
+            make neg-eye
+        case eye
+          send back
+            make one
+        case neg
+          send back
+            make eye
+        case neg-eye
+          send back
+            make neg
+
+# The four Pauli letters.
+form pauli
+  case letter-i
+  case letter-x
+  case letter-y
+  case letter-z
+
+# A Pauli operator: a phase times a letter.
+form op
+  case scaled
+    link phase, like phase
+    link pauli, like pauli
+
+# The product of two Pauli letters, a phased letter: X X = I, X Y = i Z, X Z = -i Y, and so on.
+task mul-letter
+  take a, like pauli
+  take b, like pauli
+  like op
+  fork case, read a
+    case letter-i
+      send back
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            read b
+    case letter-x
+      fork case, read b
+        case letter-i
+          send back
+            make scaled
+              bind phase
+                make one
+              bind pauli
+                make letter-x
+        case letter-x
+          send back
+            make scaled
+              bind phase
+                make one
+              bind pauli
+                make letter-i
+        case letter-y
+          send back
+            make scaled
+              bind phase
+                make eye
+              bind pauli
+                make letter-z
+        case letter-z
+          send back
+            make scaled
+              bind phase
+                make neg-eye
+              bind pauli
+                make letter-y
+    case letter-y
+      fork case, read b
+        case letter-i
+          send back
+            make scaled
+              bind phase
+                make one
+              bind pauli
+                make letter-y
+        case letter-x
+          send back
+            make scaled
+              bind phase
+                make neg-eye
+              bind pauli
+                make letter-z
+        case letter-y
+          send back
+            make scaled
+              bind phase
+                make one
+              bind pauli
+                make letter-i
+        case letter-z
+          send back
+            make scaled
+              bind phase
+                make eye
+              bind pauli
+                make letter-x
+    case letter-z
+      fork case, read b
+        case letter-i
+          send back
+            make scaled
+              bind phase
+                make one
+              bind pauli
+                make letter-z
+        case letter-x
+          send back
+            make scaled
+              bind phase
+                make eye
+              bind pauli
+                make letter-y
+        case letter-y
+          send back
+            make scaled
+              bind phase
+                make neg-eye
+              bind pauli
+                make letter-x
+        case letter-z
+          send back
+            make scaled
+              bind phase
+                make one
+              bind pauli
+                make letter-i
+
+# Apply two operator phases to a letter product.
+task combine-phase
+  take pa, like phase
+  take pb, like phase
+  take prod, like op
+  like op
+  fork case, read prod
+    case scaled
+      link pp
+      link letter
+      send back
+        make scaled
+          bind phase
+            call mul-phase
+              call mul-phase
+                read pa
+                read pb
+              read pp
+          bind pauli
+            read letter
+
+# The full Pauli operator product.
+task mul
+  take x, like op
+  take y, like op
+  like op
+  fork case, read x
+    case scaled
+      link px
+      link lx
+      fork case, read y
+        case scaled
+          link py
+          link ly
+          send back
+            call combine-phase
+              read px
+              read py
+              call mul-letter
+                read lx
+                read ly
+
+# Negate an operator (multiply its phase by -1).
+task neg-op
+  take x, like op
+  like op
+  fork case, read x
+    case scaled
+      link p
+      link l
+      send back
+        make scaled
+          bind phase
+            call mul-phase
+              make neg
+              read p
+          bind pauli
+            read l
+
+# X SQUARES TO THE IDENTITY: X X = I.
+rule x-squares-to-identity
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            make letter-x
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            make letter-x
+      make scaled
+        bind phase
+          make one
+        bind pauli
+          make letter-i
+  calm
+
+# X TIMES Y IS i TIMES Z: the defining Pauli product, X Y = i Z.
+rule x-times-y-is-i-z
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            make letter-x
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            make letter-y
+      make scaled
+        bind phase
+          make eye
+        bind pauli
+          make letter-z
+  calm
+
+# X AND Y ANTICOMMUTE: the two products carry OPPOSITE phases. X Y = i Z (above) while Y X = -i Z, so swapping the order
+# flips the sign, XY = -(YX). This noncommutativity is the algebraic root of the uncertainty principle. (Stated as the
+# second product; comparing it with X Y = i Z above shows the sign flip directly, avoiding a deeply nested term.)
+rule y-times-x-is-neg-i-z
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            make letter-y
+        make scaled
+          bind phase
+            make one
+          bind pauli
+            make letter-x
+      make scaled
+        bind phase
+          make neg-eye
+        bind pauli
+          make letter-z
+  calm

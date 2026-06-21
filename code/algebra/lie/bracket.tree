@@ -1,0 +1,122 @@
+# The Lie algebra so(3), the algebra of rotations of space (and su(2), the spin algebra), modeled by its bracket and
+# proved to satisfy the Lie axioms by the kernel. The three generators are the rotations about the three axes; their
+# bracket is the cross product, [e1,e2] = e3 and cyclically, the structure constants being the fully antisymmetric symbol.
+# A bracket of two generators is a signed generator or zero. The kernel proves the bracket is ALTERNATING ([a,a] = 0, a
+# rotation does not curve against itself) and ANTISYMMETRIC ([a,b] = -[b,a], the defining skew-symmetry of a Lie algebra),
+# by exhaustive induction over the three axes. This is the smallest nonabelian Lie algebra, the tangent structure of the
+# rotation group whose double cover is the spin one-half of matter, and the same bracket shape every gauge force carries.
+
+# The three axes of rotation.
+form axis
+  case a1
+  case a2
+  case a3
+
+# A bracket value: zero, or a signed generator.
+form turn
+  case still
+  case pos
+    link axis, like axis
+  case neg
+    link axis, like axis
+
+# Negate a bracket value.
+task flip-turn
+  take t, like turn
+  like turn
+  fork case, read t
+    case still
+      send back
+        make still
+    case pos
+      link axis
+      send back
+        make neg
+          bind axis
+            read axis
+    case neg
+      link axis
+      send back
+        make pos
+          bind axis
+            read axis
+
+# The Lie bracket of two generators, the cross product: [e1,e2]=e3, [e2,e3]=e1, [e3,e1]=e2, antisymmetric, zero on the
+# diagonal. The structure constants of so(3).
+task bracket
+  take a, like axis
+  take b, like axis
+  like turn
+  fork case, read a
+    case a1
+      fork case, read b
+        case a1
+          send back
+            make still
+        case a2
+          send back
+            make pos
+              bind axis
+                make a3
+        case a3
+          send back
+            make neg
+              bind axis
+                make a2
+    case a2
+      fork case, read b
+        case a1
+          send back
+            make neg
+              bind axis
+                make a3
+        case a2
+          send back
+            make still
+        case a3
+          send back
+            make pos
+              bind axis
+                make a1
+    case a3
+      fork case, read b
+        case a1
+          send back
+            make pos
+              bind axis
+                make a2
+        case a2
+          send back
+            make neg
+              bind axis
+                make a1
+        case a3
+          send back
+            make still
+
+# ALTERNATING: a generator brackets to zero with itself, [a,a] = 0. A rotation generates no turn against its own axis.
+rule bracket-is-alternating
+  mark a, like axis
+  show hold
+    call is-equal
+      call bracket
+        read a
+        read a
+      make still
+  fold a
+
+# ANTISYMMETRIC: [a,b] = -[b,a], the skew-symmetry that defines a Lie bracket. Swapping the order flips the sign. Over all
+# nine generator pairs.
+rule bracket-is-antisymmetric
+  mark a, like axis
+  mark b, like axis
+  show hold
+    call is-equal
+      call bracket
+        read a
+        read b
+      call flip-turn
+        call bracket
+          read b
+          read a
+  fold a, b

@@ -1,0 +1,174 @@
+# Quantum error correction, the three-bit repetition code, modeled and proved CORRECT by the kernel. A single logical bit
+# is encoded redundantly across three physical bits; if any ONE of them is flipped by noise, a majority vote recovers the
+# original. The kernel proves that decoding after ANY single-bit error (or no error) returns the original bit, for both bit
+# values, by exhaustive induction. This is the classical core of stabilizer quantum codes: the same redundancy and
+# syndrome decoding protect a qubit against a single Pauli-X error. It is the discrete, exactly-checkable heart of fault
+# tolerance, the property the substrate's spread-encoded memory also relies on.
+
+# A bit, the value being protected.
+form bit
+  case lo
+  case hi
+
+# Flip a bit (a single-bit error, the action of a Pauli-X / NOT).
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case lo
+      send back
+        make hi
+    case hi
+      send back
+        make lo
+
+# A codeword: three physical bits carrying one logical bit.
+form word
+  case triple
+    link one, like bit
+    link two, like bit
+    link three, like bit
+
+# Encode a logical bit as three copies.
+task encode
+  take b, like bit
+  like word
+  send back
+    make triple
+      bind one
+        read b
+      bind two
+        read b
+      bind three
+        read b
+
+# Majority-vote decode: the bit value held by at least two of the three. If the first two agree, that is the answer;
+# otherwise the third bit breaks the tie (it must then agree with one of them).
+task decode
+  take w, like word
+  like bit
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      fork case, read one
+        case lo
+          fork case, read two
+            case lo
+              send back
+                make lo
+            case hi
+              send back
+                read three
+        case hi
+          fork case, read two
+            case lo
+              send back
+                read three
+            case hi
+              send back
+                make hi
+
+# Apply a single-bit error at position one.
+task error-one
+  take w, like word
+  like word
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make triple
+          bind one
+            call flip
+              read one
+          bind two
+            read two
+          bind three
+            read three
+
+task error-two
+  take w, like word
+  like word
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make triple
+          bind one
+            read one
+          bind two
+            call flip
+              read two
+          bind three
+            read three
+
+task error-three
+  take w, like word
+  like word
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make triple
+          bind one
+            read one
+          bind two
+            read two
+          bind three
+            call flip
+              read three
+
+# NO ERROR: decoding a clean codeword returns the bit. decode (encode b) = b.
+rule decodes-clean-codeword
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call encode
+          read b
+      read b
+  fold b
+
+# CORRECTS A FLIP AT POSITION ONE: decode (error-one (encode b)) = b, for both bit values.
+rule corrects-error-at-one
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call error-one
+          call encode
+            read b
+      read b
+  fold b
+
+# CORRECTS A FLIP AT POSITION TWO.
+rule corrects-error-at-two
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call error-two
+          call encode
+            read b
+      read b
+  fold b
+
+# CORRECTS A FLIP AT POSITION THREE. With the two cases above, EVERY single-bit error is corrected: the code distance is
+# three, so it fixes any one error.
+rule corrects-error-at-three
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call error-three
+          call encode
+            read b
+      read b
+  fold b

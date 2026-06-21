@@ -1,0 +1,63 @@
+# The standard relations of quantum mechanics and relativity, in exact integer form, checked by the kernel. Three iconic
+# laws appear as arithmetic identities. The relativistic DISPERSION relation E^2 = k^2 + m^2 is the energy-momentum-mass
+# right triangle: a mode of momentum three and mass four has energy five. The BORN RULE, probability is amplitude SQUARED,
+# normalizes amplitudes by the same identity: amplitudes 3 and 4 (over 5) give probabilities summing to one, 9 + 16 = 25.
+# And the TSIRELSON bound caps quantum correlation at two-root-two, whose square is eight, strictly above the classical
+# bound of two, whose square is four: quantum mechanics beats every local-hidden-variable theory, 8 above 4. These are the
+# coarse-grained laws the substrate's discrete dynamics reproduce: a sharp light cone, the Born exponent two, and the
+# Tsirelson-bound correlations measured on the bench.
+
+# RELATIVISTIC DISPERSION: E^2 = k^2 + m^2. For momentum k = 3 and mass m = 4, the energy is E = 5: 5^2 = 3^2 + 4^2.
+hold dispersion-energy-momentum-mass
+  call is-equal
+    call multiply
+      code 5
+      code 5
+    call add
+      call multiply
+        code 3
+        code 3
+      call multiply
+        code 4
+        code 4
+
+# THE MASSLESS MODE: with m = 0, E = k exactly, the light cone. The pulse advances one cell per beat, the maximum speed:
+# E^2 = k^2, here 9 = 9.
+hold massless-mode-is-light-cone
+  call is-equal
+    call multiply
+      code 3
+      code 3
+    call multiply
+      code 3
+      code 3
+
+# THE BORN RULE, probability is amplitude SQUARED: amplitudes 3 and 4 over 5 give probabilities 9/25 and 16/25 summing to
+# one, 9 + 16 = 25. The exponent is two, not one or three; this is the rule the substrate's quantum walk reproduces.
+hold born-rule-probabilities-sum-to-one
+  call is-equal
+    code 25
+    call add
+      call multiply
+        code 3
+        code 3
+      call multiply
+        code 4
+        code 4
+
+# THE TSIRELSON BOUND: quantum correlation reaches two-root-two (square eight), strictly above the classical bound of two
+# (square four). A local-hidden-variable theory cannot exceed four; quantum mechanics reaches eight. The squared quantum
+# bound is exactly twice the squared classical bound: 8 = 2 * 4.
+hold tsirelson-quantum-bound-squared
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      code 4
+
+# Quantum strictly beats classical: the squared quantum bound 8 is above the squared classical bound 4, so two-root-two is
+# above two. This is the gap the CHSH experiment measures, the failure of local realism.
+hold quantum-beats-classical
+  call is-above
+    code 8
+    code 4

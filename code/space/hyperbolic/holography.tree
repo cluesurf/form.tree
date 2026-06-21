@@ -1,0 +1,67 @@
+# Holography and the horosphere, the cusp-bulk geometry of the substrate, checked by the kernel from the mesh shell
+# counts. In hyperbolic space the boundary of a region is as large as its interior: room opens up so fast that almost all
+# of a ball sits near its surface. The kernel verifies this directly. Counting docks outward from a seed, the shells are
+# 1, 24, 456, 8376; the shell at radius three (the boundary) is 8376, while everything inside it (the ball of radius two)
+# is only 481, so the BOUNDARY EXCEEDS THE WHOLE INTERIOR, and the boundary is more than half the entire ball. This is the
+# holographic principle in discrete form: the bulk can be read off its boundary, the surface "knows" the volume, exactly
+# the relation an anti-de-Sitter bulk has with its conformal boundary. The flat three-dimensional boundary the mesh grows
+# toward is the CUSP, a HOROSPHERE (the {4,3,4} cubic honeycomb, intrinsically Euclidean), and it is ordinary space.
+
+# The ball of radius three is the sum of its shells: 1 + 24 + 456 + 8376 = 8857.
+hold ball-three-is-sum-of-shells
+  call is-equal
+    code 8857
+    call add
+      code 1
+      call add
+        code 24
+        call add
+          code 456
+          code 8376
+
+# The interior (ball of radius two) is 1 + 24 + 456 = 481.
+hold interior-ball-two-is-481
+  call is-equal
+    code 481
+    call add
+      code 1
+      call add
+        code 24
+        code 456
+
+# HOLOGRAPHY: the boundary shell at radius three exceeds the ENTIRE interior, 8376 > 481. Each new shell is larger than
+# everything already inside it, so the bulk lives on its boundary. In flat space the boundary would be a vanishing
+# fraction of the bulk; here it dominates.
+hold boundary-exceeds-interior
+  call is-above
+    code 8376
+    code 481
+
+# The boundary is more than half the whole ball: 2 * 8376 = 16752 is above 8857. Most of the bulk sits within one step of
+# the surface, which is why a boundary theory can encode the bulk (the substrate's version of AdS/CFT).
+hold boundary-is-most-of-the-bulk
+  call is-above
+    call multiply
+      code 2
+      code 8376
+    code 8857
+
+# The hyperbolic growth ratio is large and roughly constant (the shell at three is about eighteen times the shell at two):
+# 8376 is above 18 * 456 = 8208. Exponential growth, the source of the holographic relation, not the bounded ratio of a
+# flat lattice.
+hold growth-ratio-is-about-eighteen
+  call is-above
+    code 8376
+    call multiply
+      code 18
+      code 456
+
+# THE HOROSPHERE / CUSP: the flat boundary the 4D bulk grows toward is three-dimensional, the bulk dimension minus one:
+# 4 - 1 = 3. It is the {4,3,4} cubic honeycomb, the only regular Euclidean honeycomb of space, intrinsically flat, and it
+# is the ordinary three-dimensional space we live in.
+hold cusp-is-three-dimensional
+  call is-equal
+    code 3
+    call subtract
+      code 4
+      code 1

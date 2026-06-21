@@ -1,0 +1,142 @@
+# Reversible gates, the building blocks of quantum cellular automata and reversible computing, proved INVERTIBLE by the
+# kernel. A quantum CA evolves by a local rule that must be reversible (unitary), so no information is lost and the
+# dynamics run both ways, exactly the property the knit collision has. The controlled-NOT (CNOT) flips a target bit when
+# its control is set; the Toffoli gate (controlled-controlled-NOT) flips a target when BOTH controls are set and is
+# universal for reversible computation. The kernel proves each gate is its OWN INVERSE (an involution): applying it twice
+# returns the original state, over all four (CNOT) and all eight (Toffoli) input configurations. These are the discrete,
+# exactly-reversible primitives a substrate computes with, and the classical skeleton of unitary quantum gates.
+
+form bit
+  case off
+  case on
+
+# Exclusive or: on exactly when the two bits differ. Its key property is being its own inverse.
+task xor
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      fork case, read b
+        case off
+          send back
+            make on
+        case on
+          send back
+            make off
+
+# Conjunction: on exactly when both bits are on.
+task and-bit
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make off
+    case on
+      send back
+        read b
+
+# A two-bit register: a control and a target.
+form pair
+  case reg
+    link control, like bit
+    link target, like bit
+
+# The controlled-NOT: leave the control, flip the target by the control (target becomes target xor control).
+task cnot
+  take p, like pair
+  like pair
+  fork case, read p
+    case reg
+      link control
+      link target
+      send back
+        make reg
+          bind control
+            read control
+          bind target
+            call xor
+              read target
+              read control
+
+# CNOT IS REVERSIBLE (its own inverse): cnot (cnot p) = p, over all four register states. Because xor by the same control
+# twice cancels. The gate runs backward, no information lost.
+rule cnot-is-reversible
+  mark c, like bit
+  mark t, like bit
+  show hold
+    call is-equal
+      call cnot
+        call cnot
+          make reg
+            bind control
+              read c
+            bind target
+              read t
+      make reg
+        bind control
+          read c
+        bind target
+          read t
+  fold c, t
+
+# A three-bit register: two controls and a target.
+form trio
+  case wire
+    link first, like bit
+    link second, like bit
+    link target, like bit
+
+# The Toffoli gate (controlled-controlled-NOT): flip the target when BOTH controls are on. Universal for reversible
+# computation; with it any classical circuit can be made reversible.
+task toffoli
+  take w, like trio
+  like trio
+  fork case, read w
+    case wire
+      link first
+      link second
+      link target
+      send back
+        make wire
+          bind first
+            read first
+          bind second
+            read second
+          bind target
+            call xor
+              read target
+              call and-bit
+                read first
+                read second
+
+# TOFFOLI IS REVERSIBLE: toffoli (toffoli w) = w, over all eight input states. The universal reversible gate is its own
+# inverse, so a reversible (and quantum) computer built from it can always be run backward.
+rule toffoli-is-reversible
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call toffoli
+        call toffoli
+          make wire
+            bind first
+              read a
+            bind second
+              read b
+            bind target
+              read c
+      make wire
+        bind first
+          read a
+        bind second
+          read b
+        bind target
+          read c
+  fold a, b, c

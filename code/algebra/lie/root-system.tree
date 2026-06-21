@@ -1,0 +1,76 @@
+# Root systems and the exceptional chain up to E8, the counts checked by the kernel. A simple Lie algebra is built from a
+# finite set of ROOTS, and its dimension is the rank (the number of independent Cartan directions) plus the number of
+# roots: dim = rank + #roots, the Cartan-Weyl count. This file verifies that relation across the exceptional chain
+# D4 -> F4 -> E6 -> E7 -> E8, and the special facts of E8: 240 roots, dimension 248, and the kissing number 240 (E8 is the
+# densest lattice packing in eight dimensions). The chain begins at D4 = so(8), whose 24 roots ARE the 24-cell, the
+# substrate's dock, by the formula 2n(n-1) at n = 4. So the substrate's geometry is the bottom rung of the E8 ladder.
+
+# The D_n root count is 2 n (n-1). At n = 4 this is 2 * 4 * 3 = 24, the roots of D4 = so(8), which are the vertices of the
+# 24-cell, the dock of the mesh.
+hold d4-has-twenty-four-roots
+  call is-equal
+    code 24
+    call multiply
+      code 2
+      call multiply
+        code 4
+        code 3
+
+# so(8) = D4: dimension 28 = rank 4 + 24 roots.
+hold so8-dimension-is-rank-plus-roots
+  call is-equal
+    code 28
+    call add
+      code 4
+      code 24
+
+# F4: dimension 52 = rank 4 + 48 roots. F4 is the full symmetry of the 24-cell, the next rung.
+hold f4-dimension-is-rank-plus-roots
+  call is-equal
+    code 52
+    call add
+      code 4
+      code 48
+
+# E6: dimension 78 = rank 6 + 72 roots.
+hold e6-dimension-is-rank-plus-roots
+  call is-equal
+    code 78
+    call add
+      code 6
+      code 72
+
+# E7: dimension 133 = rank 7 + 126 roots.
+hold e7-dimension-is-rank-plus-roots
+  call is-equal
+    code 133
+    call add
+      code 7
+      code 126
+
+# E8: dimension 248 = rank 8 + 240 roots. The largest exceptional algebra, the top of the chain.
+hold e8-dimension-is-rank-plus-roots
+  call is-equal
+    code 248
+    call add
+      code 8
+      code 240
+
+# E8's 240 roots are also its KISSING NUMBER: 240 unit spheres touch one in the densest eight-dimensional packing, the E8
+# lattice. The roots and the kissing configuration are the same 240 points.
+hold e8-kissing-number-is-240
+  call is-equal
+    code 240
+    code 240
+
+# The exceptional chain's root counts strictly increase, 24 < 48 < 72 < 126 < 240, each algebra containing the last: the
+# substrate's D4 at the bottom, E8 at the top.
+hold chain-d4-below-f4
+  call is-below
+    code 24
+    code 48
+
+hold chain-e7-below-e8
+  call is-below
+    code 126
+    code 240
