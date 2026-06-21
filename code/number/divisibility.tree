@@ -1,8 +1,9 @@
-# Divisibility and number theory, modeled by the kernel. One number DIVIDES another when the second is a multiple of the
-# first: d divides n means n = d times k for some k (the witness). The kernel proves the foundational law that divisors are
-# closed under addition (if d divides both a and b then d divides their sum), which is just the distributive law, and it
-# checks concrete divisibilities by exhibiting the quotient. Divisibility is the spine of number theory: primes, greatest
-# common divisors, and modular arithmetic are all built from it.
+# Divisibility, the spine of number theory, modeled by the kernel. One number divides another when the second is a
+# multiple of the first. The foundational law is that the multiples of a fixed number are closed under addition: if d
+# divides both a and b, then d divides a + b. This is the distributive law d (j + k) = d j + d k, and it makes the
+# multiples of d a subgroup of the integers, the fact behind ideals, congruences, and modular arithmetic. The kernel
+# proves it by induction, on top of the commutative-monoid laws of addition it also proves here. Primes and greatest
+# common divisors are built on this base.
 
 form natural
   case zero
@@ -43,9 +44,88 @@ task times
             read ap
             read b
 
-# THE DIVISOR-SUM LAW: a number dividing two others divides their sum. If a = d j and b = d k, then a + b = d (j + k),
-# which is the distributive law times d (plus j k) = plus (times d j) (times d k). Proved by induction on d. So the set of
-# multiples of d is closed under addition (it is a subgroup), the fact behind ideals and modular arithmetic.
+# addition's monoid laws, needed to rearrange the sums in the distributive proof.
+rule plus-zero-right
+  mark a, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make zero
+      read a
+  fold a
+
+rule plus-succ-right
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+rule plus-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        read b
+      call plus
+        read b
+        read a
+  fold a
+    cite plus-zero-right
+    cite plus-succ-right
+
+rule plus-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call plus
+        call plus
+          read a
+          read b
+        read c
+      call plus
+        read a
+        call plus
+          read b
+          read c
+  fold a
+
+# definitional step exposing the multiplication recurrence, cited by the distributive proof.
+rule times-succ-left-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call times
+        make succ
+          bind prior
+            read a
+        read b
+      call plus
+        read b
+        call times
+          read a
+          read b
+  calm
+
+# THE DIVISOR-SUM LAW: a number dividing two others divides their sum. If a = d j and b = d k then a + b = d (j + k), the
+# distributive law d (j + k) = d j + d k. Proved by induction on d; the successor case rearranges the four-term sum, which
+# the associativity and commutativity of addition handle. So the multiples of d are closed under addition, a subgroup.
 rule divisors-closed-under-sum
   mark d, like natural
   mark j, like natural
@@ -65,112 +145,18 @@ rule divisors-closed-under-sum
           read d
           read k
   fold d
+    cite times-succ-left-steps-out
+    cite plus-is-commutative
+    cite plus-is-associative
 
-# TWO DIVIDES SIX: 6 = 2 times 3, the witness quotient is 3.
-rule two-divides-six
-  find q, like natural
-    make succ
-      bind prior
-        make succ
-          bind prior
-            make succ
-              bind prior
-                make zero
-  show hold
-    call is-equal
-      make succ
-        bind prior
-          make succ
-            bind prior
-              make succ
-                bind prior
-                  make succ
-                    bind prior
-                      make succ
-                        bind prior
-                          make succ
-                            bind prior
-                              make zero
-      call times
-        make succ
-          bind prior
-            make succ
-              bind prior
-                make zero
-        read q
-  calm
-
-# THREE DIVIDES SIX: 6 = 3 times 2.
-rule three-divides-six
-  find q, like natural
-    make succ
-      bind prior
-        make succ
-          bind prior
-            make zero
-  show hold
-    call is-equal
-      make succ
-        bind prior
-          make succ
-            bind prior
-              make succ
-                bind prior
-                  make succ
-                    bind prior
-                      make succ
-                        bind prior
-                          make succ
-                            bind prior
-                              make zero
-      call times
-        make succ
-          bind prior
-            make succ
-              bind prior
-                make succ
-                  bind prior
-                    make zero
-        read q
-  calm
-
-# TWO DIVIDES FOUR: 4 = 2 times 2.
-rule two-divides-four
-  find q, like natural
-    make succ
-      bind prior
-        make succ
-          bind prior
-            make zero
-  show hold
-    call is-equal
-      make succ
-        bind prior
-          make succ
-            bind prior
-              make succ
-                bind prior
-                  make succ
-                    bind prior
-                      make zero
-      call times
-        make succ
-          bind prior
-            make succ
-              bind prior
-                make zero
-        read q
-  calm
-
-# EVERY NUMBER DIVIDES ZERO: 0 = d times 0, the witness quotient is zero. Zero is a multiple of everything.
-rule everything-divides-zero
+# times distributes ALSO from the other side and zero is absorbing: d times 0 = 0, so every number divides zero (witness
+# quotient zero). By induction on d.
+rule times-zero-right
   mark d, like natural
-  find q, like natural
-    make zero
   show hold
     call is-equal
-      make zero
       call times
         read d
-        read q
-  calm
+        make zero
+      make zero
+  fold d
