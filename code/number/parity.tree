@@ -76,7 +76,7 @@ rule parity-succ-steps
       call flip
         call parity
           read n
-  calm
+  calm hold
 
 rule plus-succ-left-steps
   mark a, like natural
@@ -93,7 +93,7 @@ rule plus-succ-left-steps
           call plus
             read a
             read b
-  calm
+  calm hold
 
 rule plus-succ-right-steps
   mark a, like natural
@@ -181,7 +181,7 @@ rule half-two-steps
         bind prior
           call half
             read n
-  calm
+  calm hold
 
 # half undoes double: half (n + n) = n, for every n. By induction on n, citing the half and plus step lemmas. With
 # `double-is-even` this says every even number is exactly twice its half.

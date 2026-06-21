@@ -31,7 +31,7 @@ rule equal-is-reflexive
     call is-equal
       read a
       read a
-  calm
+  calm hold
 
 rule equal-is-symmetric
   mark a, like natural
@@ -44,7 +44,7 @@ rule equal-is-symmetric
     call is-equal
       read b
       read a
-  calm
+  calm hold
 
 rule equal-is-transitive
   mark a, like natural
@@ -62,7 +62,7 @@ rule equal-is-transitive
     call is-equal
       read a
       read c
-  calm
+  calm hold
 
 rule succ-respects-equal
   mark a, like natural
@@ -79,7 +79,7 @@ rule succ-respects-equal
       make succ
         bind prior
           read b
-  calm
+  calm hold
 
 rule plus-respects-equal-left
   mark a, like natural
@@ -97,7 +97,7 @@ rule plus-respects-equal-left
       call plus
         read b
         read c
-  calm
+  calm hold
 
 rule plus-respects-equal-right
   mark a, like natural
@@ -115,4 +115,4 @@ rule plus-respects-equal-right
       call plus
         read c
         read b
-  calm
+  calm hold

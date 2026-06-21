@@ -79,7 +79,7 @@ rule mirror-leaf-is-leaf
       call mirror
         make leaf
       make leaf
-  calm
+  calm hold
 
 # UNIVERSAL: a leaf has size zero. Definitional.
 rule size-leaf-is-zero
@@ -88,7 +88,7 @@ rule size-leaf-is-zero
       call size
         make leaf
       make zero
-  calm
+  calm hold
 
 # UNIVERSAL: mirror is an involution. mirror (mirror t) = t, for every tree t. Proved by induction on t: the leaf case
 # computes, and the node case closes using the induction hypothesis on BOTH the left and the right subtree.
@@ -169,7 +169,7 @@ rule mirror-node-steps
         bind right
           call mirror
             read l
-  calm
+  calm hold
 
 rule size-node-steps
   mark l, like bush
@@ -192,7 +192,7 @@ rule size-node-steps
               read l
             call size
               read r
-  calm
+  calm hold
 
 # mirror preserves size: size (mirror t) = size t, for every tree. By induction on t; the node case swaps the two
 # subtree sizes, which agree by commutativity of addition (handled by AC normalization).

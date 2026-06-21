@@ -76,7 +76,7 @@ rule length-of-nil-is-zero
       call length
         make nil
       make zero
-  calm
+  calm hold
 
 # UNIVERSAL: nil is a left identity for append. append nil ys = ys, for every roll ys. Definitional.
 rule append-nil-left-is-identity
@@ -87,7 +87,7 @@ rule append-nil-left-is-identity
         make nil
         read ys
       read ys
-  calm
+  calm hold
 
 # UNIVERSAL: length steps through a cons. length (cons h t) = succ (length t), for every head h and tail t. Definitional.
 rule length-of-cons-steps
@@ -105,7 +105,7 @@ rule length-of-cons-steps
         bind prior
           call length
             read t
-  calm
+  calm hold
 
 # UNIVERSAL: append steps through a cons. append (cons h t) ys = cons h (append t ys), for every h, t, ys. Definitional.
 rule append-of-cons-steps
@@ -128,7 +128,7 @@ rule append-of-cons-steps
           call append
             read t
             read ys
-  calm
+  calm hold
 
 # The laws below are NOT definitional: append recurses on its FIRST argument, so each is stuck on a variable list and is
 # proved by structural induction on that list (`fold xs`). The nil case holds by computation; the cons case closes using
@@ -207,7 +207,7 @@ rule reverse-nil-is-nil
       call reverse
         make nil
       make nil
-  calm
+  calm hold
 
 rule reverse-cons-steps
   mark h, like natural
@@ -228,7 +228,7 @@ rule reverse-cons-steps
             read h
           bind more
             make nil
-  calm
+  calm hold
 
 # reverse is an anti-homomorphism on append: reverse (append xs ys) = append (reverse ys) (reverse xs). By induction on
 # xs, using the reverse and append step laws and associativity of append.

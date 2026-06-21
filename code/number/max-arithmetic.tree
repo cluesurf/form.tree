@@ -89,7 +89,7 @@ rule monus-succ-right-steps
         call monus
           read a
           read b
-  calm
+  calm hold
 
 rule pred-succ-is-prior
   mark n, like natural
@@ -100,7 +100,7 @@ rule pred-succ-is-prior
           bind prior
             read n
       read n
-  calm
+  calm hold
 
 rule monus-zero-left
   mark n, like natural
@@ -140,7 +140,7 @@ rule monus-zero-right
         read a
         make zero
       read a
-  calm
+  calm hold
 
 rule plus-succ-left-steps
   mark a, like natural
@@ -157,7 +157,7 @@ rule plus-succ-left-steps
           call plus
             read a
             read b
-  calm
+  calm hold
 
 rule max-succ-both-steps
   mark a, like natural
@@ -176,7 +176,7 @@ rule max-succ-both-steps
           call max
             read a
             read b
-  calm
+  calm hold
 
 rule plus-zero-right
   mark n, like natural

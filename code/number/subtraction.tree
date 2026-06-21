@@ -44,7 +44,7 @@ rule pred-succ-is-prior
           bind prior
             read n
       read n
-  calm
+  calm hold
 
 rule monus-zero-right-is-self
   mark a, like natural
@@ -54,7 +54,7 @@ rule monus-zero-right-is-self
         read a
         make zero
       read a
-  calm
+  calm hold
 
 rule monus-succ-right-steps
   mark a, like natural
@@ -70,7 +70,7 @@ rule monus-succ-right-steps
         call monus
           read a
           read b
-  calm
+  calm hold
 
 rule monus-zero-left-is-zero
   mark n, like natural

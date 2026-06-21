@@ -98,7 +98,7 @@ rule run-step-unfolds
         call apply
           read c
           read s
-  calm
+  calm hold
 
 rule then-step-unfolds
   mark c, like command
@@ -120,7 +120,7 @@ rule then-step-unfolds
           call then
             read p
             read q
-  calm
+  calm hold
 
 # THE EMPTY PROGRAM IS A NO-OP: run done s = s, the handler of an empty program returns the state unchanged.
 rule empty-program-is-identity
@@ -131,7 +131,7 @@ rule empty-program-is-identity
         make done
         read s
       read s
-  calm
+  calm hold
 
 # HANDLER COMPOSITION: run (then p q) s = run q (run p s), for all programs and states. Running two programs in sequence
 # is running the first, then running the second from the state it left. The state accumulates and changes along the

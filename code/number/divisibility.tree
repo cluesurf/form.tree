@@ -121,7 +121,7 @@ rule times-succ-left-steps-out
         call times
           read a
           read b
-  calm
+  calm hold
 
 # THE DIVISOR-SUM LAW: a number dividing two others divides their sum. If a = d j and b = d k then a + b = d (j + k), the
 # distributive law d (j + k) = d j + d k. Proved by induction on d; the successor case rearranges the four-term sum, which

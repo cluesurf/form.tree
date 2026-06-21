@@ -65,7 +65,7 @@ rule one-plus-one-is-two
         call one
         call one
       call two
-  calm
+  calm hold
 
 # two plus one is three.
 rule two-plus-one-is-three
@@ -75,7 +75,7 @@ rule two-plus-one-is-three
         call two
         call one
       call three
-  calm
+  calm hold
 
 # one plus two is three: addition reduces on the FIRST argument, so this exercises a different reduction path than
 # two-plus-one, and still lands on three.
@@ -86,7 +86,7 @@ rule one-plus-two-is-three
         call one
         call two
       call three
-  calm
+  calm hold
 
 # zero is a left identity, concretely: zero plus three is three (the base case of the recursion).
 rule zero-plus-three-is-three
@@ -96,7 +96,7 @@ rule zero-plus-three-is-three
         make zero
         call three
       call three
-  calm
+  calm hold
 
 # UNIVERSAL laws proved through the kernel, not just concrete instances. These are definitional: each side reduces to
 # the same normal form FOR EVERY value of the bound variables, so `calm` discharges them. Genuine forall-theorems.
@@ -111,7 +111,7 @@ rule plus-zero-left-is-identity
         make zero
         read n
       read n
-  calm
+  calm hold
 
 # The successor steps out of a sum: (succ a) + b = succ (a + b), for every a and b. (This is the recursion equation of
 # plus, definitionally true.)
@@ -130,7 +130,7 @@ rule plus-succ-steps-out
           call plus
             read a
             read b
-  calm
+  calm hold
 
 # Zero is ALSO a right identity: n + 0 = n, for every n. This is NOT definitional (plus recurses on its first argument,
 # so plus n zero is stuck on a variable n), and is proved by structural induction on n: the base n = 0 holds by
@@ -229,7 +229,7 @@ rule times-zero-left-is-zero
         make zero
         read n
       make zero
-  calm
+  calm hold
 
 # Zero is ALSO a right absorber: n * 0 = 0, for every n. Not definitional (times recurses on its first argument), so
 # proved by induction on n: the successor case 0 + (k * 0) reduces to k * 0, which the hypothesis sends to zero.
@@ -274,7 +274,7 @@ rule times-succ-left-steps-out
         call times
           read a
           read b
-  calm
+  calm hold
 
 # Right distributivity: (a + b) * c = a*c + b*c, for every a, b, c. Proved by induction on a, CHAINING the two
 # definitional step lemmas (which rewrite the recurrence into view) with associativity of addition (which realigns the
@@ -377,7 +377,7 @@ rule two-times-two-is-four
       call plus
         call two
         call two
-  calm
+  calm hold
 
 # Exponentiation by repeated multiplication: b^0 = 1, and b^(succ d) = b * b^d. Recursion descends on the exponent, so
 # it is verified terminating and the kernel unfolds it. This is the reach of an associative query: in d broadcast steps
@@ -411,7 +411,7 @@ rule power-zero-is-one
       make succ
         bind prior
           make zero
-  calm
+  calm hold
 
 # the exponent step: b^(succ d) = b * b^d. Definitional (the recurrence of power).
 rule power-succ-steps-out
@@ -429,7 +429,7 @@ rule power-succ-steps-out
         call power
           read b
           read d
-  calm
+  calm hold
 
 # Exponents ADD over a product: b^(d + e) = b^d * b^e, for every b, d, e. Proved by induction on d, chaining the additive
 # step lemma, the multiplicative step lemma, associativity of multiplication, and (in the base) the right identity of

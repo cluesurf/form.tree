@@ -89,7 +89,7 @@ rule times3-one-left
         make f1
         read a
       read a
-  calm
+  calm hold
 
 # times3 one on the right, times3 a f1 = a.
 rule times3-one-right
@@ -166,7 +166,7 @@ rule times3-zero-left
         make f0
         read a
       make f0
-  calm
+  calm hold
 
 # THE FIELD LAW: every nonzero element has a multiplicative inverse. F3's nonzero elements are exactly one and two, and
 # each is proved invertible by computation: one inverts to one, and two inverts to two since 2 * 2 = 4 = 1 modulo three.
@@ -179,7 +179,7 @@ rule one-is-invertible
         call invert3
           make f1
       make f1
-  calm
+  calm hold
 
 rule two-is-invertible
   show hold
@@ -189,4 +189,4 @@ rule two-is-invertible
         call invert3
           make f2
       make f1
-  calm
+  calm hold

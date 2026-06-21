@@ -48,7 +48,7 @@ rule double-turn-returns
         make odd
         make odd
       make even
-  calm
+  calm hold
 
 # The turn composition is ASSOCIATIVE, with even the identity and every element its own inverse: Z/2 is a group.
 rule turn-add-is-associative

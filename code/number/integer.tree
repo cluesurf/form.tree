@@ -68,7 +68,7 @@ rule negate-zero-is-zero
       call negate
         make zero-int
       make zero-int
-  calm
+  calm hold
 
 rule negate-negsucc-is-possucc
   mark p, like natural
@@ -81,7 +81,7 @@ rule negate-negsucc-is-possucc
       make possucc
         bind prior
           read p
-  calm
+  calm hold
 
 rule negate-possucc-is-negsucc
   mark p, like natural
@@ -94,7 +94,7 @@ rule negate-possucc-is-negsucc
       make negsucc
         bind prior
           read p
-  calm
+  calm hold
 
 rule from-natural-zero-is-zero
   show hold
@@ -102,7 +102,7 @@ rule from-natural-zero-is-zero
       call from-natural
         make zero
       make zero-int
-  calm
+  calm hold
 
 # successor on integers: z + 1. Matches the sign, and on a negative steps the magnitude down (matching the inner field).
 task next
@@ -254,7 +254,7 @@ rule combine-zero-right-is-self
         read z
         make zero-int
       read z
-  calm
+  calm hold
 
 # definitional recurrence: climb z (succ p) = next (climb z p).
 rule climb-succ-steps
@@ -271,7 +271,7 @@ rule climb-succ-steps
         call climb
           read z
           read p
-  calm
+  calm hold
 
 rule drop-succ-steps
   mark z, like rung
@@ -287,7 +287,7 @@ rule drop-succ-steps
         call drop
           read z
           read p
-  calm
+  calm hold
 
 # climb from zero builds the positive integer: climb zero-int p = possucc p.
 rule climb-from-zero-is-possucc
@@ -331,7 +331,7 @@ rule combine-possucc-steps
       call climb
         read z
         read p
-  calm
+  calm hold
 
 rule combine-negsucc-steps
   mark z, like rung
@@ -346,7 +346,7 @@ rule combine-negsucc-steps
       call drop
         read z
         read p
-  calm
+  calm hold
 
 # 0 + z = z. Proved by case on z, citing the two builder lemmas for the positive and negative cases.
 rule combine-zero-left-is-self
@@ -376,7 +376,7 @@ rule combine-one-is-next
             make zero
       call next
         read z
-  calm
+  calm hold
 
 # Adding the integer minus-one is the predecessor: z + (-1) = back z. Definitional.
 rule combine-neg-one-is-back
@@ -390,7 +390,7 @@ rule combine-neg-one-is-back
             make zero
       call back
         read z
-  calm
+  calm hold
 
 # The successor of the embedded natural is the embedded successor: next (from-natural n) = from-natural (succ n)? No --
 # rather, adding one to a positive steps it up: z + (succ p as positive) = next (z + (p as positive)). Definitional step.
@@ -412,7 +412,7 @@ rule combine-possucc-succ-steps
           make possucc
             bind prior
               read p
-  calm
+  calm hold
 
 # definitional: drop z 0 = back z (drop subtracts one then iterates; subtracting the integer one is the predecessor).
 rule drop-zero-steps
@@ -424,7 +424,7 @@ rule drop-zero-steps
         make zero
       call back
         read z
-  calm
+  calm hold
 
 # climbing commutes with the successor: climb (next z) p = next (climb z p). By induction on p.
 rule climb-next-commute
@@ -495,7 +495,7 @@ rule climb-zero-steps
         make zero
       call next
         read z
-  calm
+  calm hold
 
 # climbing commutes with the predecessor: climb (back z) p = next iterated over (back z) = back of the climb.
 rule climb-back-commute
@@ -617,7 +617,7 @@ rule possucc-zero-is-next-zero
           make zero
       call next
         make zero-int
-  calm
+  calm hold
 
 rule possucc-succ-is-next-possucc
   mark p, like natural
@@ -632,7 +632,7 @@ rule possucc-succ-is-next-possucc
         make possucc
           bind prior
             read p
-  calm
+  calm hold
 
 rule negsucc-zero-is-back-zero
   show hold
@@ -642,7 +642,7 @@ rule negsucc-zero-is-back-zero
           make zero
       call back
         make zero-int
-  calm
+  calm hold
 
 rule negsucc-succ-is-back-negsucc
   mark p, like natural
@@ -657,7 +657,7 @@ rule negsucc-succ-is-back-negsucc
         make negsucc
           bind prior
             read p
-  calm
+  calm hold
 
 # Positive commute: combine (possucc p) z = climb z p, for every magnitude p and integer z. This is commutativity of
 # addition restricted to a positive left operand. By induction on the natural p, peeling a `next` each step: the base

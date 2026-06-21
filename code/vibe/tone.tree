@@ -50,7 +50,7 @@ rule mirror-fixes-middle
       call mirror
         make middle
       make middle
-  calm
+  calm hold
 
 # The two outer tones are genuinely SWAPPED, not fixed: mirror low = high. With the fixed middle, this shows the mirror is
 # the transposition of the outer pair, the order-two symmetry of the ternary set.
@@ -60,7 +60,7 @@ rule mirror-swaps-low-to-high
       call mirror
         make low
       make high
-  calm
+  calm hold
 
 # The charge sign: a tone reads as a signed value through the lean. The low value is negative, the middle is neutral, the
 # high value is positive. This is the smallest signed group, the integers modulo their order: minus, naught, plus.

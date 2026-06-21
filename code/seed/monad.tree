@@ -115,7 +115,7 @@ rule monad-left-identity-instance
           read a
       call flip-opt
         read a
-  calm
+  calm hold
 
 # NONE SHORT-CIRCUITS: binding an absent value runs no continuation, the failure propagates. This is why the Option monad
 # models safe error handling, a single absence ends the chain.
@@ -125,4 +125,4 @@ rule none-short-circuits
       call chain-flip
         make none
       make none
-  calm
+  calm hold

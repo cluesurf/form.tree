@@ -98,7 +98,7 @@ rule heptagrid-is-two-dimensional
           make succ
             bind prior
               make zero
-  calm
+  calm hold
 
 # The order-4 pentagrid {5,4}: two entries, 2D.
 rule pentagrid-is-two-dimensional
@@ -137,7 +137,7 @@ rule pentagrid-is-two-dimensional
           make succ
             bind prior
               make zero
-  calm
+  calm hold
 
 # The dodecagrid {5,3,4}: three entries, a 3D honeycomb of dodecahedra.
 rule dodecagrid-is-three-dimensional
@@ -188,7 +188,7 @@ rule dodecagrid-is-three-dimensional
               make succ
                 bind prior
                   make zero
-  calm
+  calm hold
 
 # The substrate {3,4,3,4}: four entries, the 4D hyperbolic honeycomb that is the bulk of the mesh.
 rule substrate-is-four-dimensional
@@ -249,7 +249,7 @@ rule substrate-is-four-dimensional
                   make succ
                     bind prior
                       make zero
-  calm
+  calm hold
 
 # A 5D regular hyperbolic honeycomb {3,3,3,4,3}: five entries. Dimension five is the last where these live.
 rule five-dimensional-honeycomb
@@ -320,4 +320,4 @@ rule five-dimensional-honeycomb
                       make succ
                         bind prior
                           make zero
-  calm
+  calm hold

@@ -84,7 +84,7 @@ rule f-preserves-identity
       call f
         make e0
       make e0
-  calm
+  calm hold
 
 # f IS BIJECTIVE (its own inverse): f (f a) = a, over the three elements. An invertible homomorphism is an ISOMORPHISM, so
 # negation is an automorphism of Z/3, a symmetry of the group with itself.

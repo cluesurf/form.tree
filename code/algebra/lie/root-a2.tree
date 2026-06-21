@@ -1,0 +1,104 @@
+# The A2 root system, the roots of su(3), modeled as a REAL CONSTRUCTED set of roots with its symmetries. A root system is
+# a finite set of vectors closed under negation and under the reflections in each root (the Weyl group). A2 has six roots:
+# the simple roots a and b, their sum c = a + b, and the three negatives. The kernel proves the defining axioms on the
+# constructed roots: negation is an involution (the set is closed under negation), the Weyl reflection in a is an
+# involution that PERMUTES the six roots (closed under reflection), and the reflection commutes with negation. This is a
+# root system as the structure itself, with computable negation and reflection, not a count of roots. A2 is the rank-two
+# case; the same shape scales up through D4 (the 24-cell), F4, and E8.
+
+# The six roots of A2: positives a, b, c = a+b, and their negatives.
+form root
+  case pa
+  case pb
+  case pc
+  case na
+  case nb
+  case nc
+
+# Negation: each root and its opposite. The root system is closed under this.
+task negate
+  take r, like root
+  like root
+  fork case, read r
+    case pa
+      send back
+        make na
+    case pb
+      send back
+        make nb
+    case pc
+      send back
+        make nc
+    case na
+      send back
+        make pa
+    case nb
+      send back
+        make pb
+    case nc
+      send back
+        make pc
+
+# The WEYL REFLECTION in the root a: it negates a, and swaps b with c = a+b (since reflecting b across a adds a). The
+# defining symmetry of the root system, a reflection that maps roots to roots.
+task reflect-a
+  take r, like root
+  like root
+  fork case, read r
+    case pa
+      send back
+        make na
+    case na
+      send back
+        make pa
+    case pb
+      send back
+        make pc
+    case pc
+      send back
+        make pb
+    case nb
+      send back
+        make nc
+    case nc
+      send back
+        make nb
+
+# NEGATION IS AN INVOLUTION: negate (negate r) = r. The set of roots is closed under negation, each root paired with its
+# opposite (the six roots are three lines, like the 24-cell's twelve).
+rule negate-is-an-involution
+  mark r, like root
+  show hold
+    call is-equal
+      call negate
+        call negate
+          read r
+      read r
+  fold r
+
+# THE REFLECTION IS AN INVOLUTION: reflect-a (reflect-a r) = r. Reflecting twice in the same root returns the original, the
+# mark of a genuine reflection (a Weyl group generator, order two).
+rule reflect-a-is-an-involution
+  mark r, like root
+  show hold
+    call is-equal
+      call reflect-a
+        call reflect-a
+          read r
+      read r
+  fold r
+
+# THE REFLECTION COMMUTES WITH NEGATION: reflect-a (negate r) = negate (reflect-a r), for every root. The reflection
+# respects the root-and-opposite pairing, a symmetry of the whole root system. With the involutions above, this shows the
+# Weyl reflection is a genuine automorphism of the constructed root set.
+rule reflection-commutes-with-negation
+  mark r, like root
+  show hold
+    call is-equal
+      call reflect-a
+        call negate
+          read r
+      call negate
+        call reflect-a
+          read r
+  fold r

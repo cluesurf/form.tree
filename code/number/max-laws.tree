@@ -65,7 +65,7 @@ rule max-zero-left
         make zero
         read a
       read a
-  calm
+  calm hold
 
 # commutative: max a b = max b a. The join is independent of argument order.
 rule max-commutes

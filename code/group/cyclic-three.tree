@@ -66,7 +66,7 @@ rule add3-zero-left
         make z0
         read a
       read a
-  calm
+  calm hold
 
 # IDENTITY (right): zero added on the right is the identity, add3 a z0 = a. By case on a.
 rule add3-zero-right

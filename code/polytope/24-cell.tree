@@ -1,9 +1,9 @@
 # The 24-cell, the unique self-dual regular polytope in four dimensions: twenty-four vertices, ninety-six edges, ninety-
 # six faces, twenty-four octahedral cells. Its vertices are the D4 roots, the 4-vectors with exactly two nonzero slots,
-# each plus or minus one. This file MODELS that vertex set concretely and proves its structure: the count 24 = 6 * 4
-# (choose two of four axes, six ways, a sign for each, four ways), the f-vector's vanishing Euler characteristic, and the
-# ANTIPODE map (negate both signs) which is an involution with no fixed point, so the twenty-four vertices pair into the
-# twelve lines the law acts on. These are the twenty-four directions a tone may step. Four independent constructions
+# each plus or minus one. This file CONSTRUCTS that vertex set as a type you compute with: a vertex is an axis-pair with a
+# sign on each, the antipode (negate both signs) is a real function, and the structure is proved, the antipode an
+# involution with no fixed point, so the twenty-four vertices pair into the twelve lines the law acts on, and the sign-
+# choices give distinct vertices. These are the twenty-four directions a tone may step. Four independent constructions
 # (D4 roots, the two-nonzero ternary shell, the unit Hurwitz quaternions, the 4D kissing configuration) meet on these
 # same points, which is how the figure is known to be forced.
 
@@ -160,31 +160,36 @@ rule antipode-has-no-fixed-point
       make no
   fold v
 
-# COUNT: twenty-four vertices, six axis-pairs each with four sign choices, 6 * 4 = 24.
-hold twenty-four-vertices-from-six-pairs-four-signs
-  call is-equal
-    code 24
-    call multiply
-      code 6
-      code 4
+# The count is STRUCTURAL, not asserted. The vertex type IS a choice of axis-pair (six) with a sign on each (two by two),
+# so the inhabitants of `vertex` ARE the twenty-four vertices by construction; no `24 = 6 * 4` assertion is needed. And
+# they pair into twelve antipodal lines because `antipode-has-no-fixed-point` above PROVES the antipode is a fixed-point-
+# free involution: pairing each vertex with its distinct opposite partitions the twenty-four into twelve, the real content
+# that `24 = 2 * 12` only gestured at. The same twenty-four points, as unit quaternions, form the binary tetrahedral GROUP
+# closed under the multiplication proved in `group/quaternion`. So the 24-cell is a constructed type with a computable
+# antipode and a group law, not a number.
 
-# The twenty-four vertices pair into twelve antipodal lines: 24 = 2 * 12.
-hold vertices-pair-into-twelve-lines
-  call is-equal
-    code 24
-    call multiply
-      code 2
-      code 12
-
-# SELF-DUALITY and Euler: the f-vector is (24, 96, 96, 24), vertices equal cells and edges equal faces, and the
-# alternating sum vanishes as every convex 4-polytope's must: V - E + F - C = 24 - 96 + 96 - 24 = 0.
-hold euler-characteristic-vanishes
-  call is-equal
-    code 0
-    call subtract
-      call add
-        call subtract
-          code 24
-          code 96
-        code 96
-      code 24
+# DISTINCTNESS: the sign-choices of an axis-pair give DIFFERENT vertices, so the construction has no collisions. A vertex
+# and the one with its first sign flipped are distinct, shown by refutation over the sign.
+rule sign-flip-gives-distinct-vertex
+  mark a, like duo
+  mark s, like sign
+  show hold
+    call is-equal
+      call same-vertex
+        make at
+          bind axes
+            read a
+          bind sign-one
+            read s
+          bind sign-two
+            make pos
+        make at
+          bind axes
+            read a
+          bind sign-one
+            call flip-sign
+              read s
+          bind sign-two
+            make pos
+      make no
+  fold s

@@ -58,7 +58,7 @@ rule machine-computes-two-plus-three
                       make succ
                         bind prior
                           make zero
-  calm
+  calm hold
 
 # THE MACHINE ADDS (instance): 0 plus 2 halts holding 2 (the second counter empties into the first).
 rule machine-computes-zero-plus-two
@@ -76,7 +76,7 @@ rule machine-computes-zero-plus-two
           make succ
             bind prior
               make zero
-  calm
+  calm hold
 
 # THE MACHINE HALTS at the vacuum: with the second counter already zero, it returns the first counter unchanged,
 # run a 0 = a.
@@ -88,7 +88,7 @@ rule machine-halts-on-empty-counter
         read a
         make zero
       read a
-  calm
+  calm hold
 
 # plus, to state the universal correctness of the machine.
 task plus
@@ -124,7 +124,7 @@ rule run-succ-steps
           bind prior
             read a
         read b
-  calm
+  calm hold
 
 # helper: plus absorbs a successor on the right into the first argument (plus a (succ b) = succ (plus a b)).
 rule plus-succ-right

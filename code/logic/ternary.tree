@@ -155,7 +155,7 @@ rule excluded-middle-fails
         call neg
           make maybe
       make maybe
-  calm
+  calm hold
 
 # Confirm the contrast: on a DEFINITE value, excluded middle DOES hold, dis yes (neg yes) = yes. Only the unknown escapes
 # it, so three-valued logic extends two-valued logic rather than replacing it.
@@ -167,4 +167,4 @@ rule excluded-middle-holds-on-definite
         call neg
           make yes
       make yes
-  calm
+  calm hold

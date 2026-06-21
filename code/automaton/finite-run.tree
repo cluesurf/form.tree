@@ -100,7 +100,7 @@ rule run-cons-steps
           read s
           read g
         read w
-  calm
+  calm hold
 
 # Definitional step law of append on a cons.
 rule append-cons-steps
@@ -123,7 +123,7 @@ rule append-cons-steps
           call append
             read u
             read v
-  calm
+  calm hold
 
 # REVERSIBILITY: reading a one twice returns the state, step (step s i) i = s, for every state. The one-transition is an
 # involution, so the parity rule is locally reversible, the automaton can be run backward over its input. This is the
@@ -160,7 +160,7 @@ rule run-empty-is-identity
         read s
         make nil
       read s
-  calm
+  calm hold
 
 # CONCRETE BEHAVIOR: from even, two ones return to even (an even count of ones is accepted).
 rule even-then-two-ones-is-even
@@ -178,7 +178,7 @@ rule even-then-two-ones-is-even
               bind tail
                 make nil
       make even
-  calm
+  calm hold
 
 # From even, a single one reaches odd (an odd count is rejected).
 rule even-then-one-one-is-odd
@@ -192,7 +192,7 @@ rule even-then-one-one-is-odd
           bind tail
             make nil
       make odd
-  calm
+  calm hold
 
 # THE EXTENDED-TRANSITION HOMOMORPHISM: run s (append u v) = run (run s u) v, for every state s and words u, v. Running
 # the machine over a concatenation equals running it over the first word and continuing, from the reached state, over the

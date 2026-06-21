@@ -50,7 +50,7 @@ rule add-zero-left-is-identity-function
     call is-equal
       read add-zero-left
       read identity
-  calm
+  calm hold
 
 # the same point made through a second writing: `0 + (0 + n)` as a function is still the identity (funext composes).
 task add-zero-twice
@@ -68,7 +68,7 @@ rule add-zero-twice-is-identity-function
     call is-equal
       read add-zero-twice
       read identity
-  calm
+  calm hold
 
 # A NON-definitional function extensionality: `(-) + 0` and the identity function are equal as functions, even though
 # `n + 0` does NOT reduce to `n` definitionally (plus recurses on its first argument). The pointwise law is proved by

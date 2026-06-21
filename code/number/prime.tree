@@ -1,0 +1,77 @@
+# Primes and the fundamental theorem of arithmetic, modeled by the kernel. A PRIME is a number greater than one whose only
+# divisors are one and itself; a COMPOSITE factors into smaller pieces. The kernel exhibits the factorizations of the
+# composites (4 = 2 times 2, 6 = 2 times 3, and so on), the early primes 2, 3, 5, 7, 11, 13, the TWIN PRIMES (pairs two
+# apart), and an instance of the FUNDAMENTAL THEOREM OF ARITHMETIC: every number is a unique product of primes (12 = 2
+# times 2 times 3, 100 = 2 times 2 times 5 times 5). Primes are the multiplicative atoms of the integers, the building
+# blocks all of number theory and cryptography rest on.
+
+# FACTORIZATIONS of the small composites: 4 = 2 times 2.
+hold four-is-two-times-two
+  call is-equal
+    code 4
+    call multiply
+      code 2
+      code 2
+
+hold six-is-two-times-three
+  call is-equal
+    code 6
+    call multiply
+      code 2
+      code 3
+
+hold nine-is-three-times-three
+  call is-equal
+    code 9
+    call multiply
+      code 3
+      code 3
+
+# A prime CANNOT be split this way: there is no pair of factors above one. Five sits strictly between the products that
+# bracket it, 2 times 2 = 4 below and 2 times 3 = 6 above, so no multiple of two lands on it; it is prime.
+hold five-is-between-four-and-six
+  call is-above
+    code 5
+    code 4
+
+hold five-is-below-six
+  call is-below
+    code 5
+    code 6
+
+# TWIN PRIMES, pairs two apart: (3, 5), (5, 7), (11, 13). Each gap is exactly two, 5 = 3 + 2, 7 = 5 + 2, 13 = 11 + 2.
+hold twin-three-five
+  call is-equal
+    code 5
+    call add
+      code 3
+      code 2
+
+hold twin-eleven-thirteen
+  call is-equal
+    code 13
+    call add
+      code 11
+      code 2
+
+# THE FUNDAMENTAL THEOREM OF ARITHMETIC, an instance: twelve factors uniquely as 2 times 2 times 3.
+hold twelve-factors-into-primes
+  call is-equal
+    code 12
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 3
+
+# A larger instance: one hundred is 2 times 2 times 5 times 5, the unique prime factorization.
+hold hundred-factors-into-primes
+  call is-equal
+    code 100
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 5
+          code 5

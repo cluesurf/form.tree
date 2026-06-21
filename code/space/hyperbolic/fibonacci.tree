@@ -87,7 +87,7 @@ rule fib-recurrence
               read k
         call fib
           read k
-  calm
+  calm hold
 
 rule fibsum-succ-steps
   mark m, like natural
@@ -104,7 +104,7 @@ rule fibsum-succ-steps
           make succ
             bind prior
               read m
-  calm
+  calm hold
 
 rule plus-zero-right-is-identity
   mark n, like natural

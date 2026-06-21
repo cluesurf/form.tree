@@ -61,7 +61,7 @@ rule tetrahedron-three-three-is-spherical
           bind prior
             make zero
       make sphere
-  calm
+  calm hold
 
 # The octahedron {3,4}: excess (3-2)(4-2) = 2, below four, SPHERICAL.
 rule octahedron-three-four-is-spherical
@@ -74,7 +74,7 @@ rule octahedron-three-four-is-spherical
               bind prior
                 make zero
       make sphere
-  calm
+  calm hold
 
 # The square tiling {4,4}: excess (4-2)(4-2) = 4, exactly four, FLAT. Four right angles tile the plane.
 rule square-tiling-four-four-is-flat
@@ -91,7 +91,7 @@ rule square-tiling-four-four-is-flat
                       bind prior
                         make zero
       make flat
-  calm
+  calm hold
 
 # The triangular tiling {3,6}: excess (3-2)(6-2) = 4, exactly four, FLAT. Six triangles fill a vertex.
 rule triangular-tiling-three-six-is-flat
@@ -108,7 +108,7 @@ rule triangular-tiling-three-six-is-flat
                       bind prior
                         make zero
       make flat
-  calm
+  calm hold
 
 # The hexagonal tiling {6,3}: excess (6-2)(3-2) = 4, exactly four, FLAT.
 rule hexagonal-tiling-six-three-is-flat
@@ -125,7 +125,7 @@ rule hexagonal-tiling-six-three-is-flat
                       bind prior
                         make zero
       make flat
-  calm
+  calm hold
 
 # The heptagrid {7,3}: excess (7-2)(3-2) = 5, above four, HYPERBOLIC. Margenstern's tiling; angles overflow.
 rule heptagrid-seven-three-is-hyperbolic
@@ -144,7 +144,7 @@ rule heptagrid-seven-three-is-hyperbolic
                           bind prior
                             make zero
       make horn
-  calm
+  calm hold
 
 # The order-4 pentagonal tiling {5,4}: excess (5-2)(4-2) = 6, above four, HYPERBOLIC. The dodecagrid's planar cousin.
 rule pentagrid-five-four-is-hyperbolic
@@ -165,4 +165,4 @@ rule pentagrid-five-four-is-hyperbolic
                               bind prior
                                 make zero
       make horn
-  calm
+  calm hold

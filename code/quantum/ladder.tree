@@ -45,7 +45,7 @@ rule annihilate-undoes-create
         call create
           read n
       read n
-  calm
+  calm hold
 
 # THE VACUUM IS ANNIHILATED TO ITSELF: annihilate empty = empty. There is no quantum to remove from the empty mode.
 rule vacuum-annihilates-to-itself
@@ -54,7 +54,7 @@ rule vacuum-annihilates-to-itself
       call annihilate
         make empty
       make empty
-  calm
+  calm hold
 
 # THE COMMUTATOR AT THE VACUUM: creating-then-annihilating always returns the start, but at the vacuum annihilating-then-
 # creating does NOT. annihilate (create empty) = empty, while create (annihilate empty) = one quantum, not empty. The two
@@ -80,4 +80,4 @@ rule creation-raises-the-number
       make more
         bind prior
           read n
-  calm
+  calm hold

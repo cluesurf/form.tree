@@ -109,7 +109,7 @@ rule at-most-zero-left-is-on
         make zero
         read n
       make on
-  calm
+  calm hold
 
 # (succ a) <= (succ b) iff a <= b. Definitional.
 rule at-most-succ-both
@@ -127,7 +127,7 @@ rule at-most-succ-both
       call at-most
         read a
         read b
-  calm
+  calm hold
 
 # n <= n, always (reflexivity). By induction on n.
 rule at-most-reflexive
@@ -255,7 +255,7 @@ rule min-zero-left-is-zero
         make zero
         read n
       make zero
-  calm
+  calm hold
 
 # max 0 n = n. Definitional.
 rule max-zero-left-is-self
@@ -266,7 +266,7 @@ rule max-zero-left-is-self
         make zero
         read n
       read n
-  calm
+  calm hold
 
 # The lattice laws. min and max each recurse on BOTH arguments, so their commutativity and associativity are proved by
 # SIMULTANEOUS induction (`fold a, b` and `fold a, b, c`): the prover walks the product of the constructors and, in the
@@ -427,7 +427,7 @@ rule plus-succ-left-steps
           call plus
             read a
             read b
-  calm
+  calm hold
 
 rule max-succ-both-steps
   mark a, like natural
@@ -446,7 +446,7 @@ rule max-succ-both-steps
           call max
             read a
             read b
-  calm
+  calm hold
 
 rule min-succ-both-steps
   mark a, like natural
@@ -465,7 +465,7 @@ rule min-succ-both-steps
           call min
             read a
             read b
-  calm
+  calm hold
 
 rule max-plus-min-is-plus
   mark a, like natural

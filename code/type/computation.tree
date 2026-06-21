@@ -27,7 +27,7 @@ rule flip-off-is-on
       call flip
         make off
       make on
-  calm
+  calm hold
 
 # flip on computes to off.
 rule flip-on-is-off
@@ -36,7 +36,7 @@ rule flip-on-is-off
       call flip
         make on
       make off
-  calm
+  calm hold
 
 # flip is an involution at off: flipping twice returns off. The kernel performs TWO reductions and checks the result.
 rule flip-flip-off-is-off
@@ -46,7 +46,7 @@ rule flip-flip-off-is-off
         call flip
           make off
       make off
-  calm
+  calm hold
 
 # Boolean conjunction: and off b = off, and on b = b. Defined by a match the kernel reduces.
 task both
@@ -83,7 +83,7 @@ rule both-off-absorbs
         make off
         read b
       make off
-  calm
+  calm hold
 
 # UNIVERSAL law: on is the identity of and. and on b = b, for every b.
 rule both-on-is-identity
@@ -94,7 +94,7 @@ rule both-on-is-identity
         make on
         read b
       read b
-  calm
+  calm hold
 
 # UNIVERSAL law: on is the absorber of or. or on b = on, for every b.
 rule some-on-absorbs
@@ -105,7 +105,7 @@ rule some-on-absorbs
         make on
         read b
       make on
-  calm
+  calm hold
 
 # UNIVERSAL law: off is the identity of or. or off b = b, for every b.
 rule some-off-is-identity
@@ -116,7 +116,7 @@ rule some-off-is-identity
         make off
         read b
       read b
-  calm
+  calm hold
 
 # de Morgan, concretely: not (and on off) = or (not on) (not off). The kernel reduces both sides to on.
 rule de-morgan-on-off
@@ -131,4 +131,4 @@ rule de-morgan-on-off
           make on
         call flip
           make off
-  calm
+  calm hold

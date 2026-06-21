@@ -87,7 +87,7 @@ rule reads-zero-writes-one
           make right
         bind next
           make go
-  calm
+  calm hold
 
 # TRANSITION ENTRY: reading a one writes a zero (the bit flip).
 rule reads-one-writes-zero
@@ -103,7 +103,7 @@ rule reads-one-writes-zero
           make right
         bind next
           make go
-  calm
+  calm hold
 
 # HALTING: reading a blank in the go state halts the machine (next state stop).
 rule reads-blank-halts
@@ -119,7 +119,7 @@ rule reads-blank-halts
           make stay
         bind next
           make stop
-  calm
+  calm hold
 
 # THE STOP STATE IS FINAL: once halted, every symbol leaves the machine halted and unchanged, for every symbol read.
 rule stop-state-is-final
