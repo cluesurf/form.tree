@@ -181,3 +181,136 @@ rule length-of-append-adds
         call length
           read ys
   fold xs
+
+# reverse: the list read back to front, built by appending each head as a one-element list at the end.
+task reverse
+  take xs, like roll
+  like roll
+  fork case, read xs
+    case nil
+      send back
+        make nil
+    case cons
+      send back
+        call append
+          call reverse
+            read more
+          make cons
+            bind item
+              read item
+            bind more
+              make nil
+
+rule reverse-nil-is-nil
+  show hold
+    call is-equal
+      call reverse
+        make nil
+      make nil
+  calm
+
+rule reverse-cons-steps
+  mark h, like natural
+  mark t, like roll
+  show hold
+    call is-equal
+      call reverse
+        make cons
+          bind item
+            read h
+          bind more
+            read t
+      call append
+        call reverse
+          read t
+        make cons
+          bind item
+            read h
+          bind more
+            make nil
+  calm
+
+# reverse is an anti-homomorphism on append: reverse (append xs ys) = append (reverse ys) (reverse xs). By induction on
+# xs, using the reverse and append step laws and associativity of append.
+rule reverse-of-append
+  mark xs, like roll
+  mark ys, like roll
+  show hold
+    call is-equal
+      call reverse
+        call append
+          read xs
+          read ys
+      call append
+        call reverse
+          read ys
+        call reverse
+          read xs
+  fold xs
+    cite reverse-nil-is-nil
+    cite reverse-cons-steps
+    cite append-of-cons-steps
+    cite append-is-associative
+    cite append-nil-right-is-identity
+
+# reverse is an INVOLUTION: reverse (reverse xs) = xs, for every list. The canonical list theorem, by induction on xs
+# citing the reverse-append anti-homomorphism.
+rule reverse-reverse-is-identity
+  mark xs, like roll
+  show hold
+    call is-equal
+      call reverse
+        call reverse
+          read xs
+      read xs
+  fold xs
+    cite reverse-nil-is-nil
+    cite reverse-cons-steps
+    cite reverse-of-append
+
+# helper plus laws (over the lengths) for the length-of-reverse theorem.
+rule plus-zero-right-on-length
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+rule plus-succ-right-on-length
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# reverse preserves length: length (reverse xs) = length xs, for every list. By induction on xs, using the reverse step
+# law, the length-of-append homomorphism, and the plus step laws.
+rule length-of-reverse-is-length
+  mark xs, like roll
+  show hold
+    call is-equal
+      call length
+        call reverse
+          read xs
+      call length
+        read xs
+  fold xs
+    cite reverse-cons-steps
+    cite length-of-append-adds
+    cite length-of-cons-steps
+    cite length-of-nil-is-zero
+    cite plus-succ-right-on-length
+    cite plus-zero-right-on-length

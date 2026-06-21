@@ -231,6 +231,142 @@ rule times-zero-left-is-zero
       make zero
   calm
 
+# Zero is ALSO a right absorber: n * 0 = 0, for every n. Not definitional (times recurses on its first argument), so
+# proved by induction on n: the successor case 0 + (k * 0) reduces to k * 0, which the hypothesis sends to zero.
+rule times-zero-right-is-zero
+  mark n, like natural
+  show hold
+    call is-equal
+      call times
+        read n
+        make zero
+      make zero
+  fold n
+
+# One is a right identity: n * 1 = n, for every n. The successor case 1 + (k * 1) reduces to succ (k * 1), which the
+# hypothesis closes. Proved by induction on n.
+rule times-one-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call times
+        read n
+        make succ
+          bind prior
+            make zero
+      read n
+  fold n
+
+# The successor steps out on the LEFT of a product: (succ a) * b = b + (a * b). This is the recurrence of `times`,
+# definitionally true, and the lemma the ring proofs below rewrite with to expose the recursive call.
+rule times-succ-left-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call times
+        make succ
+          bind prior
+            read a
+        read b
+      call plus
+        read b
+        call times
+          read a
+          read b
+  calm
+
+# Right distributivity: (a + b) * c = a*c + b*c, for every a, b, c. Proved by induction on a, CHAINING the two
+# definitional step lemmas (which rewrite the recurrence into view) with associativity of addition (which realigns the
+# two sides). The induction hypothesis fires automatically on the recursive call.
+rule times-distributes-right
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call times
+        call plus
+          read a
+          read b
+        read c
+      call plus
+        call times
+          read a
+          read c
+        call times
+          read b
+          read c
+  fold a
+    cite plus-succ-steps-out
+    cite times-succ-left-steps-out
+    cite plus-is-associative
+
+# Multiplication is associative: (a * b) * c = a * (b * c), for every a, b, c. Proved by induction on a, citing the
+# left step lemma (to expose the recurrence) and right distributivity (to split the product over the sum it unfolds to).
+rule times-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call times
+        call times
+          read a
+          read b
+        read c
+      call times
+        read a
+        call times
+          read b
+          read c
+  fold a
+    cite times-succ-left-steps-out
+    cite times-distributes-right
+
+# The successor steps out on the RIGHT of a product: a * (succ b) = a + (a * b). Not definitional (times recurses on its
+# first argument), so proved by induction on a. The step needs to commute and reassociate a sum, so the proof cites
+# addition's commutativity and associativity, which the prover handles by normalizing the additive chains modulo AC.
+rule times-succ-right-is-plus
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call times
+        read a
+        make succ
+          bind prior
+            read b
+      call plus
+        read a
+        call times
+          read a
+          read b
+  fold a
+    cite times-succ-left-steps-out
+    cite plus-succ-steps-out
+    cite plus-is-associative
+    cite plus-is-commutative
+
+# Multiplication is commutative: a * b = b * a, for every a and b. Proved by induction on a: the base case needs the
+# right absorber n * 0 = 0, and the successor case rewrites both sides through the two product step lemmas, the induction
+# hypothesis closing k * b = b * k.
+rule times-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call times
+        read a
+        read b
+      call times
+        read b
+        read a
+  fold a
+    cite times-zero-right-is-zero
+    cite times-succ-left-steps-out
+    cite times-succ-right-is-plus
+
 # A concrete product: two times two is four, computed through the kernel (multiplication unfolds into two additions).
 rule two-times-two-is-four
   show hold
@@ -242,3 +378,189 @@ rule two-times-two-is-four
         call two
         call two
   calm
+
+# Exponentiation by repeated multiplication: b^0 = 1, and b^(succ d) = b * b^d. Recursion descends on the exponent, so
+# it is verified terminating and the kernel unfolds it. This is the reach of an associative query: in d broadcast steps
+# a branching-b search reaches b^d cells (see computation/associative/search.tree).
+task power
+  take b, like natural
+  take d, like natural
+  like natural
+  fork case, read d
+    case zero
+      send back
+        make succ
+          bind prior
+            make zero
+    case succ
+      send back
+        call times
+          read b
+          call power
+            read b
+            read prior
+
+# b to the zero is one. Definitional.
+rule power-zero-is-one
+  mark b, like natural
+  show hold
+    call is-equal
+      call power
+        read b
+        make zero
+      make succ
+        bind prior
+          make zero
+  calm
+
+# the exponent step: b^(succ d) = b * b^d. Definitional (the recurrence of power).
+rule power-succ-steps-out
+  mark b, like natural
+  mark d, like natural
+  show hold
+    call is-equal
+      call power
+        read b
+        make succ
+          bind prior
+            read d
+      call times
+        read b
+        call power
+          read b
+          read d
+  calm
+
+# Exponents ADD over a product: b^(d + e) = b^d * b^e, for every b, d, e. Proved by induction on d, chaining the additive
+# step lemma, the multiplicative step lemma, associativity of multiplication, and (in the base) the right identity of
+# addition. This is the general law behind "doubling the search depth squares the reach": b^(2d) = (b^d)^2.
+rule power-adds-exponents
+  mark b, like natural
+  mark d, like natural
+  mark e, like natural
+  show hold
+    call is-equal
+      call power
+        read b
+        call plus
+          read d
+          read e
+      call times
+        call power
+          read b
+          read d
+        call power
+          read b
+          read e
+  fold d
+    cite power-succ-steps-out
+    cite power-zero-is-one
+    cite plus-succ-steps-out
+    cite plus-zero-left-is-identity
+    cite times-succ-left-steps-out
+    cite times-zero-left-is-zero
+    cite times-is-associative
+    cite plus-zero-right-is-identity
+
+# Left distributivity: a * (b + c) = a*b + a*c, for every a, b, c. Proved by induction on a; the successor case spreads
+# the product over the sum and the two sides agree after commuting and reassociating the additive terms (AC). With right
+# distributivity this completes the distributive law of the semiring on both sides.
+rule times-distributes-left
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call times
+        read a
+        call plus
+          read b
+          read c
+      call plus
+        call times
+          read a
+          read b
+        call times
+          read a
+          read c
+  fold a
+    cite times-succ-left-steps-out
+    cite plus-is-commutative
+    cite plus-is-associative
+
+# One is a LEFT identity for multiplication: 1 * n = n, for every n. (Right identity n * 1 = n is proved above; this
+# completes the multiplicative identity on both sides.) The single product step unfolds 1 * n to n + 0*n = n + 0 = n.
+rule times-one-left-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call times
+        make succ
+          bind prior
+            make zero
+        read n
+      read n
+  fold n
+    cite times-succ-left-steps-out
+    cite times-zero-left-is-zero
+    cite plus-zero-right-is-identity
+
+# Two times n is n doubled: n * 2 = n + n, for every n. Connects multiplication by two to addition.
+rule times-two-is-double
+  mark n, like natural
+  show hold
+    call is-equal
+      call times
+        read n
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      call plus
+        read n
+        read n
+  fold n
+    cite times-succ-left-steps-out
+    cite plus-succ-left-steps-out
+    cite plus-succ-right-steps-out
+    cite plus-zero-right-is-identity
+    cite times-zero-left-is-zero
+
+# The square of a sum: (a + b)^2 = a^2 + 2ab + b^2, written `(a+b)*(a+b) = a*a + (a*b + a*b) + b*b`. A classic algebraic
+# identity, proved by spreading the product over the sum on both sides (both distributive laws) and commuting the cross
+# term, with addition AND multiplication normalized modulo associativity-commutativity. Exercises the whole semiring.
+rule square-of-sum
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call times
+        call plus
+          read a
+          read b
+        call plus
+          read a
+          read b
+      call plus
+        call plus
+          call times
+            read a
+            read a
+          call plus
+            call times
+              read a
+              read b
+            call times
+              read a
+              read b
+        call times
+          read b
+          read b
+  fold a
+    cite times-distributes-right
+    cite times-distributes-left
+    cite times-is-commutative
+    cite times-is-associative
+    cite plus-is-commutative
+    cite plus-is-associative

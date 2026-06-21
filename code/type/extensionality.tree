@@ -1,0 +1,100 @@
+# Function extensionality, exercised at the surface. The dependent kernel's equality is OBSERVATIONAL: the identity type
+# at a function type COMPUTES to the pointwise identity (`Id ((x:A) -> B) f g` reduces to `(x:A) -> Id B (f x) (g x)`),
+# so two functions are equal exactly when they agree at every point, and funext is derivable (it is the identity), not a
+# postulated axiom. This file proves two functions EQUAL AS FUNCTIONS through that mechanism: `calm` discharges the
+# function equality by the kernel applying both functions to a fresh point and reducing. This is the QTT + observational
+# kernel (judge.ts) showing through into form.tree, not just a value-level fact. (Pointwise equalities that are not
+# definitional are proved as `mark`-quantified value laws and lifted by funext once the surface exposes a funext tactic.)
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# add-zero-left n = 0 + n. Pointwise it equals n, definitionally (plus matches its first argument).
+task add-zero-left
+  take n, like natural
+  like natural
+  send back
+    call plus
+      make zero
+      read n
+
+# the identity function on the naturals.
+task identity
+  take n, like natural
+  like natural
+  send back
+    read n
+
+# FUNCTION EXTENSIONALITY: `0 + (-)` and the identity function are EQUAL AS FUNCTIONS. Not "equal at a given n" (a value
+# law), but the two function values themselves identical, proved through the kernel's computing funext.
+rule add-zero-left-is-identity-function
+  show hold
+    call is-equal
+      read add-zero-left
+      read identity
+  calm
+
+# the same point made through a second writing: `0 + (0 + n)` as a function is still the identity (funext composes).
+task add-zero-twice
+  take n, like natural
+  like natural
+  send back
+    call plus
+      make zero
+      call plus
+        make zero
+        read n
+
+rule add-zero-twice-is-identity-function
+  show hold
+    call is-equal
+      read add-zero-twice
+      read identity
+  calm
+
+# A NON-definitional function extensionality: `(-) + 0` and the identity function are equal as functions, even though
+# `n + 0` does NOT reduce to `n` definitionally (plus recurses on its first argument). The pointwise law is proved by
+# induction, then the `melt` tactic LIFTS it to the function equality through the kernel's funext. This is the funext
+# tactic: a pointwise equality, however deeply proved, becomes an equality of the functions themselves.
+task add-zero-right
+  take n, like natural
+  like natural
+  send back
+    call plus
+      read n
+      make zero
+
+rule add-zero-right-pointwise
+  mark n, like natural
+  show hold
+    call is-equal
+      call add-zero-right
+        read n
+      call identity
+        read n
+  fold n
+
+rule add-zero-right-is-identity-function
+  show hold
+    call is-equal
+      read add-zero-right
+      read identity
+  melt add-zero-right-pointwise

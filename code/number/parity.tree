@@ -1,0 +1,200 @@
+# Parity of the natural numbers, machine-checked: every number is even or odd, doubles are even, and their successors
+# are odd. `parity n` is `off` when n is even and `on` when n is odd, defined by flipping on each successor. This is the
+# elementary number theory of even and odd (the residues mod two), the base of divisibility. The two theorems below --
+# a double is even, its successor is odd -- are proved by induction, chaining the parity and addition step lemmas and
+# the involution `flip (flip b) = b`.
+
+form bit
+  case off
+  case on
+
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# parity n = off if n is even, on if odd. parity (succ n) flips parity n.
+task parity
+  take n, like natural
+  like bit
+  fork case, read n
+    case zero
+      send back
+        make off
+    case succ
+      link p
+      send back
+        call flip
+          call parity
+            read p
+
+rule flip-flip-is-identity
+  mark b, like bit
+  show hold
+    call is-equal
+      call flip
+        call flip
+          read b
+      read b
+  fold b
+
+rule parity-succ-steps
+  mark n, like natural
+  show hold
+    call is-equal
+      call parity
+        make succ
+          bind prior
+            read n
+      call flip
+        call parity
+          read n
+  calm
+
+rule plus-succ-left-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            read a
+        read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  calm
+
+rule plus-succ-right-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# every double is EVEN: parity (n + n) = off, for every n. By induction on n.
+rule double-is-even
+  mark n, like natural
+  show hold
+    call is-equal
+      call parity
+        call plus
+          read n
+          read n
+      make off
+  fold n
+    cite plus-succ-left-steps
+    cite plus-succ-right-steps
+    cite parity-succ-steps
+    cite flip-flip-is-identity
+
+# every successor of a double is ODD: parity (succ (n + n)) = on, for every n.
+rule succ-double-is-odd
+  mark n, like natural
+  show hold
+    call is-equal
+      call parity
+        make succ
+          bind prior
+            call plus
+              read n
+              read n
+      make on
+  fold n
+    cite parity-succ-steps
+    cite double-is-even
+
+# half n = floor(n / 2), the inverse of doubling. Two-step recursion (half (k+2) = 1 + half k), verified terminating
+# because the structural-descent check is transitive (the doubly-nested field k is smaller than n).
+task half
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link m
+      fork case, read m
+        case zero
+          send back
+            make zero
+        case succ
+          link k
+          send back
+            make succ
+              bind prior
+                call half
+                  read k
+
+rule half-two-steps
+  mark n, like natural
+  show hold
+    call is-equal
+      call half
+        make succ
+          bind prior
+            make succ
+              bind prior
+                read n
+      make succ
+        bind prior
+          call half
+            read n
+  calm
+
+# half undoes double: half (n + n) = n, for every n. By induction on n, citing the half and plus step lemmas. With
+# `double-is-even` this says every even number is exactly twice its half.
+rule half-of-double-is-self
+  mark n, like natural
+  show hold
+    call is-equal
+      call half
+        call plus
+          read n
+          read n
+      read n
+  fold n
+    cite plus-succ-left-steps
+    cite plus-succ-right-steps
+    cite half-two-steps

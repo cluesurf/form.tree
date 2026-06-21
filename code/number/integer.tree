@@ -1,108 +1,901 @@
-# The integers, built from the naturals as signed counts, and the unique totally ordered rung of the whole tower. In
-# any ordered ring every square is at least zero, because a positive times a positive and a negative times a negative
-# are both positive. The integers satisfy this and lie on a line. The moment the tower builds outward a square root of
-# minus one appears, its square is below zero, and no order can place it, so every higher rung is unorderable and
-# stays so. An order runs one way, and that one-wayness, the count having a before and an after that cannot be
-# reversed, is the arrow of time. This is the first object Vibe Theory rests on.
+# The integers as a sign-magnitude self-type, with negation and the embedding of the naturals, the laws PROVED BY THE
+# KERNEL. An integer is a strictly-negative `negsucc p` (meaning -(p+1)), `zero-int`, or a strictly-positive `possucc p`
+# (meaning p+1). The name is `rung` because `integer` is reserved for the primitive machine number, exactly as `roll`
+# and `bush` stand in for the reserved `list` and `tree`. The plan calls the integers the totally ordered rung whose
+# one-way order is the arrow of time. This file gives the type, negation (an involution), and the natural embedding.
+# Successor / predecessor and addition need case analysis on a constructor's FIELD (a sub-term split beyond `fold z`,
+# which only splits the top constructor), so they await a field-case tactic; negation needs no such split.
 
-# The arrow of time, proof-checked by `seed test`. The integers carry a one-way (reflexive, transitive,
-# antisymmetric) order, and every square is non-negative.
+form natural
+  case zero
+  case succ
+    link prior, like natural
 
-# UNIVERSAL order laws, true for EVERY integer (the parameters are quantified), proved by the linear prover.
+form rung
+  case negsucc
+    link prior, like natural
+  case zero-int
+  case possucc
+    link prior, like natural
 
-# The order is reflexive: every integer is at least itself, n >= n, for every n.
-rule every-integer-is-at-least-itself
-  mark n, like integer
+task negate
+  take z, like rung
+  like rung
+  fork case, read z
+    case negsucc
+      link p
+      send back
+        make possucc
+          bind prior
+            read p
+    case zero-int
+      send back
+        make zero-int
+    case possucc
+      link p
+      send back
+        make negsucc
+          bind prior
+            read p
+
+task from-natural
+  take n, like natural
+  like rung
+  fork case, read n
+    case zero
+      send back
+        make zero-int
+    case succ
+      link p
+      send back
+        make possucc
+          bind prior
+            read p
+
+rule negate-involution
+  mark z, like rung
   show hold
-    call is-minimum
-      read n
-      read n
-
-# The order is translation-invariant, the arrow's engine: adding one strictly increases, n < n + 1, for every n. So
-# the count always has a next, an after that is never a before, which is the one-wayness of time.
-rule every-integer-is-below-its-successor
-  mark n, like integer
-  show hold
-    call is-below
-      read n
-      call add
-        read n
-        code 1
-
-# The order is transitive: if a is at most b and b is at most c, then a is at most c, for every a, b, c.
-rule order-is-transitive
-  mark a, like integer
-  mark b, like integer
-  mark c, like integer
-  have h1
-    call is-maximum
-      read a
-      read b
-  have h2
-    call is-maximum
-      read b
-      read c
-  show hold
-    call is-maximum
-      read a
-      read c
-
-# Addition preserves the order (translation invariance): if a is at most b then a + c is at most b + c, for every
-# a, b, c. This is what makes the order a ring order and the arrow a consistent direction.
-rule addition-preserves-order
-  mark a, like integer
-  mark b, like integer
-  mark c, like integer
-  have h
-    call is-maximum
-      read a
-      read b
-  show hold
-    call is-maximum
-      call add
-        read a
-        read c
-      call add
-        read b
-        read c
-
-# The loss of order, the arrow's far wall: a value whose square is at least zero (the orderability every ordered ring
-# demands) cannot also be a square root of minus one. Assume both and a contradiction follows (zero would lie below
-# minus one), so no order can place the new unit, and every rung past the integers is unorderable. The one-way order
-# stops here, and that is the arrow.
-rule orderability-fails-once-square-is-minus-one
-  mark square, like integer
-  have h1
-    call is-minimum
-      read square
-      code 0
-  have h2
     call is-equal
-      read square
-      code -1
-  show hold
-    call is-below
-      code 0
-      code -1
+      call negate
+        call negate
+          read z
+      read z
+  fold z
 
-# Every square is non-negative, for EVERY integer n: n * n >= 0. This is the law no higher rung satisfies, so the
-# integers are the unique orderable rung. A universal law, proved by the sum-of-squares certificate (a square is at
-# least zero over any ordered ring).
-rule every-square-is-at-least-zero
-  mark n, like integer
+rule negate-zero-is-zero
   show hold
-    call is-minimum
-      call multiply
-        read n
-        read n
-      code 0
+    call is-equal
+      call negate
+        make zero-int
+      make zero-int
+  calm
 
-# The order is one-way (strict and antisymmetric): 2 is below 5, and conversely 5 is at least 2, so 5 is not below 2.
-hold two-is-below-five
-  call is-below
-    code 2
-    code 5
-hold five-is-at-least-two
-  call is-minimum
-    code 5
-    code 2
+rule negate-negsucc-is-possucc
+  mark p, like natural
+  show hold
+    call is-equal
+      call negate
+        make negsucc
+          bind prior
+            read p
+      make possucc
+        bind prior
+          read p
+  calm
+
+rule negate-possucc-is-negsucc
+  mark p, like natural
+  show hold
+    call is-equal
+      call negate
+        make possucc
+          bind prior
+            read p
+      make negsucc
+        bind prior
+          read p
+  calm
+
+rule from-natural-zero-is-zero
+  show hold
+    call is-equal
+      call from-natural
+        make zero
+      make zero-int
+  calm
+
+# successor on integers: z + 1. Matches the sign, and on a negative steps the magnitude down (matching the inner field).
+task next
+  take z, like rung
+  like rung
+  fork case, read z
+    case negsucc
+      link p
+      fork case, read p
+        case zero
+          send back
+            make zero-int
+        case succ
+          link q
+          send back
+            make negsucc
+              bind prior
+                read q
+    case zero-int
+      send back
+        make possucc
+          bind prior
+            make zero
+    case possucc
+      link p
+      send back
+        make possucc
+          bind prior
+            make succ
+              bind prior
+                read p
+
+# predecessor on integers: z - 1, the mirror of next.
+task back
+  take z, like rung
+  like rung
+  fork case, read z
+    case negsucc
+      link p
+      send back
+        make negsucc
+          bind prior
+            make succ
+              bind prior
+                read p
+    case zero-int
+      send back
+        make negsucc
+          bind prior
+            make zero
+    case possucc
+      link p
+      fork case, read p
+        case zero
+          send back
+            make zero-int
+        case succ
+          link q
+          send back
+            make possucc
+              bind prior
+                read q
+
+# predecessor undoes successor: back (next z) = z, for every integer. Proved by case analysis on z AND, where the
+# operation matches a field (the magnitude inside a sign), a further split on that field. This is the field-case tactic.
+rule back-next-cancels
+  mark z, like rung
+  show hold
+    call is-equal
+      call back
+        call next
+          read z
+      read z
+  fold z
+
+# successor undoes predecessor: next (back z) = z.
+rule next-back-cancels
+  mark z, like rung
+  show hold
+    call is-equal
+      call next
+        call back
+          read z
+      read z
+  fold z
+
+# --- Integer addition, by iterating successor / predecessor over the magnitude. ---
+
+task climb
+  take z, like rung
+  take p, like natural
+  like rung
+  fork case, read p
+    case zero
+      send back
+        call next
+          read z
+    case succ
+      link q
+      send back
+        call next
+          call climb
+            read z
+            read q
+
+task drop
+  take z, like rung
+  take p, like natural
+  like rung
+  fork case, read p
+    case zero
+      send back
+        call back
+          read z
+    case succ
+      link q
+      send back
+        call back
+          call drop
+            read z
+            read q
+
+task combine
+  take z, like rung
+  take w, like rung
+  like rung
+  fork case, read w
+    case negsucc
+      link p
+      send back
+        call drop
+          read z
+          read p
+    case zero-int
+      send back
+        read z
+    case possucc
+      link p
+      send back
+        call climb
+          read z
+          read p
+
+rule combine-zero-right-is-self
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        make zero-int
+      read z
+  calm
+
+# definitional recurrence: climb z (succ p) = next (climb z p).
+rule climb-succ-steps
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call climb
+        read z
+        make succ
+          bind prior
+            read p
+      call next
+        call climb
+          read z
+          read p
+  calm
+
+rule drop-succ-steps
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call drop
+        read z
+        make succ
+          bind prior
+            read p
+      call back
+        call drop
+          read z
+          read p
+  calm
+
+# climb from zero builds the positive integer: climb zero-int p = possucc p.
+rule climb-from-zero-is-possucc
+  mark p, like natural
+  show hold
+    call is-equal
+      call climb
+        make zero-int
+        read p
+      make possucc
+        bind prior
+          read p
+  fold p
+    cite climb-succ-steps
+
+# drop from zero builds the negative integer: drop zero-int p = negsucc p.
+rule drop-from-zero-is-negsucc
+  mark p, like natural
+  show hold
+    call is-equal
+      call drop
+        make zero-int
+        read p
+      make negsucc
+        bind prior
+          read p
+  fold p
+    cite drop-succ-steps
+
+# definitional: combine z (possucc p) = climb z p, and combine z (negsucc p) = drop z p.
+rule combine-possucc-steps
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call combine
+        read z
+        make possucc
+          bind prior
+            read p
+      call climb
+        read z
+        read p
+  calm
+
+rule combine-negsucc-steps
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call combine
+        read z
+        make negsucc
+          bind prior
+            read p
+      call drop
+        read z
+        read p
+  calm
+
+# 0 + z = z. Proved by case on z, citing the two builder lemmas for the positive and negative cases.
+rule combine-zero-left-is-self
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        make zero-int
+        read z
+      read z
+  fold z
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite climb-from-zero-is-possucc
+    cite drop-from-zero-is-negsucc
+
+# Adding the integer one is the successor: z + 1 = next z. Definitional (combine on possucc zero reduces to climb z
+# zero, which is next z). This grounds integer addition in the successor operation.
+rule combine-one-is-next
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        make possucc
+          bind prior
+            make zero
+      call next
+        read z
+  calm
+
+# Adding the integer minus-one is the predecessor: z + (-1) = back z. Definitional.
+rule combine-neg-one-is-back
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        make negsucc
+          bind prior
+            make zero
+      call back
+        read z
+  calm
+
+# The successor of the embedded natural is the embedded successor: next (from-natural n) = from-natural (succ n)? No --
+# rather, adding one to a positive steps it up: z + (succ p as positive) = next (z + (p as positive)). Definitional step.
+rule combine-possucc-succ-steps
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call combine
+        read z
+        make possucc
+          bind prior
+            make succ
+              bind prior
+                read p
+      call next
+        call combine
+          read z
+          make possucc
+            bind prior
+              read p
+  calm
+
+# definitional: drop z 0 = back z (drop subtracts one then iterates; subtracting the integer one is the predecessor).
+rule drop-zero-steps
+  mark z, like rung
+  show hold
+    call is-equal
+      call drop
+        read z
+        make zero
+      call back
+        read z
+  calm
+
+# climbing commutes with the successor: climb (next z) p = next (climb z p). By induction on p.
+rule climb-next-commute
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call climb
+        call next
+          read z
+        read p
+      call next
+        call climb
+          read z
+          read p
+  fold p
+    cite climb-succ-steps
+
+# dropping commutes with the successor: drop (next z) p = next (drop z p). Uses that `next` and `back` cancel both ways.
+rule drop-next-commute
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call drop
+        call next
+          read z
+        read p
+      call next
+        call drop
+          read z
+          read p
+  fold p
+    cite drop-succ-steps
+    cite drop-zero-steps
+    cite back-next-cancels
+    cite next-back-cancels
+
+# Addition commutes with the successor on the LEFT: combine (next z) w = next (combine z w), for every z and w. By case
+# on w's sign, using that climb and drop each commute with `next`. This is the key homomorphism law of integer addition
+# (the integers are a torsor over their successor), the bridge to commutativity and associativity.
+rule combine-next-left
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call combine
+        call next
+          read z
+        read w
+      call next
+        call combine
+          read z
+          read w
+  fold w
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite climb-next-commute
+    cite drop-next-commute
+
+# definitional: climb z 0 = next z (climbing by the integer one is the successor).
+rule climb-zero-steps
+  mark z, like rung
+  show hold
+    call is-equal
+      call climb
+        read z
+        make zero
+      call next
+        read z
+  calm
+
+# climbing commutes with the predecessor: climb (back z) p = next iterated over (back z) = back of the climb.
+rule climb-back-commute
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call climb
+        call back
+          read z
+        read p
+      call back
+        call climb
+          read z
+          read p
+  fold p
+    cite climb-succ-steps
+    cite climb-zero-steps
+    cite next-back-cancels
+    cite back-next-cancels
+
+# dropping commutes with the predecessor: drop (back z) p = back (drop z p).
+rule drop-back-commute
+  mark z, like rung
+  mark p, like natural
+  show hold
+    call is-equal
+      call drop
+        call back
+          read z
+        read p
+      call back
+        call drop
+          read z
+          read p
+  fold p
+    cite drop-succ-steps
+    cite drop-zero-steps
+    cite next-back-cancels
+    cite back-next-cancels
+
+# Addition commutes with the predecessor on the LEFT: combine (back z) w = back (combine z w). The companion of the
+# successor homomorphism; together they make integer addition a translation, the structure commutativity rests on.
+rule combine-back-left
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call combine
+        call back
+          read z
+        read w
+      call back
+        call combine
+          read z
+          read w
+  fold w
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite climb-back-commute
+    cite drop-back-commute
+
+# Addition commutes with the successor on the RIGHT: combine z (next w) = next (combine z w). By case on w (with a
+# field split in the negative case, where `next` steps the magnitude down), using the combine/drop step laws and the
+# next/back cancellation. With combine-next-left this is full successor translation-invariance on both arguments.
+rule combine-next-right
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        call next
+          read w
+      call next
+        call combine
+          read z
+          read w
+  fold w
+    cite combine-one-is-next
+    cite combine-possucc-succ-steps
+    cite combine-negsucc-steps
+    cite drop-succ-steps
+    cite drop-zero-steps
+    cite next-back-cancels
+
+# Addition commutes with the predecessor on the RIGHT: combine z (back w) = back (combine z w). The fourth and final
+# translation-invariance law. With the other three, integer addition is fully invariant under successor/predecessor in
+# either argument -- the structure from which commutativity and associativity are assembled.
+rule combine-back-right
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        call back
+          read w
+      call back
+        call combine
+          read z
+          read w
+  fold w
+    cite combine-neg-one-is-back
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite climb-succ-steps
+    cite climb-zero-steps
+    cite drop-succ-steps
+    cite back-next-cancels
+
+# Reversed definitional steps of next/back, oriented so a sign-magnitude constructor REWRITES into a successor or
+# predecessor of the next-smaller integer. These let an induction on the natural magnitude peel one next/back per step.
+rule possucc-zero-is-next-zero
+  show hold
+    call is-equal
+      make possucc
+        bind prior
+          make zero
+      call next
+        make zero-int
+  calm
+
+rule possucc-succ-is-next-possucc
+  mark p, like natural
+  show hold
+    call is-equal
+      make possucc
+        bind prior
+          make succ
+            bind prior
+              read p
+      call next
+        make possucc
+          bind prior
+            read p
+  calm
+
+rule negsucc-zero-is-back-zero
+  show hold
+    call is-equal
+      make negsucc
+        bind prior
+          make zero
+      call back
+        make zero-int
+  calm
+
+rule negsucc-succ-is-back-negsucc
+  mark p, like natural
+  show hold
+    call is-equal
+      make negsucc
+        bind prior
+          make succ
+            bind prior
+              read p
+      call back
+        make negsucc
+          bind prior
+            read p
+  calm
+
+# Positive commute: combine (possucc p) z = climb z p, for every magnitude p and integer z. This is commutativity of
+# addition restricted to a positive left operand. By induction on the natural p, peeling a `next` each step: the base
+# rewrites possucc zero to next zero-int and uses left-translation, the step rewrites possucc (succ q) to next (possucc q)
+# and applies the induction hypothesis under the next.
+rule combine-possucc-commutes
+  mark p, like natural
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        make possucc
+          bind prior
+            read p
+        read z
+      call climb
+        read z
+        read p
+  fold p
+    cite possucc-zero-is-next-zero
+    cite possucc-succ-is-next-possucc
+    cite combine-next-left
+    cite combine-zero-left-is-self
+    cite climb-zero-steps
+    cite climb-succ-steps
+
+# Negative commute: combine (negsucc p) z = drop z p, the mirror, peeling a `back` each step.
+rule combine-negsucc-commutes
+  mark p, like natural
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        make negsucc
+          bind prior
+            read p
+        read z
+      call drop
+        read z
+        read p
+  fold p
+    cite negsucc-zero-is-back-zero
+    cite negsucc-succ-is-back-negsucc
+    cite combine-back-left
+    cite combine-zero-left-is-self
+    cite drop-zero-steps
+    cite drop-succ-steps
+
+# COMMUTATIVITY OF INTEGER ADDITION: combine z w = combine w z, for all integers z and w. By case on w: zero is handled
+# by the two identity laws, and each signed case collapses both orders to the same iterate (climb or drop) using the
+# definitional step on one side and the positive/negative commute lemma on the other.
+rule combine-is-commutative
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        read w
+      call combine
+        read w
+        read z
+  fold w
+    cite combine-zero-left-is-self
+    cite combine-zero-right-is-self
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite combine-possucc-commutes
+    cite combine-negsucc-commutes
+
+# Iterating `next` past an addition: climb (combine z w) p = combine z (climb w p). Climbing the sum equals adding the
+# climbed second operand. By induction on the natural p, using right-translation (combine z (next w) = next (combine z w))
+# to move each `next` outside the addition.
+rule climb-combine-right
+  mark p, like natural
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call climb
+        call combine
+          read z
+          read w
+        read p
+      call combine
+        read z
+        call climb
+          read w
+          read p
+  fold p
+    cite climb-zero-steps
+    cite climb-succ-steps
+    cite combine-next-right
+
+# The `drop` mirror: drop (combine z w) p = combine z (drop w p), moving each `back` outside the addition.
+rule drop-combine-right
+  mark p, like natural
+  mark z, like rung
+  mark w, like rung
+  show hold
+    call is-equal
+      call drop
+        call combine
+          read z
+          read w
+        read p
+      call combine
+        read z
+        call drop
+          read w
+          read p
+  fold p
+    cite drop-zero-steps
+    cite drop-succ-steps
+    cite combine-back-right
+
+# ASSOCIATIVITY OF INTEGER ADDITION: combine (combine z w) u = combine z (combine w u), for all integers. By case on the
+# third operand u: zero by the identity law, and each signed case reduces both groupings to the same iterate of the sum
+# via the climb/drop-past-addition lemmas above.
+rule combine-is-associative
+  mark z, like rung
+  mark w, like rung
+  mark u, like rung
+  show hold
+    call is-equal
+      call combine
+        call combine
+          read z
+          read w
+        read u
+      call combine
+        read z
+        call combine
+          read w
+          read u
+  fold u
+    cite combine-zero-right-is-self
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite climb-combine-right
+    cite drop-combine-right
+
+# drop undoes climb at equal count: drop (climb z p) p = z. The two iterations are inverse. By induction on p, moving the
+# inner `next` out through drop (drop-next-commute) so the induction hypothesis applies, then cancelling back/next.
+rule drop-climb-cancels
+  mark p, like natural
+  mark z, like rung
+  show hold
+    call is-equal
+      call drop
+        call climb
+          read z
+          read p
+        read p
+      read z
+  fold p
+    cite climb-zero-steps
+    cite drop-zero-steps
+    cite climb-succ-steps
+    cite drop-succ-steps
+    cite drop-next-commute
+    cite back-next-cancels
+
+# climb undoes drop at equal count: climb (drop z p) p = z. The mirror.
+rule climb-drop-cancels
+  mark p, like natural
+  mark z, like rung
+  show hold
+    call is-equal
+      call climb
+        call drop
+          read z
+          read p
+        read p
+      read z
+  fold p
+    cite climb-zero-steps
+    cite drop-zero-steps
+    cite climb-succ-steps
+    cite drop-succ-steps
+    cite climb-back-commute
+    cite next-back-cancels
+
+# A positive integer dropped by its own magnitude returns to zero: drop (possucc p) p = zero-int. By induction on p,
+# rewriting possucc (succ q) to next (possucc q) so a `back` cancels the `next` after the induction hypothesis.
+rule drop-possucc-self
+  mark p, like natural
+  show hold
+    call is-equal
+      call drop
+        make possucc
+          bind prior
+            read p
+        read p
+      make zero-int
+  fold p
+    cite drop-zero-steps
+    cite possucc-succ-is-next-possucc
+    cite drop-succ-steps
+    cite drop-next-commute
+    cite back-next-cancels
+
+# A negative integer climbed by its own magnitude returns to zero: climb (negsucc p) p = zero-int. The mirror.
+rule climb-negsucc-self
+  mark p, like natural
+  show hold
+    call is-equal
+      call climb
+        make negsucc
+          bind prior
+            read p
+        read p
+      make zero-int
+  fold p
+    cite climb-zero-steps
+    cite negsucc-succ-is-back-negsucc
+    cite climb-succ-steps
+    cite climb-back-commute
+    cite next-back-cancels
+
+# ADDITIVE INVERSE: combine z (negate z) = zero-int, for every integer z. Adding an integer to its negation gives zero.
+# By case on z: zero is immediate, the positive case becomes a self-drop and the negative case a self-climb, each landing
+# on zero. With identity, associativity, and commutativity, the integers are an ABELIAN GROUP under addition.
+rule combine-negate-right-is-zero
+  mark z, like rung
+  show hold
+    call is-equal
+      call combine
+        read z
+        call negate
+          read z
+      make zero-int
+  fold z
+    cite negate-zero-is-zero
+    cite combine-zero-right-is-self
+    cite negate-possucc-is-negsucc
+    cite negate-negsucc-is-possucc
+    cite combine-possucc-steps
+    cite combine-negsucc-steps
+    cite drop-possucc-self
+    cite climb-negsucc-self

@@ -101,3 +101,111 @@ rule mirror-mirror-is-identity
           read t
       read t
   fold t
+
+# helper plus laws (commutativity, for the swapped subtree sizes under mirror).
+rule plus-zero-right-on-size
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+rule plus-succ-right-on-size
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+rule plus-is-commutative-on-size
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        read b
+      call plus
+        read b
+        read a
+  fold a
+    cite plus-zero-right-on-size
+    cite plus-succ-right-on-size
+
+# definitional step laws of mirror and size on a node.
+rule mirror-node-steps
+  mark l, like bush
+  mark v, like natural
+  mark r, like bush
+  show hold
+    call is-equal
+      call mirror
+        make node
+          bind left
+            read l
+          bind value
+            read v
+          bind right
+            read r
+      make node
+        bind left
+          call mirror
+            read r
+        bind value
+          read v
+        bind right
+          call mirror
+            read l
+  calm
+
+rule size-node-steps
+  mark l, like bush
+  mark v, like natural
+  mark r, like bush
+  show hold
+    call is-equal
+      call size
+        make node
+          bind left
+            read l
+          bind value
+            read v
+          bind right
+            read r
+      make succ
+        bind prior
+          call plus
+            call size
+              read l
+            call size
+              read r
+  calm
+
+# mirror preserves size: size (mirror t) = size t, for every tree. By induction on t; the node case swaps the two
+# subtree sizes, which agree by commutativity of addition (handled by AC normalization).
+rule size-of-mirror-is-size
+  mark t, like bush
+  show hold
+    call is-equal
+      call size
+        call mirror
+          read t
+      call size
+        read t
+  fold t
+    cite mirror-node-steps
+    cite size-node-steps
+    cite plus-is-commutative-on-size

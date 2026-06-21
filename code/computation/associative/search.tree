@@ -33,3 +33,9 @@ hold bulk-reaches-by-twenty-four-per-step
       code 24
       code 24
     code 576
+
+# The GENERAL law behind these counts is the exponent-addition theorem, proved by induction over the naturals in
+# `number/peano.tree` as `power-adds-exponents`: b^(d + e) = b^d * b^e. It says a query run for d + e steps reaches the
+# PRODUCT of the d-step and e-step reaches, so depth composes multiplicatively and the reach is exponential in the depth
+# (equivalently, the depth to cover N cells is logarithmic). The concrete `16 * 16 = 256` above is its instance at
+# b = 2, d = e = 4. That theorem is the kernel-checked heart of "associative search is logarithmic in the bulk".

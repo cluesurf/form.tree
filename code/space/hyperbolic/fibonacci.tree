@@ -1,0 +1,189 @@
+# The Fibonacci theory of the hyperbolic pentagrid, machine-checked. Margenstern's splitting method addresses the cells
+# of the {5,4} tiling by a spanning tree whose level counts obey the Fibonacci recurrence (Fibonacci / Zeckendorf
+# addressing), so the cell count grows EXPONENTIALLY with the radius (the hyperbolic shells expand, unlike the
+# polynomial growth of a Euclidean grid). This file defines `fib` by the two-step recursion (verified terminating
+# because the structural-descent check is transitive: a field of a field of the parameter is still smaller), the running
+# sum `fibsum`, and proves the closed-form SUM identity by induction. The sum step reassociates and commutes a partial
+# sum, so the proof closes by rewriting modulo associativity-commutativity (AC matching): the induction hypothesis fires
+# inside a larger sum than a syntactic match could reach.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+task fib
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link m
+      fork case, read m
+        case zero
+          send back
+            make succ
+              bind prior
+                make zero
+        case succ
+          link k
+          send back
+            call plus
+              call fib
+                read m
+              call fib
+                read k
+
+task fibsum
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link m
+      send back
+        call plus
+          call fibsum
+            read m
+          call fib
+            make succ
+              bind prior
+                read m
+
+rule fib-recurrence
+  mark k, like natural
+  show hold
+    call is-equal
+      call fib
+        make succ
+          bind prior
+            make succ
+              bind prior
+                read k
+      call plus
+        call fib
+          make succ
+            bind prior
+              read k
+        call fib
+          read k
+  calm
+
+rule fibsum-succ-steps
+  mark m, like natural
+  show hold
+    call is-equal
+      call fibsum
+        make succ
+          bind prior
+            read m
+      call plus
+        call fibsum
+          read m
+        call fib
+          make succ
+            bind prior
+              read m
+  calm
+
+rule plus-zero-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+rule plus-succ-right-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+rule plus-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        read b
+      call plus
+        read b
+        read a
+  fold a
+    cite plus-zero-right-is-identity
+    cite plus-succ-right-steps-out
+
+rule plus-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call plus
+        call plus
+          read a
+          read b
+        read c
+      call plus
+        read a
+        call plus
+          read b
+          read c
+  fold a
+
+rule fibsum-plus-one-is-fib
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        call fibsum
+          read n
+        make succ
+          bind prior
+            make zero
+      call fib
+        make succ
+          bind prior
+            make succ
+              bind prior
+                read n
+  fold n
+    cite fibsum-succ-steps
+    cite fib-recurrence
+    cite plus-is-commutative
+    cite plus-is-associative

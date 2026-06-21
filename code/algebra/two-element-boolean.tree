@@ -1,0 +1,156 @@
+# The two-element Boolean algebra, with its axioms PROVED BY THE KERNEL. `bit` (off, on) with conjunction `both`,
+# disjunction `some`, and complement `flip` is the algebra of classical truth and of clopen sets (Stone duality at the
+# two-point space). Where `algebra/boolean.tree` carries the abstract Boolean-algebra STRUCTURE, this file is the
+# canonical concrete INSTANCE with every law machine-checked: each is a finite case analysis (`fold` over the two-valued
+# arguments), every branch definitional. Commutativity, associativity, distributivity, absorption, and the general de
+# Morgan law all hold, so the two-element lattice with complement is verified to be a Boolean algebra.
+
+form bit
+  case off
+  case on
+
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+task both
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make off
+    case on
+      send back
+        read b
+
+task some
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      send back
+        make on
+
+rule both-is-commutative
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      call both
+        read a
+        read b
+      call both
+        read b
+        read a
+  fold a, b
+
+rule some-is-commutative
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      call some
+        read a
+        read b
+      call some
+        read b
+        read a
+  fold a, b
+
+rule both-is-associative
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call both
+        call both
+          read a
+          read b
+        read c
+      call both
+        read a
+        call both
+          read b
+          read c
+  fold a, b, c
+
+rule some-is-associative
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call some
+        call some
+          read a
+          read b
+        read c
+      call some
+        read a
+        call some
+          read b
+          read c
+  fold a, b, c
+
+rule both-distributes-over-some
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call both
+        read a
+        call some
+          read b
+          read c
+      call some
+        call both
+          read a
+          read b
+        call both
+          read a
+          read c
+  fold a, b, c
+
+rule absorption-both-some
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      call both
+        read a
+        call some
+          read a
+          read b
+      read a
+  fold a, b
+
+rule de-morgan-both
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      call flip
+        call both
+          read a
+          read b
+      call some
+        call flip
+          read a
+        call flip
+          read b
+  fold a, b

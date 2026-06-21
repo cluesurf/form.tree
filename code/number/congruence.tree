@@ -1,0 +1,118 @@
+# Equality is a congruence: it is reflexive, symmetric, and transitive, and it is RESPECTED by every operation (equal
+# inputs give equal outputs). These are the laws that make `is-equal` an equivalence relation compatible with the
+# arithmetic, the substitution principle on which all rewriting rests. They are PROVED BY THE KERNEL through the
+# hypothesis-discharge path: each `have` antecedent is assumed on the branch and rewritten into the goal, so the
+# conclusion follows by reflexivity. This mirrors the `Id`-type congruence (ap / cong) of agda-unimath and Lean.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+rule equal-is-reflexive
+  mark a, like natural
+  show hold
+    call is-equal
+      read a
+      read a
+  calm
+
+rule equal-is-symmetric
+  mark a, like natural
+  mark b, like natural
+  have h
+    call is-equal
+      read a
+      read b
+  show hold
+    call is-equal
+      read b
+      read a
+  calm
+
+rule equal-is-transitive
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  have h1
+    call is-equal
+      read a
+      read b
+  have h2
+    call is-equal
+      read b
+      read c
+  show hold
+    call is-equal
+      read a
+      read c
+  calm
+
+rule succ-respects-equal
+  mark a, like natural
+  mark b, like natural
+  have h
+    call is-equal
+      read a
+      read b
+  show hold
+    call is-equal
+      make succ
+        bind prior
+          read a
+      make succ
+        bind prior
+          read b
+  calm
+
+rule plus-respects-equal-left
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  have h
+    call is-equal
+      read a
+      read b
+  show hold
+    call is-equal
+      call plus
+        read a
+        read c
+      call plus
+        read b
+        read c
+  calm
+
+rule plus-respects-equal-right
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  have h
+    call is-equal
+      read a
+      read b
+  show hold
+    call is-equal
+      call plus
+        read c
+        read a
+      call plus
+        read c
+        read b
+  calm

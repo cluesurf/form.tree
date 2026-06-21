@@ -1,0 +1,203 @@
+# Truncated subtraction (monus) on the natural numbers, with the predecessor, by structural recursion, and the laws of
+# the cut-off difference PROVED BY THE KERNEL. `monus a b` is `a - b` when `a >= b` and `zero` otherwise: it never goes
+# below zero, which is what makes it total on the naturals. This is the standard `dist`/`monus` of the elementary number
+# theory libraries (the shape agda-unimath's `elementary-number-theory` formalizes), here in seed .tree. The recurrence
+# is on the SECOND argument, so the laws that need it cite `monus-succ-right-steps` to bring it into view.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task pred
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      send back
+        read prior
+
+task monus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read b
+    case zero
+      send back
+        read a
+    case succ
+      send back
+        call pred
+          call monus
+            read a
+            read prior
+
+rule pred-succ-is-prior
+  mark n, like natural
+  show hold
+    call is-equal
+      call pred
+        make succ
+          bind prior
+            read n
+      read n
+  calm
+
+rule monus-zero-right-is-self
+  mark a, like natural
+  show hold
+    call is-equal
+      call monus
+        read a
+        make zero
+      read a
+  calm
+
+rule monus-succ-right-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call monus
+        read a
+        make succ
+          bind prior
+            read b
+      call pred
+        call monus
+          read a
+          read b
+  calm
+
+rule monus-zero-left-is-zero
+  mark n, like natural
+  show hold
+    call is-equal
+      call monus
+        make zero
+        read n
+      make zero
+  fold n
+    cite monus-succ-right-steps
+
+rule monus-succ-succ-cancels
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call monus
+        make succ
+          bind prior
+            read a
+        make succ
+          bind prior
+            read b
+      call monus
+        read a
+        read b
+  fold b
+    cite monus-succ-right-steps
+    cite pred-succ-is-prior
+
+rule monus-self-is-zero
+  mark n, like natural
+  show hold
+    call is-equal
+      call monus
+        read n
+        read n
+      make zero
+  fold n
+    cite monus-succ-succ-cancels
+
+# Addition, and its two step lemmas, included so the subtraction-addition inverse below is self-contained.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+rule plus-zero-right
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+rule plus-succ-right
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# Subtraction is the LEFT INVERSE of addition: monus (a + b) b = a, for every a and b. Proved by induction on b: the
+# successor case pulls the successor out of the sum, cancels it against the subtraction (the succ-succ law), and the
+# hypothesis closes. This is the defining relation that makes subtraction the partial inverse of addition.
+rule monus-plus-cancel
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call monus
+        call plus
+          read a
+          read b
+        read b
+      read a
+  fold b
+    cite plus-succ-right
+    cite monus-succ-succ-cancels
+    cite monus-zero-right-is-self
+    cite plus-zero-right
+
+# Double subtraction collapses to one: (a - b) - c = a - (b + c), for every a, b, c. Subtracting b then c removes the
+# same as subtracting their sum. Proved by induction on c, using the monus and plus successor step laws. This is a
+# defining law of truncated subtraction and the bridge from iterated `monus` to a single subtraction by a sum.
+rule monus-monus-is-monus-plus
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call monus
+        call monus
+          read a
+          read b
+        read c
+      call monus
+        read a
+        call plus
+          read b
+          read c
+  fold c
+    cite monus-succ-right-steps
+    cite plus-succ-right
+    cite plus-zero-right
+    cite monus-zero-right-is-self

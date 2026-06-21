@@ -1,0 +1,489 @@
+# The natural order: less-than-or-equal, minimum, and maximum, by structural recursion on BOTH arguments, with the order
+# laws PROVED BY THE KERNEL. `at-most a b` is the decidable comparison (`on` iff a <= b), recursing on both naturals at
+# once, the recursive order of agda-unimath's `inequality-natural-numbers`. Writing a two-argument recursion on one enum
+# needs the `case` field-rename binding (`case succ / link ap`) so the nested match can name both predecessors without
+# the field names colliding. This is the order the type-systems plan calls the arrow of time: the one-way order the
+# naturals carry. Reflexivity and idempotence are proved by induction; the step and absorber laws are definitional.
+
+form bit
+  case off
+  case on
+
+# disjunction on bits (or): on if either is on. Used to state the totality of the order.
+task some
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      send back
+        make on
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# at-most a b = on iff a <= b. Recurses on BOTH arguments (the field-rename binding lets the nested match name each
+# predecessor without collision), so it is the recursive order of the elementary number theory libraries.
+task at-most
+  take a, like natural
+  take b, like natural
+  like bit
+  fork case, read a
+    case zero
+      send back
+        make on
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make off
+        case succ
+          link bp
+          send back
+            call at-most
+              read ap
+              read bp
+
+# the minimum of two naturals.
+task min
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        make zero
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make zero
+        case succ
+          link bp
+          send back
+            make succ
+              bind prior
+                call min
+                  read ap
+                  read bp
+
+# the maximum of two naturals.
+task max
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make succ
+              bind prior
+                read ap
+        case succ
+          link bp
+          send back
+            make succ
+              bind prior
+                call max
+                  read ap
+                  read bp
+
+# 0 <= n, always. Definitional.
+rule at-most-zero-left-is-on
+  mark n, like natural
+  show hold
+    call is-equal
+      call at-most
+        make zero
+        read n
+      make on
+  calm
+
+# (succ a) <= (succ b) iff a <= b. Definitional.
+rule at-most-succ-both
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call at-most
+        make succ
+          bind prior
+            read a
+        make succ
+          bind prior
+            read b
+      call at-most
+        read a
+        read b
+  calm
+
+# n <= n, always (reflexivity). By induction on n.
+rule at-most-reflexive
+  mark n, like natural
+  show hold
+    call is-equal
+      call at-most
+        read n
+        read n
+      make on
+  fold n
+
+# Transitivity: a <= b and b <= c imply a <= c. Proved by SIMULTANEOUS induction on a, b, c. The cases where the order
+# fails on a step (e.g. (succ a) <= 0) make an antecedent equate the distinct constructors `off` and `on`, which is
+# impossible (constructors are disjoint), so those cases are vacuously discharged. The all-successor case closes through
+# the induction hypothesis. With reflexivity, this makes `at-most` a PREORDER on the naturals.
+rule at-most-is-transitive
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  have h1
+    call is-equal
+      call at-most
+        read a
+        read b
+      make on
+  have h2
+    call is-equal
+      call at-most
+        read b
+        read c
+      make on
+  show hold
+    call is-equal
+      call at-most
+        read a
+        read c
+      make on
+  fold a, b, c
+
+# Antisymmetry: a <= b and b <= a imply a = b. Proved by simultaneous induction on a and b, again discharging the
+# impossible (off = on) cases by constructor disjointness. With transitivity and reflexivity this makes `at-most` a
+# PARTIAL ORDER, the arrow-of-time order the type-systems plan names.
+rule at-most-is-antisymmetric
+  mark a, like natural
+  mark b, like natural
+  have h1
+    call is-equal
+      call at-most
+        read a
+        read b
+      make on
+  have h2
+    call is-equal
+      call at-most
+        read b
+        read a
+      make on
+  show hold
+    call is-equal
+      read a
+      read b
+  fold a, b
+
+# Totality (linearity): for every a and b, either a <= b or b <= a. As an equation over the bit disjunction:
+# some (a <= b) (b <= a) = on. Proved by simultaneous induction on a and b. With reflexivity, transitivity, and
+# antisymmetry, this makes `at-most` a kernel-checked TOTAL ORDER on the naturals.
+rule at-most-is-total
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call some
+        call at-most
+          read a
+          read b
+        call at-most
+          read b
+          read a
+      make on
+  fold a, b
+
+# min is a lower bound of its first argument: min a b <= a, for every a and b. By simultaneous induction.
+rule at-most-min-left
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call at-most
+        call min
+          read a
+          read b
+        read a
+      make on
+  fold a, b
+
+# min n n = n (idempotence). By induction on n.
+rule min-self-is-self
+  mark n, like natural
+  show hold
+    call is-equal
+      call min
+        read n
+        read n
+      read n
+  fold n
+
+# max n n = n (idempotence). By induction on n.
+rule max-self-is-self
+  mark n, like natural
+  show hold
+    call is-equal
+      call max
+        read n
+        read n
+      read n
+  fold n
+
+# min 0 n = 0. Definitional.
+rule min-zero-left-is-zero
+  mark n, like natural
+  show hold
+    call is-equal
+      call min
+        make zero
+        read n
+      make zero
+  calm
+
+# max 0 n = n. Definitional.
+rule max-zero-left-is-self
+  mark n, like natural
+  show hold
+    call is-equal
+      call max
+        make zero
+        read n
+      read n
+  calm
+
+# The lattice laws. min and max each recurse on BOTH arguments, so their commutativity and associativity are proved by
+# SIMULTANEOUS induction (`fold a, b` and `fold a, b, c`): the prover walks the product of the constructors and, in the
+# case where every variable is a successor, closes with the diagonal hypothesis (all stepped down together). With
+# idempotence (above) this makes (min, max) the meet and join of a lattice on the naturals.
+
+# min is commutative.
+rule min-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call min
+        read a
+        read b
+      call min
+        read b
+        read a
+  fold a, b
+
+# max is commutative.
+rule max-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call max
+        read a
+        read b
+      call max
+        read b
+        read a
+  fold a, b
+
+# min is associative.
+rule min-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call min
+        call min
+          read a
+          read b
+        read c
+      call min
+        read a
+        call min
+          read b
+          read c
+  fold a, b, c
+
+# max is associative.
+rule max-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call max
+        call max
+          read a
+          read b
+        read c
+      call max
+        read a
+        call max
+          read b
+          read c
+  fold a, b, c
+
+# Addition and the two step lemmas, included so the order-arithmetic bridge below is self-contained.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+rule plus-zero-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+rule plus-succ-right-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# Monotonicity of addition over the order: a <= b implies (a + c) <= (b + c), for every c. Proved by induction on c,
+# using the hypothesis a <= b and the addition step lemmas. This is the bridge from the order to the arithmetic.
+rule at-most-plus-monotone
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  have h
+    call is-equal
+      call at-most
+        read a
+        read b
+      make on
+  show hold
+    call is-equal
+      call at-most
+        call plus
+          read a
+          read c
+        call plus
+          read b
+          read c
+      make on
+  fold c
+    cite plus-zero-right-is-identity
+    cite plus-succ-right-steps-out
+
+# The lattice meets the arithmetic: the larger plus the smaller equals the sum, `max a b + min a b = a + b`. Proved by
+# simultaneous induction on a and b, citing the successor step lemmas of max, min, and plus. The step lemmas (all
+# definitional) are stated here so the induction can rewrite the recurrences into view.
+rule plus-succ-left-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            read a
+        read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  calm
+
+rule max-succ-both-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call max
+        make succ
+          bind prior
+            read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call max
+            read a
+            read b
+  calm
+
+rule min-succ-both-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call min
+        make succ
+          bind prior
+            read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call min
+            read a
+            read b
+  calm
+
+rule max-plus-min-is-plus
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        call max
+          read a
+          read b
+        call min
+          read a
+          read b
+      call plus
+        read a
+        read b
+  fold a, b
+    cite max-succ-both-steps
+    cite min-succ-both-steps
+    cite plus-succ-left-steps
+    cite plus-succ-right-steps-out
