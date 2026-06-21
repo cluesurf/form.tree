@@ -355,3 +355,79 @@ rule three-cube-sum-minus-thrice-product-factors
           call multiply
             read c
             read a
+
+# The square of a four-term sum: (a + b + c + d)^2 expands to the four squares plus twice each of the six pairwise
+# products. A universal ring identity over the integers.
+rule square-of-four-term-sum-expands
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call add
+          call add
+            call add
+              read a
+              read b
+            read c
+          read d
+        call add
+          call add
+            call add
+              read a
+              read b
+            read c
+          read d
+      call add
+        call add
+          call add
+            call add
+              call add
+                call add
+                  call add
+                    call add
+                      call add
+                        call multiply
+                          read a
+                          read a
+                        call multiply
+                          read b
+                          read b
+                      call multiply
+                        read c
+                        read c
+                    call multiply
+                      read d
+                      read d
+                  call multiply
+                    code 2
+                    call multiply
+                      read a
+                      read b
+                call multiply
+                  code 2
+                  call multiply
+                    read a
+                    read c
+              call multiply
+                code 2
+                call multiply
+                  read a
+                  read d
+            call multiply
+              code 2
+              call multiply
+                read b
+                read c
+          call multiply
+            code 2
+            call multiply
+              read b
+              read d
+        call multiply
+          code 2
+          call multiply
+            read c
+            read d

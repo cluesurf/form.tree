@@ -1,0 +1,49 @@
+# Kernel-COMPUTED proofs: the type theory's enum constructors and eliminator are derived as computing self-type terms,
+# so the kernel actually reduces a match on a constructor (`match (v_i) ... -> branch_i`). The `calm` tactic then
+# discharges an equation by the kernel checking both sides reduce to the same normal form (reflexivity / definitional
+# equality), NOT by the arithmetic decision procedures. These are genuine dependent-type proofs checked by judge.ts.
+
+# A bit: the two-element type, off and on.
+form bit
+  case off
+  case on
+
+# flip: swaps off and on, defined by a match (which the kernel reduces).
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# flip off computes to on: the kernel reduces flip off through the eliminator and checks it equals on. Proved by calm.
+rule flip-off-is-on
+  show hold
+    call is-equal
+      call flip
+        make off
+      make on
+  calm
+
+# flip on computes to off.
+rule flip-on-is-off
+  show hold
+    call is-equal
+      call flip
+        make on
+      make off
+  calm
+
+# flip is an involution at off: flipping twice returns off. The kernel performs TWO reductions and checks the result.
+rule flip-flip-off-is-off
+  show hold
+    call is-equal
+      call flip
+        call flip
+          make off
+      make off
+  calm
