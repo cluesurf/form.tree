@@ -1,0 +1,170 @@
+# Ternary (three-valued) logic, modeled by the kernel. Beyond true and false there is a third value, the UNKNOWN or
+# undetermined, written here false, unknown, true and ordered false below unknown below true. This is exactly the vibe
+# tone, the ternary value of the substrate. Conjunction is the minimum, disjunction the maximum, negation flips the two
+# ends and fixes the middle (Kleene's strong three-valued logic). The kernel proves negation is an involution, that
+# conjunction and disjunction are commutative, associative, and idempotent, that De Morgan's laws hold, and the defining
+# feature of three-valued logic: the LAW OF EXCLUDED MIDDLE FAILS, an unknown value or-ed with its negation stays unknown,
+# never reaching true. This is why three-valued logic models partial information and why the ternary tone is richer than a
+# bit.
+
+# The three truth values, ordered false < unknown < true.
+form trit
+  case no
+  case maybe
+  case yes
+
+# Negation: swap the two ends, fix the unknown middle.
+task neg
+  take a, like trit
+  like trit
+  fork case, read a
+    case no
+      send back
+        make yes
+    case maybe
+      send back
+        make maybe
+    case yes
+      send back
+        make no
+
+# Conjunction, the minimum of the two values.
+task con
+  take a, like trit
+  take b, like trit
+  like trit
+  fork case, read a
+    case no
+      send back
+        make no
+    case maybe
+      fork case, read b
+        case no
+          send back
+            make no
+        case maybe
+          send back
+            make maybe
+        case yes
+          send back
+            make maybe
+    case yes
+      send back
+        read b
+
+# Disjunction, the maximum of the two values.
+task dis
+  take a, like trit
+  take b, like trit
+  like trit
+  fork case, read a
+    case no
+      send back
+        read b
+    case maybe
+      fork case, read b
+        case no
+          send back
+            make maybe
+        case maybe
+          send back
+            make maybe
+        case yes
+          send back
+            make yes
+    case yes
+      send back
+        make yes
+
+# NEGATION IS AN INVOLUTION: neg (neg a) = a.
+rule neg-is-an-involution
+  mark a, like trit
+  show hold
+    call is-equal
+      call neg
+        call neg
+          read a
+      read a
+  fold a
+
+# CONJUNCTION IS COMMUTATIVE: con a b = con b a, over all nine pairs.
+rule con-is-commutative
+  mark a, like trit
+  mark b, like trit
+  show hold
+    call is-equal
+      call con
+        read a
+        read b
+      call con
+        read b
+        read a
+  fold a, b
+
+# DISJUNCTION IS COMMUTATIVE: dis a b = dis b a.
+rule dis-is-commutative
+  mark a, like trit
+  mark b, like trit
+  show hold
+    call is-equal
+      call dis
+        read a
+        read b
+      call dis
+        read b
+        read a
+  fold a, b
+
+# CONJUNCTION IS IDEMPOTENT: con a a = a (a value met with itself is unchanged).
+rule con-is-idempotent
+  mark a, like trit
+  show hold
+    call is-equal
+      call con
+        read a
+        read a
+      read a
+  fold a
+
+# DE MORGAN: the negation of a conjunction is the disjunction of the negations, neg (con a b) = dis (neg a) (neg b), over
+# all nine pairs. The duality survives the third value.
+rule de-morgan-ternary
+  mark a, like trit
+  mark b, like trit
+  show hold
+    call is-equal
+      call neg
+        call con
+          read a
+          read b
+      call dis
+        call neg
+          read a
+        call neg
+          read b
+  fold a, b
+
+# THE LAW OF EXCLUDED MIDDLE FAILS: for the unknown value, dis maybe (neg maybe) = maybe, NOT true. A statement and its
+# negation do not exhaust the possibilities when truth is undetermined. This is the essence of three-valued logic, the
+# feature a two-valued bit cannot express, and the reason the resting middle of the tone is a genuine third state.
+rule excluded-middle-fails
+  show hold
+    call is-equal
+      call dis
+        make maybe
+        call neg
+          make maybe
+      make maybe
+  calm
+
+# Confirm the contrast: on a DEFINITE value, excluded middle DOES hold, dis yes (neg yes) = yes. Only the unknown escapes
+# it, so three-valued logic extends two-valued logic rather than replacing it.
+rule excluded-middle-holds-on-definite
+  show hold
+    call is-equal
+      call dis
+        make yes
+        call neg
+          make yes
+      make yes
+  calm

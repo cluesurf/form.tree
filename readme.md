@@ -21,7 +21,7 @@ form.tree is a machine-checked library of mathematics, written in Seed `.tree` c
 
 Every structure here is defined as a concrete object and every theorem is proved by a dependent type-checker. Nothing is asserted. A file does not say "the integers form a group" in prose. It builds the integers, defines addition, and proves associativity, commutativity, identity, and inverse by induction. If a proof is wrong, the file does not compile.
 
-The aim is the full foundations of mathematics, the way Coq, Agda, and Lean libraries do it, but in Seed, with a small clear surface anyone can read.
+It is a proof assistant and proof library in the lineage of Coq, Agda, Lean, Idris, and Isabelle. The aim is the full foundations of mathematics, the way those libraries do it, but in Seed, with a small clear surface anyone can read.
 
 ### Scope
 
@@ -95,7 +95,7 @@ The result reads like ordinary code, checks like a proof assistant, and (because
 
 School and undergraduate math train one main move: compute and solve. Arithmetic gives answers, algebra solves for `x`, calculus finds a derivative. Even proofs, when they appear, are written as informal prose for a human reader to be convinced by.
 
-form.tree is a different activity. It is closer to building with code than to solving for an answer, and it rests on three ideas, more general than numbers:
+form.tree is a different activity (the same one as Lean, Agda, Idris, Coq, and Isabelle). It is closer to building with code than to solving for an answer, and it rests on three ideas, more general than numbers:
 
 - **Objects.** Everything is an object of a type, and types are not just numbers. A bit, a tone, a list, a group, a graph, even a proof, are all objects. You make new types freely with `form`, the way a programmer makes new data types. There is no privileged set of "real numbers" at the bottom.
 - **Functions.** A function is a total, terminating rule, written by cases and recursion with `task`, exactly like a small program. It does not just transform numbers, it transforms any objects: a function can take a tone and return a charge, take a group element and return its inverse, take a proof and return another proof.

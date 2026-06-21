@@ -1,0 +1,128 @@
+# A monad, the structure behind Seed's data types and effects (Option, error handling, sequencing), modeled and its laws
+# proved by the kernel. A monad packages a value into a context (return) and chains context-producing steps (bind), and it
+# must obey three laws: returning then binding is just applying the step (left identity), binding with return changes
+# nothing (right identity), and chaining is associative. The example is the OPTION monad (a value that may be absent), the
+# basis of safe error handling. The kernel proves the right-identity law and a left-identity instance by computation over
+# the two shapes. (The general laws quantify over an arbitrary continuation; the kernel computes an applied NAMED function
+# but leaves an applied unknown one symbolic, so the universal forms await higher-order reduction, while the canonical and
+# concrete continuations below are fully checked.) This is the formal heart of how Seed threads data and sequences effects.
+
+form bit
+  case off
+  case on
+
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# The Option type: a value present (some) or absent (none).
+form opt
+  case none
+  case some
+    link value, like bit
+
+# return / unit: wrap a value in the context.
+task ret
+  take x, like bit
+  like opt
+  send back
+    make some
+      bind value
+        read x
+
+# bind: run a context, and if it has a value, feed it to the continuation. The general higher-order operation.
+task bind
+  take m, like opt
+  take f
+    like task
+      take x, like bit
+      like opt
+  like opt
+  fork case, read m
+    case none
+      send back
+        make none
+    case some
+      link value
+      send back
+        call f
+          read value
+
+# bind with RETURN as the continuation, the right-identity instance (return inlined so the kernel computes it).
+task chain-return
+  take m, like opt
+  like opt
+  fork case, read m
+    case none
+      send back
+        make none
+    case some
+      link value
+      send back
+        call ret
+          read value
+
+# RIGHT IDENTITY: bind m return = m. Binding a context with return leaves it unchanged, for every option. Proved by
+# induction over the two shapes (absent stays absent, present rewraps to the same present value).
+rule monad-right-identity
+  mark m, like opt
+  show hold
+    call is-equal
+      call chain-return
+        read m
+      read m
+  fold m
+
+# A concrete continuation, to witness the left-identity law: wrap the flipped value.
+task flip-opt
+  take x, like bit
+  like opt
+  send back
+    make some
+      bind value
+        call flip
+          read x
+
+# bind with that concrete continuation inlined.
+task chain-flip
+  take m, like opt
+  like opt
+  fork case, read m
+    case none
+      send back
+        make none
+    case some
+      link value
+      send back
+        call flip-opt
+          read value
+
+# LEFT IDENTITY (instance): bind (return a) k = k a, here for the continuation k = flip-opt. Wrapping a value with return
+# then binding is the same as applying the step directly, for every value a. Holds by computation.
+rule monad-left-identity-instance
+  mark a, like bit
+  show hold
+    call is-equal
+      call chain-flip
+        call ret
+          read a
+      call flip-opt
+        read a
+  calm
+
+# NONE SHORT-CIRCUITS: binding an absent value runs no continuation, the failure propagates. This is why the Option monad
+# models safe error handling, a single absence ends the chain.
+rule none-short-circuits
+  show hold
+    call is-equal
+      call chain-flip
+        make none
+      make none
+  calm
