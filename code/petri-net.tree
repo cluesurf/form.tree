@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A Petri net: a model of concurrent processes, a bipartite graph of places (holding tokens) and transitions (firing

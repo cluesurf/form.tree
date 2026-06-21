@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A unary function takes one element of a set and returns one. It is the shape of conjugation, negation, and the norm.

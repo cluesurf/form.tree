@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # First-order logic: the logic of quantifiers over individuals, with predicates, functions, and the connectives, able to

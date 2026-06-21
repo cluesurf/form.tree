@@ -1,4 +1,4 @@
-load @/code/machine/turing
+load @cluesurf/form/code/machine/turing
   find turing-machine
 
 # Computability: the study of what can be computed at all, independent of speed. A function is computable if some Turing

@@ -1,4 +1,4 @@
-load @/code/type/term
+load @cluesurf/form/code/type/term
   find term
 
 # The typing judgment, the relation the whole checker computes: in a context (a list of typed bindings), a term has a

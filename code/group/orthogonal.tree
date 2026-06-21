@@ -1,4 +1,4 @@
-load @/code/group
+load @cluesurf/form/code/group
   find group
 
 # The orthogonal group: the group of linear maps that preserve length, the rotations and reflections of a space with a

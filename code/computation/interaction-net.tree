@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # An interaction net: a model of computation by local graph rewriting, where agents joined at ports rewrite two at a

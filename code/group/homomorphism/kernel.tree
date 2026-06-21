@@ -1,4 +1,4 @@
-load @/code/group/homomorphism
+load @cluesurf/form/code/group/homomorphism
   find group-homomorphism
 
 # The kernel of a group homomorphism: the set of elements the homomorphism sends to the identity. It is always a normal

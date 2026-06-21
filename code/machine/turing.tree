@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A Turing machine: the foundational model of computation, a finite control reading and writing symbols on an unbounded

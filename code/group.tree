@@ -1,10 +1,10 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/structure/function/binary
+load @cluesurf/form/code/structure/function/binary
   find binary-function
 
-load @/code/structure/function/unary
+load @cluesurf/form/code/structure/function/unary
   find unary-function
 
 # A group: a set with an associative operation, an identity, and an inverse for every element. It is the mathematics of

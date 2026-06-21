@@ -1,4 +1,4 @@
-load @/code/structure/manifold
+load @cluesurf/form/code/structure/manifold
   find manifold
 
 # Curvature, the local bending of a space, and the constant negative curvature that defines hyperbolic geometry. The

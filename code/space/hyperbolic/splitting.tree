@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # The splitting method, Margenstern's central tool, the instrument that makes an undrawable hyperbolic tiling

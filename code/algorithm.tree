@@ -1,4 +1,4 @@
-load @/code/machine/turing
+load @cluesurf/form/code/machine/turing
   find turing-machine
 
 # An algorithm: a finite, definite, effective procedure for solving a problem, a recipe a machine can follow without

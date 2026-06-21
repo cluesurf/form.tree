@@ -1,7 +1,7 @@
-load @/code/group
+load @cluesurf/form/code/group
   find group
 
-load @/code/structure/manifold
+load @cluesurf/form/code/structure/manifold
   find manifold
 
 # A Lie group: a group that is also a smooth manifold, with the multiplication and inversion smooth, so it carries both

@@ -1,4 +1,4 @@
-load @/code/structure/manifold
+load @cluesurf/form/code/structure/manifold
   find manifold
 
 # The hyperbolic plane, the two-dimensional space of constant negative curvature, the third geometry beside the sphere

@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A rewriting system: a set of rules that replace one pattern by another, computing by repeated local replacement until

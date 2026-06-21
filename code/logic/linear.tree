@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # Linear logic: a logic that treats propositions as resources consumed exactly once, refining the structural rules so a

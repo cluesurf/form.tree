@@ -1,4 +1,4 @@
-load @/code/type/term
+load @cluesurf/form/code/type/term
   find term
 
 # A term, the concept: an expression in a formal language, the thing a type is assigned to and a proof is built from.

@@ -1,7 +1,7 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/structure/function/binary
+load @cluesurf/form/code/structure/function/binary
   find binary-function
 
 # A Jordan algebra: a commutative but non-associative algebra whose product obeys the Jordan identity, the symmetrized

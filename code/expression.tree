@@ -1,4 +1,4 @@
-load @/code/type/term
+load @cluesurf/form/code/type/term
   find term
 
 # An expression: a well-formed combination of symbols denoting a value, built from variables, constants, and operations,

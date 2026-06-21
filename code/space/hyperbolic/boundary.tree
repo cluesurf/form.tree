@@ -1,7 +1,7 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/structure/manifold
+load @cluesurf/form/code/structure/manifold
   find manifold
 
 # The boundary at infinity, the ideal sphere the hyperbolic space approaches but never reaches, and the geometry that

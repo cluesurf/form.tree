@@ -1,4 +1,4 @@
-load @/code/theory/category
+load @cluesurf/form/code/theory/category
   find category
 
 # A functor: a structure-preserving map between categories, sending objects to objects and morphisms to morphisms so

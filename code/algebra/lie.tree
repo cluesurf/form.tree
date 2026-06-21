@@ -1,10 +1,10 @@
-load @/code/structure/field
+load @cluesurf/form/code/structure/field
   find field
 
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/structure/function/binary
+load @cluesurf/form/code/structure/function/binary
   find binary-function
 
 # A Lie algebra: a vector space with a bracket that is antisymmetric (the bracket of a thing with itself is zero) and

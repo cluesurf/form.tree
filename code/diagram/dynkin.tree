@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A Dynkin diagram: the small graph that classifies a simple Lie algebra, one node per simple root, with edges encoding

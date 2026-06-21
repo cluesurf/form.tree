@@ -1,4 +1,4 @@
-load @/code/machine/turing
+load @cluesurf/form/code/machine/turing
   find turing-machine
 
 # Computational complexity: the study of how much resource (time, space) a computation needs as the input grows, the

@@ -1,7 +1,7 @@
-load @/code/type/term
+load @cluesurf/form/code/type/term
   find term
 
-load @/code/type/multiplicity
+load @cluesurf/form/code/type/multiplicity
   find multiplicity
 
 # The dependent function type, the pi type, the one way the theory forms a type that depends on a value, and the most

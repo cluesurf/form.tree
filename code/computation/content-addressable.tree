@@ -1,7 +1,7 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/computation/spr
+load @cluesurf/form/code/computation/spr
   find spr-cycle
 
 # Content-addressable memory: memory accessed by what is stored, not where. You present a value (the comparand) and the

@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # The multiplicity, the single mechanism that unifies proof erasure, the linear interaction-net substrate, and unique

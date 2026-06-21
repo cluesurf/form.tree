@@ -1,4 +1,4 @@
-load @/code/group
+load @cluesurf/form/code/group
   find group
 
 # The symplectic group: the linear maps preserving a symplectic form, an antisymmetric pairing, the symmetries of phase

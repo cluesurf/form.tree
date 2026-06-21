@@ -1,7 +1,7 @@
-load @/code/structure/space/vector
+load @cluesurf/form/code/structure/space/vector
   find vector-space
 
-load @/code/structure/function/unary
+load @cluesurf/form/code/structure/function/unary
   find unary-function
 
 # A normed vector space: a vector space with a norm, a length assigned to each vector that is zero only for the zero

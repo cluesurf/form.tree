@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # Graph theory: the study of networks, of vertices joined by edges, the mathematics of connection. Paths, cycles,

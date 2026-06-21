@@ -1,7 +1,7 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/structure/function/binary
+load @cluesurf/form/code/structure/function/binary
   find binary-function
 
 # A magma: the barest algebraic structure, a set with one binary operation closed on it and nothing more, no

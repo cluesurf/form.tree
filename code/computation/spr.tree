@@ -1,7 +1,7 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
-load @/code/computation/sitdac
+load @cluesurf/form/code/computation/sitdac
   find sitdac-machine
 
 # The SPR cycle, the heartbeat of associative computing: Search, Process, Retrieve. It mirrors a teacher broadcasting a

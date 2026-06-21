@@ -1,7 +1,7 @@
-load @/code/structure/space/vector
+load @cluesurf/form/code/structure/space/vector
   find vector-space
 
-load @/code/structure/function/binary
+load @cluesurf/form/code/structure/function/binary
   find binary-function
 
 # An inner-product space: a vector space with an inner product, a way to multiply two vectors into a scalar that is

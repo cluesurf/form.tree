@@ -1,4 +1,4 @@
-load @/code/group/homomorphism
+load @cluesurf/form/code/group/homomorphism
   find group-homomorphism
 
 # A group endomorphism: a homomorphism from a group to itself, a structure-preserving self-map. The endomorphisms of a

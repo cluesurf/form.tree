@@ -1,4 +1,4 @@
-load @/code/type/self
+load @cluesurf/form/code/type/self
   find self-type
 
 # The natural numbers, the first counting structure, encoded as a self type carrying its induction principle, in the

@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A state: a complete description of a system at one moment, a point in the space of all the system's possibilities. A

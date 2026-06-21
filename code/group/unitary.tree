@@ -1,4 +1,4 @@
-load @/code/group
+load @cluesurf/form/code/group
   find group
 
 # The unitary group: the complex linear maps preserving a Hermitian inner product, the length-preserving symmetries of

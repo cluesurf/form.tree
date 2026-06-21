@@ -1,4 +1,4 @@
-load @/code/structure/function/binary
+load @cluesurf/form/code/structure/function/binary
   find binary-function
 
 # A radial basis function kernel: a similarity measure between two points that falls off with their distance, peaking

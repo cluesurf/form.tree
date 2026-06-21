@@ -1,4 +1,4 @@
-load @/code/type/term
+load @cluesurf/form/code/type/term
   find term
 
 # The identity type, the observational equality the kernel computes with. For two values of one type it is the type of

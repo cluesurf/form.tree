@@ -1,4 +1,4 @@
-load @/code/structure/manifold
+load @cluesurf/form/code/structure/manifold
   find manifold
 
 # The dodecagrid, the regular honeycomb {5, 3, 4}, hyperbolic three-space tiled by right-angled dodecahedra, four around

@@ -1,4 +1,4 @@
-load @/code/structure/set
+load @cluesurf/form/code/structure/set
   find set
 
 # A stack machine: a model of computation whose only memory is one or more stacks, evaluating by pushing operands and
