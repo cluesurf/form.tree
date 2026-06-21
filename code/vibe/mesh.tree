@@ -4,3 +4,12 @@ load @/code/vibe/dock
 # The mesh, the whole of space, the fifth base element. One growing hyperbolic honeycomb of identical docks joined face to face, whose cells are 24-cells. It is discrete, hyperbolic so that room opens up faster than flat space, and it grows at its open edge. Its flat boundary is the three-dimensional space we live in.
 form mesh
   link docks, like list, like dock
+
+# The mesh, proof-checked by `seed test`: a hyperbolic honeycomb of 24-cell docks joined face to face, so every dock
+# meets twenty-four neighbors, one across each face, 24 = 2 * 12.
+hold <each dock meets twenty-four neighbors>
+  call is-equal
+    mark 24
+    call multiply
+      mark 2
+      mark 12

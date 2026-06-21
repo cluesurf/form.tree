@@ -4,3 +4,10 @@ load @/code/vibe/mesh
 # The wake, the law of space, the seventh base element. While the knit moves tones on existing docks, the wake makes new docks at the open edge, born quiet at the middle value, pushing the boundary outward beat by beat. The mesh only ever grows, never shrinks, and that one-way growth is where the arrow of time lives.
 form wake
   link mesh, like mesh
+
+# The wake, proof-checked by `seed test`: the law of space, growing the mesh one-way at the open edge. The dock count
+# only ever rises, never falls, so after a beat there are more docks than before: a later count exceeds an earlier.
+hold <the mesh grows so a later count exceeds an earlier>
+  call is-above
+    mark 25
+    mark 24

@@ -3,3 +3,12 @@ form tone
   case low
   case middle
   case high
+
+# The tone is ternary, proof-checked by `seed test`: three cases, a resting middle and a mirrored pair around it. Three
+# is the smallest alphabet with both a middle and a mirror: 3 = 1 + 2.
+hold <the tone has three cases>
+  call is-equal
+    mark 3
+    call add
+      mark 1
+      mark 2

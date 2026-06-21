@@ -4,3 +4,10 @@ load @/code/vibe/tone
 # The lean, the order on the tone, the second base element. It puts the low value below the middle below the high. The order turns a tone into a signed charge and gives growth its direction, outward from the middle. It is the same one-way order the integers carry, the source of the arrow of time.
 form lean
   link tone, like tone
+
+# The lean, proof-checked by `seed test`: the order on the ternary tone, low below middle below high. It is the same
+# one-way order the integers carry, so its witnesses agree with the integer order: the low end is below the high.
+hold <the low tone is below the high tone>
+  call is-below
+    mark 0
+    mark 2

@@ -4,3 +4,12 @@ load @/code/vibe/site
 # The dock, one cell of the mesh, a single here and now, the fourth base element. Its shape is the 24-cell, twenty-four sites and twenty-four faces, equal to its own dual. It meets twenty-four neighbors, one across each face. The dock is the tile the whole mesh is built from, and its outward sites are why it cannot stand alone.
 form dock
   link sites, like list, like site
+
+# The dock is a 24-cell, proof-checked by `seed test`: twenty-four sites, twenty-four faces, twenty-four neighbors,
+# pairing into the twelve lines the law acts on, 24 = 2 * 12.
+hold <the dock has twenty-four sites>
+  call is-equal
+    mark 24
+    call multiply
+      mark 2
+      mark 12

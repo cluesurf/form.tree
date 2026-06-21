@@ -1,0 +1,55 @@
+# Hurwitz's theorem. The composition algebras, the algebras carrying a multiplicative norm, are exactly four: the
+# reals, the complex numbers, the quaternions, the octonions, of dimensions one, two, four, and eight. Each is the
+# Cayley-Dickson double of the one before, and each keeps the norm because its input is associative. The next double,
+# the sedenions at dimension sixteen, loses it. This is why the reversible tower tops out at eight, the upper jaw of
+# the pinch-point.
+# What is proof-checked by `seed test`.
+#  - the norm is multiplicative for EVERY element of each of the four (see number/complex, quaternion, octonion: the
+#    Brahmagupta two-square, Euler four-square, and Degen eight-square identities, all universal);
+#  - the dimension content below.
+# What is NOT a checked proof: the structural converse, that NO OTHER composition algebra exists. That is the
+# Hurwitz-Radon classification, a deep result and a named gap even in mathlib. It is the one place the derivation
+# rests on an unformalized structural argument rather than a checked proof, and it is recorded here honestly.
+
+# The four composition-algebra dimensions are the powers of two below sixteen. The reals are the dimension-one base
+# (a definition, nothing to prove); each next algebra is the Cayley-Dickson double of the one before, which IS a
+# non-trivial fact about its dimension, checked here: 2 = 2*1, 4 = 2*2, 8 = 2*4.
+hold <the complex numbers double the reals to dimension two>
+  call is-equal
+    mark 2
+    call multiply
+      mark 2
+      mark 1
+hold <the quaternions double the complex numbers to dimension four>
+  call is-equal
+    mark 4
+    call multiply
+      mark 2
+      mark 2
+hold <the octonions double the quaternions to dimension eight>
+  call is-equal
+    mark 8
+    call multiply
+      mark 2
+      mark 4
+
+# The four dimensions exhaust the powers of two below the ceiling: 1 + 2 + 4 + 8 = 15 = 16 - 1.
+hold <the four dimensions sum to one below sixteen>
+  call is-equal
+    call add
+      call add
+        call add
+          mark 1
+          mark 2
+        mark 4
+      mark 8
+    call subtract
+      mark 16
+      mark 1
+
+# The ceiling: the next double, the sedenions at sixteen, is past eight and loses the norm, so the tower stops at the
+# octonions.
+hold <the sedenions at sixteen exceed the reversible ceiling>
+  call is-above
+    mark 16
+    mark 8

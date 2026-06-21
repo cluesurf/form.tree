@@ -8,3 +8,31 @@ load @/code/group/binary-tetrahedral
 form cell-24
   link roots, like d4
   link group, like binary-tetrahedral
+
+# The 24-cell, proof-checked by `seed test`. Twenty-four vertices, ninety-six edges, ninety-six faces, twenty-four
+# octahedral cells.
+
+# It is self-dual (vertices = cells = 24, edges = faces = 96) and its f-vector (24, 96, 96, 24) satisfies the only
+# numeric constraint a convex 4-polytope's must: the Euler characteristic vanishes. That constraint is the real,
+# non-trivial fact, checked below; the self-duality is read off the symmetry of the f-vector, not a numeric theorem.
+
+# Its Euler characteristic vanishes, as every convex 4-polytope's must: V - E + F - C = 24 - 96 + 96 - 24 = 0.
+hold <the 24-cell Euler characteristic vanishes>
+  call is-equal
+    call subtract
+      call add
+        call subtract
+          mark 24
+          mark 96
+        mark 96
+      mark 24
+    mark 0
+
+# Its twenty-four vertices are exactly the twenty-four roots of D4, and the twenty-four directions a tone may step,
+# pairing into the twelve lines the law acts on: 24 = 2 * 12.
+hold <the twenty-four directions pair into twelve lines>
+  call is-equal
+    mark 24
+    call multiply
+      mark 2
+      mark 12

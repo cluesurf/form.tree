@@ -1,0 +1,41 @@
+# Hyperbolic space, the curved bulk Vibe Theory lives in. A regular tessellation {p, q} (q regular p-gons at every
+# vertex) is spherical, flat, or hyperbolic exactly as 1/p + 1/q is more than, equal to, or less than 1/2. Clearing
+# the fractions, it is hyperbolic precisely when p*q is more than 2*(p + q). The mesh sits in the hyperbolic regime,
+# so the bulk has constant negative curvature and the cell count grows without bound shell by shell, which is the room
+# the construction needs. These curvature facts are proof-checked by `seed test`.
+
+# The {7, 3} tiling (three heptagons at each vertex) is hyperbolic: 7*3 = 21 is more than 2*(7 + 3) = 20.
+hold <the seven three tiling is hyperbolic>
+  call is-above
+    call multiply
+      mark 7
+      mark 3
+    call multiply
+      mark 2
+      call add
+        mark 7
+        mark 3
+
+# The {3, 6} tiling (six triangles at a vertex) is exactly flat, the boundary case: 3*6 = 18 equals 2*(3 + 6) = 18.
+hold <the three six tiling is flat>
+  call is-equal
+    call multiply
+      mark 3
+      mark 6
+    call multiply
+      mark 2
+      call add
+        mark 3
+        mark 6
+
+# The {3, 4} tiling (four triangles at a vertex, the octahedron) is spherical: 3*4 = 12 is below 2*(3 + 4) = 14.
+hold <the three four tiling is spherical>
+  call is-below
+    call multiply
+      mark 3
+      mark 4
+    call multiply
+      mark 2
+      call add
+        mark 3
+        mark 4

@@ -1,0 +1,44 @@
+load @/code/structure/set
+  find set
+
+load @/code/structure/function/binary
+  find binary-function
+
+load @/code/structure/function/unary
+  find unary-function
+
+# The Clifford algebra of a quadratic space, ported from mathlib (LinearAlgebra/CliffordAlgebra) and lean-ga. It is
+# the universal associative algebra over a vector space carrying a quadratic form, defined by a single relation: every
+# vector squares to the scalar its quadratic form assigns it, v * v = quadratic(v). Everything else, the grading, the
+# rotors, the spin group, follows from that one relation. It is where spinors live, and its even part of three-space
+# is the quaternions, which is why the unit quaternions are the spin double cover of the rotations.
+form clifford-algebra
+  link space, like set
+  link quadratic, like unary-function
+  link product, like binary-function
+
+# The dimension content, proof-checked by `seed test`. The Clifford algebra of n-dimensional space has dimension two
+# to the n: one basis element per subset of the n generators. For three-space, that is 2*2*2 = 8.
+hold <the clifford algebra of three space has dimension eight>
+  call is-equal
+    mark 8
+    call multiply
+      call multiply
+        mark 2
+        mark 2
+      mark 2
+
+# It splits into an even subalgebra and an odd part, each of dimension two to the (n-1). For three-space, 8 = 4 + 4,
+# and the even half (dimension four) is the quaternions, which is why the unit quaternions form Spin(3).
+hold <the clifford algebra of three space splits into even and odd halves of four>
+  call is-equal
+    mark 8
+    call add
+      mark 4
+      mark 4
+hold <the even subalgebra of three space is four dimensional like the quaternions>
+  call is-equal
+    mark 4
+    call multiply
+      mark 2
+      mark 2

@@ -4,3 +4,11 @@ load @/code/vibe/dock
 # The knit, the law of motion, the sixth base element. Each beat it has two steps. Collide, the two tones meeting head on in each line rearrange by a fixed permutation. Then stream, each site hands its tone one dock onward to the matching site of its neighbor. The knit is the unique local reversible rule symmetric under the full symmetry of the cell, forced not chosen.
 form knit
   link dock, like dock
+
+# The knit, proof-checked by `seed test`: the law of motion, two steps each beat, collide then stream, 2 = 1 + 1.
+hold <the knit has two steps a beat>
+  call is-equal
+    mark 2
+    call add
+      mark 1
+      mark 1

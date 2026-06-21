@@ -1,0 +1,125 @@
+# The natural numbers, the first counting structure: the distinctions counted, zero and a successor for each. Their
+# arithmetic is addition (repeated successor) and multiplication (repeated addition). Counting the distinctions gives
+# the naturals, and ordering them, then signing them, gives the integers, the unique totally ordered rung whose
+# one-way order is the arrow of time. This is the first object Vibe Theory rests on.
+
+# The additive laws below hold for EVERY natural (the parameters are universally quantified), proved by the linear
+# prover and checked by `seed test`. These are universal laws, not single witnesses.
+
+# Zero is a right identity for addition: n + 0 = n, for every n.
+task additive-identity
+  take n, like natural
+  like natural
+  hold <zero is a right identity for addition>
+    call is-equal
+      call add
+        loan n
+        mark 0
+      loan n
+  send back
+    loan n
+
+# Addition commutes: a + b = b + a, for every a and b.
+task additive-commutativity
+  take a, like natural
+  take b, like natural
+  like natural
+  hold <addition commutes>
+    call is-equal
+      call add
+        loan a
+        loan b
+      call add
+        loan b
+        loan a
+  send back
+    loan a
+
+# Addition associates: (a + b) + c = a + (b + c), for every a, b, c.
+task additive-associativity
+  take a, like natural
+  take b, like natural
+  take c, like natural
+  like natural
+  hold <addition associates>
+    call is-equal
+      call add
+        call add
+          loan a
+          loan b
+        loan c
+      call add
+        loan a
+        call add
+          loan b
+          loan c
+  send back
+    loan a
+
+# Every natural is non-negative: n >= 0, for every n. This is the base of the order, the floor the arrow runs up from.
+# (The `natural-number` refinement is what carries the n >= 0 assumption to the prover.)
+task non-negativity
+  take n, like natural-number
+  like natural-number
+  hold <every natural is at least zero>
+    call is-minimum
+      loan n
+      mark 0
+  send back
+    loan n
+
+# Multiplication facts (the universal multiplication laws are non-linear, so these stand as concrete witnesses for
+# now, pending the inductive lowering).
+hold <two times three is six>
+  call is-equal
+    call multiply
+      mark 2
+      mark 3
+    mark 6
+hold <three times three is nine>
+  call is-equal
+    call multiply
+      mark 3
+      mark 3
+    mark 9
+
+# A genuinely INDUCTIVE law, proved by Peano induction (the `fold` tactic) over a recursive definition, not by a
+# closed certificate. The triangular-number recurrence: sum 0 = 0, sum (m+1) = sum m + (m+1).
+task sum
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          loan n
+          mark 0
+      hook hold
+        mark 0
+      hook miss
+        call add
+          call sum
+            call subtract
+              loan n
+              mark 1
+          loan n
+
+# Gauss's formula, for EVERY n: twice the sum from 1 to n equals n times (n + 1). Proved by induction on n -- base
+# 2*sum(0) = 0, step 2*sum(k+1) = 2*sum(k) + 2*(k+1), which the hypothesis and the ring normalizer close.
+task triangular-number-formula
+  take n, like natural-number
+  like natural-number
+  hold <twice the sum from one to n is n times n plus one>
+    call is-equal
+      call multiply
+        mark 2
+        call sum
+          loan n
+      call multiply
+        loan n
+        call add
+          loan n
+          mark 1
+    fold n
+  send back
+    loan n

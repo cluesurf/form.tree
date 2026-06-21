@@ -1,0 +1,47 @@
+# The Hopf fibrations, ported from HoTT-Agda (homotopy/Hopf). There are exactly four, one per normed division algebra:
+# the reals, complex numbers, quaternions, octonions. For a division algebra of dimension d, the unit sphere fibers
+# the bigger sphere over the smaller: the total sphere has dimension 2d - 1, the base has dimension d, and the fiber
+# has dimension d - 1. They are the topological shadow of the four division algebras, and the octonionic one,
+# S^15 -> S^8 with fiber S^7, is the shadow of the dimension-eight ceiling. The dimension arithmetic is proof-checked
+# by `seed test`.
+
+# The octonionic Hopf fibration S^15 -> S^8: the total sphere dimension is 2*8 - 1 = 15.
+hold <the octonionic hopf total sphere has dimension fifteen>
+  call is-equal
+    mark 15
+    call subtract
+      call multiply
+        mark 2
+        mark 8
+      mark 1
+
+# Its fiber is the seven-sphere, of dimension one less than the algebra: 8 - 1 = 7.
+hold <the octonionic hopf fiber is the seven sphere>
+  call is-equal
+    mark 7
+    call subtract
+      mark 8
+      mark 1
+
+# The total sphere's dimension is the base plus the fiber: 15 = 8 + 7.
+hold <the octonionic hopf total is the base plus the fiber>
+  call is-equal
+    mark 15
+    call add
+      mark 8
+      mark 7
+
+# Across the family the fiber dimension is exactly the algebra dimension minus one: the quaternionic Hopf S^7 -> S^4
+# has fiber S^3 (4 - 1 = 3), and the complex Hopf S^3 -> S^2 has fiber S^1 (2 - 1 = 1).
+hold <the quaternionic hopf fiber is the three sphere>
+  call is-equal
+    mark 3
+    call subtract
+      mark 4
+      mark 1
+hold <the complex hopf fiber is the one sphere>
+  call is-equal
+    mark 1
+    call subtract
+      mark 2
+      mark 1

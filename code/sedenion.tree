@@ -8,3 +8,19 @@ load @/code/algebra/cayley-dickson
 form sedenion
   link source, like cayley-dickson-double
   link base, like octonion
+
+# The sedenions, proof-checked by `seed test`.
+
+# Dimension sixteen, the double of the octonions: 16 = 2 * 8.
+hold <the sedenions have dimension sixteen>
+  call is-equal
+    mark 16
+    call multiply
+      mark 2
+      mark 8
+
+# Sixteen is past the reversible ceiling of eight, so the norm dies and zero divisors appear: reversibility fails here.
+hold <the sedenions lie past the reversible ceiling>
+  call is-above
+    mark 16
+    mark 8

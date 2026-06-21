@@ -8,3 +8,80 @@ load @/code/algebra/normed-division
 form complex
   link source, like cayley-dickson-double
   link algebra, like normed-division-algebra
+
+# The complex numbers, proof-checked by `seed test`.
+
+# The norm is multiplicative for EVERY pair of complex numbers, the composition property that is the seed of the whole
+# tower and of Hurwitz's theorem. With z = a + b i and w = c + d i, the product z w = (ac - bd) + (ad + bc) i, and the
+# Brahmagupta-Fibonacci identity says (a*a + b*b) (c*c + d*d) = (ac - bd)^2 + (ad + bc)^2. A universal law over all
+# a, b, c, d, proved by the commutative-ring normalizer.
+task complex-norm-is-multiplicative
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  take d, like integer
+  like integer
+  hold <the complex norm is multiplicative>
+    call is-equal
+      call multiply
+        call add
+          call multiply
+            loan a
+            loan a
+          call multiply
+            loan b
+            loan b
+        call add
+          call multiply
+            loan c
+            loan c
+          call multiply
+            loan d
+            loan d
+      call add
+        call multiply
+          call subtract
+            call multiply
+              loan a
+              loan c
+            call multiply
+              loan b
+              loan d
+          call subtract
+            call multiply
+              loan a
+              loan c
+            call multiply
+              loan b
+              loan d
+        call multiply
+          call add
+            call multiply
+              loan a
+              loan d
+            call multiply
+              loan b
+              loan c
+          call add
+            call multiply
+              loan a
+              loan d
+            call multiply
+              loan b
+              loan c
+  send back
+    loan a
+
+# The Gaussian norm of 3 + 4i is the Pythagorean five: 3*3 + 4*4 = 25 = 5*5.
+hold <the norm of three plus four i is five>
+  call is-equal
+    call add
+      call multiply
+        mark 3
+        mark 3
+      call multiply
+        mark 4
+        mark 4
+    call multiply
+      mark 5
+      mark 5

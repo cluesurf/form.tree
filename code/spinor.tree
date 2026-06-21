@@ -1,0 +1,43 @@
+load @/code/algebra/clifford
+  find clifford-algebra
+
+# The spinor, ported from mathlib (CliffordAlgebra/SpinGroup) and lean-ga (versors). A spinor is an element the spin
+# group acts on, and the spin group is the EVEN unit versors of a Clifford algebra: products of an even number of unit
+# vectors. So a spinor is built from the even subalgebra, and it is the double cover of a rotation, a full turn being
+# minus one. This is why the 24-cell, the binary tetrahedral group, carries spin exactly.
+form spinor
+  link source, like clifford-algebra
+
+# The half-spinor of the rotation algebra so(2n) has dimension two to the (n-1). The vector it rotates has dimension
+# 2n. These two formulas are different, yet they COINCIDE at one place: n = 4, the rotation algebra so(8), where the
+# half-spinor 2*2*2 = 8 equals the vector 2*4 = 8. That coincidence is the one-substance floor of the pinch-point, and
+# the equality of vector and the two half-spinors is triality. Proof-checked by `seed test`.
+hold <the half-spinor of so eight equals the vector by two different formulas>
+  call is-equal
+    call multiply
+      call multiply
+        mark 2
+        mark 2
+      mark 2
+    call multiply
+      mark 2
+      mark 4
+
+# Below dimension eight the half-spinor is smaller than the vector, above it larger; the crossing is exactly at eight.
+# At so(6) the half-spinor is 2*2 = 4, below the vector 6; at so(10) it is 2*2*2*2 = 16, above the vector 10.
+hold <below eight the half-spinor is smaller than the vector>
+  call is-below
+    call multiply
+      mark 2
+      mark 2
+    mark 6
+hold <above eight the half-spinor is larger than the vector>
+  call is-above
+    call multiply
+      call multiply
+        call multiply
+          mark 2
+          mark 2
+        mark 2
+      mark 2
+    mark 10
