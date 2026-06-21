@@ -1,0 +1,28 @@
+load @/code/structure/set
+  find set
+
+load @/code/computation/sitdac
+  find sitdac-machine
+
+# Responders: the cells whose record matched the broadcast query, the ones that raise their hands. A search produces a
+# responder set; processing acts on exactly these cells. Cycles NEST, and a nested cycle can only touch the active
+# responders of the enclosing cycle, so entering a deeper level narrows the set and leaving it restores the set. A
+# parallel `if` refines the responders (intersects with them); `setscope` replaces them. The whole structure is a stack
+# of scopes. In the bulk the responders are the lit-up region of the honeycomb a query wave selects. The form carries
+# the set of responding cells.
+form responder-set
+  link cells, like set
+
+# The some-or-none signal: the single bit that reports whether ANY cell responded to the search. It is the primitive
+# that makes associative search constant-time: the controller reads one wire instead of polling cells. The form carries
+# the machine whose responders the signal summarizes.
+form some-or-none-signal
+  link machine, like sitdac-machine
+
+# The minimum-index search (mindex): of all the responders, the index of the one with the smallest value in a chosen
+# field, so one field's extreme fetches a second field from the same record. It is the content-addressable best-match
+# primitive: after a query wave lights the responders, mindex over a distance or score field picks the single closest
+# match in a number of steps set by the hyperbolic diameter (logarithmic in the cell count). Its kin are maxdex,
+# nthdex, and the value forms maxval / minval / nthval / count. The form carries the responder set searched.
+form best-match-index
+  link responders, like responder-set

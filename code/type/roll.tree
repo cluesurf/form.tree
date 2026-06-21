@@ -1,0 +1,114 @@
+# The inductive cons-list as a self-type, with length and append defined by structural recursion and their laws PROVED
+# BY THE KERNEL computing normal forms (the same dependent-proof path as the Peano naturals). A roll is empty (nil) or a
+# head element consed onto a tail roll. It is the free monoid on naturals, the inductive sibling of the native `list`
+# array: where `list` is a primitive container, a `roll` is built nil-then-cons and reduces under the kernel, so its
+# equations check by reflexivity. This mirrors the list theory of agda-unimath / Lean's standard library, in seed .tree.
+# The recursions descend on the matched tail, so they are verified terminating and the kernel unfolds them transparently.
+
+# A natural number: zero, or the successor of a natural.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# A roll of naturals: empty, or a head element consed onto a tail roll.
+form roll
+  case nil
+  case cons
+    link item, like natural
+    link more, like roll
+
+# the length of a roll, by recursion on its structure: length nil = 0, length (cons h t) = succ (length t).
+task length
+  take xs, like roll
+  like natural
+  fork case, read xs
+    case nil
+      send back
+        make zero
+    case cons
+      send back
+        make succ
+          bind prior
+            call length
+              read more
+
+# append two rolls, by recursion on the first: append nil ys = ys, append (cons h t) ys = cons h (append t ys).
+task append
+  take xs, like roll
+  take ys, like roll
+  like roll
+  fork case, read xs
+    case nil
+      send back
+        read ys
+    case cons
+      send back
+        make cons
+          bind item
+            read item
+          bind more
+            call append
+              read more
+              read ys
+
+# UNIVERSAL: the empty roll has length zero (the nil branch). Definitional, the kernel reduces length nil to zero.
+rule length-of-nil-is-zero
+  show hold
+    call is-equal
+      call length
+        make nil
+      make zero
+  calm
+
+# UNIVERSAL: nil is a left identity for append. append nil ys = ys, for every roll ys. Definitional.
+rule append-nil-left-is-identity
+  mark ys, like roll
+  show hold
+    call is-equal
+      call append
+        make nil
+        read ys
+      read ys
+  calm
+
+# UNIVERSAL: length steps through a cons. length (cons h t) = succ (length t), for every head h and tail t. Definitional.
+rule length-of-cons-steps
+  mark h, like natural
+  mark t, like roll
+  show hold
+    call is-equal
+      call length
+        make cons
+          bind item
+            read h
+          bind more
+            read t
+      make succ
+        bind prior
+          call length
+            read t
+  calm
+
+# UNIVERSAL: append steps through a cons. append (cons h t) ys = cons h (append t ys), for every h, t, ys. Definitional.
+rule append-of-cons-steps
+  mark h, like natural
+  mark t, like roll
+  mark ys, like roll
+  show hold
+    call is-equal
+      call append
+        make cons
+          bind item
+            read h
+          bind more
+            read t
+        read ys
+      make cons
+        bind item
+          read h
+        bind more
+          call append
+            read t
+            read ys
+  calm

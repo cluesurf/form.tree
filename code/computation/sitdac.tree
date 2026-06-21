@@ -1,0 +1,24 @@
+load @/code/structure/set
+  find set
+
+# SITDAC, the model of associative computing (Potter 1992): Single Instruction stream, Tabular Data, Associative
+# Control. Each row of a data table sits in its own cell that is a tiny processor plus its local memory; one instruction
+# stream broadcasts to all cells, and every cell runs the same instruction at once on its own data. You program by
+# searching by CONTENT, not by addressing by location, so there are no pointers and no sorting. This is the
+# content-addressable array of processors, the abstract machine the {3,4,3,4} bulk realizes: each honeycomb cell is a
+# SITDAC cell, the broadcast is the query wave, and the matching cells answer. The form carries the set of cells; the
+# single instruction stream and the tabular data layout are the model.
+form sitdac-machine
+  link cells, like set
+
+# A cell: one processing element with its local memory, holding one record (one row of the table). Every cell executes
+# the broadcast instruction simultaneously on its own record. In the bulk a cell is one dock of the mesh, its record the
+# twenty-four-slot coin of tones. The form carries the set of records the cell can hold.
+form associative-cell
+  link records, like set
+
+# A parallel field: one value per cell, the column of the table, written across all active cells at once (the cell
+# dimension). A scalar combined with a parallel field broadcasts to every cell. The form carries the set of cells the
+# field spans.
+form parallel-field
+  link cells, like set

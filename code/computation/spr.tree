@@ -1,0 +1,31 @@
+load @/code/structure/set
+  find set
+
+load @/code/computation/sitdac
+  find sitdac-machine
+
+# The SPR cycle, the heartbeat of associative computing: Search, Process, Retrieve. It mirrors a teacher broadcasting a
+# query and the matching students raising their hands. SEARCH specifies values for some fields; the records that match
+# are the responders. PROCESS runs operations on the cells that responded. RETRIEVE reads back specific fields of the
+# responders for later cycles. Any phase may be omitted, so real programs are streams of partial cycles. In the
+# {3,4,3,4} bulk the SPR cycle IS the query-wave loop: the broadcast comparand is the search, the matching bulk cells
+# are the responders, the local update is the process, and reading a slot off the matched cells is the retrieve. The
+# form carries the machine the cycle runs on.
+form spr-cycle
+  link machine, like sitdac-machine
+
+# Search: the query phase. A comparand is broadcast to every cell, each compares it to its own record in parallel, and
+# the cells whose record matches become active. A one-bit some-or-none signal tells the controller whether anyone
+# matched, and that single signal drives constant-time search. The form carries the machine searched.
+form search-phase
+  link machine, like sitdac-machine
+
+# Process: the action phase. Every responder runs the same sequence of operations at once on its own record. The form
+# carries the machine processed.
+form process-phase
+  link machine, like sitdac-machine
+
+# Retrieve: the readback phase. Specific fields of the responders are read out (one at a time when their order matters,
+# all at once when it does not), so later cycles can use them. The form carries the machine retrieved from.
+form retrieve-phase
+  link machine, like sitdac-machine

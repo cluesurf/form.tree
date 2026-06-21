@@ -47,3 +47,88 @@ rule flip-flip-off-is-off
           make off
       make off
   calm
+
+# Boolean conjunction: and off b = off, and on b = b. Defined by a match the kernel reduces.
+task both
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make off
+    case on
+      send back
+        read b
+
+# Boolean disjunction: or off b = b, or on b = on.
+task some
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      send back
+        make on
+
+# UNIVERSAL law: off is the absorber of and. and off b = off, for every b. Definitional, proved by the kernel.
+rule both-off-absorbs
+  mark b, like bit
+  show hold
+    call is-equal
+      call both
+        make off
+        read b
+      make off
+  calm
+
+# UNIVERSAL law: on is the identity of and. and on b = b, for every b.
+rule both-on-is-identity
+  mark b, like bit
+  show hold
+    call is-equal
+      call both
+        make on
+        read b
+      read b
+  calm
+
+# UNIVERSAL law: on is the absorber of or. or on b = on, for every b.
+rule some-on-absorbs
+  mark b, like bit
+  show hold
+    call is-equal
+      call some
+        make on
+        read b
+      make on
+  calm
+
+# UNIVERSAL law: off is the identity of or. or off b = b, for every b.
+rule some-off-is-identity
+  mark b, like bit
+  show hold
+    call is-equal
+      call some
+        make off
+        read b
+      read b
+  calm
+
+# de Morgan, concretely: not (and on off) = or (not on) (not off). The kernel reduces both sides to on.
+rule de-morgan-on-off
+  show hold
+    call is-equal
+      call flip
+        call both
+          make on
+          make off
+      call some
+        call flip
+          make on
+        call flip
+          make off
+  calm

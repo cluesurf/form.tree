@@ -1,1 +1,31 @@
-# scratch probe (safe to remove)
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# NON-definitional: n + 0 = n needs induction on n (0+0=0 base; succ case uses the hypothesis).
+rule plus-zero-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n

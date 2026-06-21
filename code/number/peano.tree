@@ -97,3 +97,78 @@ rule zero-plus-three-is-three
         call three
       call three
   calm
+
+# UNIVERSAL laws proved through the kernel, not just concrete instances. These are definitional: each side reduces to
+# the same normal form FOR EVERY value of the bound variables, so `calm` discharges them. Genuine forall-theorems.
+
+# Zero is a left identity for addition: 0 + n = n, for every natural n. (The zero branch of plus returns its second
+# argument directly, so plus zero n reduces to n even when n is an arbitrary variable.)
+rule plus-zero-left-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        make zero
+        read n
+      read n
+  calm
+
+# The successor steps out of a sum: (succ a) + b = succ (a + b), for every a and b. (This is the recursion equation of
+# plus, definitionally true.)
+rule plus-succ-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            read a
+        read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  calm
+
+# Multiplication by recursion on the first argument: 0 * b = 0, and (succ a) * b = b + (a * b). Recursion descends on
+# the matched predecessor, so it is verified terminating and the kernel unfolds it.
+task times
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        make zero
+    case succ
+      send back
+        call plus
+          read b
+          call times
+            read prior
+            read b
+
+# Zero is a left absorber for multiplication: 0 * n = 0, for every n. Definitional.
+rule times-zero-left-is-zero
+  mark n, like natural
+  show hold
+    call is-equal
+      call times
+        make zero
+        read n
+      make zero
+  calm
+
+# A concrete product: two times two is four, computed through the kernel (multiplication unfolds into two additions).
+rule two-times-two-is-four
+  show hold
+    call is-equal
+      call times
+        call two
+        call two
+      call plus
+        call two
+        call two
+  calm

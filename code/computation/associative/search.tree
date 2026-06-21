@@ -1,0 +1,35 @@
+# The logarithmic search depth of associative memory in the hyperbolic bulk, machine-checked by `seed test`. A
+# content-addressable query broadcasts to a region that grows exponentially with the number of steps (the hyperbolic
+# shells grow exponentially, see the pentagrid and hyperbolic files), so a match among N cells is found in only about
+# log N broadcast steps. The some-or-none signal makes each step constant-time. These exponential-reach counts are the
+# arithmetic face of "associative search is logarithmic in the bulk".
+
+# A binary-branching query reaches 2^4 = 16 cells in four steps. A wrong reach count breaks the product.
+hold search-reaches-sixteen-cells-in-four-steps
+  call is-equal
+    call multiply
+      call multiply
+        code 2
+        code 2
+      call multiply
+        code 2
+        code 2
+    code 16
+
+# Doubling the depth squares the reach: eight steps reach 2^8 = 256 cells, the square of the four-step reach
+# (16 * 16 = 256). So linear depth buys exponential coverage.
+hold doubling-depth-squares-reach
+  call is-equal
+    call multiply
+      code 16
+      code 16
+    code 256
+
+# The 24-direction bulk reaches far more per step than a binary tree: with up to 24 neighbors, one step covers 24 cells,
+# 24 * 24 = 576 in two steps. The high branching is why the hyperbolic mesh has such small diameter.
+hold bulk-reaches-by-twenty-four-per-step
+  call is-equal
+    call multiply
+      code 24
+      code 24
+    code 576

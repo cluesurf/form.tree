@@ -1,0 +1,27 @@
+load @/code/structure/set
+  find set
+
+load @/code/computation/spr
+  find spr-cycle
+
+# Content-addressable memory: memory accessed by what is stored, not where. You present a value (the comparand) and the
+# memory returns the locations whose contents match, in parallel, in one step, instead of walking addresses. Associative
+# computing extends this from a passive memory to a content-addressable ARRAY OF PROCESSORS: each matched location can
+# also compute. The {3,4,3,4} bulk is exactly this, a content-addressable memory whose cells are docks of the mesh and
+# whose matching is the query wave, with the Coxeter-word address of a cell available but rarely needed (you find a
+# memory by its content, not its address). The form carries the SPR cycle the memory answers through.
+form content-addressable-memory
+  link cycle, like spr-cycle
+
+# An association: several parallel fields grouped into one logical record per cell (one word), so a search that matches
+# one field selects the whole record. In the bulk the association is the twenty-four-slot coin of a cell: a match on one
+# direction-slot selects the whole coin. The form carries the set of fields that travel together.
+form association
+  link fields, like set
+
+# A structure code: an address-free encoding of a linked structure (a list, a tree, a graph) directly in the table, so
+# that pointer-following is replaced by parallel search over codes. Graph structure codes connect to the bulk's
+# Coxeter-word addressing of the honeycomb: the tree of the splitting method is itself a structure code. The form
+# carries the set of coded records.
+form structure-code
+  link records, like set
