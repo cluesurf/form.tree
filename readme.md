@@ -17,9 +17,9 @@
 
 ## Introduction
 
-**form.tree is a machine-checked library of mathematics, written in Seed `.tree` code.**
+form.tree is a machine-checked library of mathematics, written in Seed `.tree` code.
 
-Every structure here is **defined** as a concrete object and every theorem is **proved** by a dependent type-checker. Nothing is asserted. A file does not say "the integers form a group" in prose. It builds the integers, defines addition, and proves associativity, commutativity, identity, and inverse by induction. If a proof is wrong, the file does not compile.
+Every structure here is defined as a concrete object and every theorem is proved by a dependent type-checker. Nothing is asserted. A file does not say "the integers form a group" in prose. It builds the integers, defines addition, and proves associativity, commutativity, identity, and inverse by induction. If a proof is wrong, the file does not compile.
 
 The aim is the full foundations of mathematics, the way Coq, Agda, and Lean libraries do it, but in Seed, with a small clear surface anyone can read.
 
@@ -35,20 +35,20 @@ The library descends from pure foundations up to physics:
 
 ### What a foundation is, and why it exists
 
-A **foundation of mathematics** is a single small system of rules from which **all** of mathematics can be built. Numbers, functions, spaces, groups, and proofs about them are all expressed in the one language, and every theorem reduces, in principle, to that base.
+A foundation of mathematics is a single small system of rules from which all of mathematics can be built. Numbers, functions, spaces, groups, and proofs about them are all expressed in the one language, and every theorem reduces, in principle, to that base.
 
 Foundations exist for four reasons:
 
 - **One language.** Every branch of math (algebra, geometry, analysis) should rest on the same precise ground, so results in one area can be used in another without doubt.
 - **Consistency.** A foundation must not prove a falsehood. Naive set theory did, and collapsed. A good foundation is built so the known paradoxes cannot be stated.
-- **Certainty by checking.** If every step reduces to fixed rules, a **machine** can verify a proof with no trust in the author. Mathematics becomes mechanically certain, not socially agreed.
-- **Meaning of proof.** A foundation decides what a proof *is*. In the constructive, computational view, a proof of "there exists an x" is a program that produces the x. Proofs become things that **run**.
+- **Certainty by checking.** If every step reduces to fixed rules, a machine can verify a proof with no trust in the author. Mathematics becomes mechanically certain, not socially agreed.
+- **Meaning of proof.** A foundation decides what a proof *is*. In the constructive, computational view, a proof of "there exists an x" is a program that produces the x. Proofs become things that run.
 
 The history is a series of trade-offs. Set theory gave one language but made everything an untyped collection and left proof non-computational. Formalism wanted pure symbol-pushing and was shown by Godel to be unable to certify itself. Type theory grew up to make proofs typed and runnable, and the modern branches argue over how equality should behave.
 
 ### Why we chose what we did
 
-form.tree exists to serve a system, Seed, that **compiles and runs** real programs, and to **model physics** (the vibe substrate) where computation is the subject itself. So we need a foundation that is:
+form.tree exists to serve a system, Seed, that compiles and runs real programs, and to model physics (the vibe substrate) where computation is the subject itself. So we need a foundation that is:
 
 - **Typed**, because types catch errors and match how a programmer and a mathematician actually think.
 - **Computational**, because a proof should reduce, run, and erase to efficient code, not sit as an inert symbol.
@@ -59,26 +59,26 @@ That points to the dependent, quantitative, observational branch below, and away
 
 ### The foundation we use
 
-Our kernel is a **dependent type theory** chosen to be powerful and computational at once. It combines:
+Our kernel is a dependent type theory chosen to be powerful and computational at once. It combines:
 
 - **Quantitative Type Theory (QTT)** with usage `0 / 1 / many`, so erasure and linearity are one mechanism.
-- **Observational equality** that **computes**: function extensionality is a theorem the machine reduces, not an axiom bolted on.
-- A **predicative, cumulative, universe-polymorphic** hierarchy (no paradoxes of self-containing collections).
+- **Observational equality** that computes: function extensionality is a theorem the machine reduces, not an axiom bolted on.
+- A predicative, cumulative, universe-polymorphic hierarchy (no paradoxes of self-containing collections).
 - **Self-types** for inductive definitions, dependent pairs (Sigma), the identity type with J, and metavariables with pattern unification.
 
 This stack gives the strength of Agda and Lean while keeping equality and resource-use clean, avoiding both the heavy cubical machinery and impredicative shortcuts.
 
 ### How the modeling works (and why it compiles)
 
-The same idea as Agda, Coq, and Lean, **proof is type-checking**, but with a tiny, fixed, readable surface.
+The same idea as Agda, Coq, and Lean, proof is type-checking, but with a tiny, fixed, readable surface.
 
 A model has three kinds of line:
 
 - `form` defines a data type by its cases (an inductive type), like `form bit / case lo / case hi`.
 - `task` defines a function by recursion on those cases (a total, terminating function the kernel can reduce).
-- `rule` states a theorem (`mark` the variables, `show hold` the goal as `is-equal` of two terms) and proves it with **one tactic**.
+- `rule` states a theorem (`mark` the variables, `show hold` the goal as `is-equal` of two terms) and proves it with one tactic.
 
-The tactic vocabulary is **small and closed** (the opposite of Coq's hundreds, no tactic language, no custom tactics):
+The tactic vocabulary is small and closed (the opposite of Coq's hundreds, no tactic language, no custom tactics):
 
 | tactic | proves |
 |---|---|
@@ -87,27 +87,27 @@ The tactic vocabulary is **small and closed** (the opposite of Coq's hundreds, n
 | `cite` | rewrites with an already-proved lemma |
 | `melt` | two functions are equal, lifted from a pointwise proof (funext) |
 
-Compilation runs the file through parse, build, resolve, and **check**. The checker normalizes terms (normalization by evaluation), decides convertibility, and validates every `rule` against the kernel. A `rule` desugars to a function whose parameters are its bound variables, so a theorem is literally a checked program and an axiom is a postulated value. Because the kernel is sound, **a file that compiles is a file whose theorems are true.** Each is also tested against a deliberately false variant, which must be rejected, so the proofs are not vacuous.
+Compilation runs the file through parse, build, resolve, and check. The checker normalizes terms (normalization by evaluation), decides convertibility, and validates every `rule` against the kernel. A `rule` desugars to a function whose parameters are its bound variables, so a theorem is literally a checked program and an axiom is a postulated value. Because the kernel is sound, a file that compiles is a file whose theorems are true. Each is also tested against a deliberately false variant, which must be rejected, so the proofs are not vacuous.
 
 The result reads like ordinary code, checks like a proof assistant, and (because Seed compiles to many targets) can run anywhere. That is the power and the future of form.tree: one readable library, mechanically certain, growing toward all of mathematics and the physics built on it.
 
 ### How this differs from the math you were taught
 
-School and undergraduate math train one main move: **compute and solve**. Arithmetic gives answers, algebra solves for `x`, calculus finds a derivative. Even proofs, when they appear, are written as informal prose for a human reader to be convinced by.
+School and undergraduate math train one main move: compute and solve. Arithmetic gives answers, algebra solves for `x`, calculus finds a derivative. Even proofs, when they appear, are written as informal prose for a human reader to be convinced by.
 
-form.tree is a different activity. It is closer to **building with code than to solving for an answer**, and it rests on three ideas, more general than numbers:
+form.tree is a different activity. It is closer to building with code than to solving for an answer, and it rests on three ideas, more general than numbers:
 
-- **Objects.** Everything is an object of a **type**, and types are not just numbers. A bit, a tone, a list, a group, a graph, even a **proof**, are all objects. You make new types freely with `form`, the way a programmer makes new data types. There is no privileged set of "real numbers" at the bottom.
-- **Functions.** A function is a **total, terminating rule**, written by cases and recursion with `task`, exactly like a small program. It does not just transform numbers, it transforms any objects: a function can take a tone and return a charge, take a group element and return its inverse, take a proof and return another proof.
-- **Relations and propositions.** A statement like "a equals b" or "x is below y" is itself an **object you can hold, build, and prove**. A proof is a value of that object's type. To know something is to have constructed it.
+- **Objects.** Everything is an object of a type, and types are not just numbers. A bit, a tone, a list, a group, a graph, even a proof, are all objects. You make new types freely with `form`, the way a programmer makes new data types. There is no privileged set of "real numbers" at the bottom.
+- **Functions.** A function is a total, terminating rule, written by cases and recursion with `task`, exactly like a small program. It does not just transform numbers, it transforms any objects: a function can take a tone and return a charge, take a group element and return its inverse, take a proof and return another proof.
+- **Relations and propositions.** A statement like "a equals b" or "x is below y" is itself an object you can hold, build, and prove. A proof is a value of that object's type. To know something is to have constructed it.
 
-So the work is not "find the value of x". It is **define a structure, then prove the laws it obeys**, and the machine checks the proof. An equation like `mirror (mirror t) = t` is not computed to a number, it is *established* for every `t` by induction.
+So the work is not "find the value of x". It is define a structure, then prove the laws it obeys, and the machine checks the proof. An equation like `mirror (mirror t) = t` is not computed to a number, it is *established* for every `t` by induction.
 
-The slogan is **proofs are programs**. A theorem is a typed program, running it is checking it, and an existence proof literally carries the thing it claims exists. This is why the same file reads like ordinary code yet carries the certainty of a proof. It is the generalization of programming where types may depend on values and truth is a kind of data.
+The slogan is proofs are programs. A theorem is a typed program, running it is checking it, and an existence proof literally carries the thing it claims exists. This is why the same file reads like ordinary code yet carries the certainty of a proof. It is the generalization of programming where types may depend on values and truth is a kind of data.
 
 ### Formal verification, and why foundations are essential
 
-form.tree is one point in a much larger field: **formal verification**, the science of proving software and mathematics correct rather than just hoping they are. The field is a spectrum, from cheap-and-partial to expensive-and-total.
+form.tree is one point in a much larger field: formal verification, the science of proving software and mathematics correct rather than just hoping they are. The field is a spectrum, from cheap-and-partial to expensive-and-total.
 
 | technique | the question it answers | guarantee |
 |---|---|---|
@@ -118,13 +118,13 @@ form.tree is one point in a much larger field: **formal verification**, the scie
 | SAT / SMT solving | is this logical or arithmetic constraint satisfiable? | total, within the theory |
 | Theorem proving | does this follow from the axioms, for all inputs? | total, universal |
 
-Underneath, three philosophies: **search** (SAT, SMT, fuzzing, model checking find a bug or a witness), **approximate** (types, abstract interpretation compute a safe summary), and **prove** (Coq, Lean, Agda, and form.tree construct a certificate that holds for *every* case). The advanced tools converge downward onto SMT and SAT engines.
+Underneath, three philosophies: search (SAT, SMT, fuzzing, model checking find a bug or a witness), approximate (types, abstract interpretation compute a safe summary), and prove (Coq, Lean, Agda, and form.tree construct a certificate that holds for *every* case). The advanced tools converge downward onto SMT and SAT engines.
 
-How proving is done in practice is **interactive theorem proving**: a person states a theorem and builds the proof, while the machine checks each step, usually live in an editor over the Language Server Protocol or at a terminal, so a red underline appears the instant a step is wrong. Some steps are discharged by **automated** search (an SMT call, a decision procedure); the rest are guided by the human. form.tree sits firmly on the **prove** side: it is a type-checker, every `rule` is a machine-checked proof, and the same Seed tooling that gives editor feedback for code gives it for proofs.
+How proving is done in practice is interactive theorem proving: a person states a theorem and builds the proof, while the machine checks each step, usually live in an editor over the Language Server Protocol or at a terminal, so a red underline appears the instant a step is wrong. Some steps are discharged by automated search (an SMT call, a decision procedure); the rest are guided by the human. form.tree sits firmly on the prove side: it is a type-checker, every `rule` is a machine-checked proof, and the same Seed tooling that gives editor feedback for code gives it for proofs.
 
-Why insist on this when testing is so much cheaper? Because **tests sample and proofs cover.** A test of a few inputs says nothing about the millions you did not try. This is why the highest-stakes software is formally verified end to end: the CompCert C compiler, the seL4 operating-system kernel, cryptographic protocols, aircraft control code. A bug there is not a crash report, it is a catastrophe, and a proof is the only thing that rules out *all* of them.
+Why insist on this when testing is so much cheaper? Because tests sample and proofs cover. A test of a few inputs says nothing about the millions you did not try. This is why the highest-stakes software is formally verified end to end: the CompCert C compiler, the seL4 operating-system kernel, cryptographic protocols, aircraft control code. A bug there is not a crash report, it is a catastrophe, and a proof is the only thing that rules out *all* of them.
 
-And here is the reason **formal foundations are essential, not optional**: every one of these tools is only as trustworthy as the logic it runs on. A model checker, an SMT solver, a proof assistant each rest on a small formal core whose own rules must be sound, or the whole tower certifies nothing. The foundation is the bedrock. It is what makes "the machine checked it" mean "it is true" rather than "it passed the tests we wrote." form.tree builds on a foundation chosen to be sound, computational, and small precisely so that everything checked on top of it inherits that certainty, all the way up to the physics models.
+And here is the reason formal foundations are essential, not optional: every one of these tools is only as trustworthy as the logic it runs on. A model checker, an SMT solver, a proof assistant each rest on a small formal core whose own rules must be sound, or the whole tower certifies nothing. The foundation is the bedrock. It is what makes "the machine checked it" mean "it is true" rather than "it passed the tests we wrote." form.tree builds on a foundation chosen to be sound, computational, and small precisely so that everything checked on top of it inherits that certainty, all the way up to the physics models.
 
 ### Standard foundations, and why we chose differently
 
@@ -139,7 +139,7 @@ Each historical foundation solved a problem and left one. form.tree sits at the 
 | Simple type theory (Church) | 1930s-1940 | typed and clean, but no dependent types, so most math cannot be stated |
 | Martin-Lof type theory (MLTT) | 1970s-1980s | dependent and computational, but the identity type is subtle (equality vs univalence tension) |
 | Calculus of Constructions / CIC (Coq) | 1980s | very powerful, but impredicative `Prop` and heavy machinery |
-| Homotopy Type Theory / Univalent Foundations | 2000s-2010s | beautiful, but univalence was a non-computing **axiom** |
+| Homotopy Type Theory / Univalent Foundations | 2000s-2010s | beautiful, but univalence was a non-computing axiom |
 | Cubical type theory | 2010s | makes univalence compute, at the cost of large, intricate machinery |
 | Quantitative + Observational TT (our base) | 2010s-2020s | usage-aware and equality-computing, the branch form.tree builds on |
 

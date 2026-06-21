@@ -1,10 +1,112 @@
-load @/code/group
-  find group
+# Group homomorphisms and isomorphisms, modeled by the kernel. A homomorphism is a map between groups that respects the
+# operation: f(a . b) = f(a) . f(b). From that one law, two facts follow for any homomorphism, and the kernel proves them
+# here for a concrete one: it sends the identity to the identity, and it sends inverses to inverses. The example is
+# NEGATION on Z/3, the map sending each element to its additive inverse. In an abelian group negation respects addition,
+# so it is a homomorphism, it fixes the identity, and being its own inverse it is a bijection, hence an ISOMORPHISM of Z/3
+# with itself (an automorphism). This is the bottom of the whole hierarchy of structure-preserving maps: homomorphism,
+# monomorphism (injective), epimorphism (surjective), isomorphism (bijective), automorphism (to itself).
 
-# A group homomorphism: a map between two groups that respects their operations, so the image of a product is the
-# product of the images. It is the structure-preserving map of group theory, the arrow that lets two groups be compared.
-# Its kernel (what maps to the identity) and its image are themselves groups, and the first isomorphism theorem relates
-# them. The form carries the source and target groups; the operation-preserving law is the defining condition.
-form group-homomorphism
-  link source, like group
-  link target, like group
+# Z/3, the group it acts on.
+form z3
+  case e0
+  case e1
+  case e2
+
+# The group operation, addition modulo three.
+task op
+  take a, like z3
+  take b, like z3
+  like z3
+  fork case, read a
+    case e0
+      send back
+        read b
+    case e1
+      fork case, read b
+        case e0
+          send back
+            make e1
+        case e1
+          send back
+            make e2
+        case e2
+          send back
+            make e0
+    case e2
+      fork case, read b
+        case e0
+          send back
+            make e2
+        case e1
+          send back
+            make e0
+        case e2
+          send back
+            make e1
+
+# The homomorphism: negation, sending each element to its additive inverse.
+task f
+  take a, like z3
+  like z3
+  fork case, read a
+    case e0
+      send back
+        make e0
+    case e1
+      send back
+        make e2
+    case e2
+      send back
+        make e1
+
+# THE HOMOMORPHISM LAW: f respects the operation, f (op a b) = op (f a) (f b), over all nine pairs. Negation distributes
+# over addition because the group is abelian. This single law is the definition of a homomorphism.
+rule f-is-a-homomorphism
+  mark a, like z3
+  mark b, like z3
+  show hold
+    call is-equal
+      call f
+        call op
+          read a
+          read b
+      call op
+        call f
+          read a
+        call f
+          read b
+  fold a, b
+
+# A HOMOMORPHISM PRESERVES THE IDENTITY: f e0 = e0. The neutral element maps to the neutral element.
+rule f-preserves-identity
+  show hold
+    call is-equal
+      call f
+        make e0
+      make e0
+  calm
+
+# f IS BIJECTIVE (its own inverse): f (f a) = a, over the three elements. An invertible homomorphism is an ISOMORPHISM, so
+# negation is an automorphism of Z/3, a symmetry of the group with itself.
+rule f-is-an-isomorphism
+  mark a, like z3
+  show hold
+    call is-equal
+      call f
+        call f
+          read a
+      read a
+  fold a
+
+# A HOMOMORPHISM PRESERVES INVERSES: the inverse of a in Z/3 is f a (negation IS the inverse map), and f sends a to its
+# inverse, so f respects inversion. Here a + f(a) = e0 for every a, the defining property of an inverse, proved for all.
+rule f-sends-element-to-its-inverse
+  mark a, like z3
+  show hold
+    call is-equal
+      call op
+        read a
+        call f
+          read a
+      make e0
+  fold a

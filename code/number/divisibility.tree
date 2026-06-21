@@ -1,0 +1,176 @@
+# Divisibility and number theory, modeled by the kernel. One number DIVIDES another when the second is a multiple of the
+# first: d divides n means n = d times k for some k (the witness). The kernel proves the foundational law that divisors are
+# closed under addition (if d divides both a and b then d divides their sum), which is just the distributive law, and it
+# checks concrete divisibilities by exhibiting the quotient. Divisibility is the spine of number theory: primes, greatest
+# common divisors, and modular arithmetic are all built from it.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link ap
+      send back
+        make succ
+          bind prior
+            call plus
+              read ap
+              read b
+
+task times
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        make zero
+    case succ
+      link ap
+      send back
+        call plus
+          read b
+          call times
+            read ap
+            read b
+
+# THE DIVISOR-SUM LAW: a number dividing two others divides their sum. If a = d j and b = d k, then a + b = d (j + k),
+# which is the distributive law times d (plus j k) = plus (times d j) (times d k). Proved by induction on d. So the set of
+# multiples of d is closed under addition (it is a subgroup), the fact behind ideals and modular arithmetic.
+rule divisors-closed-under-sum
+  mark d, like natural
+  mark j, like natural
+  mark k, like natural
+  show hold
+    call is-equal
+      call times
+        read d
+        call plus
+          read j
+          read k
+      call plus
+        call times
+          read d
+          read j
+        call times
+          read d
+          read k
+  fold d
+
+# TWO DIVIDES SIX: 6 = 2 times 3, the witness quotient is 3.
+rule two-divides-six
+  find q, like natural
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+  show hold
+    call is-equal
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make succ
+                            bind prior
+                              make zero
+      call times
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        read q
+  calm
+
+# THREE DIVIDES SIX: 6 = 3 times 2.
+rule three-divides-six
+  find q, like natural
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make zero
+  show hold
+    call is-equal
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make succ
+                            bind prior
+                              make zero
+      call times
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+        read q
+  calm
+
+# TWO DIVIDES FOUR: 4 = 2 times 2.
+rule two-divides-four
+  find q, like natural
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make zero
+  show hold
+    call is-equal
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+      call times
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        read q
+  calm
+
+# EVERY NUMBER DIVIDES ZERO: 0 = d times 0, the witness quotient is zero. Zero is a multiple of everything.
+rule everything-divides-zero
+  mark d, like natural
+  find q, like natural
+    make zero
+  show hold
+    call is-equal
+      make zero
+      call times
+        read d
+        read q
+  calm

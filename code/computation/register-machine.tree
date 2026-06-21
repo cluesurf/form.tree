@@ -89,3 +89,87 @@ rule machine-halts-on-empty-counter
         make zero
       read a
   calm
+
+# plus, to state the universal correctness of the machine.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link ap
+      send back
+        make succ
+          bind prior
+            call plus
+              read ap
+              read b
+
+# definitional step of run on a successor counter, cited by the universal proof.
+rule run-succ-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call run
+        read a
+        make succ
+          bind prior
+            read b
+      call run
+        make succ
+          bind prior
+            read a
+        read b
+  calm
+
+# helper: plus absorbs a successor on the right into the first argument (plus a (succ b) = succ (plus a b)).
+rule plus-succ-right
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# helper: zero on the right is the identity for plus (plus a zero = a), by induction on a.
+rule plus-zero-right
+  mark a, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make zero
+      read a
+  fold a
+
+# THE MACHINE COMPUTES ADDITION, universally: run a b = plus a b, for ALL starting counters. The register machine's loop
+# is exactly addition. Proved by induction on the second counter b; the first counter accumulates and CHANGES along the
+# recursion, so this uses the generalized induction hypothesis.
+rule machine-computes-addition
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call run
+        read a
+        read b
+      call plus
+        read a
+        read b
+  fold b
+    cite run-succ-steps
+    cite plus-succ-right
+    cite plus-zero-right

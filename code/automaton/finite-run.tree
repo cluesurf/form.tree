@@ -194,6 +194,26 @@ rule even-then-one-one-is-odd
       make odd
   calm
 
-# NOTE: the universal extended-transition homomorphism, run s (append u v) = run (run s u) v, needs the induction
-# hypothesis generalized over the threaded state s (the state changes along the recursion). The current structural
-# induction fixes the non-induction variables, so that theorem awaits the generalized-induction-hypothesis feature.
+# THE EXTENDED-TRANSITION HOMOMORPHISM: run s (append u v) = run (run s u) v, for every state s and words u, v. Running
+# the machine over a concatenation equals running it over the first word and continuing, from the reached state, over the
+# second. The determinism of the automaton as an algebraic law, the foundation regular-language theory is built on. Proved
+# by induction on u; the threaded state changes along the recursion, so this uses the GENERALIZED induction hypothesis.
+rule run-distributes-over-append
+  mark s, like phase
+  mark u, like word
+  mark v, like word
+  show hold
+    call is-equal
+      call run
+        read s
+        call append
+          read u
+          read v
+      call run
+        call run
+          read s
+          read u
+        read v
+  fold u
+    cite run-cons-steps
+    cite append-cons-steps
