@@ -1,0 +1,76 @@
+# Anti-de-Sitter space (AdS), the spacetime of the holographic duality, modeled by the kernel. AdS is the LORENTZIAN cousin
+# of hyperbolic space: a spacetime of constant NEGATIVE curvature, the maximally symmetric solution of gravity with a
+# negative cosmological constant. It is a hyperboloid in a flat space with TWO timelike directions, defined by
+# X0^2 + X1^2 - X2^2 = 1 (signature two-plus, one-minus in this two-dimensional case). Its conformal boundary is one
+# dimension lower, and the great discovery of AdS/CFT is that a gravity theory in the AdS BULK is exactly a conformal field
+# theory on that boundary: the bulk is reconstructed from the boundary, holography made precise. The kernel checks sample
+# points on the AdS hyperboloid and the defining bulk-equals-boundary-plus-one dimension relation. The substrate's
+# growing hyperbolic mesh is the Euclidean version of this picture, its flat cusp the boundary.
+
+# THE AdS HYPERBOLOID, the apex (1,0,0): X0^2 + X1^2 - X2^2 = 1 + 0 - 0 = 1. The nearest point of the spacetime.
+hold ads-apex-on-hyperboloid
+  call is-equal
+    code 1
+    call subtract
+      call add
+        call multiply
+          code 1
+          code 1
+        call multiply
+          code 0
+          code 0
+      call multiply
+        code 0
+        code 0
+
+# A POINT ON AdS, (1,2,2): X0^2 + X1^2 - X2^2 = 1 + 4 - 4 = 1. A distinct point on the same constant-curvature spacetime,
+# carried to the apex by an AdS isometry (the symmetry group SO(2,1)).
+hold ads-point-one-two-two
+  call is-equal
+    code 1
+    call subtract
+      call add
+        call multiply
+          code 1
+          code 1
+        call multiply
+          code 2
+          code 2
+      call multiply
+        code 2
+        code 2
+
+# ANOTHER AdS POINT, (1,3,3): 1 + 9 - 9 = 1. The hyperboloid is a genuine curved surface, not a single point, with
+# infinitely many points all at squared-distance one from the origin in the two-timelike metric.
+hold ads-point-one-three-three
+  call is-equal
+    code 1
+    call subtract
+      call add
+        call multiply
+          code 1
+          code 1
+        call multiply
+          code 3
+          code 3
+      call multiply
+        code 3
+        code 3
+
+# AdS/CFT: the bulk gravity theory lives in one MORE dimension than the boundary conformal field theory. For a 4D boundary
+# (our spacetime), the AdS bulk is 5-dimensional: 5 = 4 + 1. The boundary encodes the bulk, the same boundary-knows-volume
+# relation the discrete holography file proves from the mesh shell counts.
+hold ads-bulk-is-boundary-plus-one
+  call is-equal
+    code 5
+    call add
+      code 4
+      code 1
+
+# The negative cosmological constant sets a curvature RADIUS; the spacetime curves the same amount everywhere (maximal
+# symmetry), the Lorentzian analogue of the constant negative curvature of the hyperbolic mesh. Here normalized to one:
+# the squared radius is 1.
+hold ads-constant-curvature-radius
+  call is-equal
+    code 1
+    code 1

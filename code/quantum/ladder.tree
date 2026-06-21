@@ -1,0 +1,83 @@
+# The creation and annihilation operators of quantum field theory, modeled by the kernel. A quantum field is a collection
+# of modes, each holding an occupation number (how many quanta are in it). The CREATION operator raises the count by one,
+# the ANNIHILATION operator lowers it, and the NUMBER operator reads it. The vacuum is the empty mode, and annihilating it
+# yields nothing (you cannot remove a quantum that is not there). The kernel proves that annihilation undoes creation (a
+# quantum added and then removed leaves the mode unchanged), that the vacuum is annihilated to itself, and the asymmetry
+# at the vacuum that is the root of the canonical commutation relation: creating-then-annihilating returns the start, but
+# at the vacuum annihilating-then-creating does NOT, the +1 of [a, a-dagger] = 1. This is second quantization, how a field
+# becomes particles, the same create and annihilate moves the substrate's collision performs on the mesh.
+
+# A mode's occupation number: how many quanta it holds.
+form mode
+  case empty
+  case more
+    link prior, like mode
+
+# CREATION: add one quantum to the mode.
+task create
+  take n, like mode
+  like mode
+  send back
+    make more
+      bind prior
+        read n
+
+# ANNIHILATION: remove one quantum. The vacuum (empty) annihilates to itself, since there is nothing to remove.
+task annihilate
+  take n, like mode
+  like mode
+  fork case, read n
+    case empty
+      send back
+        make empty
+    case more
+      link prior
+      send back
+        read prior
+
+# ANNIHILATION UNDOES CREATION: annihilate (create n) = n, for every occupation. A quantum added and immediately removed
+# leaves the mode exactly as it was. This is a a-dagger acting as the identity on any state.
+rule annihilate-undoes-create
+  mark n, like mode
+  show hold
+    call is-equal
+      call annihilate
+        call create
+          read n
+      read n
+  calm
+
+# THE VACUUM IS ANNIHILATED TO ITSELF: annihilate empty = empty. There is no quantum to remove from the empty mode.
+rule vacuum-annihilates-to-itself
+  show hold
+    call is-equal
+      call annihilate
+        make empty
+      make empty
+  calm
+
+# THE COMMUTATOR AT THE VACUUM: creating-then-annihilating always returns the start, but at the vacuum annihilating-then-
+# creating does NOT. annihilate (create empty) = empty, while create (annihilate empty) = one quantum, not empty. The two
+# orders disagree by exactly one quantum at the vacuum, which is the +1 of the canonical commutation relation [a, a-dagger]
+# = 1, the source of zero-point energy. Shown here as the order-dependence: create (annihilate empty) is NOT empty.
+rule commutator-asymmetry-at-vacuum
+  show miss
+    call is-equal
+      call create
+        call annihilate
+          make empty
+      make empty
+  calm miss
+
+# The NUMBER operator reads the occupation, and creation raises it by one: the number after creation is one more than
+# before. number (create n) = succ of number n, here the occupation IS the number, so creating adds one quantum.
+rule creation-raises-the-number
+  mark n, like mode
+  show hold
+    call is-equal
+      call create
+        read n
+      make more
+        bind prior
+          read n
+  calm

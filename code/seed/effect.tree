@@ -1,0 +1,157 @@
+# Algebraic effects and handlers, the model of Seed's effectful computation, checked by the kernel. An effectful program
+# is a sequence of OPERATIONS (here the state effect: read the state, or set it on or off). A HANDLER interprets the
+# program, threading the state through and producing a final state. The kernel proves the handler's structural law: running
+# the concatenation of two programs equals running the first and then, from the resulting state, running the second. The
+# state is an accumulator that CHANGES along the recursion, so this proof uses the generalized induction hypothesis. It
+# also checks that the empty program is a no-op and that the last write wins. This is the algebraic-effects discipline,
+# operations plus a handler that gives them meaning, the foundation of how Seed sequences side effects purely.
+
+form bit
+  case off
+  case on
+
+# The state-effect operations: read the state (leaving it), or set it on or off.
+form command
+  case ask
+  case turn-on
+  case turn-off
+
+# A program: a sequence of operations.
+form program
+  case done
+  case step
+    link first, like command
+    link rest, like program
+
+# Apply one operation to the state: ask leaves it, turn-on sets it on, turn-off sets it off.
+task apply
+  take c, like command
+  take s, like bit
+  like bit
+  fork case, read c
+    case ask
+      send back
+        read s
+    case turn-on
+      send back
+        make on
+    case turn-off
+      send back
+        make off
+
+# The HANDLER: run a program from a starting state, threading the state through each operation, returning the final state.
+task run
+  take p, like program
+  take s, like bit
+  like bit
+  fork case, read p
+    case done
+      send back
+        read s
+    case step
+      link first
+      link rest
+      send back
+        call run
+          read rest
+          call apply
+            read first
+            read s
+
+# concatenate two programs.
+task then
+  take p, like program
+  take q, like program
+  like program
+  fork case, read p
+    case done
+      send back
+        read q
+    case step
+      link first
+      link rest
+      send back
+        make step
+          bind first
+            read first
+          bind rest
+            call then
+              read rest
+              read q
+
+# definitional step laws, cited by the composition proof.
+rule run-step-unfolds
+  mark c, like command
+  mark p, like program
+  mark s, like bit
+  show hold
+    call is-equal
+      call run
+        make step
+          bind first
+            read c
+          bind rest
+            read p
+        read s
+      call run
+        read p
+        call apply
+          read c
+          read s
+  calm
+
+rule then-step-unfolds
+  mark c, like command
+  mark p, like program
+  mark q, like program
+  show hold
+    call is-equal
+      call then
+        make step
+          bind first
+            read c
+          bind rest
+            read p
+        read q
+      make step
+        bind first
+          read c
+        bind rest
+          call then
+            read p
+            read q
+  calm
+
+# THE EMPTY PROGRAM IS A NO-OP: run done s = s, the handler of an empty program returns the state unchanged.
+rule empty-program-is-identity
+  mark s, like bit
+  show hold
+    call is-equal
+      call run
+        make done
+        read s
+      read s
+  calm
+
+# HANDLER COMPOSITION: run (then p q) s = run q (run p s), for all programs and states. Running two programs in sequence
+# is running the first, then running the second from the state it left. The state accumulates and changes along the
+# recursion, so this is proved by induction on p with the GENERALIZED induction hypothesis.
+rule handler-composes
+  mark p, like program
+  mark q, like program
+  mark s, like bit
+  show hold
+    call is-equal
+      call run
+        call then
+          read p
+          read q
+        read s
+      call run
+        read q
+        call run
+          read p
+          read s
+  fold p
+    cite run-step-unfolds
+    cite then-step-unfolds

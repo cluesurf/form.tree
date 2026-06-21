@@ -1,0 +1,95 @@
+# A quantum cellular automaton (a reversible partitioned CA), modeled by the kernel. A QCA evolves a line of cells by a
+# LOCAL rule that must be reversible (unitary), so the whole evolution is invertible and information is conserved, exactly
+# the property the knit collision has on the mesh. The model is a four-cell ring partitioned into two blocks; each beat
+# applies a controlled-NOT inside each block (the second cell is flipped by the first). The kernel proves that the GLOBAL
+# step, the whole-ring update, is its own inverse: applying it twice returns every one of the sixteen configurations to
+# itself, so the dynamics run backward as well as forward. Global reversibility emerges from local reversibility, the
+# discrete root of unitarity and of the substrate's reversible bulk.
+
+form bit
+  case off
+  case on
+
+# Exclusive or, the reversible primitive (its own inverse).
+task xor
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      fork case, read b
+        case off
+          send back
+            make on
+        case on
+          send back
+            make off
+
+# A configuration of the four-cell ring.
+form grid
+  case cells
+    link c0, like bit
+    link c1, like bit
+    link c2, like bit
+    link c3, like bit
+
+# The global step: one beat. Inside block one (cells 0,1) the first cell flips the second; inside block two (cells 2,3)
+# likewise. A controlled-NOT in each block, the local reversible rule applied across the whole ring at once.
+task step
+  take g, like grid
+  like grid
+  fork case, read g
+    case cells
+      link c0
+      link c1
+      link c2
+      link c3
+      send back
+        make cells
+          bind c0
+            read c0
+          bind c1
+            call xor
+              read c1
+              read c0
+          bind c2
+            read c2
+          bind c3
+            call xor
+              read c3
+              read c2
+
+# THE GLOBAL STEP IS REVERSIBLE: step (step g) = g, for every one of the sixteen configurations. The whole-ring update is
+# its own inverse, because each block's controlled-NOT is, so the QCA can be run backward. Proved by simultaneous case
+# analysis on all four cells.
+rule global-step-is-reversible
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  mark d, like bit
+  show hold
+    call is-equal
+      call step
+        call step
+          make cells
+            bind c0
+              read a
+            bind c1
+              read b
+            bind c2
+              read c
+            bind c3
+              read d
+      make cells
+        bind c0
+          read a
+        bind c1
+          read b
+        bind c2
+          read c
+        bind c3
+          read d
+  fold a, b, c, d
