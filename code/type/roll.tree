@@ -11,6 +11,23 @@ form natural
   case succ
     link prior, like natural
 
+# Addition by recursion on the first argument, needed to state the length homomorphism below.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
 # A roll of naturals: empty, or a head element consed onto a tail roll.
 form roll
   case nil
@@ -112,3 +129,55 @@ rule append-of-cons-steps
             read t
             read ys
   calm
+
+# The laws below are NOT definitional: append recurses on its FIRST argument, so each is stuck on a variable list and is
+# proved by structural induction on that list (`fold xs`). The nil case holds by computation; the cons case closes using
+# the induction hypothesis on the tail. This is the inductive theory of lists, the same theorems agda-unimath / Lean
+# prove for their list type, here checked by the kernel through the type's eliminator.
+
+# nil is ALSO a right identity for append: append xs nil = xs, for every roll xs.
+rule append-nil-right-is-identity
+  mark xs, like roll
+  show hold
+    call is-equal
+      call append
+        read xs
+        make nil
+      read xs
+  fold xs
+
+# append is associative: append (append xs ys) zs = append xs (append ys zs), for every xs, ys, zs.
+rule append-is-associative
+  mark xs, like roll
+  mark ys, like roll
+  mark zs, like roll
+  show hold
+    call is-equal
+      call append
+        call append
+          read xs
+          read ys
+        read zs
+      call append
+        read xs
+        call append
+          read ys
+          read zs
+  fold xs
+
+# length is a monoid homomorphism from append to plus: length (append xs ys) = length xs + length ys, for every xs, ys.
+rule length-of-append-adds
+  mark xs, like roll
+  mark ys, like roll
+  show hold
+    call is-equal
+      call length
+        call append
+          read xs
+          read ys
+      call plus
+        call length
+          read xs
+        call length
+          read ys
+  fold xs

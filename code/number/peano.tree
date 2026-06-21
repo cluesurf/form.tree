@@ -132,6 +132,76 @@ rule plus-succ-steps-out
             read b
   calm
 
+# Zero is ALSO a right identity: n + 0 = n, for every n. This is NOT definitional (plus recurses on its first argument,
+# so plus n zero is stuck on a variable n), and is proved by structural induction on n: the base n = 0 holds by
+# computation, and the successor case closes using the induction hypothesis. This is the type's eliminator at work.
+rule plus-zero-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+# The successor steps out on the RIGHT: a + (succ b) = succ (a + b), for every a and b. Proved by induction on a (each
+# side recurses on a, and the hypothesis aligns the successor cases).
+rule plus-succ-right-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# Addition is associative: (a + b) + c = a + (b + c), for every a, b, c. Proved by induction on a (each side recurses on
+# a, and the successor cases align through the hypothesis). No lemma needed: the recurrence alone closes it.
+rule plus-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call plus
+        call plus
+          read a
+          read b
+        read c
+      call plus
+        read a
+        call plus
+          read b
+          read c
+  fold a
+
+# Addition is commutative: a + b = b + a, for every a and b. Proved by induction on a, CHAINING two previously proven
+# lemmas: the base case a = 0 needs n + 0 = n (right identity), and the successor case needs a + succ b = succ (a + b)
+# (the successor steps out on the right). The `cite`s name those lemmas, which the induction applies as rewrites.
+rule plus-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        read b
+      call plus
+        read b
+        read a
+  fold a
+    cite plus-zero-right-is-identity
+    cite plus-succ-right-steps-out
+
 # Multiplication by recursion on the first argument: 0 * b = 0, and (succ a) * b = b + (a * b). Recursion descends on
 # the matched predecessor, so it is verified terminating and the kernel unfolds it.
 task times

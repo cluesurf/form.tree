@@ -1,0 +1,103 @@
+# The binary tree as an inductive self-type, with mirror and size by structural recursion and their laws PROVED BY THE
+# KERNEL. A bush is empty (leaf) or a branch (node) carrying a left subtree, a value, and a right subtree. It is the
+# canonical two-recursive-field inductive type, so its induction principle uses the hypothesis on BOTH subtrees at once.
+# The name is `bush` because `tree` is reserved for the syntax AST, exactly as `roll` stands in for the reserved `list`.
+
+# A natural number: zero, or the successor of a natural.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition by recursion on the first argument, used to size a tree by counting its nodes.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# A binary tree of naturals: a leaf, or a node with a left subtree, a value, and a right subtree.
+form bush
+  case leaf
+  case node
+    link left, like bush
+    link value, like natural
+    link right, like bush
+
+# mirror reflects a tree left-to-right: leaf stays a leaf, and a node swaps its mirrored subtrees.
+task mirror
+  take t, like bush
+  like bush
+  fork case, read t
+    case leaf
+      send back
+        make leaf
+    case node
+      send back
+        make node
+          bind left
+            call mirror
+              read right
+          bind value
+            read value
+          bind right
+            call mirror
+              read left
+
+# size counts the nodes: a leaf has none, a node has one plus the sizes of its two subtrees.
+task size
+  take t, like bush
+  like natural
+  fork case, read t
+    case leaf
+      send back
+        make zero
+    case node
+      send back
+        make succ
+          bind prior
+            call plus
+              call size
+                read left
+              call size
+                read right
+
+# UNIVERSAL: mirroring a leaf gives a leaf. Definitional.
+rule mirror-leaf-is-leaf
+  show hold
+    call is-equal
+      call mirror
+        make leaf
+      make leaf
+  calm
+
+# UNIVERSAL: a leaf has size zero. Definitional.
+rule size-leaf-is-zero
+  show hold
+    call is-equal
+      call size
+        make leaf
+      make zero
+  calm
+
+# UNIVERSAL: mirror is an involution. mirror (mirror t) = t, for every tree t. Proved by induction on t: the leaf case
+# computes, and the node case closes using the induction hypothesis on BOTH the left and the right subtree.
+rule mirror-mirror-is-identity
+  mark t, like bush
+  show hold
+    call is-equal
+      call mirror
+        call mirror
+          read t
+      read t
+  fold t

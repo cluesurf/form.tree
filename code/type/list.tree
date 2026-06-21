@@ -1,2 +1,0 @@
-# Superseded by code/type/roll.tree. The name `list` is reserved for the native array container (mill.ts treats a
-# form named `list` as the primitive array and registers no record-type), so the inductive cons-list lives under `roll`.
