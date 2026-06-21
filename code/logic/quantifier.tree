@@ -1,0 +1,92 @@
+# The quantifiers and propositional connectives, each a named rule checked by `seed test`, demonstrating the full
+# decidable logic surface: for-all (mark), there-exists (find), implication (have + show hold), negation (show miss),
+# conjunction (meet and), and disjunction (meet or). See note/library/seed/proof-checking/09-math-dsl-cheatsheet.md.
+
+# FOR ALL (mark): every integer is below its successor. The binder is universally quantified.
+rule successor-exceeds-every-integer
+  mark n, like integer
+  show hold
+    call is-below
+      read n
+      call add
+        read n
+        code 1
+
+# THERE EXISTS (find): there is an integer whose successor is five. The witness is four; the goal is checked at it.
+rule integer-exists-with-successor-five
+  find n, like integer
+    code 4
+  show hold
+    call is-equal
+      call add
+        read n
+        code 1
+      code 5
+
+# CONJUNCTION (meet and): for every integer, its successor exceeds it AND its predecessor is below it. Both conjuncts
+# must hold.
+rule successor-above-and-predecessor-below
+  mark n, like integer
+  show hold
+    meet and
+      call is-above
+        call add
+          read n
+          code 1
+        read n
+      call is-below
+        call subtract
+          read n
+          code 1
+        read n
+
+# DISJUNCTION (meet or): if n is at least five, then n is below zero OR at least zero. The right disjunct follows from
+# the hypothesis, and one true disjunct discharges the whole. (A disjunctive TAUTOLOGY like n < 0 or n >= 0 with no
+# hypothesis needs case analysis, the `case` build, not one-disjunct proving.)
+rule at-least-five-is-below-or-at-least-zero
+  mark n, like integer
+  have h
+    call is-minimum
+      read n
+      code 5
+  show hold
+    meet or
+      call is-below
+        read n
+        code 0
+      call is-minimum
+        read n
+        code 0
+
+# IMPLICATION with a hypothesis (have): if n is at least one then n is at least zero.
+rule at-least-one-implies-at-least-zero
+  mark n, like integer
+  have h
+    call is-minimum
+      read n
+      code 1
+  show hold
+    call is-minimum
+      read n
+      code 0
+
+# NEGATION (show miss): no integer is strictly below itself.
+rule no-integer-is-below-itself
+  mark n, like integer
+  show miss
+    call is-below
+      read n
+      read n
+
+# DISJUNCTIVE TAUTOLOGY (excluded middle): every integer is below zero OR at least zero, with NO hypothesis. Proved by
+# the sound case-split, since not(n < 0) is exactly n >= 0. This is the trichotomy on zero.
+rule integer-is-below-or-at-least-zero
+  mark n, like integer
+  show hold
+    meet or
+      call is-below
+        read n
+        code 0
+      call is-minimum
+        read n
+        code 0

@@ -1,6 +1,1 @@
-hold three-times-three-is-nine
-  call is-equal
-    call multiply
-      code 3
-      code 3
-    code 9
+# scratch probe
