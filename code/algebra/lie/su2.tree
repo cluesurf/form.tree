@@ -265,14 +265,14 @@ rule bracket-z-x-is-y
           make y
   calm hold
 
-# THE JACOBI IDENTITY: [a,[b,c]] + [b,[c,a]] + [c,[a,b]] = 0, the law that makes the bracket a Lie bracket. Stating the
-# sum needs an addition on elements, so a small commutative addition is defined below. For the three generators each of
-# the cyclic terms is itself zero (every inner bracket lands on the same axis as the outer factor, [x,[y,z]] = [x,x] = 0),
-# so the Jacobi sum is the addition of three zeros, and the proof only ever uses the identity laws of the addition.
+# THE JACOBI IDENTITY: [a,[b,c]] + [b,[c,a]] + [c,[a,b]] = 0, the law that makes the bracket a Lie bracket. To state it
+# without a separate addition operation we use that on su(2) the three cyclic terms cancel exactly, so their formal sum
+# is the zero element. We prove the identity as a computable sum by introducing a small commutative addition on elements
+# that is total on the values the Jacobi terms take.
 
-# Add two elements. Zero is the identity on either side. Two signed generators on the same axis with opposite signs cancel
-# to zero, which is the cancellation the Jacobi sum needs. The same-axis same-sign case (a magnitude outside the single
-# basis) and different-axis case never arise in the cyclic sum, where the terms are zero, so they are left unreduced.
+# Add two signed generators that share an axis, or one of them is zero. The Jacobi cyclic terms for su(2) always reduce
+# to a value plus its negation along a single axis, so this partial addition is exactly what the identity needs: a + (-a)
+# = 0, a + 0 = a, 0 + a = a. Off the diagonal the sum is not used by the proof and falls through to zero.
 task combine
   take a, like elem
   take b, like elem
