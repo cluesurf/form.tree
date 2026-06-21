@@ -1,16 +1,27 @@
 load @/code/type/term
   find term
 
-# The self type, the one primitive under all inductive types, and the bottom of the shared foundation with the kernel.
-# A self type binds a value to its own type, so its members are the terms that inhabit a family applied to themselves.
-# The self combinator names the fixed point of a family. Every later inductive type, the booleans, the naturals, the
-# integers, the algebra tower, is a self type whose body states its own induction principle, so the trusted core stays
-# tiny while expressing inductive and even inductive-inductive types, exactly what a self-hosting compiler needs for
-# its own syntax tree. Nothing else is added as a primitive.
-#
-# The rules. Formation: a self type is well-formed when its body, given a value standing for the type itself, is a
-# type. Introduction: a value inhabits the self type when it inhabits the body with itself substituted in. Elimination:
-# a value of the self type may be used at the body with the value substituted in. Introduction and elimination are
-# mutually inverse coercions the checker discharges by normalization.
+# The self type, the one primitive under all inductive types, the reason the trusted kernel stays tiny yet expresses
+# inductive and inductive-inductive data (exactly what the self-hosting compiler needs for its own syntax tree). A self
+# type binds a value to its own type. Its rules in full.
+
+# FORMATION: from a body that is a type given a variable standing for the self type itself, form the self type. The
+# variable refers to the very type being defined, which is what lets a type state its own induction principle.
 form self-type
   link body, like term
+
+# INTRODUCTION: a value inhabits the self type when it inhabits the body with the value itself substituted for the
+# self-variable. This is a coercion the checker discharges by normalization.
+form self-introduction
+  link value, like term
+
+# ELIMINATION: a value of the self type may be used at the body with the value substituted in, the inverse coercion.
+# Introduction and elimination are mutually inverse, so the self type is definitionally equal to its unrolling.
+form self-elimination
+  link value, like term
+
+# THE ENCODING PATTERN: every inductive type is a self type whose body is its own dependent eliminator. The booleans,
+# the naturals, the integers, lists, and the compiler's own abstract syntax tree are all this one pattern (see the
+# boolean and natural files). Nothing else is added as a primitive: the entire inductive world is self types.
+form inductive-encoding
+  link type, like self-type

@@ -1,11 +1,50 @@
 load @/code/structure/manifold
   find manifold
 
-# A model of hyperbolic space: a way to draw the curved space inside flat space so it can be reasoned about. The four
-# standard models are the Poincare disk (the whole plane inside a disk, angles true, lengths stretching toward the rim),
-# the Poincare upper half-space (a half-plane, conformal, with a flat boundary at infinity), the Klein disk (geodesics
-# drawn as straight chords, angles distorted), and the hyperboloid (the space as one sheet of a hyperbola in one-higher
-# Minkowski space, the most symmetric). Each shows the same space; the substrate's flat-lattice picture is a horosphere
-# in the upper half-space model. The form carries the manifold the model depicts.
-form hyperbolic-model
-  link manifold, like manifold
+load @/code/structure/set
+  find set
+
+# The models of hyperbolic space, the ways to draw the undrawable inside flat space. No model is faithful (a perfect
+# flat picture is impossible, since the hyperbolic plane has no flat embedding), so each trades away something: angles,
+# or straightness, or finiteness. The four standard models below each show the SAME space; choosing one is choosing
+# which distortion to accept. Margenstern: "We are in the situation of a plane flying with instruments only", and the
+# model is the instrument.
+
+# The Poincare disk model: the whole hyperbolic plane drawn inside an open disk, the boundary circle the points at
+# infinity. It is CONFORMAL (angles are true), so it is the model for seeing shapes, but lengths stretch without bound
+# toward the rim, so equal hyperbolic tiles look ever smaller near the edge. Geodesics are circular arcs meeting the
+# boundary at right angles (and diameters). This is the model the tilings are usually pictured in.
+form poincare-disk
+  link space, like manifold
+  link boundary, like set
+
+# The Poincare upper half-space model: the points with positive last coordinate, the bounding plane the points at
+# infinity (plus one point at the top). Also CONFORMAL. Geodesics are vertical lines and semicircles centered on the
+# boundary. Its gift is a distinguished point at infinity, which makes horocycles into horizontal planes, so the
+# substrate's flat-lattice picture lives most naturally here, on a horosphere parallel to the boundary.
+form upper-half-space
+  link space, like manifold
+  link boundary, like set
+
+# The Klein (Beltrami-Klein) model: again the open disk, but now geodesics are drawn as STRAIGHT CHORDS. It trades
+# conformality for straightness: lines look straight, but angles are distorted. It is the model for reasoning about
+# incidence and collinearity, where only straightness matters.
+form klein-model
+  link space, like manifold
+  link boundary, like set
+
+# The hyperboloid (Minkowski / Lorentz) model: the hyperbolic plane realized as one sheet of a two-sheeted hyperboloid
+# in one-higher Minkowski space, the set of timelike unit vectors. It is the MOST SYMMETRIC model, where the isometries
+# are exactly the Lorentz transformations fixing the sheet, so it ties hyperbolic geometry directly to special
+# relativity. The other three models are projections of this one. The form carries the ambient Minkowski space.
+form hyperboloid-model
+  link ambient, like manifold
+
+# The four models as one object: each depicts the same hyperbolic space, related by explicit isometries (stereographic
+# projections carry the hyperboloid to the disks, an inversion carries the disk to the half-space). A theorem proved in
+# one transfers to all.
+form hyperbolic-models
+  link disk, like poincare-disk
+  link half-space, like upper-half-space
+  link klein, like klein-model
+  link hyperboloid, like hyperboloid-model

@@ -1,21 +1,43 @@
 load @/code/type/term
   find term
 
-# The identity type, the observational equality the kernel computes with. For two values of one type, the identity
-# type is the type of proofs that they are equal. Reflexivity gives the canonical proof that a value equals itself, and
-# the eliminator, the J rule, says a property that holds at reflexivity holds along any proof of equality, which is how
-# every fact about equality is derived. On top of this intensional core the kernel makes equality observational: the
-# identity at a function type reduces to pointwise identity, so two functions equal at every argument are equal, and
-# function extensionality is the identity function rather than a postulate. The same computation gives the pair case
-# componentwise, and the dependent pair case by transport. This is the observational discipline: full function and
-# pair extensionality and quotients, while type-checking stays decidable, without the cost of cubical machinery.
-# Univalence is deliberately out of scope; this is a programming language's logic, not a synthetic homotopy theory.
-#
-# The rules. Reflexivity: every value equals itself. Elimination (J): a motive true at reflexivity is true along any
-# equality proof. Function extensionality, computed not postulated: the identity at a function type reduces to the
-# pointwise identity. Transport: a proof that two values are equal carries any structure indexed by the first to the
-# same structure indexed by the second, the dependent companion of the eliminator.
+# The identity type, the observational equality the kernel computes with. For two values of one type it is the type of
+# proofs that they are equal. The intensional core (reflexivity and the J eliminator) is made OBSERVATIONAL by adding
+# computing extensionality rules, the committed choice over both bare intensional equality (too weak, no funext) and
+# full univalence (too strong, undecidable to teach and unneeded for a programming language). Its rules in full.
+
+# FORMATION: from a type A and two values of A, form the identity type, the type of equality proofs between them.
 form identity-type
   link space, like term
   link left, like term
   link right, like term
+
+# INTRODUCTION: reflexivity. Every value is equal to itself, witnessed by the canonical proof refl, the only direct way
+# to build an equality.
+form reflexivity
+  link value, like term
+
+# ELIMINATION (J): to prove a property holds along any equality proof, it suffices to prove it at reflexivity. The J
+# rule is path induction, and every theorem about equality (symmetry, transitivity, congruence, transport) is derived
+# from it.
+form path-induction
+  link proof, like term
+  link motive, like term
+
+# COMPUTATION at a function type (function extensionality, COMPUTED): the identity at a pi type reduces to the pointwise
+# identity (two functions are equal exactly when they agree at every argument), so funext is the identity function, not
+# a postulate. This is the observational extension's defining rule.
+form function-extensionality
+  link space, like term
+
+# COMPUTATION at a pair type (pair extensionality): the identity at a sigma reduces componentwise (a pair of equality
+# proofs), via transport in the dependent case. Together with funext this makes equality extensional while keeping
+# type-checking decidable.
+form pair-extensionality
+  link space, like term
+
+# TRANSPORT: an equality proof between two values carries any structure indexed by the first to the same structure
+# indexed by the second, the dependent companion of J, the operation that moves a value along an equality.
+form transport
+  link proof, like term
+  link family, like term

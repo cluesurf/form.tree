@@ -7,7 +7,7 @@ form wake
 
 # The wake, proof-checked by `seed test`: the law of space, growing the mesh one-way at the open edge. The dock count
 # only ever rises, never falls, so after a beat there are more docks than before: a later count exceeds an earlier.
-hold <the mesh grows so a later count exceeds an earlier>
+hold mesh-grows-so-later-count-exceeds-earlier
   call is-above
     code 25
     code 24

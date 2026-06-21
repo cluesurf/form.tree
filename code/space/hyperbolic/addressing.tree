@@ -7,7 +7,7 @@
 # navigation into a finite one. The Fibonacci arithmetic underneath is machine-checked by `seed test`.
 
 # The Fibonacci numbers (1, 2, 3, 5, 8, 13, 21) obey f(n) = f(n-1) + f(n-2). Checked across the sequence: 8 + 13 = 21.
-hold <consecutive Fibonacci numbers sum to the next>
+hold consecutive-fibonacci-numbers-sum-to-next
   call is-equal
     call add
       code 8
@@ -16,7 +16,7 @@ hold <consecutive Fibonacci numbers sum to the next>
 
 # A Zeckendorf representation: twelve is eight plus three plus one (the Fibonacci numbers F6, F4, F2, no two
 # consecutive). A wrong decomposition breaks the sum.
-hold <twelve is a sum of non-consecutive Fibonacci numbers>
+hold twelve-is-sum-of-non-consecutive-fibonacci-numbers
   call is-equal
     call add
       call add
@@ -27,7 +27,7 @@ hold <twelve is a sum of non-consecutive Fibonacci numbers>
 
 # Cassini's identity at n = 5: F(6) * F(4) - F(5)^2 = 8 * 3 - 5 * 5 = 24 - 25 = -1, equal to (-1)^5. The product of a
 # Fibonacci number's neighbors differs from its square by exactly one, alternating in sign.
-hold <Cassini's identity holds at the fifth Fibonacci number>
+hold cassini-s-identity-holds-at-fifth-fibonacci-number
   call is-equal
     call subtract
       call multiply
@@ -40,7 +40,7 @@ hold <Cassini's identity holds at the fifth Fibonacci number>
 
 # Cassini's identity at n = 6: F(7) * F(5) - F(6)^2 = 13 * 5 - 8 * 8 = 65 - 64 = 1, equal to (-1)^6. The sign has
 # flipped, as the identity demands.
-hold <Cassini's identity flips sign at the sixth Fibonacci number>
+hold cassini-s-identity-flips-sign-at-sixth-fibonacci-number
   call is-equal
     call subtract
       call multiply

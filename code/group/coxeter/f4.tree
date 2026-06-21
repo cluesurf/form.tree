@@ -6,7 +6,7 @@
 
 # The order of F4 is 1152, which factors as the twenty-four cells times a forty-eight-element cell symmetry:
 # 1152 = 24 * 48.
-hold <the order of F4 is the cells times their symmetry>
+hold order-of-f4-is-cells-times-their-symmetry
   call is-equal
     code 1152
     call multiply
@@ -15,7 +15,7 @@ hold <the order of F4 is the cells times their symmetry>
 
 # Equivalently it is the binary tetrahedral group of order twenty-four scaled by forty-eight, and it is divisible by
 # the twenty-four directions of the mesh: 1152 = 48 * 24.
-hold <the order of F4 is a multiple of the twenty-four directions>
+hold order-of-f4-is-multiple-of-twenty-four-directions
   call is-equal
     code 1152
     call multiply

@@ -6,7 +6,7 @@
 # by `seed test`.
 
 # The octonionic Hopf fibration S^15 -> S^8: the total sphere dimension is 2*8 - 1 = 15.
-hold <the octonionic hopf total sphere has dimension fifteen>
+hold octonionic-hopf-total-sphere-has-dimension-fifteen
   call is-equal
     code 15
     call subtract
@@ -16,7 +16,7 @@ hold <the octonionic hopf total sphere has dimension fifteen>
       code 1
 
 # Its fiber is the seven-sphere, of dimension one less than the algebra: 8 - 1 = 7.
-hold <the octonionic hopf fiber is the seven sphere>
+hold octonionic-hopf-fiber-is-seven-sphere
   call is-equal
     code 7
     call subtract
@@ -24,7 +24,7 @@ hold <the octonionic hopf fiber is the seven sphere>
       code 1
 
 # The total sphere's dimension is the base plus the fiber: 15 = 8 + 7.
-hold <the octonionic hopf total is the base plus the fiber>
+hold octonionic-hopf-total-is-base-plus-fiber
   call is-equal
     code 15
     call add
@@ -33,13 +33,13 @@ hold <the octonionic hopf total is the base plus the fiber>
 
 # Across the family the fiber dimension is exactly the algebra dimension minus one: the quaternionic Hopf S^7 -> S^4
 # has fiber S^3 (4 - 1 = 3), and the complex Hopf S^3 -> S^2 has fiber S^1 (2 - 1 = 1).
-hold <the quaternionic hopf fiber is the three sphere>
+hold quaternionic-hopf-fiber-is-three-sphere
   call is-equal
     code 3
     call subtract
       code 4
       code 1
-hold <the complex hopf fiber is the one sphere>
+hold complex-hopf-fiber-is-one-sphere
   call is-equal
     code 1
     call subtract

@@ -1,9 +1,32 @@
 load @/code/structure/set
   find set
 
-# The boundary at infinity: the set of ideal points a hyperbolic space approaches but never reaches, the rim of the
-# Poincare disk, the horizon. Geodesics run out to ideal points, and the boundary carries its own geometry (a sphere one
-# dimension down) on which the space's symmetries act. In the substrate this ideal boundary is the thin skin of the
-# baseball, the cusp where the bulk meets physical reality. The form carries the set of ideal points.
+load @/code/structure/manifold
+  find manifold
+
+# The boundary at infinity, the ideal sphere the hyperbolic space approaches but never reaches, and the geometry that
+# lives on it. In the substrate this boundary is the thin skin of the baseball, the cusp where the dense bulk meets
+# physical reality.
+
+# The ideal boundary: the set of ideal points, one for each "end" a geodesic can run out to, forming a sphere one
+# dimension below the space (a circle for the plane, a two-sphere for hyperbolic three-space). It is not part of the
+# space (no point is at finite distance from the interior) yet it organizes everything: geodesics are pinned by their
+# two ideal endpoints, and the isometries act on it by conformal (Mobius) maps. The form carries the set of ideal
+# points.
 form ideal-boundary
   link points, like set
+
+# Ideal, hyperideal, and ordinary vertices: a tiling vertex may be an ordinary interior point (giving a COMPACT tiling),
+# an ideal point on the boundary (PARACOMPACT, the cusp case), or a hyperideal point outside the space entirely
+# (NON-COMPACT). The substrate's honeycomb and the pentagrid sit in this family, and the cusp where the mesh meets the
+# skin is an ideal vertex. The form carries the boundary the vertex type is measured against.
+form vertex-type
+  link boundary, like set
+
+# Sphere packing and the limit set: a hyperbolic Coxeter group of level two leaves a maximal sphere packing on the
+# ideal boundary, spheres filling the boundary without overlapping, whose complement is the limit set (the closure of
+# the group's orbit). Level one fills the whole boundary with the limit set (no packing); level above two forces the
+# spheres to overlap. This (Maxwell's level classification) is the boundary-side fingerprint of which hyperbolic tiling
+# a Coxeter group makes. The form carries the boundary the packing lives on.
+form sphere-packing
+  link boundary, like set

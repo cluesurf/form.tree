@@ -1,10 +1,31 @@
 load @/code/structure/manifold
   find manifold
 
-# A geodesic: the straightest possible path in a curved space, the shortest route between two points, the hyperbolic
-# version of a straight line. In the Poincare disk geodesics are arcs of circles meeting the boundary at right angles;
-# in the upper half-space they are vertical lines and semicircles centered on the boundary. Two geodesics that do not
-# meet still drift apart exponentially, the signature of negative curvature. The form carries the manifold the geodesic
-# runs in.
+# Geodesics in hyperbolic space, the straight lines of the curved geometry, the shortest paths and the paths of no
+# turning. Their behavior is the visible signature of negative curvature, and it is unlike anything in flat space.
+
+# A geodesic: the locally-shortest path between points, the curve a taut string would follow, equivalently the curve
+# whose acceleration has no component along the surface (zero geodesic curvature). In the Poincare disk a geodesic is a
+# circular arc meeting the boundary at right angles or a diameter; in the upper half-space a vertical line or a
+# semicircle centered on the boundary; in the Klein model a straight chord. The form carries the manifold it runs in.
 form geodesic
+  link manifold, like manifold
+
+# Limiting (asymptotic) parallels: two geodesics that never meet yet approach each other, sharing a single ideal point
+# on the boundary. Through a point off a line there are exactly TWO limiting parallels, one for each end of the line,
+# and they bound the angle of parallelism. These are the "parallels" of the hyperbolic parallel axiom.
+form limiting-parallel
+  link manifold, like manifold
+
+# Ultraparallel (diverging) geodesics: two geodesics that neither meet nor share an ideal point, drifting apart
+# exponentially in both directions. Any two ultraparallel lines have a UNIQUE common perpendicular, the segment of least
+# distance between them, a feature with no Euclidean analogue. Through a point off a line there are infinitely many
+# ultraparallels (every line between the two limiting parallels).
+form ultraparallel
+  link manifold, like manifold
+
+# Geodesic divergence: two geodesics from one point spread apart so that the distance between them grows EXPONENTIALLY
+# with arc length, the hyperbolic-sine law. This exponential spreading is why a small region commands an astronomically
+# large frontier a few steps out, the exponential workforce the substrate and Margenstern's machines spend.
+form geodesic-divergence
   link manifold, like manifold

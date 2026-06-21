@@ -4,7 +4,7 @@ form beat
 
 # The beat, proof-checked by `seed test`: one discrete tick of time, and time is the count of beats, whose one-way
 # order is the arrow. A later beat is above an earlier: the count runs forward and cannot be reversed.
-hold <a later beat is above an earlier beat>
+hold later-beat-is-above-earlier-beat
   call is-above
     code 2
     code 1

@@ -7,7 +7,7 @@ form dock
 
 # The dock is a 24-cell, proof-checked by `seed test`: twenty-four sites, twenty-four faces, twenty-four neighbors,
 # pairing into the twelve lines the law acts on, 24 = 2 * 12.
-hold <the dock has twenty-four sites>
+hold dock-has-twenty-four-sites
   call is-equal
     code 24
     call multiply

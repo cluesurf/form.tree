@@ -1,18 +1,33 @@
-# The multiplicity, the single mechanism that unifies proof erasure, the linear substrate, and uniqueness. Every
-# binding carries a quantity drawn from a three-element semiring: zero, one, and many. Zero means used no times at run
-# time, which is exactly a proof, present for checking and gone when the program runs. One means used exactly once,
-# which is exactly an interaction-net wire and exactly a uniquely owned mutable value, the condition that makes
-# in-place reuse sound. Many means used any number of times, an ordinary shared value. One annotation therefore erases
-# proofs, tracks the linearity the runtime substrate demands, and licenses safe mutation, all at once. This is
-# quantitative type theory, the reason this kernel fits a language whose runtime is literally linear.
-#
-# The quantities form a semiring under two operations. Addition combines two uses of the same variable: zero is its
-# identity, and any sum reaching past one is many. Multiplication composes a use through an enclosing binding: zero
-# absorbs, so a use inside an erased binding is erased, and one is its identity. A use fits a binding when its counted
-# quantity matches what the binding allows: many accepts anything, one demands exactly one use, zero demands none.
-# That fit is the linearity check the type checker runs over every body.
+load @/code/structure/set
+  find set
 
-# The quantity on a binding: rank zero is erased, rank one is linear, rank two stands for many. The three ranks are the
-# carrier of the semiring; the addition, multiplication, and fit rules above are how the checker reasons over them.
+# The multiplicity, the single mechanism that unifies proof erasure, the linear interaction-net substrate, and unique
+# mutable ownership. Every binding carries a quantity from a three-element semiring, and that one annotation does the
+# work of three separate systems. This is quantitative type theory, and it is why this kernel fits a language whose
+# runtime is literally linear. The full structure below.
+
+# THE THREE QUANTITIES. Zero means used no times at run time, which is exactly a PROOF (present for checking, erased
+# when the program runs). One means used exactly once, which is exactly an interaction-net WIRE and exactly a uniquely
+# owned mutable value (the in-place-reuse condition). Many means used any number of times, an ordinary SHARED value.
 form multiplicity
-  link rank, like natural
+  link zero, like set
+  link one, like set
+  link many, like set
+
+# ADDITION: combine two uses of the same variable. Zero is the identity (zero plus x is x), and any sum that reaches
+# past one is many (one plus one is many). This is the operation the usage checker sums a variable's occurrences with.
+form multiplicity-addition
+  link carrier, like multiplicity
+
+# MULTIPLICATION: compose a use through an enclosing binding. Zero absorbs (a use inside an erased binding is erased,
+# zero times x is zero), and one is the identity (one times x is x). Together addition and multiplication make the
+# quantities a semiring.
+form multiplicity-multiplication
+  link carrier, like multiplicity
+
+# THE FIT (linearity check): a use fits a binding when its counted quantity matches what the binding allows. Many
+# accepts any count, one demands exactly one use, zero demands none. This single check enforces erasure (a zero binding
+# is never used at run time), linearity (a one binding is used exactly once, so aliasing and dropping are rejected), and
+# sharing, all at once.
+form multiplicity-fit
+  link carrier, like multiplicity

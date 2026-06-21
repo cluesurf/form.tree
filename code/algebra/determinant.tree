@@ -9,17 +9,16 @@
 # A = [[a, b], [c, d]] and B = [[e, f], [g, h]], their product A B has determinant (a e + b g)(c f + d h) minus
 # (a f + b h)(c e + d g), and this equals (a d - b c)(e h - f g), the product of the two determinants. A universal law
 # over all eight entries.
-task determinant-is-multiplicative
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  take d, like integer
-  take e, like integer
-  take f, like integer
-  take g, like integer
-  take h, like integer
-  like integer
-  hold <the determinant of a product is the product of the determinants>
+rule determinant-of-product-is-product-of-determinants
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  mark e, like integer
+  mark f, like integer
+  mark g, like integer
+  mark h, like integer
+  show hold
     call is-equal
       call subtract
         call multiply
@@ -67,5 +66,3 @@ task determinant-is-multiplicative
           call multiply
             read f
             read g
-  send back
-    read a

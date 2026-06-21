@@ -17,7 +17,7 @@ form cell-24
 # non-trivial fact, checked below; the self-duality is read off the symmetry of the f-vector, not a numeric theorem.
 
 # Its Euler characteristic vanishes, as every convex 4-polytope's must: V - E + F - C = 24 - 96 + 96 - 24 = 0.
-hold <the 24-cell Euler characteristic vanishes>
+hold 24-cell-euler-characteristic-vanishes
   call is-equal
     call subtract
       call add
@@ -30,7 +30,7 @@ hold <the 24-cell Euler characteristic vanishes>
 
 # Its twenty-four vertices are exactly the twenty-four roots of D4, and the twenty-four directions a tone may step,
 # pairing into the twelve lines the law acts on: 24 = 2 * 12.
-hold <the twenty-four directions pair into twelve lines>
+hold twenty-four-directions-pair-into-twelve-lines
   call is-equal
     code 24
     call multiply

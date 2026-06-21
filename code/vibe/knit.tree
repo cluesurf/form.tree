@@ -6,7 +6,7 @@ form knit
   link dock, like dock
 
 # The knit, proof-checked by `seed test`: the law of motion, two steps each beat, collide then stream, 2 = 1 + 1.
-hold <the knit has two steps a beat>
+hold knit-has-two-steps-beat
   call is-equal
     code 2
     call add

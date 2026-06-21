@@ -6,25 +6,25 @@
 # strictly increase.
 
 # Regular sits below context-free: level 0 is below level 1.
-hold <regular is below context-free>
+hold regular-is-below-context-free
   call is-below
     code 0
     code 1
 
 # Context-free sits below context-sensitive: level 1 is below level 2.
-hold <context-free is below context-sensitive>
+hold context-free-is-below-context-sensitive
   call is-below
     code 1
     code 2
 
 # Context-sensitive sits below recursively-enumerable: level 2 is below level 3.
-hold <context-sensitive is below recursively-enumerable>
+hold context-sensitive-is-below-recursively-enumerable
   call is-below
     code 2
     code 3
 
 # The ordering is transitive across the whole ladder: regular (0) sits below recursively-enumerable (3).
-hold <regular is below recursively-enumerable>
+hold regular-is-below-recursively-enumerable
   call is-below
     code 0
     code 3

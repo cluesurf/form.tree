@@ -11,7 +11,7 @@
 # The four-dimensional Euler characteristic of the 24-cell is zero: vertices minus edges plus faces minus cells,
 # 24 - 96 + 96 - 24, equals zero, as it must for a convex 4-polytope (whose boundary is a 3-sphere). A false count would
 # break this alternating sum.
-hold <the 24-cell has Euler characteristic zero>
+hold 24-cell-euler-characteristic-zero
   call is-equal
     call subtract
       call add
@@ -24,7 +24,7 @@ hold <the 24-cell has Euler characteristic zero>
 
 # The 24 vertices factor as six coordinate-pairs times four sign-patterns: 6 * 4 = 24, the way the directions of the
 # 24-cell are spelled as length-four ternary words with exactly two nonzero letters.
-hold <the 24 directions factor as six pairs by four signs>
+hold directions-factor-as-six-pairs-by-four-signs
   call is-equal
     call multiply
       code 6
@@ -33,7 +33,7 @@ hold <the 24 directions factor as six pairs by four signs>
 
 # The full symmetry group of the 24-cell, the Weyl group of F4, has order 1152, which is 48 times its 24 vertices. A
 # wrong vertex count or symmetry-per-vertex would break this product.
-hold <the F4 symmetry order is 48 times the vertex count>
+hold f4-symmetry-order-is-48-times-vertex-count
   call is-equal
     call multiply
       code 48
@@ -42,7 +42,7 @@ hold <the F4 symmetry order is 48 times the vertex count>
 
 # The handshake relation: each of the 24 vertices meets 8 edges, and each edge has 2 ends, so 24 * 8 equals 96 * 2,
 # pinning the edge count at 96. A wrong edge count breaks the equality of the two products.
-hold <the handshake relation pins the edge count>
+hold handshake-relation-pins-edge-count
   call is-equal
     call multiply
       code 24

@@ -1,10 +1,32 @@
 load @/code/structure/manifold
   find manifold
 
-# Curvature: the measure of how a space bends away from flat. Positive curvature (the sphere) closes space up and makes
-# triangles fat; zero curvature (the plane) is flat; negative curvature (the hyperbolic space) opens space out and makes
-# triangles thin, their angle sum falling short of two right angles by exactly their area. The mesh has constant negative
-# curvature, which is why its shells grow exponentially and a single cell, reflected endlessly, tiles the whole space.
-# The form carries the manifold whose curvature this is.
-form curvature
+# Curvature, the local bending of a space, and the constant negative curvature that defines hyperbolic geometry. The
+# sign of the curvature is read off triangles: fat (angle sum above two right angles) is positive, exact is flat,
+# thin (angle sum below) is negative.
+
+# Gaussian curvature: the single number measuring how a surface bends at a point, the product of its two principal
+# curvatures, intrinsic (it can be felt without leaving the surface, by measuring triangles and circles). The
+# hyperbolic plane has constant NEGATIVE Gaussian curvature everywhere. The form carries the manifold.
+form gaussian-curvature
+  link manifold, like manifold
+
+# Constant curvature: the curvature is the same at every point and in every direction, so the space is homogeneous (it
+# looks the same from everywhere) and isotropic (the same in every direction). There are exactly three such geometries:
+# the sphere (positive), the flat plane (zero), and the hyperbolic plane (negative). The substrate's bulk is the
+# negative one.
+form constant-curvature
+  link manifold, like manifold
+
+# The Gauss-Bonnet theorem: it ties the total curvature of a region to its boundary turning and its topology, and for a
+# geodesic triangle it says the area times the curvature equals the angle DEFECT (two right angles minus the angle sum).
+# In hyperbolic space, with negative curvature, the defect is positive and equals the area, so area is bounded by the
+# ideal triangle's. The form carries the manifold.
+form gauss-bonnet
+  link manifold, like manifold
+
+# Sectional curvature: in dimension three and up, the curvature of each two-dimensional slice through a point. A
+# hyperbolic space has all sectional curvatures equal and negative, which is the higher-dimensional meaning of
+# "constant negative curvature" for the dodecagrid and the 120-cell grid. The form carries the manifold.
+form sectional-curvature
   link manifold, like manifold

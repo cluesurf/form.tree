@@ -4,19 +4,37 @@ load @/code/type/term
 load @/code/type/multiplicity
   find multiplicity
 
-# The dependent function type, the pi type, the one way the theory forms a type that depends on a value. A pi type
-# gathers a domain type, a multiplicity saying how the argument may be used, and a codomain type that may mention the
-# argument. An ordinary function is the special case where the codomain ignores the argument. The multiplicity on the
-# domain is what makes this a quantitative theory: an erased argument is a type or proof present only for checking, a
-# linear argument is used exactly once, a shared argument any number of times. The universe a pi inhabits is the
-# maximum of its domain's and codomain's, except at the impredicative bottom, where a pi landing in Type 0 stays in
-# Type 0 whatever the domain.
-#
-# The rules. Introduction: a lambda inhabits a pi type when, given an argument of the domain, its body inhabits the
-# codomain. Elimination: applying a function of a pi type to an argument of the domain yields the codomain at that
-# argument. Computation (beta): applying a lambda to an argument substitutes the argument into the body, the engine of
-# normalization.
+# The dependent function type, the pi type, the one way the theory forms a type that depends on a value, and the most
+# important type former. A function type carries a domain, a multiplicity on the argument (how many times it may be
+# used at run time), and a codomain that may MENTION the argument. An ordinary function is the special case where the
+# codomain ignores the argument. Below are its four rules in full, the standard formation / introduction / elimination /
+# computation shape every type former follows.
+
+# FORMATION: from a domain type A, a multiplicity rho, and a codomain type B that may use a variable of A, form the pi
+# type. It inhabits the maximum of A's and B's universe, except at the impredicative bottom where a pi into Type 0 stays
+# in Type 0 whatever the domain's level. This is the rule that builds the type.
 form function-type
   link domain, like term
   link usage, like multiplicity
   link codomain, like term
+
+# INTRODUCTION: a lambda abstraction. Given a body that inhabits the codomain B under a fresh variable of the domain A,
+# the lambda inhabits the pi type. This is how a function is built: by saying what it does to its argument.
+form lambda-abstraction
+  link body, like term
+
+# ELIMINATION: application. A term of the pi type applied to an argument of the domain A yields a term of the codomain B
+# with the argument substituted in. This is how a function is used.
+form function-application
+  link target, like term
+  link input, like term
+
+# COMPUTATION (beta): applying a lambda to an argument reduces to the body with the argument substituted for the bound
+# variable. Beta is the engine of normalization, the rule that actually runs a function.
+form beta-reduction
+  link redex, like function-application
+
+# UNIQUENESS (eta): a function equals the lambda that applies it to a fresh variable, so two functions agreeing on every
+# argument are equal. With observational equality this eta law computes, giving function extensionality for free.
+form eta-law
+  link function, like term

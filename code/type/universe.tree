@@ -1,25 +1,35 @@
-# The universe hierarchy, the spine of the type theory. Types are themselves values, so they need types, and a single
-# self-typed universe (a type of all types, including itself) is inconsistent by Girard's paradox. The fix is a tower:
-# Type 0, Type 1, Type 2, and on, each universe a member of the next. The hierarchy is predicative (a universe is built
-# only from universes below it), cumulative (a type in a lower universe also sits in every higher one, so a small type
-# is usable where a larger one is expected), and universe-polymorphic (a definition is written once over a level
-# variable and instantiates at every level). The one exception is the bottom: Type 0 is impredicative, so a function
-# landing in Type 0 stays in Type 0 whatever its domain, which is what lets a self-encoded inductive type live in the
-# bottom universe instead of floating above its own induction motive. This is the impredicative-bottom discipline, not
-# a self-typed universe.
-#
-# The rules: Type i has type Type (i + 1). A function type inhabits the maximum of its domain's and codomain's
-# universe, except when the codomain is the bottom, where the function type stays in the bottom. Comparison of levels
-# is decidable, which is what makes universe polymorphism mechanical.
+load @/code/structure/set
+  find set
 
-# A level: the address of a universe. A constant floor joined with the maximum over level variables, each carried with
-# a non-negative offset. The floor alone names a concrete universe (Type 0, Type 1, and on); the variables make a
-# definition polymorphic over levels.
+# The universe hierarchy, the spine of the type theory. A single self-typed universe (a type of all types including
+# itself) is inconsistent by Girard's paradox, so types are stratified into a tower. The full set of rules below makes
+# it predicative, cumulative, and universe-polymorphic, with an impredicative bottom.
+
+# A LEVEL: the address of a universe, a constant floor joined with the maximum over level variables each carried with a
+# non-negative offset. This algebra (the same as Agda's and Lean's) makes level comparison decidable, which universe
+# polymorphism needs. A level may be a literal (Type 0, Type 1) or polymorphic (Type i for a variable i).
 form level
-  link floor, like natural
-  link variables, like text
+  link floor, like set
+  link variables, like set
 
-# The universe at a level: the type whose members are exactly the types of that level. Type i is a member of Type
-# (i + 1), and by cumulativity also of every universe above.
+# FORMATION and TYPING: Type at a level is a type, and Type i has type Type (i + 1). No universe is its own type. This
+# is the rule that replaces Type-in-Type and restores consistency.
 form universe
+  link level, like level
+
+# CUMULATIVITY: a type in a lower universe is also a type in every higher universe, so a small type is usable wherever a
+# larger one is expected, without explicit lifting. Type i is contained in Type j whenever i is at most j.
+form cumulativity
+  link level, like level
+
+# UNIVERSE POLYMORPHISM: a definition may be written once over a level variable and instantiated at every level, so a
+# notion like "the identity function" or "lists" exists uniformly at all sizes instead of being copied per level.
+form universe-polymorphism
+  link level, like level
+
+# IMPREDICATIVE BOTTOM: a function type (a pi) whose codomain lands in Type 0 stays in Type 0 whatever the domain's
+# level. Only the literal bottom is impredicative; every universe above stays predicative, and Type 0 has type Type 1
+# unchanged. This impredicative-Set discipline is what lets a self-encoded inductive live in the bottom universe rather
+# than floating above its own induction motive.
+form impredicative-bottom
   link level, like level

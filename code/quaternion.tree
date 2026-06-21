@@ -12,7 +12,7 @@ form quaternion
 # The quaternions, proof-checked by `seed test`.
 
 # Dimension four, the double of the complex plane: 4 = 2 * 2.
-hold <the quaternions have dimension four>
+hold quaternions-have-dimension-four
   call is-equal
     code 4
     call multiply
@@ -22,17 +22,16 @@ hold <the quaternions have dimension four>
 # The norm is multiplicative for EVERY pair of quaternions, Euler's four-square identity: with q = a + b i + c j + d k
 # and r = e + f i + g j + h k, the squared norm of the product equals the product of the squared norms. A universal
 # law over all eight coordinates, proved by the commutative-ring normalizer.
-task quaternion-norm-is-multiplicative
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  take d, like integer
-  take e, like integer
-  take f, like integer
-  take g, like integer
-  take h, like integer
-  like integer
-  hold <the quaternion norm is multiplicative>
+rule quaternion-norm-is-multiplicative
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  mark e, like integer
+  mark f, like integer
+  mark g, like integer
+  mark h, like integer
+  show hold
     call is-equal
       call multiply
         call add
@@ -192,5 +191,3 @@ task quaternion-norm-is-multiplicative
             call multiply
               read d
               read e
-  send back
-    read a

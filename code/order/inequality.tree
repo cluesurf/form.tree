@@ -6,25 +6,21 @@
 
 # Every square is non-negative: a^2 >= 0, for every a. The floor of the order, the reason the integers carry a
 # square-respecting order while no higher rung in the tower can.
-task square-is-non-negative
-  take a, like integer
-  like integer
-  hold <every square is at least zero>
+rule every-square-is-at-least-zero
+  mark a, like integer
+  show hold
     call is-minimum
       call multiply
         read a
         read a
       code 0
-  send back
-    read a
 
 # The arithmetic-mean / geometric-mean inequality for two terms: a^2 + b^2 >= 2 a b, for every a and b. The difference
 # is (a - b)^2.
-task arithmetic-geometric-mean
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <the sum of two squares is at least twice their product>
+rule sum-of-two-squares-is-at-least-twice-their-product
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-minimum
       call add
         call multiply
@@ -38,17 +34,14 @@ task arithmetic-geometric-mean
         call multiply
           read a
           read b
-  send back
-    read a
 
 # The sum of three squares dominates the cyclic sum of products: a^2 + b^2 + c^2 >= a b + b c + c a, for every a, b, c.
 # The difference is one half the sum of the three squared differences.
-task three-square-cyclic
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  like integer
-  hold <the sum of three squares is at least their cyclic product sum>
+rule sum-of-three-squares-is-at-least-their-cyclic-product-sum
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  show hold
     call is-minimum
       call add
         call add
@@ -72,16 +65,13 @@ task three-square-cyclic
         call multiply
           read c
           read a
-  send back
-    read a
 
 # The power-mean step for two terms: 2 a^2 + 2 b^2 >= (a + b)^2, for every a and b. The difference is (a - b)^2. This is
 # why the mean of squares is at least the square of the mean.
-task power-mean-two
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <twice the sum of two squares is at least the square of their sum>
+rule twice-sum-of-two-squares-is-at-least-square-of-their-sum
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-minimum
       call add
         call multiply
@@ -101,18 +91,15 @@ task power-mean-two
         call add
           read a
           read b
-  send back
-    read a
 
 # A four-term sum of squares dominates two cross products: a^2 + b^2 + c^2 + d^2 >= 2 a b + 2 c d, for every a, b, c, d.
 # The difference is (a - b)^2 + (c - d)^2.
-task four-square-paired
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  take d, like integer
-  like integer
-  hold <four squares dominate twice two paired products>
+rule four-squares-dominate-twice-two-paired-products
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
     call is-minimum
       call add
         call add
@@ -140,18 +127,15 @@ task four-square-paired
           call multiply
             read c
             read d
-  send back
-    read a
 
 # A four-term sum of squares dominates the cyclic sum of adjacent products: a^2 + b^2 + c^2 + d^2 >= a b + b c + c d + d a,
 # for every a, b, c, d. The difference is one half the sum of the four squared adjacent differences.
-task four-square-cyclic
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  take d, like integer
-  like integer
-  hold <four squares dominate the cyclic adjacent product sum>
+rule four-squares-dominate-cyclic-adjacent-product-sum
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
     call is-minimum
       call add
         call add
@@ -183,18 +167,15 @@ task four-square-cyclic
         call multiply
           read d
           read a
-  send back
-    read a
 
 # The three-term Cauchy bound: (a + b + c)^2 <= 3 (a^2 + b^2 + c^2), for every a, b, c. The difference is the sum of the
 # three squared differences (a - b)^2 + (b - c)^2 + (c - a)^2, so the square of a sum never exceeds the count times the
 # sum of squares. This is the power-mean inequality for three terms.
-task three-term-power-mean
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  like integer
-  hold <the square of a three-term sum is at most three times the sum of squares>
+rule square-of-three-term-sum-is-at-most-three-times-sum-of-squares
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  show hold
     call is-minimum
       call multiply
         code 3
@@ -220,5 +201,23 @@ task three-term-power-mean
             read a
             read b
           read c
-  send back
-    read a
+
+# The sum of two non-negatives is non-negative: if a >= 0 and b >= 0 then a + b >= 0, for every a and b. A conditional
+# law, proved under its assumptions by the linear prover.
+rule sum-of-non-negatives-is-non-negative
+  mark a, like integer
+  mark b, like integer
+  have h1
+    call is-minimum
+      read a
+      code 0
+  have h2
+    call is-minimum
+      read b
+      code 0
+  show hold
+    call is-minimum
+      call add
+        read a
+        read b
+      code 0

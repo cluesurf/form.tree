@@ -7,7 +7,7 @@ form lean
 
 # The lean, proof-checked by `seed test`: the order on the ternary tone, low below middle below high. It is the same
 # one-way order the integers carry, so its witnesses agree with the integer order: the low end is below the high.
-hold <the low tone is below the high tone>
+hold low-tone-is-below-high-tone
   call is-below
     code 0
     code 2

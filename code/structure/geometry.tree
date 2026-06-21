@@ -1,0 +1,76 @@
+# The primitive objects and relations of synthetic geometry, the structured vocabulary the geometric axioms and theorems
+# are written over (see the hyperbolic axiom file and note/library/seed/proof-checking/08-structured-rule-dsl). Points
+# are sites; the constructors bond, beam, bend, and face build segments, rays, angles, and triangles (all carried as one
+# figure type, so the congruence relation is uniform); and the relations twin (congruent), mean (between), and meet
+# (incident) are the predicates the axioms postulate. Every term is a 4-letter head with structured arguments.
+
+# A site: a point, the atom of geometry.
+form site
+  link place, note private
+
+# A line: a straight one-dimensional figure.
+form line
+  link place, note private
+
+# A figure: any constructed shape (a segment, ray, angle, or triangle), the thing congruence compares.
+form figure
+  link place, note private
+
+# bond: the segment from site a to site b.
+task bond
+  take a, like site
+  take b, like site
+  like figure
+  send back
+    make figure
+
+# beam: the ray from site a through site b.
+task beam
+  take a, like site
+  take b, like site
+  like figure
+  send back
+    make figure
+
+# bend: the angle at site b, from site a to site c.
+task bend
+  take a, like site
+  take b, like site
+  take c, like site
+  like figure
+  send back
+    make figure
+
+# face: the triangle on sites a, b, c.
+task face
+  take a, like site
+  take b, like site
+  take c, like site
+  like figure
+  send back
+    make figure
+
+# twin: the congruence relation, true when two figures are congruent.
+task twin
+  take left, like figure
+  take rest, like figure
+  like wave
+  send back
+    wave true
+
+# mean: the betweenness relation, true when site b lies between sites a and c.
+task mean
+  take a, like site
+  take b, like site
+  take c, like site
+  like wave
+  send back
+    wave true
+
+# meet: the incidence relation, true when a site lies on a line.
+task meet
+  take a, like site
+  take here, like line
+  like wave
+  send back
+    wave true

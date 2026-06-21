@@ -7,24 +7,20 @@
 # prover and checked by `seed test`. These are universal laws, not single witnesses.
 
 # Zero is a right identity for addition: n + 0 = n, for every n.
-task additive-identity
-  take n, like natural
-  like natural
-  hold <zero is a right identity for addition>
+rule zero-is-right-identity-for-addition
+  mark n, like natural
+  show hold
     call is-equal
       call add
         read n
         code 0
       read n
-  send back
-    read n
 
 # Addition commutes: a + b = b + a, for every a and b.
-task additive-commutativity
-  take a, like natural
-  take b, like natural
-  like natural
-  hold <addition commutes>
+rule addition-commutes
+  mark a, like natural
+  mark b, like natural
+  show hold
     call is-equal
       call add
         read a
@@ -32,16 +28,13 @@ task additive-commutativity
       call add
         read b
         read a
-  send back
-    read a
 
 # Addition associates: (a + b) + c = a + (b + c), for every a, b, c.
-task additive-associativity
-  take a, like natural
-  take b, like natural
-  take c, like natural
-  like natural
-  hold <addition associates>
+rule addition-associates
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
     call is-equal
       call add
         call add
@@ -53,30 +46,24 @@ task additive-associativity
         call add
           read b
           read c
-  send back
-    read a
 
 # Every natural is non-negative: n >= 0, for every n. This is the base of the order, the floor the arrow runs up from.
 # (The `natural-number` refinement is what carries the n >= 0 assumption to the prover.)
-task non-negativity
-  take n, like natural-number
-  like natural-number
-  hold <every natural is at least zero>
+rule every-natural-is-at-least-zero
+  mark n, like natural-number
+  show hold
     call is-minimum
       read n
       code 0
-  send back
-    read n
 
 # Multiplication distributes over addition: a (b + c) = a b + a c, for EVERY a, b, c. A universal law (not a witness),
 # proved by the commutative-ring normalizer. With commutativity and associativity of addition above, this makes the
 # naturals a commutative semiring, the algebraic floor the integers and the whole tower are built on.
-task left-distributivity
-  take a, like natural
-  take b, like natural
-  take c, like natural
-  like natural
-  hold <multiplication distributes over addition>
+rule multiplication-distributes-over-addition
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
     call is-equal
       call multiply
         read a
@@ -90,15 +77,12 @@ task left-distributivity
         call multiply
           read a
           read c
-  send back
-    read a
 
 # Multiplication commutes: a b = b a, for every a and b. The semiring is commutative.
-task multiplicative-commutativity
-  take a, like natural
-  take b, like natural
-  like natural
-  hold <multiplication commutes>
+rule multiplication-commutes
+  mark a, like natural
+  mark b, like natural
+  show hold
     call is-equal
       call multiply
         read a
@@ -106,16 +90,13 @@ task multiplicative-commutativity
       call multiply
         read b
         read a
-  send back
-    read a
 
 # Multiplication associates: (a b) c = a (b c), for every a, b, c.
-task multiplicative-associativity
-  take a, like natural
-  take b, like natural
-  take c, like natural
-  like natural
-  hold <multiplication associates>
+rule multiplication-associates
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
     call is-equal
       call multiply
         call multiply
@@ -127,8 +108,6 @@ task multiplicative-associativity
         call multiply
           read b
           read c
-  send back
-    read a
 
 # The inductive summation identities (the triangular numbers, the sum of odds, squares, and cubes), each a closed form
 # proved for every n by Peano induction, live in the sum file.

@@ -15,13 +15,12 @@ form complex
 # tower and of Hurwitz's theorem. With z = a + b i and w = c + d i, the product z w = (ac - bd) + (ad + bc) i, and the
 # Brahmagupta-Fibonacci identity says (a*a + b*b) (c*c + d*d) = (ac - bd)^2 + (ad + bc)^2. A universal law over all
 # a, b, c, d, proved by the commutative-ring normalizer.
-task complex-norm-is-multiplicative
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  take d, like integer
-  like integer
-  hold <the complex norm is multiplicative>
+rule complex-norm-is-multiplicative
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
     call is-equal
       call multiply
         call add
@@ -69,11 +68,9 @@ task complex-norm-is-multiplicative
             call multiply
               read b
               read c
-  send back
-    read a
 
 # The Gaussian norm of 3 + 4i is the Pythagorean five: 3*3 + 4*4 = 25 = 5*5.
-hold <the norm of three plus four i is five>
+hold norm-of-three-plus-four-i-is-five
   call is-equal
     call add
       call multiply

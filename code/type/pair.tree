@@ -4,16 +4,35 @@ load @/code/type/term
 load @/code/type/multiplicity
   find multiplicity
 
-# The dependent pair type, the sigma type, the one way the theory forms a type whose second part depends on its first.
-# A sigma type gathers a first type, a multiplicity, and a second type that may mention the first component. An
-# ordinary pair, a product, is the special case where the second part ignores the first. A sigma also serves as an
-# existential: a value of it is a witness paired with evidence about that witness.
-#
-# The rules. Introduction: a pair inhabits a sigma type when its first part inhabits the first type and its second part
-# inhabits the second type at that first part. First projection: the first component inhabits the first type. Second
-# projection: the second component inhabits the second type at the first projection. Eta: a pair rebuilt from its own
-# first and second projections is the original pair (surjective pairing).
+# The dependent pair type, the sigma type, the one way the theory forms a type whose second component depends on its
+# first. It is the existential of the foundation: a value of it is a witness paired with evidence about that witness.
+# Its four rules in full.
+
+# FORMATION: from a first type A, a multiplicity, and a second type B that may mention a variable of A, form the sigma
+# type. When B ignores its variable this is the ordinary product (a pair type); when it uses it, the type of the second
+# part genuinely depends on the first.
 form pair-type
   link first, like term
   link usage, like multiplicity
   link second, like term
+
+# INTRODUCTION: the pair. Given a first component of A and a second component of B at that first, the pair inhabits the
+# sigma type.
+form pair-introduction
+  link first, like term
+  link second, like term
+
+# ELIMINATION, first projection: the first component of a pair of the sigma type inhabits A.
+form first-projection
+  link couple, like term
+
+# ELIMINATION, second projection: the second component inhabits B evaluated at the first projection (the dependent
+# elimination, where the type of the result depends on the first component).
+form second-projection
+  link couple, like term
+
+# COMPUTATION and UNIQUENESS: projecting a pair returns its components (the beta laws fst(a, b) = a and snd(a, b) = b),
+# and a pair rebuilt from its projections is the original (the eta law, surjective pairing). With observational equality
+# this gives pair extensionality.
+form pair-laws
+  link couple, like term

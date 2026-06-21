@@ -9,14 +9,14 @@ form binary-tetrahedral
 # Hurwitz quaternions, exactly the vertices of the 24-cell.
 
 # Its order is twenty-four, and it splits into three cosets of eight, which is triality in the lattice: 24 = 3 * 8.
-hold <the binary tetrahedral group splits into three octets>
+hold binary-tetrahedral-group-splits-into-three-octets
   call is-equal
     code 24
     call multiply
       code 3
       code 8
 # It double-covers the rotational symmetry of the tetrahedron, order twelve, so it is twice as large: 24 = 2 * 12.
-hold <the binary tetrahedral group double covers the tetrahedral rotations>
+hold binary-tetrahedral-group-double-covers-tetrahedral-rotations
   call is-equal
     code 24
     call multiply

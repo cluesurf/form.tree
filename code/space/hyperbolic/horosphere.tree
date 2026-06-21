@@ -1,10 +1,26 @@
 load @/code/structure/manifold
   find manifold
 
-# A horosphere: a limit of ever-larger spheres all tangent to one ideal point at infinity, a surface that is curved as
-# seen from outside yet intrinsically FLAT, carrying ordinary Euclidean geometry. Horocycles (its two-dimensional
-# version) are the curves a constant distance from an ideal point. The horosphere is the bridge from the hyperbolic bulk
-# to a flat lattice: the substrate's flat-lattice model lives on a horosphere, where the curvature is in the embedding,
-# not the tiling. The form carries the manifold the horosphere sits in.
+# Horocycles and horospheres, the surfaces centered at infinity, the bridge from the curved bulk to a flat lattice.
+
+# A horocycle: in the plane, the limit of circles through a fixed point as their centers run off to an ideal point, a
+# curve perpendicular to all the geodesics aiming at that ideal point. Equivalently a circle of infinite radius. In the
+# Poincare disk it is a circle internally tangent to the boundary; in the upper half-space a horizontal line. The form
+# carries the manifold.
+form horocycle
+  link manifold, like manifold
+
+# A horosphere: the higher-dimensional horocycle, the limit of growing spheres tangent to one ideal point. Its crucial
+# property is that it is INTRINSICALLY FLAT: a being living on a horosphere measures ordinary Euclidean geometry, even
+# though the horosphere sits curved inside hyperbolic space. So a Euclidean lattice can live on a horosphere. The
+# substrate's flat-lattice model is exactly this: the curvature is in the embedding, not in the tiling on the surface.
+# The form carries the manifold the horosphere sits in.
 form horosphere
+  link manifold, like manifold
+
+# Horospherical coordinates: in the upper half-space model the horospheres are the horizontal planes, and the geodesics
+# aimed at the top ideal point are the vertical lines, giving a clean coordinate system (a Euclidean plane stacked along
+# an exponential height). This is the coordinate frame in which the flat-lattice picture of the substrate is read. The
+# form carries the manifold.
+form horospherical-coordinates
   link manifold, like manifold

@@ -11,125 +11,98 @@
 # UNIVERSAL order laws, true for EVERY integer (the parameters are quantified), proved by the linear prover.
 
 # The order is reflexive: every integer is at least itself, n >= n, for every n.
-task order-reflexivity
-  take n, like integer
-  like integer
-  hold <every integer is at least itself>
+rule every-integer-is-at-least-itself
+  mark n, like integer
+  show hold
     call is-minimum
       read n
       read n
-  send back
-    read n
 
 # The order is translation-invariant, the arrow's engine: adding one strictly increases, n < n + 1, for every n. So
 # the count always has a next, an after that is never a before, which is the one-wayness of time.
-task successor-increases
-  take n, like integer
-  like integer
-  hold <every integer is below its successor>
+rule every-integer-is-below-its-successor
+  mark n, like integer
+  show hold
     call is-below
       read n
       call add
         read n
         code 1
-  send back
-    read n
 
 # The order is transitive: if a is at most b and b is at most c, then a is at most c, for every a, b, c.
-task order-transitivity
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  like integer
-  fork test
-    hook test
-      call is-maximum
-        read a
-        read b
-    hook hold
-      fork test
-        hook test
-          call is-maximum
-            read b
-            read c
-        hook hold
-          hold <the order is transitive>
-            call is-maximum
-              read a
-              read c
-  send back
-    read a
+rule order-is-transitive
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  have h1
+    call is-maximum
+      read a
+      read b
+  have h2
+    call is-maximum
+      read b
+      read c
+  show hold
+    call is-maximum
+      read a
+      read c
 
 # Addition preserves the order (translation invariance): if a is at most b then a + c is at most b + c, for every
 # a, b, c. This is what makes the order a ring order and the arrow a consistent direction.
-task addition-monotone
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  like integer
-  fork test
-    hook test
-      call is-maximum
+rule addition-preserves-order
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  have h
+    call is-maximum
+      read a
+      read b
+  show hold
+    call is-maximum
+      call add
         read a
+        read c
+      call add
         read b
-    hook hold
-      hold <addition preserves the order>
-        call is-maximum
-          call add
-            read a
-            read c
-          call add
-            read b
-            read c
-  send back
-    read a
+        read c
 
 # The loss of order, the arrow's far wall: a value whose square is at least zero (the orderability every ordered ring
-# demands) cannot also be a square root of minus one. Assume both and a contradiction follows, so no order can place
-# the new unit, and every rung past the integers is unorderable. The one-way order stops here, and that is the arrow.
-task no-order-past-the-integers
-  take square, like integer
-  like integer
-  fork test
-    hook test
-      call is-minimum
-        read square
-        code 0
-    hook hold
-      fork test
-        hook test
-          call is-equal
-            read square
-            code -1
-        hook hold
-          hold <orderability fails once a square is minus one>
-            call is-below
-              code 0
-              code -1
-  send back
-    read square
+# demands) cannot also be a square root of minus one. Assume both and a contradiction follows (zero would lie below
+# minus one), so no order can place the new unit, and every rung past the integers is unorderable. The one-way order
+# stops here, and that is the arrow.
+rule orderability-fails-once-square-is-minus-one
+  mark square, like integer
+  have h1
+    call is-minimum
+      read square
+      code 0
+  have h2
+    call is-equal
+      read square
+      code -1
+  show hold
+    call is-below
+      code 0
+      code -1
 
 # Every square is non-negative, for EVERY integer n: n * n >= 0. This is the law no higher rung satisfies, so the
 # integers are the unique orderable rung. A universal law, proved by the sum-of-squares certificate (a square is at
 # least zero over any ordered ring).
-task every-square-is-non-negative
-  take n, like integer
-  like integer
-  hold <every square is at least zero>
+rule every-square-is-at-least-zero
+  mark n, like integer
+  show hold
     call is-minimum
       call multiply
         read n
         read n
       code 0
-  send back
-    read n
 
 # The order is one-way (strict and antisymmetric): 2 is below 5, and conversely 5 is at least 2, so 5 is not below 2.
-hold <two is below five>
+hold two-is-below-five
   call is-below
     code 2
     code 5
-hold <five is at least two>
+hold five-is-at-least-two
   call is-minimum
     code 5
     code 2

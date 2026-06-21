@@ -1,0 +1,123 @@
+# The laws of a total order, each a named rule checked by `seed test`. The order on the integers is written with the
+# comparison relations: is-maximum (at most), is-minimum (at least), is-below (strictly below), is-above (strictly
+# above). These laws are what make the integers the unique orderable rung of the number tower, and the one-way order is
+# the arrow of time. The conditional laws use `have` antecedents, proved under assumption by the linear prover.
+
+# Reflexivity: every value is at most itself, a <= a, for every a.
+rule order-is-reflexive
+  mark a, like integer
+  show hold
+    call is-maximum
+      read a
+      read a
+
+# Antisymmetry: if a is at most b and b is at most a, then a equals b, for every a and b.
+rule order-is-antisymmetric
+  mark a, like integer
+  mark b, like integer
+  have h1
+    call is-maximum
+      read a
+      read b
+  have h2
+    call is-maximum
+      read b
+      read a
+  show hold
+    call is-equal
+      read a
+      read b
+
+# The strict order is irreflexive: no value is strictly below itself, a < a never holds, for every a.
+rule strict-order-is-irreflexive
+  mark a, like integer
+  show miss
+    call is-below
+      read a
+      read a
+
+# A strict order implies the weak order: if a is strictly below b then a is at most b, for every a and b.
+rule strict-below-implies-at-most
+  mark a, like integer
+  mark b, like integer
+  have h
+    call is-below
+      read a
+      read b
+  show hold
+    call is-maximum
+      read a
+      read b
+
+# The order separates strict from equal: if a is at most b and b is at most a, then a is NOT strictly below b (they are
+# equal), for every a and b.
+rule at-most-both-ways-is-not-strict
+  mark a, like integer
+  mark b, like integer
+  have h1
+    call is-maximum
+      read a
+      read b
+  have h2
+    call is-maximum
+      read b
+      read a
+  show miss
+    call is-below
+      read a
+      read b
+
+# Translation invariance of the strict order: if a is strictly below b then a + c is strictly below b + c, for every
+# a, b, c. The engine of the arrow, lifted to the strict order.
+rule strict-order-is-translation-invariant
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  have h
+    call is-below
+      read a
+      read b
+  show hold
+    call is-below
+      call add
+        read a
+        read c
+      call add
+        read b
+        read c
+
+# Transitivity of the strict order: if a is strictly below b and b is strictly below c, then a is strictly below c.
+rule strict-order-is-transitive
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  have h1
+    call is-below
+      read a
+      read b
+  have h2
+    call is-below
+      read b
+      read c
+  show hold
+    call is-below
+      read a
+      read c
+
+# Mixed transitivity: if a is at most b and b is strictly below c, then a is strictly below c.
+rule weak-then-strict-is-strict
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  have h1
+    call is-maximum
+      read a
+      read b
+  have h2
+    call is-below
+      read b
+      read c
+  show hold
+    call is-below
+      read a
+      read c

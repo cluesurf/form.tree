@@ -15,25 +15,25 @@ form cayley-dickson-double
 
 # The doubling tower, proof-checked by `seed test`. Each double has twice the dimension of its input, so the
 # dimensions run 1, 2, 4, 8, 16: the reals, the complex numbers, the quaternions, the octonions, the sedenions.
-hold <the complex numbers double the reals>
+hold complex-numbers-double-reals
   call is-equal
     code 2
     call multiply
       code 2
       code 1
-hold <the quaternions double the complex numbers>
+hold quaternions-double-complex-numbers
   call is-equal
     code 4
     call multiply
       code 2
       code 2
-hold <the octonions double the quaternions>
+hold octonions-double-quaternions
   call is-equal
     code 8
     call multiply
       code 2
       code 4
-hold <the sedenions double the octonions>
+hold sedenions-double-octonions
   call is-equal
     code 16
     call multiply
@@ -42,11 +42,11 @@ hold <the sedenions double the octonions>
 
 # The norm survives exactly while the input stays associative, through dimension eight, and dies at sixteen. So the
 # octonions at eight sit strictly below the sedenions at sixteen where it fails: eight is below sixteen.
-hold <the octonions at eight are below the cliff at sixteen>
+hold octonions-at-eight-are-below-cliff-at-sixteen
   call is-below
     code 8
     code 16
-hold <the sedenions are past the reversible ceiling>
+hold sedenions-are-past-reversible-ceiling
   call is-above
     code 16
     code 8

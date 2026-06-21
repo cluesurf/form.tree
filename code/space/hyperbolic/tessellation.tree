@@ -4,7 +4,7 @@
 # the overwhelming majority, an infinite family against the five spherical Platonic and three flat cases.
 
 # {5, 4} (four pentagons at a vertex) is hyperbolic: 5*4 = 20 is above 2*(5 + 4) = 18.
-hold <the five four tiling is hyperbolic>
+hold five-four-tiling-is-hyperbolic
   call is-above
     call multiply
       code 5
@@ -16,7 +16,7 @@ hold <the five four tiling is hyperbolic>
         code 4
 
 # {4, 4} (the square grid, four squares at a vertex) is exactly flat: 4*4 = 16 equals 2*(4 + 4) = 16.
-hold <the four four tiling is flat>
+hold four-four-tiling-is-flat
   call is-equal
     call multiply
       code 4
@@ -28,7 +28,7 @@ hold <the four four tiling is flat>
         code 4
 
 # {5, 3} (the dodecahedron, three pentagons at a vertex) is spherical: 5*3 = 15 is below 2*(5 + 3) = 16.
-hold <the five three tiling is spherical>
+hold five-three-tiling-is-spherical
   call is-below
     call multiply
       code 5
@@ -40,7 +40,7 @@ hold <the five three tiling is spherical>
         code 3
 
 # {3, 3} (the tetrahedron) is spherical: 3*3 = 9 is below 2*(3 + 3) = 12. The most basic Platonic solid.
-hold <the three three tiling is spherical>
+hold three-three-tiling-is-spherical
   call is-below
     call multiply
       code 3
@@ -50,3 +50,44 @@ hold <the three three tiling is spherical>
       call add
         code 3
         code 3
+
+# The Coxeter LEVEL classification (Maxwell): the level of a reflection group is the fewest diagram vertices whose
+# removal leaves only finite (spherical) and affine (Euclidean) pieces. Level 0 is spherical or Euclidean; level 1 and 2
+# are hyperbolic. Encode the levels as integers and the classification is a strict ordering, machine-checked here.
+
+# A spherical or Euclidean group has level 0, strictly below the hyperbolic level 1.
+hold euclidean-level-is-below-first-hyperbolic-level
+  call is-below
+    code 0
+    code 1
+
+# The level-1 hyperbolic groups (limit set the whole boundary) sit below the level-2 groups (maximal sphere packing).
+hold first-hyperbolic-level-is-below-packing-level
+  call is-below
+    code 1
+    code 2
+
+# {3, 7} (seven triangles at a vertex) is hyperbolic: 3*7 = 21 is above 2*(3+7) = 20, by one. It is the dual of the
+# heptagrid and the densest small triangular hyperbolic tiling.
+hold three-seven-tiling-is-hyperbolic
+  call is-above
+    call multiply
+      code 3
+      code 7
+    call multiply
+      code 2
+      call add
+        code 3
+        code 7
+
+# {6, 4} (four hexagons at a vertex) is hyperbolic: 6*4 = 24 is above 2*(6+4) = 20.
+hold six-four-tiling-is-hyperbolic
+  call is-above
+    call multiply
+      code 6
+      code 4
+    call multiply
+      code 2
+      call add
+        code 6
+        code 4

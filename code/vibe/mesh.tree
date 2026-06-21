@@ -7,7 +7,7 @@ form mesh
 
 # The mesh, proof-checked by `seed test`: a hyperbolic honeycomb of 24-cell docks joined face to face, so every dock
 # meets twenty-four neighbors, one across each face, 24 = 2 * 12.
-hold <each dock meets twenty-four neighbors>
+hold each-dock-meets-twenty-four-neighbors
   call is-equal
     code 24
     call multiply

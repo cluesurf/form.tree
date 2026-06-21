@@ -12,7 +12,7 @@ form sedenion
 # The sedenions, proof-checked by `seed test`.
 
 # Dimension sixteen, the double of the octonions: 16 = 2 * 8.
-hold <the sedenions have dimension sixteen>
+hold sedenions-have-dimension-sixteen
   call is-equal
     code 16
     call multiply
@@ -20,7 +20,7 @@ hold <the sedenions have dimension sixteen>
       code 8
 
 # Sixteen is past the reversible ceiling of eight, so the norm dies and zero divisors appear: reversibility fails here.
-hold <the sedenions lie past the reversible ceiling>
+hold sedenions-lie-past-reversible-ceiling
   call is-above
     code 16
     code 8

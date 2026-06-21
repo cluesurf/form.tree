@@ -8,7 +8,7 @@ load @/code/structure/set
 # tree and addressing follow the same method as the pentagrid.
 
 # The heptagrid is hyperbolic by the Schläfli test: (7 - 2)(3 - 2) = 5 * 1 = 5, above 4.
-hold <the heptagrid is hyperbolic>
+hold heptagrid-is-hyperbolic
   call is-above
     call multiply
       call subtract

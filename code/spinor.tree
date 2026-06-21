@@ -12,7 +12,7 @@ form spinor
 # 2n. These two formulas are different, yet they COINCIDE at one place: n = 4, the rotation algebra so(8), where the
 # half-spinor 2*2*2 = 8 equals the vector 2*4 = 8. That coincidence is the one-substance floor of the pinch-point, and
 # the equality of vector and the two half-spinors is triality. Proof-checked by `seed test`.
-hold <the half-spinor of so eight equals the vector by two different formulas>
+hold half-spinor-of-so-eight-equals-vector-by-two-different-formulas
   call is-equal
     call multiply
       call multiply
@@ -25,13 +25,13 @@ hold <the half-spinor of so eight equals the vector by two different formulas>
 
 # Below dimension eight the half-spinor is smaller than the vector, above it larger; the crossing is exactly at eight.
 # At so(6) the half-spinor is 2*2 = 4, below the vector 6; at so(10) it is 2*2*2*2 = 16, above the vector 10.
-hold <below eight the half-spinor is smaller than the vector>
+hold below-eight-half-spinor-is-smaller-than-vector
   call is-below
     call multiply
       code 2
       code 2
     code 6
-hold <above eight the half-spinor is larger than the vector>
+hold above-eight-half-spinor-is-larger-than-vector
   call is-above
     call multiply
       call multiply

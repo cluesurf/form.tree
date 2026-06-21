@@ -19,7 +19,7 @@ form clifford-algebra
 
 # The dimension content, proof-checked by `seed test`. The Clifford algebra of n-dimensional space has dimension two
 # to the n: one basis element per subset of the n generators. For three-space, that is 2*2*2 = 8.
-hold <the clifford algebra of three space has dimension eight>
+hold clifford-algebra-of-three-space-has-dimension-eight
   call is-equal
     code 8
     call multiply
@@ -30,13 +30,13 @@ hold <the clifford algebra of three space has dimension eight>
 
 # It splits into an even subalgebra and an odd part, each of dimension two to the (n-1). For three-space, 8 = 4 + 4,
 # and the even half (dimension four) is the quaternions, which is why the unit quaternions form Spin(3).
-hold <the clifford algebra of three space splits into even and odd halves of four>
+hold clifford-algebra-of-three-space-splits-into-even-and-odd-halves-of-four
   call is-equal
     code 8
     call add
       code 4
       code 4
-hold <the even subalgebra of three space is four dimensional like the quaternions>
+hold even-subalgebra-of-three-space-is-four-dimensional-like-quaternions
   call is-equal
     code 4
     call multiply

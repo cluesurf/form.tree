@@ -5,7 +5,7 @@
 # the construction needs. These curvature facts are proof-checked by `seed test`.
 
 # The {7, 3} tiling (three heptagons at each vertex) is hyperbolic: 7*3 = 21 is more than 2*(7 + 3) = 20.
-hold <the seven three tiling is hyperbolic>
+hold seven-three-tiling-is-hyperbolic
   call is-above
     call multiply
       code 7
@@ -17,7 +17,7 @@ hold <the seven three tiling is hyperbolic>
         code 3
 
 # The {3, 6} tiling (six triangles at a vertex) is exactly flat, the boundary case: 3*6 = 18 equals 2*(3 + 6) = 18.
-hold <the three six tiling is flat>
+hold three-six-tiling-is-flat
   call is-equal
     call multiply
       code 3
@@ -29,7 +29,7 @@ hold <the three six tiling is flat>
         code 6
 
 # The {3, 4} tiling (four triangles at a vertex, the octahedron) is spherical: 3*4 = 12 is below 2*(3 + 4) = 14.
-hold <the three four tiling is spherical>
+hold three-four-tiling-is-spherical
   call is-below
     call multiply
       code 3

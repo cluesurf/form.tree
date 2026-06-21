@@ -8,7 +8,7 @@ form d4
 # D4, proof-checked by `seed test`.
 
 # The one-substance demand: the half-spinor and the vector have the same size at dimension eight, two cubed: 8 = 2*2*2.
-hold <the spinor meets the vector at eight>
+hold spinor-meets-vector-at-eight
   call is-equal
     code 8
     call multiply
@@ -18,7 +18,7 @@ hold <the spinor meets the vector at eight>
       code 2
 
 # Its root system is the 24-cell: twenty-four roots, the twenty-four directions, pairing into twelve lines, 24 = 2*12.
-hold <D four has twenty-four roots>
+hold d-four-has-twenty-four-roots
   call is-equal
     code 24
     call multiply

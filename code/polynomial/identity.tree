@@ -4,11 +4,10 @@
 # equal over any commutative ring. These are the algebraic backbone the number tower and the norm identities rest on.
 
 # The square of a sum: (a + b)^2 = a^2 + 2 a b + b^2.
-task square-of-a-sum
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <the square of a sum expands>
+rule square-of-sum-expands
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call multiply
         call add
@@ -30,15 +29,12 @@ task square-of-a-sum
         call multiply
           read b
           read b
-  send back
-    read a
 
 # The square of a difference: (a - b)^2 = a^2 - 2 a b + b^2.
-task square-of-a-difference
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <the square of a difference expands>
+rule square-of-difference-expands
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call multiply
         call subtract
@@ -60,15 +56,12 @@ task square-of-a-difference
         call multiply
           read b
           read b
-  send back
-    read a
 
 # The difference of squares: (a - b)(a + b) = a^2 - b^2.
-task difference-of-squares
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <a difference of squares factors>
+rule difference-of-squares-factors
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call multiply
         call subtract
@@ -84,15 +77,12 @@ task difference-of-squares
         call multiply
           read b
           read b
-  send back
-    read a
 
 # The cube of a sum: (a + b)^3 = a^3 + 3 a^2 b + 3 a b^2 + b^3.
-task cube-of-a-sum
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <the cube of a sum expands>
+rule cube-of-sum-expands
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call multiply
         call multiply
@@ -132,15 +122,12 @@ task cube-of-a-sum
             read b
             read b
           read b
-  send back
-    read a
 
 # The sum of two cubes: a^3 + b^3 = (a + b)(a^2 - a b + b^2).
-task sum-of-two-cubes
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <a sum of cubes factors>
+rule sum-of-cubes-factors
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call add
         call multiply
@@ -168,15 +155,12 @@ task sum-of-two-cubes
           call multiply
             read b
             read b
-  send back
-    read a
 
 # The difference of two cubes: a^3 - b^3 = (a - b)(a^2 + a b + b^2).
-task difference-of-two-cubes
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <a difference of cubes factors>
+rule difference-of-cubes-factors
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call subtract
         call multiply
@@ -204,16 +188,13 @@ task difference-of-two-cubes
           call multiply
             read b
             read b
-  send back
-    read a
 
 # The Sophie Germain identity: a^4 + 4 b^4 = (a^2 + 2 a b + 2 b^2)(a^2 - 2 a b + 2 b^2). The factorization of a sum of a
 # fourth power and four times a fourth power, the classic example that a^4 + 4 is composite for every a above one.
-task sophie-germain-identity
-  take a, like integer
-  take b, like integer
-  like integer
-  hold <the sophie germain identity factors a fourth-power sum>
+rule sophie-germain-identity-factors-fourth-power-sum
+  mark a, like integer
+  mark b, like integer
+  show hold
     call is-equal
       call add
         call multiply
@@ -263,16 +244,13 @@ task sophie-germain-identity
             call multiply
               read b
               read b
-  send back
-    read a
 
 # The square of a three-term sum: (a + b + c)^2 = a^2 + b^2 + c^2 + 2 a b + 2 b c + 2 c a.
-task square-of-a-three-term-sum
-  take a, like integer
-  take b, like integer
-  take c, like integer
-  like integer
-  hold <the square of a three-term sum expands>
+rule square-of-three-term-sum-expands
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  show hold
     call is-equal
       call multiply
         call add
@@ -314,5 +292,66 @@ task square-of-a-three-term-sum
           call multiply
             read c
             read a
-  send back
-    read a
+
+# Euler's factorization: a^3 + b^3 + c^3 - 3 a b c = (a + b + c)(a^2 + b^2 + c^2 - a b - b c - c a), for every a, b, c.
+# The identity behind the fact that a sum of three cubes minus thrice their product factors through the cyclic sum.
+rule three-cube-sum-minus-thrice-product-factors
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  show hold
+    call is-equal
+      call subtract
+        call add
+          call add
+            call multiply
+              call multiply
+                read a
+                read a
+              read a
+            call multiply
+              call multiply
+                read b
+                read b
+              read b
+          call multiply
+            call multiply
+              read c
+              read c
+            read c
+        call multiply
+          code 3
+          call multiply
+            call multiply
+              read a
+              read b
+            read c
+      call multiply
+        call add
+          call add
+            read a
+            read b
+          read c
+        call subtract
+          call subtract
+            call subtract
+              call add
+                call add
+                  call multiply
+                    read a
+                    read a
+                  call multiply
+                    read b
+                    read b
+                call multiply
+                  read c
+                  read c
+              call multiply
+                read a
+                read b
+            call multiply
+              read b
+              read c
+          call multiply
+            read c
+            read a
