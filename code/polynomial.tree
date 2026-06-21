@@ -1,39 +1,11 @@
+load @/code/structure/ring
+  find ring
 
-class homogeneous polynomial
-  mount m, class degree
-  mount k, class strap
-  mount r, class polynomial ring
-    mount k, think k
-  mount f, group r
-
-  march a, group r
-
-class polynomial
-  mount variables
-  mount expression, of variables, class polynomial expression
-
-class polynomial expression
-
-class polynomial
-
-The polynomials  f  in the ring k[x1, ..., xn] can be viewed as k-valued functions on An by evaluating  f  at the points in An, i.e. by choosing values in k for each xi. For each set S of polynomials in k[x1, ..., xn], define the zero-locus Z(S) to be the set of points in An on which the functions in S simultaneously vanish, that is to say
-
-{\displaystyle Z(S)=\left\{x\in \mathbf {A} ^{n}\mid f(x)=0{\text{ for all }}f\in S\right\}.} Z(S)=\left\{x\in \mathbf {A} ^{n}\mid f(x)=0{\text{ for all }}f\in S\right\}.
-A subset V of An is called an affine algebraic set if V = Z(S) for some S.[1]:2 A nonempty affine algebraic set V is called irreducible if it cannot be written as the union of two proper algebraic subsets.[1]:3 An irreducible affine algebraic set is also called an affine variety.
-
-class homogeneous polynomial
-  class polynomial
-
-  strap p, class these
-
-  march t, in p
-    check match
-      t
-      0
-      right
-      wrong
-        degree is the same
-
-class polynomial
-  strap variables, class sequence
-  strap expression, of variables, class polynomial expression
+# A polynomial: a finite sum of powers of variables with coefficients in a ring, the basic object of algebra. Setting a
+# polynomial to zero defines a variety, the geometric shape of its solutions, the bridge from algebra to geometry. The
+# elementary polynomial identities (the squares, the cubes, the Sophie Germain factorization) are machine-checked in the
+# polynomial identity file, and the norm of each rung of the number tower is a polynomial identity. The form carries the
+# coefficient ring and an opaque expression; the identities are the theorems.
+form polynomial
+  link ring, like ring
+  link expression, note private

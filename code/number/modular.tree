@@ -1,0 +1,71 @@
+# Modular arithmetic: the arithmetic of remainders, where numbers wrap around a fixed modulus like hours on a clock.
+# The remainder of n divided by k is always one of the k values from zero up to k minus one, and these bound facts are
+# proved for EVERY n by the refinement prover (which models a remainder as an unknown pinned to its range) and checked
+# by `seed test`. Modular arithmetic is how the twenty-four directions of the substrate compose: a direction plus a
+# direction wraps within the twenty-four, the clock of the 24-cell.
+
+# Every remainder modulo two is at least zero: n mod 2 >= 0, for every n.
+task remainder-mod-two-non-negative
+  take n, like integer
+  like integer
+  hold <a remainder modulo two is at least zero>
+    call is-minimum
+      call modulo
+        read n
+        code 2
+      code 0
+  send back
+    read n
+
+# Every remainder modulo two is below two: n mod 2 < 2, for every n. So a parity is always zero or one.
+task remainder-mod-two-below-two
+  take n, like integer
+  like integer
+  hold <a remainder modulo two is below two>
+    call is-below
+      call modulo
+        read n
+        code 2
+      code 2
+  send back
+    read n
+
+# Every remainder modulo three is at least zero: n mod 3 >= 0, for every n.
+task remainder-mod-three-non-negative
+  take n, like integer
+  like integer
+  hold <a remainder modulo three is at least zero>
+    call is-minimum
+      call modulo
+        read n
+        code 3
+      code 0
+  send back
+    read n
+
+# Every remainder modulo three is below three: n mod 3 < 3, for every n. The three residues are the ternary tone.
+task remainder-mod-three-below-three
+  take n, like integer
+  like integer
+  hold <a remainder modulo three is below three>
+    call is-below
+      call modulo
+        read n
+        code 3
+      code 3
+  send back
+    read n
+
+# Every remainder modulo twenty-four is below twenty-four: n mod 24 < 24, for every n. The directions of the 24-cell
+# compose on this clock.
+task remainder-mod-twenty-four-below-twenty-four
+  take n, like integer
+  like integer
+  hold <a remainder modulo twenty-four is below twenty-four>
+    call is-below
+      call modulo
+        read n
+        code 24
+      code 24
+  send back
+    read n

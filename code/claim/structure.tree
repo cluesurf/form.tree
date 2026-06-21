@@ -1,0 +1,4 @@
+# Claims that an object forms a particular structure: that a set with operations is a group, ring, field, or space, by
+# satisfying that structure's axioms. Verifying such a claim is checking the axioms. The canonical structures are in the
+# structure folder, and the finite-structure facts whose counts are machine-checked (the 24-cell, the F4 symmetry) are
+# in the polytope and group files.

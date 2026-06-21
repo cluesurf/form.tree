@@ -1,72 +1,20 @@
+load @/code/structure/space/vector
+  find vector-space
 
-structure clifford-algebra
-  head type
+load @/code/structure/function/binary
+  find binary-function
 
-  link vector-space, like vector-space, have type
-  link quadratic-form, like function, have type
-  link product, like binary-operation, have type
+load @/code/structure/function/unary
+  find unary-function
 
-  # Bilinear property
-  assert bilinear
-    head type, have type
-    have vector-space
-    have product
-
-  # Clifford relation
-  assert clifford-relation
-    head type, have type
-    have vector-space
-    have quadratic-form
-    have product
-
-property bilinear
-  head type
-
-  take vector-space, like vector-space, have type
-  take product, like binary-operation, have type
-
-  all u, v, w, in vector-space.set
-    assert equal
-      do product
-        item u
-        do vector-space.operation
-          item v
-          item w
-      do vector-space.operation
-        do product
-          item u
-          item v
-        do product
-          item u
-          item w
-
-    assert equal
-      do product
-        do vector-space.operation
-          item u
-          item v
-        item w
-      do vector-space.operation
-        do product
-          item u
-          item w
-        do product
-          item v
-          item w
-
-property clifford-relation
-  head type
-
-  take vector-space, like vector-space, have type
-  take quadratic-form, like function, have type
-  take product, like binary-operation, have type
-
-  all v, in vector-space.set
-    assert equal
-      do product
-        item v
-        item v
-      do vector-space.scalar-multiply
-        item quadratic-form
-          item v
-        item vector-space.identity
+# A Clifford algebra: the universal associative algebra built from a vector space with a quadratic form, in which every
+# vector squares to its quadratic-form value, v times v equals Q(v), a scalar. From that one relation everything follows:
+# the grading into even and odd parts, the wedge product (the quadratic form set to zero), and the Pin and Spin groups
+# as the unit versors. The left-multiplications of the octonions form a Clifford algebra on seven generators, which is
+# why the octonions speak the language of spin. The form carries the vector space, the quadratic form, and the product;
+# the defining relation v times v equals Q(v) is the law, and the dimension facts are machine-checked in the Clifford
+# file under the algebra folder.
+form clifford-algebra
+  link space, like vector-space
+  link quadratic-form, like unary-function
+  link product, like binary-function

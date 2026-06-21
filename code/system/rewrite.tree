@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A rewriting system: a set of rules that replace one pattern by another, computing by repeated local replacement until
+# nothing more applies. Term rewriting, graph rewriting, and string rewriting are its forms, and a rewriting system is
+# confluent when the order of rewrites does not change the result. The substrate computes by local rewriting on the
+# mesh. The form carries the set of terms; the rules are the rewrites.
+form rewriting-system
+  link terms, like set

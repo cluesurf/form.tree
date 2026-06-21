@@ -1,0 +1,9 @@
+load @/code/structure/manifold
+  find manifold
+
+# A Riemannian manifold: a manifold with a smoothly varying inner product on each tangent space, so lengths, angles,
+# distances, and curvature are defined. It is the setting for curved geometry where every direction has a definite
+# length. The hyperbolic four-space of the substrate is Riemannian with constant negative curvature. The form carries
+# the underlying manifold; the metric on the tangent spaces is the added structure.
+form riemannian-manifold
+  link manifold, like manifold

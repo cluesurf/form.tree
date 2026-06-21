@@ -1,0 +1,9 @@
+load @/code/manifold/riemannian
+  find riemannian-manifold
+
+# A sub-Riemannian manifold: a manifold where motion is allowed only along certain directions at each point (a
+# distribution), with distance measured along admissible paths, the geometry of constrained motion. A parking car and
+# the carrying of quantum phase are sub-Riemannian. The form carries the underlying Riemannian manifold; the constraint
+# on admissible directions is the added structure.
+form sub-riemannian-manifold
+  link manifold, like riemannian-manifold

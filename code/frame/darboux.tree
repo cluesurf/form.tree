@@ -1,0 +1,8 @@
+load @/code/manifold/riemannian
+  find riemannian-manifold
+
+# A Darboux frame: a moving set of axes attached to a curve lying on a surface, adapted to the surface (one axis along
+# the curve, one along the surface normal, one in the surface), measuring how the curve bends within the surface versus
+# how the surface itself bends. The form carries the manifold the surface sits in.
+form darboux-frame
+  link manifold, like riemannian-manifold

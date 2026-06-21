@@ -1,14 +1,6 @@
-
-field falsity
-  start value
-
-  check equality
-    mount a, share value
-    mount b, share false
-
-field truth
-  start value
-
-  check equality
-    mount a, share value
-    mount b, share false
+# Truth: the two-valued logic the surface checker reasons in, true and false. A truth value is the result of a
+# decidable test, and the connectives (and, or, not, implies) combine them. The deeper logic of the kernel is
+# constructive and proof-relevant (a proof is a term, not just a bit), but at the surface, decidable propositions
+# collapse to this boolean. The form carries a boolean value.
+form truth
+  link value, like boolean

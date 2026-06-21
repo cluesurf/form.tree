@@ -1,37 +1,5 @@
-# Properties of the algebra tower that carry the Vibe Theory derivation.
-# These are the laws the composition, division, and Cayley-Dickson layers assert.
-# The norm multiplies through the product: norm(a * b) = norm(a) * norm(b).
-# This single law is the composition condition, and by Hurwitz it caps the
-# reversible dimension at eight.
-property set-norm-multiplicativity
-  head type
-  take set, like set, have type
-  take multiplication, like binary-function, have type
-  take norm, like unary-function, have type
-  all
-    a b
-    in set
-    assert norm-multiplicativity
-      head type, have type
-      have a
-      have b
-      have multiplication
-      have norm
-
-# No two nonzero elements multiply to zero. Equivalent, given a norm, to the
-# norm being multiplicative, and equivalent to every nonzero element being
-# invertible. This is reversibility: the product loses nothing.
-property set-no-zero-divisor
-  head type
-  take set, like set, have type
-  take multiplication, like binary-function, have type
-  take zero, like type
-  all
-    a b
-    in set
-    assert no-zero-divisor
-      head type, have type
-      have a
-      have b
-      have multiplication
-      have zero
+# The properties an algebra's product may satisfy, in the order the number tower loses them: commutativity (the
+# quaternions lose it), associativity (the octonions lose it, keeping alternativity, where any two elements generate an
+# associative subalgebra), and the multiplicative norm (the sedenions lose it, where zero divisors appear). The
+# alternative and flexible laws are the weakened associativity the octonions keep. These are universal equations over
+# the product; the tower's losses are recorded in the algebra-tower files.

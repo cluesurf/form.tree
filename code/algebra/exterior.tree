@@ -1,0 +1,10 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# An exterior algebra: the algebra of the wedge product, where a vector times itself is zero, so products of distinct
+# vectors are antisymmetric and measure oriented volume. It is the Clifford algebra of the zero quadratic form, the pure
+# antisymmetric corner with no metric. Its graded pieces are the spaces of areas, volumes, and higher oriented extents,
+# and the determinant lives in its top degree. The form carries the underlying vector space; the relation that a vector
+# wedged with itself is zero is the defining law.
+form exterior-algebra
+  link space, like vector-space

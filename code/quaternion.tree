@@ -14,10 +14,10 @@ form quaternion
 # Dimension four, the double of the complex plane: 4 = 2 * 2.
 hold <the quaternions have dimension four>
   call is-equal
-    mark 4
+    code 4
     call multiply
-      mark 2
-      mark 2
+      code 2
+      code 2
 
 # The norm is multiplicative for EVERY pair of quaternions, Euler's four-square identity: with q = a + b i + c j + d k
 # and r = e + f i + g j + h k, the squared norm of the product equals the product of the squared norms. A universal
@@ -39,32 +39,32 @@ task quaternion-norm-is-multiplicative
           call add
             call add
               call multiply
-                loan a
-                loan a
+                read a
+                read a
               call multiply
-                loan b
-                loan b
+                read b
+                read b
             call multiply
-              loan c
-              loan c
+              read c
+              read c
           call multiply
-            loan d
-            loan d
+            read d
+            read d
         call add
           call add
             call add
               call multiply
-                loan e
-                loan e
+                read e
+                read e
               call multiply
-                loan f
-                loan f
+                read f
+                read f
             call multiply
-              loan g
-              loan g
+              read g
+              read g
           call multiply
-            loan h
-            loan h
+            read h
+            read h
       call add
         call add
           call add
@@ -73,124 +73,124 @@ task quaternion-norm-is-multiplicative
                 call subtract
                   call subtract
                     call multiply
-                      loan a
-                      loan e
+                      read a
+                      read e
                     call multiply
-                      loan b
-                      loan f
+                      read b
+                      read f
                   call multiply
-                    loan c
-                    loan g
+                    read c
+                    read g
                 call multiply
-                  loan d
-                  loan h
+                  read d
+                  read h
               call subtract
                 call subtract
                   call subtract
                     call multiply
-                      loan a
-                      loan e
+                      read a
+                      read e
                     call multiply
-                      loan b
-                      loan f
+                      read b
+                      read f
                   call multiply
-                    loan c
-                    loan g
+                    read c
+                    read g
                 call multiply
-                  loan d
-                  loan h
+                  read d
+                  read h
             call multiply
               call subtract
                 call add
                   call add
                     call multiply
-                      loan a
-                      loan f
+                      read a
+                      read f
                     call multiply
-                      loan b
-                      loan e
+                      read b
+                      read e
                   call multiply
-                    loan c
-                    loan h
+                    read c
+                    read h
                 call multiply
-                  loan d
-                  loan g
+                  read d
+                  read g
               call subtract
                 call add
                   call add
                     call multiply
-                      loan a
-                      loan f
+                      read a
+                      read f
                     call multiply
-                      loan b
-                      loan e
+                      read b
+                      read e
                   call multiply
-                    loan c
-                    loan h
+                    read c
+                    read h
                 call multiply
-                  loan d
-                  loan g
+                  read d
+                  read g
           call multiply
             call add
               call add
                 call subtract
                   call multiply
-                    loan a
-                    loan g
+                    read a
+                    read g
                   call multiply
-                    loan b
-                    loan h
+                    read b
+                    read h
                 call multiply
-                  loan c
-                  loan e
+                  read c
+                  read e
               call multiply
-                loan d
-                loan f
+                read d
+                read f
             call add
               call add
                 call subtract
                   call multiply
-                    loan a
-                    loan g
+                    read a
+                    read g
                   call multiply
-                    loan b
-                    loan h
+                    read b
+                    read h
                 call multiply
-                  loan c
-                  loan e
+                  read c
+                  read e
               call multiply
-                loan d
-                loan f
+                read d
+                read f
         call multiply
           call add
             call subtract
               call add
                 call multiply
-                  loan a
-                  loan h
+                  read a
+                  read h
                 call multiply
-                  loan b
-                  loan g
+                  read b
+                  read g
               call multiply
-                loan c
-                loan f
+                read c
+                read f
             call multiply
-              loan d
-              loan e
+              read d
+              read e
           call add
             call subtract
               call add
                 call multiply
-                  loan a
-                  loan h
+                  read a
+                  read h
                 call multiply
-                  loan b
-                  loan g
+                  read b
+                  read g
               call multiply
-                loan c
-                loan f
+                read c
+                read f
             call multiply
-              loan d
-              loan e
+              read d
+              read e
   send back
-    loan a
+    read a

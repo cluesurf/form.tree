@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# Temporal logic: modal logic whose worlds are moments in time, with operators for "always", "eventually", "until", and
+# "next". It is the logic of how truth changes over a run, the standard language for specifying and verifying the
+# behavior of programs and reactive systems over time. The form carries the signature; the temporal operators are the
+# logic.
+form temporal-logic
+  link symbols, like set

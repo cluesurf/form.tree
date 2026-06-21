@@ -1,0 +1,8 @@
+load @/code/operator/differential/vector
+  find vector-differential-operator
+
+# The del operator: the vector of partial derivatives, written as an upside-down triangle, the single symbol from which
+# the gradient, divergence, and curl are formed by treating it as a vector and taking dot and cross products. The form
+# carries the underlying vector differential operator.
+form del-operator
+  link operator, like vector-differential-operator

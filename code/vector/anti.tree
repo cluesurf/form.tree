@@ -1,0 +1,8 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# An antivector: a grade just below the top of a geometric algebra, the dual of a vector, an oriented hyperplane rather
+# than an oriented line. In three dimensions an antivector is a bivector (a plane), which is why the cross product (a
+# plane) masquerades as a vector there. The form carries the underlying vector space.
+form antivector
+  link space, like vector-space

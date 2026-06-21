@@ -1,0 +1,8 @@
+load @/code/group/linear/general
+  find general-linear-group
+
+# The special linear group: the invertible linear maps of determinant one, the volume-and-orientation-preserving maps.
+# It is the kernel of the determinant homomorphism. The form carries the general linear group; determinant one is the
+# added condition.
+form special-linear-group
+  link group, like general-linear-group

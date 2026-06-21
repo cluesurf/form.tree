@@ -1,72 +1,21 @@
-
-load ~/code/structure/set
+load @/code/structure/set
   find set
 
-load ~/code/property/set
-  find set-closure
-  find set-associativity
-  find set-identity-element
-  find set-inverse-element
-
-load ~/code/structure/function/unary
-  find unary-function
-
-load ~/code/structure/function/binary
+load @/code/structure/function/binary
   find binary-function
 
-structure ring
-  head type
+load @/code/structure/function/unary
+  find unary-function
 
-  link set, like set, have type
-
-  link addition, like binary-function, have type
-  link multiplication, like binary-function, have type
-
-  link additive-identity, like type
-  link multiplicative-identity, like type
-
-  link additive-inverse, like unary-function, have type
-
-  # Closure under addition and multiplication
-  assume set-closure
-    head type, have type
-    have set
-    have addition
-
-  assume set-closure
-    head type, have type
-    have set
-    have multiplication
-
-  # Associativity of addition and multiplication
-  assume set-associativity
-    head type, have type
-    have set
-    have addition
-
-  assume set-associativity
-    head type, have type
-    have set
-    have multiplication
-
-  # Existence of the additive identity
-  assume set-identity-element
-    head type, have type
-    have set
-    have addition
-    have additive-identity
-
-  # Existence of additive inverses
-  assume set-inverse-element
-    head type, have type
-    have set
-    have addition
-    have additive-identity
-    have additive-inverse
-
-  # Distributivity of multiplication over addition
-  assume set-distributivity
-    head type, have type
-    have set
-    have addition
-    have multiplication
+# A ring: a set with two operations, an addition that makes it an abelian group and a multiplication that is
+# associative and distributes over the addition. The integers are the first ring, and every number system in the tower
+# is a ring (the reals, the complex numbers, the quaternions, dropping commutativity at the fourth rung). The axioms
+# (additive associativity and commutativity, an additive identity and inverses, multiplicative associativity, and
+# distributivity of multiplication over addition) are the laws an instance satisfies; the form carries the set, the two
+# operations, and the additive negation. The machine-checked ring identities over the integers live in the number and
+# polynomial files.
+form ring
+  link set, like set
+  link addition, like binary-function
+  link multiplication, like binary-function
+  link negation, like unary-function

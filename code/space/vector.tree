@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A vector space, the concept: the space vectors live in, closed under addition and scaling by a field, the home of
+# dimension and linear maps. The eight-dimensional real vector space carrying the octonions is the arena of the whole
+# theory. The canonical form is in the structure folder; this concept file marks the vector space as the central object
+# of the geometry layer.
+form vector-space-concept
+  link structure, like vector-space

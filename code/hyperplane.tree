@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A hyperplane: a flat subspace one dimension below the whole, a line in the plane, a plane in space, the mirror a
+# reflection fixes. The reflections in hyperplanes generate the Coxeter and Weyl groups, and the hyperplanes
+# perpendicular to the roots of D4 are the mirrors whose reflections build the symmetry of the 24-cell and tile the
+# mesh. The form carries the vector space the hyperplane divides.
+form hyperplane
+  link space, like vector-space

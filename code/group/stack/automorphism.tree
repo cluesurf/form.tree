@@ -1,11 +1,9 @@
+load @/code/group/homomorphism
+  find group-homomorphism
 
-field automorphism
-  front g, field group
-  front h, field group
-
-  check endomorphism
-    mount g, share g
-    mount h, share h
-  check isomorphism
-    mount g, share g
-    mount h, share h
+# A group automorphism: an invertible endomorphism, a structure-preserving self-map with a structure-preserving inverse,
+# a symmetry of the group itself. The automorphisms form a group under composition. The automorphism group of the
+# octonions is the exceptional Lie group G2, the source of the substrate's internal symmetry. The form carries the
+# underlying self-homomorphism; invertibility is the added condition.
+form group-automorphism
+  link map, like group-homomorphism

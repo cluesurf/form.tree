@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A binary function: a function of two arguments, the arity of every algebraic operation. Addition, multiplication, the
+# group operation, and the inner product are binary. The form carries the two domain sets and the codomain.
+form binary-function
+  link left, like set
+  link right, like set
+  link codomain, like set

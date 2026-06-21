@@ -1,5 +1,4 @@
-
-claim open
-claim closed
-claim singleton
-claim unit
+# Claims that a carrier set with given operations forms a particular structure: that it is closed under the operations,
+# that the operations satisfy the structure's laws (associativity, identity, inverses, distributivity). Verifying such a
+# claim is checking the axioms of the structure against the candidate; the canonical structures are in the structure
+# folder.

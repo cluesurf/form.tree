@@ -6,5 +6,5 @@ form beat
 # order is the arrow. A later beat is above an earlier: the count runs forward and cannot be reversed.
 hold <a later beat is above an earlier beat>
   call is-above
-    mark 2
-    mark 1
+    code 2
+    code 1

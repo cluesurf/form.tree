@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A linear combination: a sum of vectors each scaled by a scalar, the basic operation of a vector space, from which span,
+# basis, and dimension are defined. Every vector in a space is a linear combination of a basis. The twenty-four
+# directions of the 24-cell are the integer linear combinations that land on its vertices. The form carries the vector
+# space the combination is formed in.
+form linear-combination
+  link space, like vector-space

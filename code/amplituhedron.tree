@@ -1,0 +1,10 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# The amplituhedron: a geometric object whose volume computes the scattering amplitudes of certain quantum field
+# theories directly, replacing the enormous sums over Feynman diagrams with a single positive-geometry calculation. It
+# hints that spacetime and locality are emergent from a deeper combinatorial geometry, a theme that resonates with the
+# substrate's view of physical reality as the projection of a discrete combinatorial bulk. The form carries the vector
+# space the geometry lives in.
+form amplituhedron
+  link space, like vector-space

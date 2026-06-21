@@ -1,34 +1,3 @@
-
-check union
-  start a
-  start b
-
-  drive x, share build
-
-  check logical-disjunction
-    chain block
-      check set-containment
-        mount element, share x
-        mount set, share a
-    chain block
-      check set-containment
-        mount element, share x
-        mount set, share b
-
-check intersection
-  start a
-  start b
-
-  match class, class set
-
-  drive x, share build
-
-  check logical-conjunction
-    chain block
-      check set-containment
-        mount element, share x
-        mount set, share a
-    chain block
-      check set-containment
-        mount element, share x
-        mount set, share b
+# Set operations as decidable checks: whether an element is a member, whether one set contains another, whether two sets
+# are equal or disjoint. These reduce to the membership predicate. This note records the set checks; the set form is in
+# the structure folder.

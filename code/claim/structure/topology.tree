@@ -1,6 +1,3 @@
-
-claim continuity
-
-claim connectedness
-
-claim compactness
+# Claims about a topology: that the open sets contain the empty set and the whole space and are closed under arbitrary
+# unions and finite intersections, and derived claims about continuity, compactness, and connectedness. The
+# topological-space form is in the space folder; this note records the topology axioms a claim verifies.

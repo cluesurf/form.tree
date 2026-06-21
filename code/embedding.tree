@@ -1,0 +1,8 @@
+load @/code/structure/manifold
+  find manifold
+
+# An embedding: an inclusion of one space inside another that faithfully preserves its structure, so the smaller space
+# is a genuine subspace of the larger, not merely mapped into it. A horosphere embeds the flat plane in hyperbolic
+# space; the 24-cell embeds in four-dimensional space. The form carries the manifold being embedded.
+form embedding
+  link manifold, like manifold

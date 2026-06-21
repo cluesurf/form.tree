@@ -1,4 +1,6 @@
-
-check equality
-  start a
-  start b
+# The equality relation: the claim that two things are the same. It is reflexive (everything equals itself), symmetric
+# (if a equals b then b equals a), and transitive (equals of equals are equal), the three laws of an equivalence
+# relation, and additionally substitutive (equals may replace equals anywhere). The kernel realizes equality as the
+# identity type that computes (function and pair extensionality), with Leibniz equality underneath; both are in the type
+# folder. The machine-checked equational identities (the ring and induction proofs) are discharged by deciding this
+# relation over the integers.

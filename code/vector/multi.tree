@@ -1,0 +1,8 @@
+load @/code/algebra/exterior
+  find exterior-algebra
+
+# A multivector: a sum of blades of different grades in a geometric or exterior algebra, the general element that may mix
+# a scalar, a vector, an area, and a volume at once. Multivectors are what the geometric product acts on, and a rotation
+# is a multivector (an even one) acting by conjugation. The form carries the exterior algebra the multivector lives in.
+form multivector
+  link algebra, like exterior-algebra

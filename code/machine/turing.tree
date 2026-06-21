@@ -1,27 +1,11 @@
+load @/code/structure/set
+  find set
 
-shift turing-machine-transition
-  start state
-  start tape-symbol
-  front share state
-  front share tape-symbol
-  front l-r
-
-field turing-machine
-  front state-set, field set state
-  front input-symbol-set
-    field set symbol
-      except blank
-  front tape-symbol-set
-    field set symbol
-      include blank
-  front transition
-    shift turing-machine-transition
-      mount state, share state-set
-      mount tape-symbol, share tape-symbol-set
-  front start-state, container share input-symbol-set
-  front accept-state, container share input-symbol-set
-  front reject-state, container share input-symbol-set
-
-  check inequality
-    mount a, share accept-state
-    mount b, share reject-state
+# A Turing machine: the foundational model of computation, a finite control reading and writing symbols on an unbounded
+# tape, one step at a time, by a transition rule. What a Turing machine can compute is what is computable at all (the
+# Church-Turing thesis), and the substrate's two-step rule (collide then stream over the mesh) is itself a universal
+# computer of this strength. The form carries the set of states and the tape alphabet; the transition rule and the
+# accept condition are the machine's program.
+form turing-machine
+  link states, like set
+  link alphabet, like set

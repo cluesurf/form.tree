@@ -1,0 +1,8 @@
+load @/code/theory/category/functor
+  find functor
+
+# A monad: a functor from a category to itself with a unit and a multiplication, the categorical pattern for wrapping
+# and sequencing, used to structure effects (state, failure, input-output) in programming. It is a monoid in the
+# category of endofunctors. The form carries the underlying endofunctor.
+form monad
+  link endofunctor, like functor

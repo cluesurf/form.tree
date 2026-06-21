@@ -1,3 +1,4 @@
-
-claim excluded-middle
-claim identity
+# The basic laws (universally true equations and implications) the structures obey: the identity, associativity,
+# commutativity, distributivity, and inverse laws of the algebraic structures, and the order laws (reflexivity,
+# transitivity, antisymmetry, totality) of the ordered ones. The machine-checked instances over the integers and
+# naturals live in the number files; this note indexes the laws themselves.

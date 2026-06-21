@@ -1,0 +1,10 @@
+load @/code/number/complex
+  find complex
+
+# The bicomplex numbers, the complex numbers doubled by a second commutative square root of minus one, the commutative
+# cousin of the quaternions. Where Cayley-Dickson doubling sacrifices commutativity to reach the quaternions, the
+# bicomplex doubling keeps it but pays by introducing zero divisors, so they are a commutative ring but not a division
+# algebra. They sit off to the side of the reversible tower, a road not taken. The form carries the complex numbers they
+# are built from.
+form bicomplex
+  link source, like complex

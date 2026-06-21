@@ -1,0 +1,3 @@
+# Claims about cellular automata: that a given rule is reversible, universal (can simulate any computation), or in a
+# given complexity class, and for the hyperbolic case, that a rule exploits the exponential growth of the space. The
+# substrate's two-step rule is claimed reversible and universal. The cellular-automaton form is in the automaton folder.

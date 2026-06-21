@@ -1,0 +1,17 @@
+# The type theory, the logic the whole library is checked against. The committed stack has four layers, each a single
+# mechanism doing the work of several. The surface is gradual and bidirectional, reading like ordinary imperative code.
+# An automatic verification layer discharges the decidable obligations by refinement and arithmetic. Underneath sits
+# the kernel, the proof island and the foundation, a quantitative dependent type theory:
+#
+#   - quantities (multiplicities zero, one, many) tie proof erasure, the linear interaction-net substrate, and unique
+#     mutable ownership into one annotation. See multiplicity.
+#   - a predicative, cumulative, universe-polymorphic hierarchy keeps the logic consistent (no self-typed universe)
+#     while staying ergonomic, with an impredicative bottom for self-encoded inductives. See universe.
+#   - self types express inductive and inductive-inductive types from a tiny core, enough for the compiler's own
+#     syntax tree. See self, and its instances boolean and natural.
+#   - observational equality gives function and pair extensionality and quotients, computing and decidable, without
+#     cubical machinery. See equal and identity.
+#
+# The term file declares the syntax every construct is built from; function (pi) and pair (sigma) are the two ways a
+# type depends on a value. The kernel itself is realized in the compiler; these files are its faithful specification,
+# and the number, algebra, and polytope files are the mathematics built on top of it and machine-checked by it.

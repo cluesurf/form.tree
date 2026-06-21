@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A deductive system: a set of axioms and inference rules for deriving theorems, the formal engine of proof. A
+# derivation is a chain of rule applications from axioms to a conclusion. The kernel's type checker is a deductive
+# system whose theorems are well-typed terms. The form carries the set of formulas; the axioms and inference rules are
+# the system.
+form deductive-system
+  link formulas, like set

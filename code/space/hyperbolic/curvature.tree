@@ -1,0 +1,10 @@
+load @/code/structure/manifold
+  find manifold
+
+# Curvature: the measure of how a space bends away from flat. Positive curvature (the sphere) closes space up and makes
+# triangles fat; zero curvature (the plane) is flat; negative curvature (the hyperbolic space) opens space out and makes
+# triangles thin, their angle sum falling short of two right angles by exactly their area. The mesh has constant negative
+# curvature, which is why its shells grow exponentially and a single cell, reflected endlessly, tiles the whole space.
+# The form carries the manifold whose curvature this is.
+form curvature
+  link manifold, like manifold

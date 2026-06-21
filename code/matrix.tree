@@ -1,13 +1,8 @@
-
-field matrix
-  start row-count, field count
-  start column-count, field count
-  start data, field chain
-
-  shift multiply
-    mount start, share row-count
-    mount front, share column-count
-    store x
-  check match
-    mount start, share data/length
-    mount front, share x
+# A matrix: a rectangular grid of numbers, the concrete shape of a linear map between vector spaces once bases are
+# chosen. Multiplying matrices composes the maps, and the rotations of the eight-dimensional arena are the orthogonal
+# matrices whose structure gives the Lie algebra D4. The form carries the row and column counts and an opaque store of
+# entries; the multiplication and its compatibility with dimensions are developed where matrices are used.
+form matrix
+  link rows, like natural
+  link columns, like natural
+  link entries, note private

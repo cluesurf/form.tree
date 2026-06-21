@@ -1,12 +1,14 @@
+load @/code/group
+  find group
 
-structure lie-group
-  head type
+load @/code/structure/manifold
+  find manifold
 
-  link group, like group, have type
-  link manifold, like manifold, have type
-
-  # Compatibility between group and manifold structures
-  assert smooth-structure
-    head type, have type
-    have group
-    have manifold
+# A Lie group: a group that is also a smooth manifold, with the multiplication and inversion smooth, so it carries both
+# a symmetry and a continuous shape. Its tangent space at the identity is a Lie algebra, the infinitesimal version of
+# the symmetry. The rotations of the eight-dimensional arena form a Lie group whose algebra is D4, and the unit
+# quaternions form the Lie group covering the rotations of three-space. The form carries the group and the manifold;
+# the smooth compatibility of the two is the law.
+form lie-group
+  link group, like group
+  link manifold, like manifold

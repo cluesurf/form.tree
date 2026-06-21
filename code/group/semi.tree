@@ -1,19 +1,12 @@
-# https://en.wikipedia.org/wiki/Semigroup
+load @/code/structure/set
+  find set
 
-structure semigroup
-  head type
+load @/code/structure/function/binary
+  find binary-function
 
-  link set, like set, have type
-  link operation, like binary-operation, have type
-
-  # Closure under the operation
-  assume set-closure
-    head type, have type
-    have set
-    have operation
-
-  # Associativity of the operation
-  assume set-associativity
-    head type, have type
-    have set
-    have operation
+# A semigroup: a set with one associative operation, a magma with associativity added but still no identity and no
+# inverses. It is the half-step between a magma and a monoid. The positive integers under addition are a semigroup. The
+# form carries the set and the operation; associativity is the single law.
+form semigroup
+  link set, like set
+  link operation, like binary-function

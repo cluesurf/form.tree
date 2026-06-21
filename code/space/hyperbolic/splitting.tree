@@ -1,0 +1,12 @@
+load @/code/structure/set
+  find set
+
+# The splitting method, Margenstern's central tool, the instrument that makes an undrawable hyperbolic tiling
+# computable. Take a wedge (a quarter) of a regular tiling and remove a single leading tile: the leftover is always a
+# few smaller standard regions, a handful of quarters plus a strip. Recurse, and the tiling unfolds as a tree. Quarters
+# become white nodes with three children, strips become black nodes with two children, and every tile sits at exactly
+# one node, a perfect one-to-one map between tree and tiling (the bijection theorem). The growth per generation follows
+# a matrix whose dominant eigenvalue is the exponential growth rate. This tree is what turns navigation into a finite
+# problem. The form carries the set of tiles; the leader-quarter-strip recursion is the method.
+form splitting-method
+  link tiles, like set

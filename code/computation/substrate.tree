@@ -1,0 +1,11 @@
+load @/code/automaton/cellular
+  find cellular-automaton
+
+# The substrate as a computer: the mesh, a hyperbolic cellular automaton, is itself a universal computer. Each cell
+# holds a ternary tone, and the two-step rule (collide, then stream) advances the whole mesh each beat, reversibly. From
+# that one local, reversible, deterministic rule, universal computation emerges, the same way it does in the simplest
+# Turing-complete cellular automata. So the physics and the computation are one object: the universe computes by
+# running its own update rule. The form carries the underlying cellular automaton; the collide-then-stream rule and the
+# ternary cell state are the substrate.
+form substrate-computer
+  link automaton, like cellular-automaton

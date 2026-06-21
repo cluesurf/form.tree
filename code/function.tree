@@ -1,0 +1,11 @@
+load @/code/structure/set
+  find set
+
+# A function: a map that assigns to each element of one set (the domain) exactly one element of another (the codomain).
+# It is the second pillar of the foundation after the set, the way structures are compared and built. A function may be
+# injective (distinct inputs give distinct outputs), surjective (every output is reached), or bijective (both, a perfect
+# pairing). Composition chains functions, and the identity function leaves its input unchanged. The form carries the
+# domain and codomain sets; the single-valued assignment is the defining law.
+form function
+  link domain, like set
+  link codomain, like set

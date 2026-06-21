@@ -1,0 +1,3 @@
+# Claims about limits: that a sequence or function converges to a value, that a limit exists, or that a space is complete
+# (every Cauchy sequence has a limit inside it). Completeness is what distinguishes the reals from the rationals. The
+# Cauchy-sequence form is in the sequence folder.

@@ -1,0 +1,224 @@
+# The quadratic inequalities, each a universal law over the integers, proved by the sum-of-squares certificate: the
+# difference of the two sides is a sum of squares of linear forms (its Gram matrix is positive semidefinite), so it is
+# non-negative for every value. These are the positivity facts the order rests on, the same inequalities Coq, Agda, and
+# Lean prove from completing the square, here machine-checked by `seed test`. The proof is the certificate itself; a
+# false version (an indefinite or negative-definite difference) fails to certify and is rejected.
+
+# Every square is non-negative: a^2 >= 0, for every a. The floor of the order, the reason the integers carry a
+# square-respecting order while no higher rung in the tower can.
+task square-is-non-negative
+  take a, like integer
+  like integer
+  hold <every square is at least zero>
+    call is-minimum
+      call multiply
+        read a
+        read a
+      code 0
+  send back
+    read a
+
+# The arithmetic-mean / geometric-mean inequality for two terms: a^2 + b^2 >= 2 a b, for every a and b. The difference
+# is (a - b)^2.
+task arithmetic-geometric-mean
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <the sum of two squares is at least twice their product>
+    call is-minimum
+      call add
+        call multiply
+          read a
+          read a
+        call multiply
+          read b
+          read b
+      call multiply
+        code 2
+        call multiply
+          read a
+          read b
+  send back
+    read a
+
+# The sum of three squares dominates the cyclic sum of products: a^2 + b^2 + c^2 >= a b + b c + c a, for every a, b, c.
+# The difference is one half the sum of the three squared differences.
+task three-square-cyclic
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  like integer
+  hold <the sum of three squares is at least their cyclic product sum>
+    call is-minimum
+      call add
+        call add
+          call multiply
+            read a
+            read a
+          call multiply
+            read b
+            read b
+        call multiply
+          read c
+          read c
+      call add
+        call add
+          call multiply
+            read a
+            read b
+          call multiply
+            read b
+            read c
+        call multiply
+          read c
+          read a
+  send back
+    read a
+
+# The power-mean step for two terms: 2 a^2 + 2 b^2 >= (a + b)^2, for every a and b. The difference is (a - b)^2. This is
+# why the mean of squares is at least the square of the mean.
+task power-mean-two
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <twice the sum of two squares is at least the square of their sum>
+    call is-minimum
+      call add
+        call multiply
+          code 2
+          call multiply
+            read a
+            read a
+        call multiply
+          code 2
+          call multiply
+            read b
+            read b
+      call multiply
+        call add
+          read a
+          read b
+        call add
+          read a
+          read b
+  send back
+    read a
+
+# A four-term sum of squares dominates two cross products: a^2 + b^2 + c^2 + d^2 >= 2 a b + 2 c d, for every a, b, c, d.
+# The difference is (a - b)^2 + (c - d)^2.
+task four-square-paired
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  take d, like integer
+  like integer
+  hold <four squares dominate twice two paired products>
+    call is-minimum
+      call add
+        call add
+          call add
+            call multiply
+              read a
+              read a
+            call multiply
+              read b
+              read b
+          call multiply
+            read c
+            read c
+        call multiply
+          read d
+          read d
+      call add
+        call multiply
+          code 2
+          call multiply
+            read a
+            read b
+        call multiply
+          code 2
+          call multiply
+            read c
+            read d
+  send back
+    read a
+
+# A four-term sum of squares dominates the cyclic sum of adjacent products: a^2 + b^2 + c^2 + d^2 >= a b + b c + c d + d a,
+# for every a, b, c, d. The difference is one half the sum of the four squared adjacent differences.
+task four-square-cyclic
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  take d, like integer
+  like integer
+  hold <four squares dominate the cyclic adjacent product sum>
+    call is-minimum
+      call add
+        call add
+          call add
+            call multiply
+              read a
+              read a
+            call multiply
+              read b
+              read b
+          call multiply
+            read c
+            read c
+        call multiply
+          read d
+          read d
+      call add
+        call add
+          call add
+            call multiply
+              read a
+              read b
+            call multiply
+              read b
+              read c
+          call multiply
+            read c
+            read d
+        call multiply
+          read d
+          read a
+  send back
+    read a
+
+# The three-term Cauchy bound: (a + b + c)^2 <= 3 (a^2 + b^2 + c^2), for every a, b, c. The difference is the sum of the
+# three squared differences (a - b)^2 + (b - c)^2 + (c - a)^2, so the square of a sum never exceeds the count times the
+# sum of squares. This is the power-mean inequality for three terms.
+task three-term-power-mean
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  like integer
+  hold <the square of a three-term sum is at most three times the sum of squares>
+    call is-minimum
+      call multiply
+        code 3
+        call add
+          call add
+            call multiply
+              read a
+              read a
+            call multiply
+              read b
+              read b
+          call multiply
+            read c
+            read c
+      call multiply
+        call add
+          call add
+            read a
+            read b
+          read c
+        call add
+          call add
+            read a
+            read b
+          read c
+  send back
+    read a

@@ -8,7 +8,7 @@ form knit
 # The knit, proof-checked by `seed test`: the law of motion, two steps each beat, collide then stream, 2 = 1 + 1.
 hold <the knit has two steps a beat>
   call is-equal
-    mark 2
+    code 2
     call add
-      mark 1
-      mark 1
+      code 1
+      code 1

@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A phase space: the space of all states of a mechanical system, each point fixing both the positions and the momenta,
+# so the system's future is a single trajectory through it. Its natural geometry is symplectic, the antisymmetric
+# pairing of position against momentum. The form carries the underlying vector space; the symplectic pairing is the
+# added structure.
+form phase-space
+  link space, like vector-space

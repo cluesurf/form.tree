@@ -1,0 +1,8 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A hyperbola: the conic of points whose distances to two foci differ by a constant, a curve of two opposing branches
+# with straight asymptotes. It is the level set of x squared minus y squared, the shape of the Lorentzian interval, and
+# the boundary between the timelike and spacelike directions of spacetime. The form carries the plane it lives in.
+form hyperbola
+  link plane, like vector-space

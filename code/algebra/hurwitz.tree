@@ -16,22 +16,22 @@
 # non-trivial fact about its dimension, checked here: 2 = 2*1, 4 = 2*2, 8 = 2*4.
 hold <the complex numbers double the reals to dimension two>
   call is-equal
-    mark 2
+    code 2
     call multiply
-      mark 2
-      mark 1
+      code 2
+      code 1
 hold <the quaternions double the complex numbers to dimension four>
   call is-equal
-    mark 4
+    code 4
     call multiply
-      mark 2
-      mark 2
+      code 2
+      code 2
 hold <the octonions double the quaternions to dimension eight>
   call is-equal
-    mark 8
+    code 8
     call multiply
-      mark 2
-      mark 4
+      code 2
+      code 4
 
 # The four dimensions exhaust the powers of two below the ceiling: 1 + 2 + 4 + 8 = 15 = 16 - 1.
 hold <the four dimensions sum to one below sixteen>
@@ -39,17 +39,17 @@ hold <the four dimensions sum to one below sixteen>
     call add
       call add
         call add
-          mark 1
-          mark 2
-        mark 4
-      mark 8
+          code 1
+          code 2
+        code 4
+      code 8
     call subtract
-      mark 16
-      mark 1
+      code 16
+      code 1
 
 # The ceiling: the next double, the sedenions at sixteen, is past eight and loses the norm, so the tower stops at the
 # octonions.
 hold <the sedenions at sixteen exceed the reversible ceiling>
   call is-above
-    mark 16
-    mark 8
+    code 16
+    code 8

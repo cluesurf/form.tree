@@ -1,0 +1,8 @@
+load @/code/manifold/riemannian
+  find riemannian-manifold
+
+# A vector differential operator: an operator that differentiates fields on a manifold, the gradient (slope of a scalar),
+# the divergence (outflow of a vector), and the curl (rotation of a vector), all assembled from partial derivatives. They
+# are the vocabulary of the field equations of physics. The form carries the manifold the fields live on.
+form vector-differential-operator
+  link manifold, like riemannian-manifold

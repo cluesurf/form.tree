@@ -1,0 +1,8 @@
+load @/code/structure/module
+  find module
+
+# A module, the concept: an abelian group whose elements can be scaled by a ring, a vector space over a ring instead of
+# a field. The canonical module form is in the structure folder. This concept file marks the module as the bridge
+# between ring theory and linear algebra.
+form module-concept
+  link structure, like module

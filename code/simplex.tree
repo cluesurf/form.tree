@@ -1,0 +1,8 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A simplex: the simplest polytope in each dimension, the convex hull of one more point than the dimension, a point, a
+# segment, a triangle, a tetrahedron, and on. Simplices are the building blocks of triangulated spaces and the cells of
+# simplicial complexes, the combinatorial bones of topology. The form carries the vector space the simplex spans.
+form simplex
+  link space, like vector-space

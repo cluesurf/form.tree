@@ -1,0 +1,9 @@
+load @/code/algebra/exterior
+  find exterior-algebra
+
+# A bivector: a grade-two element of an exterior or geometric algebra, an oriented area, the wedge of two vectors. A
+# bivector is the natural object of rotation: it names a plane and a rate of turning, and exponentiating it gives a
+# rotor. The bivectors of a space are its infinitesimal rotations, the Lie algebra of its rotation group. The form
+# carries the exterior algebra the bivector lives in.
+form bivector
+  link algebra, like exterior-algebra

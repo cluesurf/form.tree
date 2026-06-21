@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# Linear logic: a logic that treats propositions as resources consumed exactly once, refining the structural rules so a
+# hypothesis cannot be freely duplicated or discarded. It is the logical face of the kernel's linear multiplicity, where
+# a proof used once is a wire and an erased proof is a resource never spent. The form carries the signature; the
+# resource-sensitive connectives are the logic.
+form linear-logic
+  link symbols, like set

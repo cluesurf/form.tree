@@ -1,35 +1,21 @@
+load @/code/structure/set
+  find set
 
-structure group
-  head type
+load @/code/structure/function/binary
+  find binary-function
 
-  link set, like set, have type
-  link operation, like binary-operation, have type
-  link identity, like type
-  link inverse, like unary-operation, have type
+load @/code/structure/function/unary
+  find unary-function
 
-  # Closure under the group operation
-  assume set-closure
-    head type, have type
-    have set
-    have operation
-
-  # Associativity of the group operation
-  assume set-associativity
-    head type, have type
-    have set
-    have operation
-
-  # Existence of the identity element
-  assume set-identity-element
-    head type, have type
-    have set
-    have operation
-    have identity
-
-  # Existence of inverses
-  assume set-inverse-element
-    head type, have type
-    have set
-    have operation
-    have identity
-    have inverse
+# A group: a set with an associative operation, an identity, and an inverse for every element. It is the mathematics of
+# reversible symmetry, every transformation undoable, every composition again in the set. Groups are where the geometry
+# of the substrate becomes the symmetry the physics runs on: the twenty-four directions of the 24-cell form the binary
+# tetrahedral group of order twenty-four, the full symmetry of the cell is the Weyl group of F4 of order one thousand
+# one hundred fifty-two, and the reflections that tile the mesh form an infinite Coxeter group. The axioms (closure,
+# associativity, a two-sided identity, and a two-sided inverse for each element) are the laws an instance satisfies; the
+# form carries the carrier set, the operation, and the inverse map. The checked finite-group facts (orders, the
+# 24-cell's symmetry counts) live in the binary-tetrahedral, coxeter, and weyl files.
+form group
+  link set, like set
+  link operation, like binary-function
+  link inverse, like unary-function

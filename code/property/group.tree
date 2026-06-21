@@ -1,0 +1,3 @@
+# The group properties an operation may satisfy: closure, associativity, a two-sided identity, and a two-sided inverse
+# for every element, and optionally commutativity (making it abelian). Adding these to a bare set climbs from magma to
+# semigroup to monoid to group. The canonical group form is in the structure folder.

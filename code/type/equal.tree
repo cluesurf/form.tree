@@ -1,19 +1,16 @@
-# Leibniz equality, the kernel's equality, on which observational equality is
-# built. Two values are equal when every predicate true of one is true of the
-# other, and reflexivity witnesses that every value equals itself. This is the
-# bottom equality. The committed foundation extends it to observational
-# equality, adding function extensionality and quotients while staying
-# decidable. The integers and the reals are quotients, so the math library
-# needs that extension, but every equality reduces to this core.
-structure equality
-  head type
-  link set, like set, have type
-  # Reflexivity: every value equals itself, witnessed by refl.
-  assert reflexivity
-    head type, have type
-    have set
-  # Indiscernibility: equals satisfy the same predicates. This is the
-  # defining content of Leibniz equality.
-  assert indiscernibility
-    head type, have type
-    have set
+load @/code/type/term
+  find term
+
+# Leibniz equality, the kernel's bottom equality, on which the observational identity type is built. Two values are
+# equal when every predicate true of one is true of the other, and reflexivity witnesses that every value equals
+# itself. This is the weakest equality, and the committed foundation extends it to observational equality (the identity
+# type), adding function extensionality and quotients while staying decidable. The integers and the reals are
+# quotients, so the math library needs that extension, but every equality reduces to this core.
+#
+# The rules. Reflexivity: every value equals itself. Indiscernibility: equal values satisfy the same predicates, the
+# defining content of Leibniz equality. The identity type promotes this to a type of proofs that compute (see the
+# identity file).
+form equality
+  link space, like term
+  link left, like term
+  link right, like term

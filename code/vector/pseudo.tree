@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A pseudovector: a quantity that transforms like a vector under rotations but flips sign under a reflection, where a
+# true vector would not, because it is secretly an oriented area (a bivector) in disguise. Angular momentum and the
+# magnetic field are pseudovectors. The distinction is exactly the even-versus-odd grading of the geometric algebra. The
+# form carries the underlying vector space.
+form pseudovector
+  link space, like vector-space

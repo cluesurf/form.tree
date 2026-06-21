@@ -1,4 +1,3 @@
-
-claim consistency
-claim contradiction
-claim satisfiable
+# Claims at the level of a whole theory: that a set of axioms is consistent (has a model), complete (proves or refutes
+# every sentence), or categorical (has one model up to isomorphism). These are the meta-claims of logic, the subject of
+# the compactness and Lowenheim-Skolem theorems indexed in the theorem note.

@@ -1,0 +1,9 @@
+load @/code/structure/ring
+  find ring
+
+# A ring, the concept: a set with addition and multiplication where addition is an abelian group and multiplication
+# distributes over it. The integers are the first ring, and every rung of the number tower is one. The canonical ring
+# form and its axioms are in the structure folder, and the machine-checked ring identities over the integers are in the
+# number and polynomial files. This concept file marks the ring as a pillar of the algebra layer.
+form ring-concept
+  link structure, like ring

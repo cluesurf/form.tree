@@ -1,17 +1,10 @@
+load @/code/space/topological
+  find topological-space
 
-structure manifold
-  head type
-
-  link set, like set, have type
-  link charts, like chart-collection, have type
-
-  # Local Euclidean property
-  assert local-euclidean
-    head type, have type
-    have set
-    have charts
-
-  # Compatibility of charts
-  assert chart-compatibility
-    head type, have type
-    have charts
+# A manifold: a topological space that looks locally like flat Euclidean space, stitched together from overlapping
+# patches (charts) whose overlaps agree smoothly. It is the setting for curved geometry, the shape spacetime is modelled
+# on, locally simple and globally bent. The hyperbolic four-space the mesh tiles is a manifold of constant negative
+# curvature. The form carries the underlying topological space; the local-Euclidean charts and their smooth
+# compatibility are the axioms.
+form manifold
+  link space, like topological-space

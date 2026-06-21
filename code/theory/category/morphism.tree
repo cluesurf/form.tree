@@ -1,0 +1,8 @@
+load @/code/theory/category
+  find category
+
+# A morphism: an arrow of a category, a structure-preserving map from one object to another, the second primitive of
+# category theory after the object. Morphisms compose associatively and each object has an identity morphism. What an
+# object is is determined entirely by its morphisms. The form carries the category the morphism lives in.
+form morphism
+  link category, like category

@@ -1,0 +1,9 @@
+load @/code/structure/ring
+  find ring
+
+# A cluster algebra: a commutative ring with a distinguished set of generators (cluster variables) grouped into
+# overlapping clusters, related by a combinatorial mutation rule that produces new clusters from old. They organize
+# phenomena across geometry, representation theory, and physics around one mutation pattern. The form carries the
+# underlying ring.
+form cluster-algebra
+  link ring, like ring

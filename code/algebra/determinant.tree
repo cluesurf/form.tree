@@ -1,0 +1,71 @@
+# The determinant, the scalar that measures how a linear map scales volume, and its central law: the determinant of a
+# product is the product of the determinants. For two-by-two matrices this is a polynomial identity in the eight
+# entries, proved for ALL values by the commutative-ring normalizer and checked by `seed test`. This multiplicativity
+# is why the determinant descends to a homomorphism from the general linear group to the nonzero scalars, and why the
+# special linear group (determinant one) is a subgroup. The rotations of the eight-dimensional arena live in this
+# determinant-one world.
+
+# The determinant of a product of two-by-two matrices equals the product of their determinants. With
+# A = [[a, b], [c, d]] and B = [[e, f], [g, h]], their product A B has determinant (a e + b g)(c f + d h) minus
+# (a f + b h)(c e + d g), and this equals (a d - b c)(e h - f g), the product of the two determinants. A universal law
+# over all eight entries.
+task determinant-is-multiplicative
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  take d, like integer
+  take e, like integer
+  take f, like integer
+  take g, like integer
+  take h, like integer
+  like integer
+  hold <the determinant of a product is the product of the determinants>
+    call is-equal
+      call subtract
+        call multiply
+          call add
+            call multiply
+              read a
+              read e
+            call multiply
+              read b
+              read g
+          call add
+            call multiply
+              read c
+              read f
+            call multiply
+              read d
+              read h
+        call multiply
+          call add
+            call multiply
+              read a
+              read f
+            call multiply
+              read b
+              read h
+          call add
+            call multiply
+              read c
+              read e
+            call multiply
+              read d
+              read g
+      call multiply
+        call subtract
+          call multiply
+            read a
+            read d
+          call multiply
+            read b
+            read c
+        call subtract
+          call multiply
+            read e
+            read h
+          call multiply
+            read f
+            read g
+  send back
+    read a

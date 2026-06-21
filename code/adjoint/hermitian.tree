@@ -1,0 +1,9 @@
+load @/code/structure/space/hilbert
+  find hilbert-space
+
+# A Hermitian adjoint: the conjugate-transpose of an operator on an inner-product space, the operator that moves to the
+# other side of the inner product. An operator equal to its own adjoint is self-adjoint (Hermitian), and such operators
+# have real eigenvalues, which is why the observables of quantum mechanics are Hermitian. The form carries the Hilbert
+# space the operator and its adjoint act on.
+form hermitian-adjoint
+  link space, like hilbert-space

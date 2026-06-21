@@ -1,0 +1,8 @@
+load @/code/number/rational
+  find rational
+
+# A ratio: the comparison of two quantities by division, one number as a multiple of another, the seed of the rational
+# numbers. The golden ratio, the growth rate of the pentagrid's Fibonacci tree, is the ratio a length has to its larger
+# part when that equals the part's ratio to the whole. The form carries the rationals the ratio lives among.
+form ratio
+  link field, like rational

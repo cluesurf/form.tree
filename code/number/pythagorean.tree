@@ -1,0 +1,57 @@
+# The Pythagorean triples, the whole-number right triangles, and their complete parametrization, proved as a universal
+# ring identity and checked by `seed test`. Euclid's formula says that for any two integers m and n, the triple
+# (m^2 - n^2, 2 m n, m^2 + n^2) satisfies the Pythagorean relation, and every primitive triple arises this way. The
+# identity is that the first leg squared plus the second leg squared equals the hypotenuse squared, for ALL m and n.
+
+# Euclid's parametrization: (m^2 - n^2)^2 + (2 m n)^2 = (m^2 + n^2)^2, for every m and n. So every choice of m and n
+# yields a Pythagorean triple, and the squares of the two legs sum to the square of the hypotenuse.
+task euclid-pythagorean-parametrization
+  take m, like integer
+  take n, like integer
+  like integer
+  hold <euclid's formula yields a pythagorean triple>
+    call is-equal
+      call add
+        call multiply
+          call subtract
+            call multiply
+              read m
+              read m
+            call multiply
+              read n
+              read n
+          call subtract
+            call multiply
+              read m
+              read m
+            call multiply
+              read n
+              read n
+        call multiply
+          call multiply
+            code 2
+            call multiply
+              read m
+              read n
+          call multiply
+            code 2
+            call multiply
+              read m
+              read n
+      call multiply
+        call add
+          call multiply
+            read m
+            read m
+          call multiply
+            read n
+            read n
+        call add
+          call multiply
+            read m
+            read m
+          call multiply
+            read n
+            read n
+  send back
+    read m

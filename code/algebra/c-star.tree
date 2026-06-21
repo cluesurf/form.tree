@@ -1,0 +1,9 @@
+load @/code/algebra/banach
+  find banach-algebra
+
+# A C-star algebra: a Banach algebra with an involution (a conjugate-transpose) satisfying the C-star identity, the norm
+# of an element times its involution equals the norm squared. It is the abstract algebra of bounded operators on a
+# Hilbert space, the mathematical home of quantum observables. The form carries the underlying Banach algebra; the
+# involution and the C-star identity are the added structure.
+form c-star-algebra
+  link algebra, like banach-algebra

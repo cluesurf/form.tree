@@ -1,0 +1,8 @@
+load @/code/tensor
+  find tensor
+
+# The Weyl tensor: the part of the curvature that remains after the trace (the Ricci) parts are removed, the curvature
+# that is not sourced by matter, carrying tidal stretching and gravitational waves through empty space. It is what makes
+# spacetime curved even where it is empty. The form carries the underlying tensor.
+form weyl-tensor
+  link tensor, like tensor

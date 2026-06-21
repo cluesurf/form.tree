@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# A unary function: a function of one argument, the simplest arity. Negation, conjugation, and the successor are unary.
+# The form carries the domain and codomain sets.
+form unary-function
+  link domain, like set
+  link codomain, like set

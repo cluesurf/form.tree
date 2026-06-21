@@ -1,0 +1,14 @@
+load @/code/type/term
+  find term
+
+# The surface layer of the type system, the everyday code a person writes. It is gradual and bidirectional. Gradual
+# means a type may be left unknown and filled in later, so partially typed code still runs, with the unknown type acting
+# as a permissive any that the checker trusts at the boundary. Bidirectional means the checker runs in two modes that
+# call each other: it checks an expression against an expected type when one is known, and otherwise synthesizes a type
+# from the expression and propagates it. This is what makes the surface read like ordinary imperative code (mutable
+# values, loops, records) while still inferring most annotations. The surface is the inference front end; everything it
+# accepts in the functional fragment is lowered into the kernel terms and judged there, so the surface is convenient and
+# the kernel is the single authority. The form carries the term being checked; the gradual unknown and the two
+# checking modes are the layer's mechanism.
+form surface-type
+  link term, like term

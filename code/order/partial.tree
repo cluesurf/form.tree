@@ -1,0 +1,13 @@
+load @/code/structure/set
+  find set
+
+load @/code/structure/function/binary
+  find binary-function
+
+# A partial order: an order that may leave some pairs incomparable, reflexive, antisymmetric, and transitive but not
+# necessarily total. Subsets under containment and the divisibility of integers are partial orders. The faces of the
+# 24-cell under inclusion form a partial order, the lattice of the polytope. The form carries the set and the order
+# relation; reflexivity, antisymmetry, and transitivity are the laws.
+form partial-order
+  link set, like set
+  link relation, like binary-function

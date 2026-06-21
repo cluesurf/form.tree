@@ -1,0 +1,12 @@
+load @/code/type/identity
+  find identity-type
+
+# Homotopy type theory, the reading of types as spaces and of equality proofs as paths, where a type's higher structure
+# (paths, paths between paths) is genuine mathematical content. Its signature axiom is univalence: equivalent types are
+# equal. It is beautiful and powerful for synthetic geometry, but it is deliberately NOT the foundation here. This
+# library uses observational equality instead: function and pair extensionality and quotients, which compute and keep
+# type-checking decidable, without univalence or the cost of cubical machinery. Univalence buys nothing for a
+# programming language's logic. The form carries the identity type, the place the two roads (observational here,
+# univalent there) diverge.
+form homotopy-type-theory
+  link identity, like identity-type

@@ -1,2 +1,4 @@
-
-theme graded
+# Claims about ring properties: that the ring is commutative, has a multiplicative identity, is an integral domain (no
+# zero divisors), or is graded (decomposed into degree pieces whose products add degrees). The ring form is in the
+# structure folder, and the machine-checked ring identities over the integers are in the number and polynomial files;
+# this note records the ring-property claims a proof discharges.

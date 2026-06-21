@@ -16,10 +16,10 @@ task order-reflexivity
   like integer
   hold <every integer is at least itself>
     call is-minimum
-      loan n
-      loan n
+      read n
+      read n
   send back
-    loan n
+    read n
 
 # The order is translation-invariant, the arrow's engine: adding one strictly increases, n < n + 1, for every n. So
 # the count always has a next, an after that is never a before, which is the one-wayness of time.
@@ -28,12 +28,12 @@ task successor-increases
   like integer
   hold <every integer is below its successor>
     call is-below
-      loan n
+      read n
       call add
-        loan n
-        mark 1
+        read n
+        code 1
   send back
-    loan n
+    read n
 
 # The order is transitive: if a is at most b and b is at most c, then a is at most c, for every a, b, c.
 task order-transitivity
@@ -44,21 +44,21 @@ task order-transitivity
   fork test
     hook test
       call is-maximum
-        loan a
-        loan b
+        read a
+        read b
     hook hold
       fork test
         hook test
           call is-maximum
-            loan b
-            loan c
+            read b
+            read c
         hook hold
           hold <the order is transitive>
             call is-maximum
-              loan a
-              loan c
+              read a
+              read c
   send back
-    loan a
+    read a
 
 # Addition preserves the order (translation invariance): if a is at most b then a + c is at most b + c, for every
 # a, b, c. This is what makes the order a ring order and the arrow a consistent direction.
@@ -70,19 +70,19 @@ task addition-monotone
   fork test
     hook test
       call is-maximum
-        loan a
-        loan b
+        read a
+        read b
     hook hold
       hold <addition preserves the order>
         call is-maximum
           call add
-            loan a
-            loan c
+            read a
+            read c
           call add
-            loan b
-            loan c
+            read b
+            read c
   send back
-    loan a
+    read a
 
 # The loss of order, the arrow's far wall: a value whose square is at least zero (the orderability every ordered ring
 # demands) cannot also be a square root of minus one. Assume both and a contradiction follows, so no order can place
@@ -93,21 +93,21 @@ task no-order-past-the-integers
   fork test
     hook test
       call is-minimum
-        loan square
-        mark 0
+        read square
+        code 0
     hook hold
       fork test
         hook test
           call is-equal
-            loan square
-            mark -1
+            read square
+            code -1
         hook hold
           hold <orderability fails once a square is minus one>
             call is-below
-              mark 0
-              mark -1
+              code 0
+              code -1
   send back
-    loan square
+    read square
 
 # Every square is non-negative, for EVERY integer n: n * n >= 0. This is the law no higher rung satisfies, so the
 # integers are the unique orderable rung. A universal law, proved by the sum-of-squares certificate (a square is at
@@ -118,18 +118,18 @@ task every-square-is-non-negative
   hold <every square is at least zero>
     call is-minimum
       call multiply
-        loan n
-        loan n
-      mark 0
+        read n
+        read n
+      code 0
   send back
-    loan n
+    read n
 
 # The order is one-way (strict and antisymmetric): 2 is below 5, and conversely 5 is at least 2, so 5 is not below 2.
 hold <two is below five>
   call is-below
-    mark 2
-    mark 5
+    code 2
+    code 5
 hold <five is at least two>
   call is-minimum
-    mark 5
-    mark 2
+    code 5
+    code 2

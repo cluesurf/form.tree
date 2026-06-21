@@ -1,0 +1,52 @@
+# Regular tessellations and the curvature test, machine-checked by `seed test`. A regular tiling {p, q} (q regular
+# p-gons meeting at each vertex) is spherical, flat, or hyperbolic exactly as p*q is below, equal to, or above
+# 2*(p + q). This single arithmetic criterion sorts every regular tiling by its geometry, and the hyperbolic ones are
+# the overwhelming majority, an infinite family against the five spherical Platonic and three flat cases.
+
+# {5, 4} (four pentagons at a vertex) is hyperbolic: 5*4 = 20 is above 2*(5 + 4) = 18.
+hold <the five four tiling is hyperbolic>
+  call is-above
+    call multiply
+      code 5
+      code 4
+    call multiply
+      code 2
+      call add
+        code 5
+        code 4
+
+# {4, 4} (the square grid, four squares at a vertex) is exactly flat: 4*4 = 16 equals 2*(4 + 4) = 16.
+hold <the four four tiling is flat>
+  call is-equal
+    call multiply
+      code 4
+      code 4
+    call multiply
+      code 2
+      call add
+        code 4
+        code 4
+
+# {5, 3} (the dodecahedron, three pentagons at a vertex) is spherical: 5*3 = 15 is below 2*(5 + 3) = 16.
+hold <the five three tiling is spherical>
+  call is-below
+    call multiply
+      code 5
+      code 3
+    call multiply
+      code 2
+      call add
+        code 5
+        code 3
+
+# {3, 3} (the tetrahedron) is spherical: 3*3 = 9 is below 2*(3 + 3) = 12. The most basic Platonic solid.
+hold <the three three tiling is spherical>
+  call is-below
+    call multiply
+      code 3
+      code 3
+    call multiply
+      code 2
+      call add
+        code 3
+        code 3

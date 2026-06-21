@@ -1,0 +1,9 @@
+load @/code/structure/ring
+  find ring
+
+# A graded algebra: an algebra split into degree pieces whose products add degrees, so a degree-two times a degree-three
+# lands in degree five. The grading is what makes "even part" and "odd part" meaningful, and the even part of a Clifford
+# algebra is the spinor-bearing subalgebra. Polynomials are graded by degree, the exterior algebra by oriented extent.
+# The form carries the underlying ring; the degree decomposition is the added structure.
+form graded-algebra
+  link ring, like ring

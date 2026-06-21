@@ -1,25 +1,11 @@
+load @/code/structure/set
+  find set
 
-class category
-  strap o, class object, set truth
-  strap m, class morphism, set truth
-
-class group object
-  strap c, class category (with finite products (i.e. C has a terminal object 1 and any two objects of C have a product).)
-  strap g, piece c
-
-class initial object
-  an initial object of a category C is an object I in C such that for every object X in C, there exists precisely one morphism I → X.
-
-class terminal object
-  T is terminal if for every object X in C there exists a single morphism X → T.
-  strap c, class category
-  strap t, class object
-
-  march x, think c, o
-    state there
-      strap m, class morphism
-        strap start, x
-        strap cease, t
-
-class zero object
-  If an object is both initial and terminal, it is called a zero object or null object. A pointed category is one with a zero object.
+# A category: objects and the morphisms (arrows) between them, with morphisms that compose associatively and an
+# identity arrow on every object. A category is the mathematics of structure-and-structure-preserving-map in the
+# abstract, the same shape whether the objects are sets, groups, spaces, or types. Functors map between categories and
+# natural transformations map between functors. The form carries the collection of objects and the collection of
+# morphisms; the composition and identity laws are the axioms.
+form category
+  link objects, like set
+  link morphisms, like set

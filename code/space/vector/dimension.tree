@@ -1,0 +1,10 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# The dimension of a vector space: the number of vectors in any basis, the count of independent directions, the single
+# number that says how big the space is. Dimension is forced to eight in the theory: the reversibility ceiling caps it
+# at eight (no normed division algebra past the octonions) and the one-substance floor lifts it to eight (the vector
+# and the half-spinor have equal size only there), so the two jaws meet and the dimension is exactly eight. The form
+# carries the vector space whose dimension this is.
+form dimension
+  link space, like vector-space

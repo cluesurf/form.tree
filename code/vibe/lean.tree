@@ -9,5 +9,5 @@ form lean
 # one-way order the integers carry, so its witnesses agree with the integer order: the low end is below the high.
 hold <the low tone is below the high tone>
   call is-below
-    mark 0
-    mark 2
+    code 0
+    code 2

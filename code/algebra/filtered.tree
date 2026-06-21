@@ -1,0 +1,9 @@
+load @/code/structure/ring
+  find ring
+
+# A filtered algebra: an algebra with an increasing chain of subspaces whose products respect the chain (degree at most
+# m times degree at most n lands in degree at most m plus n), a looser cousin of a graded algebra where degrees only
+# bound rather than add exactly. The universal enveloping algebra of a Lie algebra is filtered, and its associated
+# graded algebra is the symmetric algebra. The form carries the underlying ring.
+form filtered-algebra
+  link ring, like ring

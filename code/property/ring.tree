@@ -1,0 +1,3 @@
+# The ring properties two operations may satisfy: the addition is an abelian group, the multiplication is associative,
+# and multiplication distributes over addition, with optional commutativity and a multiplicative identity. The integers
+# satisfy them all, and the machine-checked ring identities are in the number and polynomial files.

@@ -1,0 +1,9 @@
+load @/code/structure/manifold
+  find manifold
+
+# A Lorentzian manifold: a manifold whose metric has one timelike and the rest spacelike directions, the geometry of
+# spacetime in general relativity, where the interval can be positive, negative, or zero and light travels on the zero
+# cones. It is the curved generalization of flat Minkowski spacetime. The form carries the underlying manifold; the
+# one-timelike metric signature is the added structure.
+form lorentzian-manifold
+  link manifold, like manifold

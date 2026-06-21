@@ -26,62 +26,62 @@ task complex-norm-is-multiplicative
       call multiply
         call add
           call multiply
-            loan a
-            loan a
+            read a
+            read a
           call multiply
-            loan b
-            loan b
+            read b
+            read b
         call add
           call multiply
-            loan c
-            loan c
+            read c
+            read c
           call multiply
-            loan d
-            loan d
+            read d
+            read d
       call add
         call multiply
           call subtract
             call multiply
-              loan a
-              loan c
+              read a
+              read c
             call multiply
-              loan b
-              loan d
+              read b
+              read d
           call subtract
             call multiply
-              loan a
-              loan c
+              read a
+              read c
             call multiply
-              loan b
-              loan d
+              read b
+              read d
         call multiply
           call add
             call multiply
-              loan a
-              loan d
+              read a
+              read d
             call multiply
-              loan b
-              loan c
+              read b
+              read c
           call add
             call multiply
-              loan a
-              loan d
+              read a
+              read d
             call multiply
-              loan b
-              loan c
+              read b
+              read c
   send back
-    loan a
+    read a
 
 # The Gaussian norm of 3 + 4i is the Pythagorean five: 3*3 + 4*4 = 25 = 5*5.
 hold <the norm of three plus four i is five>
   call is-equal
     call add
       call multiply
-        mark 3
-        mark 3
+        code 3
+        code 3
       call multiply
-        mark 4
-        mark 4
+        code 4
+        code 4
     call multiply
-      mark 5
-      mark 5
+      code 5
+      code 5

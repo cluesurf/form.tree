@@ -1,0 +1,9 @@
+load @/code/type/term
+  find term
+
+# A proposition: a statement that is true or false, and in the type-theoretic foundation, a type whose inhabitants are
+# its proofs. To prove a proposition is to construct a term of its type, so propositions and types are one. A
+# proposition with at most one proof (all proofs equal) is the type-theoretic notion of a truth value. The form carries
+# the term language the proposition is a type in.
+form proposition
+  link statement, like term

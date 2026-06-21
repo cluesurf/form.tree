@@ -1,0 +1,19 @@
+load @/code/type/term
+  find term
+
+load @/code/type/multiplicity
+  find multiplicity
+
+# The dependent pair type, the sigma type, the one way the theory forms a type whose second part depends on its first.
+# A sigma type gathers a first type, a multiplicity, and a second type that may mention the first component. An
+# ordinary pair, a product, is the special case where the second part ignores the first. A sigma also serves as an
+# existential: a value of it is a witness paired with evidence about that witness.
+#
+# The rules. Introduction: a pair inhabits a sigma type when its first part inhabits the first type and its second part
+# inhabits the second type at that first part. First projection: the first component inhabits the first type. Second
+# projection: the second component inhabits the second type at the first projection. Eta: a pair rebuilt from its own
+# first and second projections is the original pair (surjective pairing).
+form pair-type
+  link first, like term
+  link usage, like multiplicity
+  link second, like term

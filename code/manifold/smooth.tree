@@ -1,0 +1,8 @@
+load @/code/structure/manifold
+  find manifold
+
+# A smooth manifold: a manifold whose charts overlap by infinitely differentiable maps, so calculus works everywhere on
+# it, the setting for vector fields, flows, and differential equations. It is the default kind of manifold for physics.
+# The form carries the underlying manifold; smooth chart compatibility is the added condition.
+form smooth-manifold
+  link manifold, like manifold

@@ -1,0 +1,5 @@
+# The Church-Turing thesis: the claim that every effectively computable function is computable by a Turing machine, so
+# the Turing machine, the lambda calculus, recursive functions, and every other reasonable model all capture the same
+# class of computable functions. It is not a theorem (it relates the informal notion of "effectively computable" to a
+# formal one) but it is overwhelmingly supported, since every model ever proposed has turned out equivalent. The
+# substrate's collide-then-stream rule is another such model, universal and therefore Turing-equivalent.

@@ -1,0 +1,8 @@
+load @/code/logic/temporal
+  find temporal-logic
+
+# Linear temporal logic: temporal logic over a single linear run of time, with operators for next, eventually, always,
+# and until, the standard language for specifying how a program should behave over time (this request is eventually
+# answered, that error never happens). The form carries the underlying temporal logic.
+form linear-temporal-logic
+  link logic, like temporal-logic

@@ -1,17 +1,9 @@
+load @/code/group/homomorphism
+  find group-homomorphism
 
-field kernel
-  start h, check homomorphism
-  front set, field set
-
-  build set, store set
-
-  drive g, share h/a
-    shift share h
-      mount a, share g
-      store x
-    check equality
-      mount a, share x
-      mount b, share eH
-    shift store-set
-      mount set, share set
-      mount element, share g
+# The kernel of a group homomorphism: the set of elements the homomorphism sends to the identity. It is always a normal
+# subgroup of the source, and the source quotiented by the kernel is isomorphic to the image (the first isomorphism
+# theorem). The kernel measures how far the homomorphism is from being injective: it is injective exactly when the
+# kernel is trivial. The form carries the homomorphism whose kernel this is.
+form homomorphism-kernel
+  link map, like group-homomorphism

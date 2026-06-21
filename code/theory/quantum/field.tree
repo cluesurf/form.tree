@@ -1,0 +1,9 @@
+load @/code/theory/quantum
+  find quantum-theory
+
+# Quantum field theory: quantum mechanics married to special relativity, where particles are excitations of fields
+# filling spacetime, and creation and annihilation are the basic events. It is the framework of the Standard Model. In
+# the substrate the fields are emergent middle layers above the raw tones, never the base tones themselves. The form
+# carries the underlying quantum theory.
+form quantum-field-theory
+  link quantum, like quantum-theory

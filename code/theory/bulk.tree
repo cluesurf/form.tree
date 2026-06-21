@@ -1,2 +1,6 @@
-
-Probability and Statistics
+# Probability and statistics, the mathematics of the bulk: when a system has too many parts to track one by one, its
+# average behavior is described by a probability distribution, and statistics infers that distribution from samples. In
+# the substrate this is the bridge from the grainy base to the smooth surface: a real number is never a base thing but
+# the average over a crowd of ternary tones, the way temperature is the average jostle of countless molecules. The bulk
+# is where the discrete many becomes the continuous one. The laws (the law of large numbers, the central limit theorem)
+# are how the average of many grains becomes a definite, smooth quantity.

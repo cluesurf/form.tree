@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A vector: an element of a vector space, an arrow with magnitude and direction that adds to other vectors and scales by
+# the field. Vectors are the things that live in space, and the deepest demand of the theory is that they are the same
+# substance as the directions of space itself, a coincidence that holds only in dimension eight. The form carries the
+# vector space the vector belongs to.
+form vector
+  link space, like vector-space

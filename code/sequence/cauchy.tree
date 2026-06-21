@@ -1,0 +1,9 @@
+load @/code/space/metric
+  find metric-space
+
+# A Cauchy sequence: a sequence whose terms eventually crowd arbitrarily close together, the precise notion of a
+# sequence that ought to converge. A space is complete when every Cauchy sequence actually reaches a limit inside it;
+# the reals are the completion of the rationals, filling the gaps the rationals leave. The form carries the metric space
+# the sequence lives in.
+form cauchy-sequence
+  link space, like metric-space

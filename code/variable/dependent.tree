@@ -1,0 +1,8 @@
+load @/code/type/term
+  find term
+
+# A dependent variable: a variable whose value is determined by others, the output side of a function, the y that
+# follows from x. In dependent type theory a type may itself depend on a variable, which is the source of the theory's
+# power. The form carries the term the dependence is expressed in.
+form dependent-variable
+  link term, like term

@@ -1,0 +1,11 @@
+load @/code/algebra/normed-division
+  find normed-division-algebra
+
+# The real numbers, the base of the number tower, dimension one. They are the unique complete ordered field: ordered, so
+# every real sits definitely left or right of every other, and complete, so there are no gaps and every bounded set has
+# a least upper bound. As a normed division algebra they are the first rung, the ground the Cayley-Dickson doubling
+# starts from, and the only rung that keeps the order (the very next rung, the complex numbers, carries a square root of
+# minus one whose square is below zero, and no order can place it). In the substrate a real number is never a base
+# thing but the mood of many ternary grains, the average over a crowd of discrete tones.
+form real
+  link algebra, like normed-division-algebra

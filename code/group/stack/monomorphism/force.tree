@@ -1,21 +1,8 @@
+load @/code/group/monomorphism
+  find group-monomorphism
 
-class force monomorphism
-  start g, field group
-  start h, field group
-
-  check monomorphism
-    mount g, share g
-    mount h, share h
-
-  force build
-    start a
-    start b
-
-    check element-monomorphism
-      mount g, share g
-      mount h, share h
-      mount p, share a
-      mount q, share b
-
-  raise build
-    share force build
+# A canonical group embedding: a distinguished injective homomorphism that includes one group into another as a
+# subgroup, such as the inclusion of the binary tetrahedral group into the unit quaternions. The form carries the
+# underlying monomorphism.
+form canonical-group-embedding
+  link map, like group-monomorphism

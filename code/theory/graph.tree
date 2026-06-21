@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# Graph theory: the study of networks, of vertices joined by edges, the mathematics of connection. Paths, cycles,
+# colorings, and connectivity are its subjects. The Dynkin diagram is a graph, the Fano plane wiring the octonions is a
+# graph, and the mesh of the substrate is a graph whose vertices are cells. The form carries the set of vertices; the
+# edges are the connections.
+form graph
+  link vertices, like set

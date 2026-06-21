@@ -1,0 +1,8 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A parabola: the conic of points equidistant from a focus and a directrix, the curve of a thrown stone and of y equal
+# to x squared. It is the borderline conic between the ellipse and the hyperbola, the shape that reflects parallel rays
+# to a single point. The form carries the plane it lives in.
+form parabola
+  link plane, like vector-space

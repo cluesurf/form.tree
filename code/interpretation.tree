@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# An interpretation: an assignment of meaning to a formal language, sending its symbols to elements, functions, and
+# relations of a structure, so that each sentence becomes true or false. A model is an interpretation that makes the
+# axioms true. Interpretation is the bridge from syntax to semantics. The form carries the set the language is
+# interpreted over (the domain of discourse).
+form interpretation
+  link domain, like set

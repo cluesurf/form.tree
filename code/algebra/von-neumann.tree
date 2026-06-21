@@ -1,0 +1,8 @@
+load @/code/algebra/c-star
+  find c-star-algebra
+
+# A von Neumann algebra: a C-star algebra of operators closed in the weak operator topology, the setting for quantum
+# statistical mechanics and the classification of factors. It is where infinite quantum systems and their symmetries are
+# studied. The form carries the underlying C-star algebra; the weak closure is the added condition.
+form von-neumann-algebra
+  link algebra, like c-star-algebra

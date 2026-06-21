@@ -1,0 +1,10 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A quadratic form: a homogeneous degree-two polynomial on a vector space, a sum of squares and cross terms, the machine
+# that assigns a number to each vector and from which a Clifford algebra is built (a vector squares to its quadratic
+# form value). Its signature (how many plus and minus squares) classifies it, and the positive-definite forms are the
+# inner products. The norm of each rung of the number tower is a quadratic form. The form carries the underlying vector
+# space; the degree-two homogeneity is the defining shape.
+form quadratic-form
+  link space, like vector-space

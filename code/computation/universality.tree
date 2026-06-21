@@ -1,0 +1,10 @@
+load @/code/machine/turing
+  find turing-machine
+
+# Universality: the existence of a single machine that, given the description of any machine and its input, simulates
+# it. A universal Turing machine runs any program, which is why one computer can run all software. Universality is
+# common, appearing in tiny cellular automata and simple rewrite systems, and the substrate is universal: its one
+# reversible rule can simulate any computation. The form carries the Turing machine being simulated; the universal
+# machine is the one that reads its description.
+form universal-machine
+  link machine, like turing-machine

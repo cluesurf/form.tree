@@ -1,0 +1,13 @@
+load @/code/type/term
+  find term
+
+# The automatic verification layer, refinement types backed by decision procedures. A refinement type is a base type
+# carved down by a predicate, the integers that are non-negative, the index that is below the array length, so the type
+# itself records a proof obligation. Where the obligation falls in a decidable fragment (linear arithmetic, the
+# commutative-ring identities, the quadratic sum-of-squares inequalities, modular bounds), it is discharged
+# automatically by the prover with no proof written by hand, the way Dafny, Liquid Haskell, and F-star do it. What the
+# automatic deciders cannot close is handed down to the kernel as an explicit proof obligation. This layer is why most
+# proofs in the library are free: the universal ring identities, the order laws, and the inequalities are all
+# discharged here. The form carries the refined term; the predicate and its automatic discharge are the mechanism.
+form refinement-type
+  link term, like term

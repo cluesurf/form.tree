@@ -1,0 +1,10 @@
+load @/code/structure/set
+  find set
+
+# A finite automaton: the simplest machine, a finite set of states reading an input symbol by symbol, jumping between
+# states by a transition rule, accepting if it ends in an accepting state. It has no memory beyond its current state,
+# and what it recognizes is exactly the regular languages, the bottom of the Chomsky hierarchy. The form carries the set
+# of states and the input alphabet; the transition rule and accepting states are the machine.
+form finite-automaton
+  link states, like set
+  link alphabet, like set

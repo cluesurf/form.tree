@@ -22,17 +22,17 @@ hold <the 24-cell Euler characteristic vanishes>
     call subtract
       call add
         call subtract
-          mark 24
-          mark 96
-        mark 96
-      mark 24
-    mark 0
+          code 24
+          code 96
+        code 96
+      code 24
+    code 0
 
 # Its twenty-four vertices are exactly the twenty-four roots of D4, and the twenty-four directions a tone may step,
 # pairing into the twelve lines the law acts on: 24 = 2 * 12.
 hold <the twenty-four directions pair into twelve lines>
   call is-equal
-    mark 24
+    code 24
     call multiply
-      mark 2
-      mark 12
+      code 2
+      code 12

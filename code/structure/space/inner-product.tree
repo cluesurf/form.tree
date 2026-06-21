@@ -1,23 +1,13 @@
-structure inner-product-space
-  head type
+load @/code/structure/space/vector
+  find vector-space
 
-  link vector-space, like vector-space, have type
-  link inner-product, like binary-function, have type
+load @/code/structure/function/binary
+  find binary-function
 
-  # Linearity in the first argument
-  assume linearity-first-argument
-    head type, have type
-    have vector-space
-    have inner-product
-
-  # Symmetry
-  assume symmetry
-    head type, have type
-    have vector-space
-    have inner-product
-
-  # Positive-definiteness
-  assume positive-definiteness
-    head type, have type
-    have vector-space
-    have inner-product
+# An inner-product space: a vector space with an inner product, a way to multiply two vectors into a scalar that is
+# linear in each argument, symmetric, and positive-definite (a vector's product with itself is zero only for the zero
+# vector). The inner product gives length and angle, and its square root is the norm. The form carries the vector space
+# and the inner product; the bilinearity, symmetry, and positivity are the axioms.
+form inner-product-space
+  link space, like vector-space
+  link inner-product, like binary-function

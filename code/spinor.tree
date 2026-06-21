@@ -16,28 +16,28 @@ hold <the half-spinor of so eight equals the vector by two different formulas>
   call is-equal
     call multiply
       call multiply
-        mark 2
-        mark 2
-      mark 2
+        code 2
+        code 2
+      code 2
     call multiply
-      mark 2
-      mark 4
+      code 2
+      code 4
 
 # Below dimension eight the half-spinor is smaller than the vector, above it larger; the crossing is exactly at eight.
 # At so(6) the half-spinor is 2*2 = 4, below the vector 6; at so(10) it is 2*2*2*2 = 16, above the vector 10.
 hold <below eight the half-spinor is smaller than the vector>
   call is-below
     call multiply
-      mark 2
-      mark 2
-    mark 6
+      code 2
+      code 2
+    code 6
 hold <above eight the half-spinor is larger than the vector>
   call is-above
     call multiply
       call multiply
         call multiply
-          mark 2
-          mark 2
-        mark 2
-      mark 2
-    mark 10
+          code 2
+          code 2
+        code 2
+      code 2
+    code 10

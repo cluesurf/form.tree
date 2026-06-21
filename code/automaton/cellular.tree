@@ -1,2 +1,11 @@
+load @/code/structure/set
+  find set
 
-field cellular-automaton
+# A cellular automaton: a grid of cells, each holding a state from a finite set, all updating together each tick by one
+# local rule that reads only a cell and its neighbors. From a trivially simple rule, global complexity emerges, which is
+# why it is the cleanest model of a physics from a substrate. The vibe substrate is a cellular automaton on the {3,4,3,4}
+# hyperbolic mesh: each cell holds a ternary tone, and the two-step rule (collide, then stream) updates the whole mesh
+# each beat, reversibly. The form carries the set of states; the neighborhood and the local rule are the automaton's
+# program, and its dynamics are studied in the substrate experiments.
+form cellular-automaton
+  link states, like set

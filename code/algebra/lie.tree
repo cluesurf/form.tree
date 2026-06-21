@@ -1,0 +1,20 @@
+load @/code/structure/field
+  find field
+
+load @/code/structure/set
+  find set
+
+load @/code/structure/function/binary
+  find binary-function
+
+# A Lie algebra: a vector space with a bracket that is antisymmetric (the bracket of a thing with itself is zero) and
+# obeys the Jacobi identity (the bracket cyclically distributes over itself). The bracket is the infinitesimal commutator,
+# what is left of a group's multiplication near its identity, so a Lie algebra is the linear shadow of a continuous
+# symmetry. The rotations of the eight-dimensional arena form the simple Lie algebra of type D4, of rank four, and its
+# roots are the twenty-four vertices of the 24-cell. The rank four is read as the four dimensions of spacetime, and the
+# threefold symmetry of its diagram is triality. So the Lie algebra is where the geometry of the substrate turns into the
+# symmetry the physics runs on.
+form lie-algebra
+  link field, like field
+  link set, like set
+  link bracket, like binary-function

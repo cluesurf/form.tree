@@ -1,0 +1,318 @@
+# The elementary polynomial identities, each a universal law over the integers, proved by the commutative-ring
+# normalizer and checked by `seed test`. Every identity below holds for ALL values of its variables (the parameters
+# are universally quantified): the prover normalizes both sides to the same canonical polynomial, which is identically
+# equal over any commutative ring. These are the algebraic backbone the number tower and the norm identities rest on.
+
+# The square of a sum: (a + b)^2 = a^2 + 2 a b + b^2.
+task square-of-a-sum
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <the square of a sum expands>
+    call is-equal
+      call multiply
+        call add
+          read a
+          read b
+        call add
+          read a
+          read b
+      call add
+        call add
+          call multiply
+            read a
+            read a
+          call multiply
+            code 2
+            call multiply
+              read a
+              read b
+        call multiply
+          read b
+          read b
+  send back
+    read a
+
+# The square of a difference: (a - b)^2 = a^2 - 2 a b + b^2.
+task square-of-a-difference
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <the square of a difference expands>
+    call is-equal
+      call multiply
+        call subtract
+          read a
+          read b
+        call subtract
+          read a
+          read b
+      call add
+        call subtract
+          call multiply
+            read a
+            read a
+          call multiply
+            code 2
+            call multiply
+              read a
+              read b
+        call multiply
+          read b
+          read b
+  send back
+    read a
+
+# The difference of squares: (a - b)(a + b) = a^2 - b^2.
+task difference-of-squares
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <a difference of squares factors>
+    call is-equal
+      call multiply
+        call subtract
+          read a
+          read b
+        call add
+          read a
+          read b
+      call subtract
+        call multiply
+          read a
+          read a
+        call multiply
+          read b
+          read b
+  send back
+    read a
+
+# The cube of a sum: (a + b)^3 = a^3 + 3 a^2 b + 3 a b^2 + b^3.
+task cube-of-a-sum
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <the cube of a sum expands>
+    call is-equal
+      call multiply
+        call multiply
+          call add
+            read a
+            read b
+          call add
+            read a
+            read b
+        call add
+          read a
+          read b
+      call add
+        call add
+          call add
+            call multiply
+              call multiply
+                read a
+                read a
+              read a
+            call multiply
+              code 3
+              call multiply
+                call multiply
+                  read a
+                  read a
+                read b
+          call multiply
+            code 3
+            call multiply
+              read a
+              call multiply
+                read b
+                read b
+        call multiply
+          call multiply
+            read b
+            read b
+          read b
+  send back
+    read a
+
+# The sum of two cubes: a^3 + b^3 = (a + b)(a^2 - a b + b^2).
+task sum-of-two-cubes
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <a sum of cubes factors>
+    call is-equal
+      call add
+        call multiply
+          call multiply
+            read a
+            read a
+          read a
+        call multiply
+          call multiply
+            read b
+            read b
+          read b
+      call multiply
+        call add
+          read a
+          read b
+        call add
+          call subtract
+            call multiply
+              read a
+              read a
+            call multiply
+              read a
+              read b
+          call multiply
+            read b
+            read b
+  send back
+    read a
+
+# The difference of two cubes: a^3 - b^3 = (a - b)(a^2 + a b + b^2).
+task difference-of-two-cubes
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <a difference of cubes factors>
+    call is-equal
+      call subtract
+        call multiply
+          call multiply
+            read a
+            read a
+          read a
+        call multiply
+          call multiply
+            read b
+            read b
+          read b
+      call multiply
+        call subtract
+          read a
+          read b
+        call add
+          call add
+            call multiply
+              read a
+              read a
+            call multiply
+              read a
+              read b
+          call multiply
+            read b
+            read b
+  send back
+    read a
+
+# The Sophie Germain identity: a^4 + 4 b^4 = (a^2 + 2 a b + 2 b^2)(a^2 - 2 a b + 2 b^2). The factorization of a sum of a
+# fourth power and four times a fourth power, the classic example that a^4 + 4 is composite for every a above one.
+task sophie-germain-identity
+  take a, like integer
+  take b, like integer
+  like integer
+  hold <the sophie germain identity factors a fourth-power sum>
+    call is-equal
+      call add
+        call multiply
+          call multiply
+            call multiply
+              read a
+              read a
+            read a
+          read a
+        call multiply
+          code 4
+          call multiply
+            call multiply
+              call multiply
+                read b
+                read b
+              read b
+            read b
+      call multiply
+        call add
+          call add
+            call multiply
+              read a
+              read a
+            call multiply
+              code 2
+              call multiply
+                read a
+                read b
+          call multiply
+            code 2
+            call multiply
+              read b
+              read b
+        call add
+          call subtract
+            call multiply
+              read a
+              read a
+            call multiply
+              code 2
+              call multiply
+                read a
+                read b
+          call multiply
+            code 2
+            call multiply
+              read b
+              read b
+  send back
+    read a
+
+# The square of a three-term sum: (a + b + c)^2 = a^2 + b^2 + c^2 + 2 a b + 2 b c + 2 c a.
+task square-of-a-three-term-sum
+  take a, like integer
+  take b, like integer
+  take c, like integer
+  like integer
+  hold <the square of a three-term sum expands>
+    call is-equal
+      call multiply
+        call add
+          call add
+            read a
+            read b
+          read c
+        call add
+          call add
+            read a
+            read b
+          read c
+      call add
+        call add
+          call add
+            call add
+              call add
+                call multiply
+                  read a
+                  read a
+                call multiply
+                  read b
+                  read b
+              call multiply
+                read c
+                read c
+            call multiply
+              code 2
+              call multiply
+                read a
+                read b
+          call multiply
+            code 2
+            call multiply
+              read b
+              read c
+        call multiply
+          code 2
+          call multiply
+            read c
+            read a
+  send back
+    read a

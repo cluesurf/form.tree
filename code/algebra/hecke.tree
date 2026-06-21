@@ -1,0 +1,9 @@
+load @/code/structure/ring
+  find ring
+
+# A Hecke algebra: a deformation of the group algebra of a Coxeter group, where the generators satisfy a quadratic
+# relation interpolating between a reflection and the identity by a parameter. Hecke algebras govern the representation
+# theory of groups of Lie type and underlie the Jones polynomial of knots. Since the Weyl group of F4 is the symmetry of
+# the 24-cell, its Hecke algebra is tied to the substrate's symmetry. The form carries the underlying ring.
+form hecke-algebra
+  link ring, like ring

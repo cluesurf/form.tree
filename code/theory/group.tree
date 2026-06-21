@@ -1,0 +1,4 @@
+# Group theory: the study of symmetry, of the groups of transformations that leave something unchanged. Finite groups,
+# Lie groups, and their representations are its reach. The genome's symmetry groups (the binary tetrahedral group of the
+# 24-cell, the Weyl group of F4, the infinite Coxeter group of the mesh) are group theory, with their orders machine-
+# checked in the group files.

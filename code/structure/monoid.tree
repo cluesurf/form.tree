@@ -1,20 +1,14 @@
+load @/code/structure/set
+  find set
 
-structure monoid
-  head type
+load @/code/structure/function/binary
+  find binary-function
 
-  link set, like set, have type
-  link operation, like binary-operation, have type
-  link identity, like type
-
-  # Associativity of the operation
-  assert set-associativity
-    head type, have type
-    have set
-    have operation
-
-  # Existence of the identity element
-  assert set-identity-element
-    head type, have type
-    have set
-    have operation
-    have identity
+# A monoid: a set with one associative binary operation and a two-sided identity element. It is a group without the
+# demand that every element be invertible, the half-step between a bare set with an operation and a full group. The
+# natural numbers under addition are a monoid, and so are the strings under concatenation. The axioms (associativity of
+# the operation, and an identity the operation leaves every element unchanged against) are the laws an instance must
+# satisfy; the form carries the carrier set and the operation.
+form monoid
+  link set, like set
+  link operation, like binary-function

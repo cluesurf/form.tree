@@ -1,0 +1,8 @@
+load @/code/structure/ring
+  find ring
+
+# An Azumaya algebra: a ring that is, locally over its center, a full matrix algebra, the algebraic generalization of a
+# central simple algebra to families. It is the natural home of the Brauer group, which classifies division algebras
+# over a field, and the quaternions are the simplest nontrivial example. The form carries the underlying ring.
+form azumaya-algebra
+  link ring, like ring

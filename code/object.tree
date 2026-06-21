@@ -1,18 +1,6 @@
-
-theme idempotence
-  start object
-  start operation, field binary-operation
-
-  match start
-    theme binary-operation-argument-type
-      mount operation, share operation
-      mount type, object/field
-
-  match front
-    cause share operation
-      mount a, share object
-      mount b, share object
-      store x
-    theme equality
-      mount a, share x
-      mount b, share object
+# An object: in category theory, one of the two primitive things, a node that morphisms run between. An object has no
+# internal structure of its own; all that can be said about it is said through the morphisms into and out of it. Sets,
+# groups, spaces, and types are each the objects of a category. The form carries an opaque identity; what an object is
+# is determined entirely by its morphisms, developed in the category files.
+form object
+  link identity, note private

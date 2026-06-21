@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# Modal logic: logic with operators for necessity and possibility, true not just here but across a space of possible
+# worlds linked by an accessibility relation. Its semantics are Kripke structures, and its variants capture time,
+# knowledge, provability, and obligation. The form carries the signature; the necessity and possibility operators and
+# the worlds they range over are the logic.
+form modal-logic
+  link symbols, like set

@@ -1,0 +1,8 @@
+load @/code/structure/function/binary
+  find binary-function
+
+# A radial basis function kernel: a similarity measure between two points that falls off with their distance, peaking
+# when they coincide, the standard kernel of machine learning that lets a linear method act nonlinearly by implicitly
+# mapping into a high-dimensional space. The form carries the underlying similarity function.
+form radial-basis-kernel
+  link similarity, like binary-function

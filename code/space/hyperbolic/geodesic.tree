@@ -1,0 +1,10 @@
+load @/code/structure/manifold
+  find manifold
+
+# A geodesic: the straightest possible path in a curved space, the shortest route between two points, the hyperbolic
+# version of a straight line. In the Poincare disk geodesics are arcs of circles meeting the boundary at right angles;
+# in the upper half-space they are vertical lines and semicircles centered on the boundary. Two geodesics that do not
+# meet still drift apart exponentially, the signature of negative curvature. The form carries the manifold the geodesic
+# runs in.
+form geodesic
+  link manifold, like manifold

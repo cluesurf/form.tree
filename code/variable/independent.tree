@@ -1,0 +1,7 @@
+load @/code/type/term
+  find term
+
+# An independent variable: a variable that may be set freely, the input side of a function, the x that determines y. The
+# form carries the term the variable occurs in.
+form independent-variable
+  link term, like term

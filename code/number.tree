@@ -1,0 +1,11 @@
+load @/code/number/real
+  find real
+
+# Number, the concept: the measure of quantity, built up in a tower of widening systems, the naturals (counting), the
+# integers (signed counting, the unique ordered rung, the arrow of time), the rationals (fractions), the reals
+# (the continuum), and then the Cayley-Dickson tower of the complex numbers, quaternions, and octonions, each doubling
+# the last and shedding one law. The octonions are the final reversible rung. Every system is in the number folder, with
+# the arithmetic laws and norm identities machine-checked. This concept file marks number as the first object the theory
+# rests on.
+form number
+  link reals, like real

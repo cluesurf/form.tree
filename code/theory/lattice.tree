@@ -1,17 +1,14 @@
+load @/code/structure/set
+  find set
 
-field lattice
+load @/code/structure/function/binary
+  find binary-function
 
-claim upper-bound
-  strap group
-  strap joint
-  strap chunk, chunk strap group
-  strap piece, piece strap group
-
-  march s, strap chunk
-    check
-      strap joint, strap joint
-      strap chief, strap s
-      strap child, strap piece
-
-  sense piece, upper bound
-    on group
+# A lattice: a partially ordered set in which every pair of elements has a least upper bound (a join) and a greatest
+# lower bound (a meet). Lattices are the algebra of order, the structure of subsets under union and intersection, of
+# logical propositions under or and and, and of subspaces under sum and intersection. The form carries the set and the
+# join and meet operations; the absorption and associativity laws of the two operations are the axioms.
+form lattice
+  link set, like set
+  link join, like binary-function
+  link meet, like binary-function

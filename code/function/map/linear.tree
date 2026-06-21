@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A linear map: a function between vector spaces that respects addition and scaling, sending sums to sums and scalings to
+# scalings, the structure-preserving map of linear algebra, represented by a matrix once bases are chosen. The rotations
+# of the eight-dimensional arena are linear maps. The form carries the source and target vector spaces.
+form linear-map
+  link source, like vector-space
+  link target, like vector-space

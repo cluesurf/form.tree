@@ -1,0 +1,8 @@
+load @/code/space/vector/normed
+  find normed-vector-space
+
+# A Banach algebra: a complete normed algebra, a vector space that is at once an algebra and a Banach space (a complete
+# normed space), with the norm submultiplicative. It is the setting for functional analysis and the spectral theory of
+# operators. The form carries the underlying normed space; completeness and the submultiplicative norm are the laws.
+form banach-algebra
+  link space, like normed-vector-space

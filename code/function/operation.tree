@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# An operation: a function that combines elements of a set into another element of the same set, the verb of an
+# algebraic structure, unary (one argument, like negation) or binary (two, like addition). The arity and the laws it
+# obeys are what distinguish one structure from another. The form carries the set the operation acts on.
+form operation
+  link set, like set

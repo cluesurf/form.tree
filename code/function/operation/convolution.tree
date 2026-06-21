@@ -1,0 +1,9 @@
+load @/code/structure/function/binary
+  find binary-function
+
+# Convolution: the operation that blends two functions by sliding one across the other and accumulating the overlap, the
+# multiplication of signals, of probability distributions, and of polynomials. It turns into ordinary multiplication
+# under the Fourier transform, and it is how a local rule on a grid spreads its effect. The form carries the underlying
+# binary operation.
+form convolution
+  link operation, like binary-function

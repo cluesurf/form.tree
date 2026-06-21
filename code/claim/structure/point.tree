@@ -1,2 +1,3 @@
-
-claim isolated
+# Claims about a point: that it lies in a set, on a curve, or in a region, that it is fixed by a map (a fixed point), or
+# that it is a limit of a sequence. The point is the atom of geometry, and the substrate's directions are points of the
+# 24-cell; this note records the claims a point-level proof discharges.

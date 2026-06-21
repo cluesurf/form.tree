@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# A quiver: a directed graph, used as the blueprint for representations, where each node carries a vector space and each
+# arrow a linear map. The representation theory of quivers classifies how such diagrams of spaces and maps decompose,
+# and it connects to root systems and Lie theory. The form carries the set of nodes.
+form quiver
+  link nodes, like set

@@ -1,0 +1,9 @@
+load @/code/structure/ring
+  find ring
+
+# The Connes-Kreimer algebra: the Hopf algebra of rooted trees that organizes the renormalization of quantum field
+# theory, turning the recursive subtraction of infinities into an algebraic operation (the antipode). It revealed that
+# renormalization, long seen as a physicist's trick, is a clean piece of Hopf-algebra mathematics. The form carries the
+# underlying ring of rooted-tree combinations.
+form connes-kreimer-algebra
+  link ring, like ring

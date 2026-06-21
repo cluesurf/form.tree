@@ -1,16 +1,11 @@
-
-load ~/code/structure/group
+load @/code/group
   find group
 
-load ~/code/property/group
-  find group-commutativity
-
-structure abelian-group
-  head type
-
-  link group, like group, have type
-
-  # Commutativity of the group operation
-  assume group-commutativity
-    head type, have type
-    have group
+# An abelian group: a group whose operation commutes, so a times b equals b times a for every pair. The order of
+# composition stops mattering. The integers under addition are the first abelian group, and every vector space is an
+# abelian group under its addition. Commutativity is the law the quaternions lose at the fourth rung of the tower and
+# the complex numbers still keep, so the additive structure stays abelian all the way up while the multiplicative
+# structure need not. The form carries the underlying group; the commutativity law is the extra axiom an instance
+# satisfies.
+form abelian-group
+  link group, like group

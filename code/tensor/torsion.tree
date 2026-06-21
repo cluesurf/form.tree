@@ -1,0 +1,8 @@
+load @/code/tensor
+  find tensor
+
+# The torsion tensor: the part of a connection that measures the failure of infinitesimal parallelograms to close, the
+# twisting of a space independent of its bending. A connection with zero torsion is symmetric, and general relativity
+# uses the unique torsion-free metric connection. The form carries the underlying tensor.
+form torsion-tensor
+  link tensor, like tensor

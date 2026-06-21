@@ -1,0 +1,8 @@
+load @/code/type/term
+  find term
+
+# A free variable: a variable in an expression that is not bound by any enclosing binder, a hole that refers outward to
+# the context, whose value must be supplied from outside. The free variables of a term are what its meaning depends on.
+# The form carries the term the variable occurs in.
+form free-variable
+  link term, like term

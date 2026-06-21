@@ -1,2 +1,3 @@
-
-theme local
+# Claims about field properties: that addition and nonzero multiplication are each abelian groups, that multiplication
+# distributes over addition, and the localized claims (a local field, a graded field) that refine the structure. The
+# field form is in the structure folder; this note records the field-property claims a proof discharges.

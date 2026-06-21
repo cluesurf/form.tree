@@ -1,0 +1,4 @@
+# Number theory: the study of the integers, their primes, divisibility, congruences, and Diophantine equations. It is
+# where the simplest objects hide the deepest questions. The machine-checked results in this library (the arithmetic
+# laws, the summation identities by induction, the Pythagorean parametrization, the modular bounds) are number theory;
+# this note marks the area, with the proofs in the number files.

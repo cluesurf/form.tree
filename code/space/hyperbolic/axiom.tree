@@ -1,0 +1,13 @@
+load @/code/space/hyperbolic/plane
+  find hyperbolic-plane
+
+# The axioms of hyperbolic geometry. Hyperbolic geometry keeps every axiom of Euclid except the parallel postulate, the
+# shared core called absolute (or neutral) geometry: the incidence axioms (two points determine a line), the order
+# axioms (betweenness on a line), the congruence axioms (segments and angles can be copied), and the continuity axioms
+# (Dedekind completeness, the Archimedean property). To these it adds the HYPERBOLIC PARALLEL AXIOM in place of
+# Euclid's: through a point not on a given line there pass at least two distinct lines that never meet the given line.
+# From this one change everything follows: triangles have angle sum below two right angles, the deficit equal to the
+# area; similar triangles are congruent (no rescaling); the plane has constant negative curvature; and there are
+# infinitely many regular tilings instead of three. The form carries the hyperbolic plane the axioms govern.
+form hyperbolic-axioms
+  link plane, like hyperbolic-plane

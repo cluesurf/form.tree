@@ -21,24 +21,24 @@ form clifford-algebra
 # to the n: one basis element per subset of the n generators. For three-space, that is 2*2*2 = 8.
 hold <the clifford algebra of three space has dimension eight>
   call is-equal
-    mark 8
+    code 8
     call multiply
       call multiply
-        mark 2
-        mark 2
-      mark 2
+        code 2
+        code 2
+      code 2
 
 # It splits into an even subalgebra and an odd part, each of dimension two to the (n-1). For three-space, 8 = 4 + 4,
 # and the even half (dimension four) is the quaternions, which is why the unit quaternions form Spin(3).
 hold <the clifford algebra of three space splits into even and odd halves of four>
   call is-equal
-    mark 8
+    code 8
     call add
-      mark 4
-      mark 4
+      code 4
+      code 4
 hold <the even subalgebra of three space is four dimensional like the quaternions>
   call is-equal
-    mark 4
+    code 4
     call multiply
-      mark 2
-      mark 2
+      code 2
+      code 2

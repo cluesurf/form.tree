@@ -1,0 +1,17 @@
+load @/code/structure/monoid
+  find monoid
+
+load @/code/structure/function/binary
+  find binary-function
+
+# Associative computation: computing by an associative operation, where the grouping of the work does not change the
+# answer. Because a monoid's operation associates, a long fold can be reassociated into a balanced tree and evaluated in
+# parallel (the parallel-prefix or scan pattern), and partial results can be combined in any order. Associativity is
+# exactly what makes a computation parallelizable and order-independent. In the substrate this is why the dynamics are
+# clean: the twenty-four directions compose associatively (they are the binary tetrahedral group, the unit quaternions,
+# an associative rung of the tower), so reductions over the mesh are well-defined however they are grouped. The form
+# carries the monoid whose associative operation the computation folds; its associativity is proved over the integers in
+# the number files.
+form associative-computation
+  link monoid, like monoid
+  link combine, like binary-function

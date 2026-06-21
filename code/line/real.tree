@@ -1,0 +1,10 @@
+load @/code/structure/field
+  find field
+
+# The real line: the continuum, the complete ordered field, the geometric image of the reals as an unbroken line. It is
+# the first rung of the number tower, dimension one, ordered (every real has a definite place left or right of every
+# other), and complete (no gaps, every bounded set has a least upper bound). It is the only complete ordered field. In
+# the substrate the real line is never a base thing but the mood of many ternary grains, the average over a crowd of
+# discrete tones. The form carries the underlying field; the order and completeness are its defining laws.
+form real-line
+  link field, like field

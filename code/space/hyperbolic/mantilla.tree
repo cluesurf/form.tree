@@ -1,0 +1,10 @@
+load @/code/space/hyperbolic/heptagrid
+  find heptagrid
+
+# The mantilla, the recursive lace-like pattern that lives in the heptagrid {7, 3}, a background of nested regions of
+# interwoven triangles that a clever tile set can be forced to build. The mantilla encodes a hierarchy capable of
+# simulating any computation, and it is the structure at the heart of Margenstern's solution of the hyperbolic tiling
+# problem: whether a given finite set of tiles can tile the hyperbolic plane is UNDECIDABLE, a theorem independently
+# confirmed by Kari in 2007. The form carries the heptagrid the mantilla is built in.
+form mantilla
+  link grid, like heptagrid

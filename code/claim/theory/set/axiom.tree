@@ -1,4 +1,4 @@
-
-claim regularity
-claim pairing
-  {\displaystyle \forall A\,\forall B\,\exists C\,\forall D\,[D\in C\iff (D=A\lor D=B)]}
+# The set-theoretic axioms a claim may rest on: extensionality (sets are equal when their members are), pairing, union,
+# power set, infinity (an infinite set exists), separation and replacement (subsets and images are sets), foundation (no
+# infinite descending membership), and choice. These axioms are the bedrock the whole foundation stands on; this note
+# indexes them.

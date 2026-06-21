@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A Petri net: a model of concurrent processes, a bipartite graph of places (holding tokens) and transitions (firing
+# when their input places are filled, moving tokens), capturing parallelism, synchronization, and resource flow without
+# a global clock. It is the natural model for distributed and asynchronous computation. The form carries the set of
+# places; the transitions and the token marking are the dynamics.
+form petri-net
+  link places, like set

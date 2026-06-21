@@ -1,0 +1,10 @@
+load @/code/machine/turing
+  find turing-machine
+
+# Computational complexity: the study of how much resource (time, space) a computation needs as the input grows, the
+# refinement of computability that asks not just whether but how efficiently. The classes P (solvable in polynomial
+# time) and NP (verifiable in polynomial time) and the open question of whether they coincide are its center. Where
+# computability draws the line of the possible, complexity draws the line of the feasible. The form carries the Turing
+# machine whose resource use is measured.
+form complexity-class
+  link machine, like turing-machine

@@ -1,0 +1,10 @@
+load @/code/machine/turing
+  find turing-machine
+
+# Computability: the study of what can be computed at all, independent of speed. A function is computable if some Turing
+# machine produces its output for every input, and the computable functions are exactly the same whether defined by
+# Turing machines, the lambda calculus, or recursive functions, the robustness that is the Church-Turing thesis. Some
+# precise questions are NOT computable, the halting problem chief among them: no machine decides, for every program and
+# input, whether the program halts. The form carries the Turing machine the computability is measured against.
+form computability
+  link machine, like turing-machine

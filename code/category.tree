@@ -1,11 +1,4 @@
-
-theme category
-  start morphism, house morphism
-  start object, house object
-
-  bound domain, house morphism
-
-  drive m, share morphism
-  cause
-
-theme exponent
+# Category, the concept: objects and the morphisms between them, with associative composition and an identity on each
+# object. The canonical category form, together with functors and natural transformations, is in the theory folder. This
+# note marks category theory as the organizing language of the library, the abstract view in which sets, groups, spaces,
+# and types are all just objects with their structure-preserving maps.

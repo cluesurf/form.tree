@@ -1,0 +1,10 @@
+load @/code/structure/manifold
+  find manifold
+
+# The 120-cell grid, the regular honeycomb {5, 3, 3, 4}, hyperbolic four-space built from 120-cell polytopes. It is the
+# ceiling of the construction: hyperbolic regular honeycombs exist only up to dimension four (Euclidean's revenge, since
+# flat space tiles regularly in every dimension but curved space runs out after four). The splitting method still works
+# here, but the addressing language is no longer regular and neighbor-finding turns slow. The form carries the
+# underlying hyperbolic manifold.
+form cell-120-grid
+  link space, like manifold

@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A stack machine: a model of computation whose only memory is one or more stacks, evaluating by pushing operands and
+# applying operators to the top. It is the execution model of many virtual machines and of postfix notation. With one
+# stack it is a pushdown automaton; with two stacks it is as powerful as a Turing machine. The form carries the set of
+# stack symbols.
+form stack-machine
+  link symbols, like set

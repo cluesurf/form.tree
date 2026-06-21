@@ -1,0 +1,8 @@
+load @/code/structure/ring
+  find ring
+
+# A scheme: the central object of modern algebraic geometry, a space glued from the spectra of commutative rings, where
+# geometry and algebra become one, points are prime ideals and functions are ring elements. Schemes generalize varieties
+# to allow nilpotents and to work over any ring. The form carries the ring the scheme is built from.
+form scheme
+  link ring, like ring

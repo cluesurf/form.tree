@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A polygon: a closed figure of straight sides in the plane, the two-dimensional polytope. The regular polygons (equal
+# sides and angles) are the faces of regular tilings: the pentagon of the pentagrid, the heptagon of the heptagrid, the
+# triangles and squares of the 24-cell. In the hyperbolic plane a regular polygon can have any angle below the Euclidean
+# one, which is why a right-angled pentagon exists there and tiles. The form carries the plane it lives in.
+form polygon
+  link plane, like vector-space

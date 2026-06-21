@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# A relational algebra: the algebra of relations (tables) under union, intersection, complement, composition, and
+# converse, the mathematical foundation of query languages and of the calculus of binary relations. The form carries
+# the set the relations range over.
+form relational-algebra
+  link set, like set

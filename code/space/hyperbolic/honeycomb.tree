@@ -1,0 +1,52 @@
+# The {3, 4, 3, 4} honeycomb, the substrate's mesh, and the self-dual 24-cell that builds it, with the counting facts
+# machine-checked by `seed test`. The honeycomb tiles hyperbolic four-space with 24-cells, four around each face, and
+# the 24-cell, the unique self-dual regular 4-polytope {3, 4, 3}, is the cell. Its symmetry generates the whole tiling
+# by reflection, one cell seen in a hall of mirrors. The genuinely arithmetic facts (the alternating sum, the
+# factorizations, the handshake relation) are checked below; the equalities of counts that hold by self-duality are
+# stated in prose, since a bare numeral equation carries no content.
+
+# The 24-cell has 24 vertices, 96 edges, 96 faces, and 24 cells. It is self-dual: the dual swaps vertices with cells
+# (24 with 24) and edges with faces (96 with 96), returning the same shape.
+
+# The four-dimensional Euler characteristic of the 24-cell is zero: vertices minus edges plus faces minus cells,
+# 24 - 96 + 96 - 24, equals zero, as it must for a convex 4-polytope (whose boundary is a 3-sphere). A false count would
+# break this alternating sum.
+hold <the 24-cell has Euler characteristic zero>
+  call is-equal
+    call subtract
+      call add
+        call subtract
+          code 24
+          code 96
+        code 96
+      code 24
+    code 0
+
+# The 24 vertices factor as six coordinate-pairs times four sign-patterns: 6 * 4 = 24, the way the directions of the
+# 24-cell are spelled as length-four ternary words with exactly two nonzero letters.
+hold <the 24 directions factor as six pairs by four signs>
+  call is-equal
+    call multiply
+      code 6
+      code 4
+    code 24
+
+# The full symmetry group of the 24-cell, the Weyl group of F4, has order 1152, which is 48 times its 24 vertices. A
+# wrong vertex count or symmetry-per-vertex would break this product.
+hold <the F4 symmetry order is 48 times the vertex count>
+  call is-equal
+    call multiply
+      code 48
+      code 24
+    code 1152
+
+# The handshake relation: each of the 24 vertices meets 8 edges, and each edge has 2 ends, so 24 * 8 equals 96 * 2,
+# pinning the edge count at 96. A wrong edge count breaks the equality of the two products.
+hold <the handshake relation pins the edge count>
+  call is-equal
+    call multiply
+      code 24
+      code 8
+    call multiply
+      code 96
+      code 2

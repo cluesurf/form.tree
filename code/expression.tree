@@ -1,0 +1,8 @@
+load @/code/type/term
+  find term
+
+# An expression: a well-formed combination of symbols denoting a value, built from variables, constants, and operations,
+# the syntactic unit a grammar generates and a type is assigned to. In the kernel an expression is a term. The form
+# carries the term language the expression belongs to.
+form expression
+  link term, like term

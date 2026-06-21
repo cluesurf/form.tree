@@ -1,0 +1,9 @@
+load @/code/algebra/lie
+  find lie-algebra
+
+# A universal enveloping algebra: the associative algebra built from a Lie algebra so that the Lie bracket becomes the
+# commutator (a times b minus b times a). It is the universal home where a Lie algebra's representations become ordinary
+# module actions, the bridge from the infinitesimal symmetry to its linear realizations. The form carries the underlying
+# Lie algebra.
+form universal-enveloping-algebra
+  link algebra, like lie-algebra

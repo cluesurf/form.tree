@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A tensor: a multilinear object on a vector space, a machine that eats vectors and covectors and returns a scalar,
+# linearly in each slot. Scalars, vectors, and linear maps are low-rank tensors, and the metric and the curvature of a
+# manifold are tensors. They are the language in which the laws of physics are written coordinate-free. The form carries
+# the underlying vector space; the rank and the multilinearity are the tensor's shape.
+form tensor
+  link space, like vector-space

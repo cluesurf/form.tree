@@ -1,13 +1,3 @@
-
-claim empty-intersection-domination
-  start a, field set
-
-  build set, share e
-
-  cause intersect
-    mount a, share a
-    mount b, share e
-    store x
-  theme equality
-    mount a, share x
-    mount b, share e
+# A set claim: an assertion about a set or its members (membership, containment, equality, cardinality) to be
+# discharged. This note records the shape of a set-level claim; the set form is in the structure folder and the
+# set-theoretic axioms are in the theory folder.

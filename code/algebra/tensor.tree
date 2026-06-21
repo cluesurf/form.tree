@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A tensor algebra: the free associative algebra on a vector space, all formal products of vectors with no relations
+# beyond linearity. It is the universal home from which the exterior and Clifford algebras are carved by imposing
+# relations (a vector squared is zero, or a vector squared is its quadratic form). The form carries the underlying
+# vector space.
+form tensor-algebra
+  link space, like vector-space

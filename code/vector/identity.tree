@@ -1,0 +1,115 @@
+# The vector identities of three-dimensional space, each a universal law over the integer coordinates, proved by the
+# commutative-ring normalizer and checked by `seed test`. These are the algebraic backbone of the cross product and the
+# dot product, the operations that turn vectors into geometry.
+
+# Lagrange's identity: the squared length of the cross product equals the product of the squared lengths minus the
+# squared dot product. With a = (a1, a2, a3) and b = (b1, b2, b3), the cross product a x b has components
+# (a2 b3 - a3 b2, a3 b1 - a1 b3, a1 b2 - a2 b1), and its squared length equals (a1^2 + a2^2 + a3^2)(b1^2 + b2^2 + b3^2)
+# minus (a1 b1 + a2 b2 + a3 b3)^2. This is what ties the cross product's magnitude to the sine of the angle between the
+# vectors, the dot product's to the cosine. A universal law over all six coordinates.
+task lagrange-cross-product-identity
+  take a1, like integer
+  take a2, like integer
+  take a3, like integer
+  take b1, like integer
+  take b2, like integer
+  take b3, like integer
+  like integer
+  hold <the squared cross product is the squared-length product minus the squared dot product>
+    call is-equal
+      call add
+        call add
+          call multiply
+            call subtract
+              call multiply
+                read a2
+                read b3
+              call multiply
+                read a3
+                read b2
+            call subtract
+              call multiply
+                read a2
+                read b3
+              call multiply
+                read a3
+                read b2
+          call multiply
+            call subtract
+              call multiply
+                read a3
+                read b1
+              call multiply
+                read a1
+                read b3
+            call subtract
+              call multiply
+                read a3
+                read b1
+              call multiply
+                read a1
+                read b3
+        call multiply
+          call subtract
+            call multiply
+              read a1
+              read b2
+            call multiply
+              read a2
+              read b1
+          call subtract
+            call multiply
+              read a1
+              read b2
+            call multiply
+              read a2
+              read b1
+      call subtract
+        call multiply
+          call add
+            call add
+              call multiply
+                read a1
+                read a1
+              call multiply
+                read a2
+                read a2
+            call multiply
+              read a3
+              read a3
+          call add
+            call add
+              call multiply
+                read b1
+                read b1
+              call multiply
+                read b2
+                read b2
+            call multiply
+              read b3
+              read b3
+        call multiply
+          call add
+            call add
+              call multiply
+                read a1
+                read b1
+              call multiply
+                read a2
+                read b2
+            call multiply
+              read a3
+              read b3
+          call add
+            call add
+              call multiply
+                read a1
+                read b1
+              call multiply
+                read a2
+                read b2
+            call multiply
+              read a3
+              read b3
+  send back
+    read a1

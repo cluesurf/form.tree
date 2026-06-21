@@ -1,0 +1,9 @@
+load @/code/structure/manifold
+  find manifold
+
+# A tangent space: the vector space of velocities at a point of a manifold, the flat space that best approximates the
+# curved manifold there, the directions you can move in. The collection of all tangent spaces is the tangent bundle, and
+# a Lie group's tangent space at the identity is its Lie algebra. The form carries the manifold the tangent space sits
+# on.
+form tangent-space
+  link manifold, like manifold

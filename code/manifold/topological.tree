@@ -1,0 +1,8 @@
+load @/code/space/topological
+  find topological-space
+
+# A topological manifold: a space that is locally like flat space but with only continuity assumed, no smoothness yet,
+# the bare shape before calculus is added. Every smooth manifold is a topological manifold with extra structure. The
+# form carries the underlying topological space; the local-Euclidean condition is the added structure.
+form topological-manifold
+  link space, like topological-space

@@ -1,0 +1,9 @@
+load @/code/axiom
+  find axiom
+
+# An axiom schema: not a single axiom but a template standing for infinitely many, one for each way of filling its
+# blanks. Separation and replacement in set theory, and induction in arithmetic, are schemas: induction is one axiom per
+# predicate. A schema is how a first-order theory expresses a second-order idea within its means. The form carries the
+# template axiom; the instances are its fillings.
+form axiom-schema
+  link template, like axiom

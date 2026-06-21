@@ -1,0 +1,8 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A tensor space: the space of tensors of a fixed rank over a vector space, built by the tensor product, the home of
+# multilinear maps. The metric and curvature of spacetime are sections of tensor spaces. The form carries the underlying
+# vector space.
+form tensor-space
+  link space, like vector-space

@@ -9,7 +9,7 @@ form site
 # twelve lines the law acts on, 24 = 2 * 12.
 hold <the twenty-four sites pair into twelve lines>
   call is-equal
-    mark 24
+    code 24
     call multiply
-      mark 2
-      mark 12
+      code 2
+      code 12

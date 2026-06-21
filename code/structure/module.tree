@@ -1,47 +1,18 @@
-structure module
-  head type
+load @/code/structure/ring
+  find ring
 
-  link ring, like ring, have type
-  link group, like abelian-group, have type
-  link scalar-multiplication, like binary-function, have type
+load @/code/group/abelian
+  find abelian-group
 
-  # Closure under scalar multiplication
-  assert set-closure
-    head type, have type
-    have group/set
-    have scalar-multiplication
+load @/code/structure/function/binary
+  find binary-function
 
-  # Associativity of scalar multiplication
-  assert scalar-multiplication-associativity
-    head type, have type
-    have ring
-    have group
-    have scalar-multiplication
-
-  # Left distributivity of scalar multiplication over ring addition
-  assert left-distributivity
-    head type, have type
-    have ring
-    have group
-    have scalar-multiplication
-
-  # Right distributivity of scalar multiplication over abelian group addition
-  assert right-distributivity
-    head type, have type
-    have ring
-    have group
-    have scalar-multiplication
-
-  # Compatibility of scalar multiplication with ring multiplication
-  assert scalar-multiplication-compatibility
-    head type, have type
-    have ring
-    have group
-    have scalar-multiplication
-
-  # Scalar multiplication by the ring's multiplicative identity
-  assert scalar-multiplication-identity
-    head type, have type
-    have ring
-    have group
-    have scalar-multiplication
+# A module: an abelian group whose elements can be scaled by the elements of a ring, the generalization of a vector
+# space from a field of scalars to a ring of scalars. The scalar action is associative and distributes over both the
+# ring's addition and the group's addition, and the ring's identity acts trivially. When the ring is a field the module
+# is a vector space. The form carries the scalar ring, the abelian group of elements, and the scalar action; the
+# distributivity and compatibility laws are the axioms.
+form module
+  link ring, like ring
+  link group, like abelian-group
+  link action, like binary-function

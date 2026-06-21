@@ -1,0 +1,14 @@
+load @/code/structure/set
+  find set
+
+load @/code/structure/function/binary
+  find binary-function
+
+# A Jordan algebra: a commutative but non-associative algebra whose product obeys the Jordan identity, the symmetrized
+# version of an associative product. Jordan algebras were built to capture the observables of quantum mechanics, and the
+# exceptional Jordan algebra of three-by-three Hermitian octonion matrices is tied to the same exceptional structure as
+# the octonions and triality. The form carries the set and the commutative product; the Jordan identity is the defining
+# law.
+form jordan-algebra
+  link set, like set
+  link product, like binary-function

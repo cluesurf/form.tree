@@ -1,0 +1,10 @@
+load @/code/structure/manifold
+  find manifold
+
+# A horosphere: a limit of ever-larger spheres all tangent to one ideal point at infinity, a surface that is curved as
+# seen from outside yet intrinsically FLAT, carrying ordinary Euclidean geometry. Horocycles (its two-dimensional
+# version) are the curves a constant distance from an ideal point. The horosphere is the bridge from the hyperbolic bulk
+# to a flat lattice: the substrate's flat-lattice model lives on a horosphere, where the curvature is in the embedding,
+# not the tiling. The form carries the manifold the horosphere sits in.
+form horosphere
+  link manifold, like manifold

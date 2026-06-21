@@ -1,35 +1,5 @@
-
-property field-scalar-multiplication-compatibility
-  head type
-
-  take f, like field, have type
-  take v, like set, have type
-  take scalar-multiplication, like binary-function, have type
-
-  all a, b, in f
-    all x, in v
-      assert equal
-        do scalar-multiplication
-          do f/multiplication
-            item a
-            item b
-          item x
-        do scalar-multiplication
-          item a
-          do scalar-multiplication
-            item b
-            item x
-
-property field-scalar-multiplication-identity
-  head type
-
-  take f, like field, have type
-  take v, like set, have type
-  take scalar-multiplication, like binary-function, have type
-
-  all x, in v
-    assert equal
-      do scalar-multiplication
-        item f/multiplicative-identity
-        item x
-      item x
+# The field axioms as properties: a field is a set with addition and multiplication where addition is an abelian group,
+# nonzero multiplication is an abelian group, and multiplication distributes over addition. The scalar-compatibility
+# properties (that scaling a vector by a product of field elements equals scaling twice, and that the field identity
+# scales trivially) are the laws tying a vector space to its field of scalars. These are universal equations the field
+# and vector-space forms satisfy; the structures themselves are in the structure folder.

@@ -1,0 +1,8 @@
+load @/code/manifold/riemannian
+  find riemannian-manifold
+
+# An elliptic partial differential equation: the class of equilibrium equations, like Laplace's and Poisson's, whose
+# solutions are smooth and determined by their boundary values, with no preferred direction of propagation. They
+# describe steady states rather than evolution. The form carries the manifold the equation is posed on.
+form elliptic-equation
+  link domain, like riemannian-manifold

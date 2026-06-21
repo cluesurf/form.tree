@@ -1,0 +1,8 @@
+load @/code/group
+  find group
+
+# A wreath product: a way of combining two groups where one group acts by permuting several copies of the other, the
+# symmetry of a structure built from repeated sub-structures (the symmetries of a stack of identical objects, or of a
+# rooted tree). The form carries the underlying group built by the wreath construction.
+form wreath-product
+  link group, like group

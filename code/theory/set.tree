@@ -1,0 +1,4 @@
+# Set theory: the theory of collections, the classical foundation of mathematics, where everything is a set and the
+# axioms (extensionality, pairing, union, power set, infinity, separation, replacement, foundation, choice) generate the
+# whole universe. This library uses type theory as its working foundation instead, but set theory is the reference
+# against which it is understood. The axioms are indexed in the claim folder.

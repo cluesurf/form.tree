@@ -1,0 +1,244 @@
+# The classic summation identities of Peano arithmetic, each defined by a recurrence and each closed form proved for
+# EVERY natural by induction (the `fold` tactic): base case and inductive step are both discharged by the
+# commutative-ring normalizer, with no value ever computed. These are the bread and butter of a foundations library,
+# the same theorems Coq, Agda, and Lean prove early, here machine-checked by `seed test`. Denominators are cleared so
+# every statement is a polynomial identity over the integers.
+
+# The sum of the first n natural numbers: sum(n) = sum(n-1) + n, base sum(0) = 0.
+task sum
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call sum
+            call subtract
+              read n
+              code 1
+          read n
+
+# Gauss's triangular-number formula: twice the sum from 1 to n is n times (n + 1), for every n.
+task triangular-number-formula
+  take n, like natural-number
+  like natural-number
+  hold <twice the sum to n is n times n plus one>
+    call is-equal
+      call multiply
+        code 2
+        call sum
+          read n
+      call multiply
+        read n
+        call add
+          read n
+          code 1
+    fold n
+  send back
+    read n
+
+# The sum of the first n odd numbers: odd-sum(n) = odd-sum(n-1) + (2n - 1), base 0.
+task odd-sum
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call odd-sum
+            call subtract
+              read n
+              code 1
+          call subtract
+            call multiply
+              code 2
+              read n
+            code 1
+
+# The sum of the first n odd numbers is exactly n squared, for every n. The cleanest induction in arithmetic.
+task odd-sum-is-a-square
+  take n, like natural-number
+  like natural-number
+  hold <the sum of the first n odd numbers is n squared>
+    call is-equal
+      call odd-sum
+        read n
+      call multiply
+        read n
+        read n
+    fold n
+  send back
+    read n
+
+# The sum of the first n squares: square-sum(n) = square-sum(n-1) + n^2, base 0.
+task square-sum
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call square-sum
+            call subtract
+              read n
+              code 1
+          call multiply
+            read n
+            read n
+
+# The square-pyramidal formula: six times the sum of the first n squares is n (n + 1) (2 n + 1), for every n.
+task square-sum-formula
+  take n, like natural-number
+  like natural-number
+  hold <six times the sum of the first n squares is n times n plus one times twice n plus one>
+    call is-equal
+      call multiply
+        code 6
+        call square-sum
+          read n
+      call multiply
+        call multiply
+          read n
+          call add
+            read n
+            code 1
+        call add
+          call multiply
+            code 2
+            read n
+          code 1
+    fold n
+  send back
+    read n
+
+# The sum of the first n cubes: cube-sum(n) = cube-sum(n-1) + n^3, base 0.
+task cube-sum
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call cube-sum
+            call subtract
+              read n
+              code 1
+          call multiply
+            call multiply
+              read n
+              read n
+            read n
+
+# Nicomachus's theorem: four times the sum of the first n cubes is n squared times (n + 1) squared, so the sum of the
+# first n cubes is the square of the sum of the first n naturals. Proved for every n by induction.
+task cube-sum-formula
+  take n, like natural-number
+  like natural-number
+  hold <four times the sum of the first n cubes is n squared times n plus one squared>
+    call is-equal
+      call multiply
+        code 4
+        call cube-sum
+          read n
+      call multiply
+        call multiply
+          read n
+          read n
+        call multiply
+          call add
+            read n
+            code 1
+          call add
+            read n
+            code 1
+    fold n
+  send back
+    read n
+
+# The sum of the first n fourth powers: fourth-sum(n) = fourth-sum(n-1) + n^4, base 0.
+task fourth-sum
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call fourth-sum
+            call subtract
+              read n
+              code 1
+          call multiply
+            call multiply
+              read n
+              read n
+            call multiply
+              read n
+              read n
+
+# Faulhaber's fourth-power formula: thirty times the sum of the first n fourth powers is
+# n (n + 1) (2 n + 1) (3 n^2 + 3 n - 1), for every n. Proved by induction.
+task fourth-sum-formula
+  take n, like natural-number
+  like natural-number
+  hold <thirty times the sum of the first n fourth powers is the faulhaber product>
+    call is-equal
+      call multiply
+        code 30
+        call fourth-sum
+          read n
+      call multiply
+        call multiply
+          call multiply
+            read n
+            call add
+              read n
+              code 1
+          call add
+            call multiply
+              code 2
+              read n
+            code 1
+        call subtract
+          call add
+            call multiply
+              code 3
+              call multiply
+                read n
+                read n
+            call multiply
+              code 3
+              read n
+          code 1
+    fold n
+  send back
+    read n

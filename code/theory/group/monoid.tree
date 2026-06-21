@@ -1,13 +1,4 @@
-
-class monoid
-  strap x, class set
-  strap a, class trade
-  strap b, class trade
-
-  class associative
-    strap x, think x
-    strap a, think a
-    strap b, think b
-
-  class identity element
-    strap x, think x
+# The monoid in the theory-of-structures view: a set with an associative operation and a two-sided identity, the
+# one-object category (its elements are the morphisms, composition is the operation, the identity is the identity
+# arrow). The canonical monoid form is in the structure folder; this note records its categorical reading, the bridge
+# from algebra to category theory.

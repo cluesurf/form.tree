@@ -1,0 +1,8 @@
+load @/code/automaton/finite
+  find finite-automaton
+
+# An input-output automaton: a finite automaton that emits an output symbol as it transitions, a transducer rather than
+# a mere acceptor, so it maps input strings to output strings. A Mealy machine outputs on transitions, a Moore machine
+# on states. The form carries the underlying finite automaton; the output function is the added structure.
+form input-output-automaton
+  link control, like finite-automaton

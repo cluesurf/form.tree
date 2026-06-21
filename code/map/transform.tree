@@ -1,0 +1,8 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A transformation: a map of a space to itself, a way of moving or reshaping it, a rotation, reflection, translation, or
+# scaling. The symmetries of an object are the transformations that leave it unchanged, and they form its symmetry group.
+# The form carries the space being transformed.
+form transformation
+  link space, like vector-space

@@ -1,0 +1,30 @@
+# The Chomsky hierarchy, the ladder of language classes ranked by the memory their machines need, with the strict
+# ordering machine-checked by `seed test`. Index the levels by memory: a finite automaton has level 0 (no memory beyond
+# its state, the regular languages), a pushdown automaton level 1 (a stack, the context-free languages), a
+# linear-bounded automaton level 2 (a bounded tape, the context-sensitive languages), and a Turing machine level 3 (an
+# unbounded tape, the recursively-enumerable languages). Each level strictly contains the one below, so the indices
+# strictly increase.
+
+# Regular sits below context-free: level 0 is below level 1.
+hold <regular is below context-free>
+  call is-below
+    code 0
+    code 1
+
+# Context-free sits below context-sensitive: level 1 is below level 2.
+hold <context-free is below context-sensitive>
+  call is-below
+    code 1
+    code 2
+
+# Context-sensitive sits below recursively-enumerable: level 2 is below level 3.
+hold <context-sensitive is below recursively-enumerable>
+  call is-below
+    code 2
+    code 3
+
+# The ordering is transitive across the whole ladder: regular (0) sits below recursively-enumerable (3).
+hold <regular is below recursively-enumerable>
+  call is-below
+    code 0
+    code 3

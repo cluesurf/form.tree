@@ -1,0 +1,9 @@
+load @/code/automaton/finite
+  find finite-automaton
+
+# A timed automaton: a finite automaton equipped with real-valued clocks that advance together and gate the
+# transitions, so it can require that events happen within or after given delays. It is the model for verifying
+# real-time systems. The form carries the underlying finite automaton; the clocks and their constraints are the added
+# structure.
+form timed-automaton
+  link control, like finite-automaton

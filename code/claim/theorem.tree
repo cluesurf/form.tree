@@ -1,10 +1,8 @@
-
-theorem Hopf–Rinow
-
-theorem stone-representation
-
-theorem lowenheim-kkolem
-
-theorem compactness
-
-theorem herbrand
+# The named theorems the library aims to capture, grouped by area. In geometry: Hopf-Rinow (a complete connected
+# Riemannian manifold has geodesics between any two points). In model theory and logic: the compactness theorem (a set
+# of first-order sentences has a model if every finite subset does), the Lowenheim-Skolem theorem (a theory with an
+# infinite model has models of every infinite size), Herbrand's theorem (a first-order proof reduces to propositional
+# logic over ground terms), and the Stone representation theorem (every Boolean algebra is the algebra of clopen sets of
+# a space). Each is a claim with a proof; the machine-checked proofs in this library are the arithmetic and algebraic
+# ones (the number, polynomial, order, and algebra-tower files), and these deeper theorems are recorded here as the
+# targets the foundation is built toward.

@@ -1,0 +1,7 @@
+# An axiom: a statement taken as given, the starting point a theory reasons from rather than proves. The choice of
+# axioms is the choice of what world to study: the field axioms define fields, the group axioms define groups, the
+# set-theoretic axioms define the universe of sets. A theorem is what follows from the axioms by the rules of inference.
+# In this library the axioms are the laws carried as prose by each structure form, and the theorems are the machine-
+# checked proofs in the number, polynomial, order, and algebra-tower files.
+form axiom
+  link statement, note private

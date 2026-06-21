@@ -1,27 +1,14 @@
+load @/code/structure/set
+  find set
 
-structure metric-space
-  head type
+load @/code/structure/function/binary
+  find binary-function
 
-  link set, like set, have type
-  link metric, like binary-function, have type
-
-  # Metric properties
-  assert non-negativity
-    head type, have type
-    have set
-    have metric
-
-  assert identity-of-indiscernibles
-    head type, have type
-    have set
-    have metric
-
-  assert symmetry
-    head type, have type
-    have set
-    have metric
-
-  assert triangle-inequality
-    head type, have type
-    have set
-    have metric
+# A metric space: a set with a distance function assigning a non-negative number to each pair of points, zero only when
+# the points coincide, symmetric, and obeying the triangle inequality (a detour is never shorter than the direct path).
+# The distance turns the set into a shape with a notion of nearness, refining the topological space with actual lengths.
+# The discrete metric of the substrate (one step per edge of the mesh) is the metric the geometry measures. The form
+# carries the set and the distance; the three distance axioms are the laws.
+form metric-space
+  link set, like set
+  link distance, like binary-function

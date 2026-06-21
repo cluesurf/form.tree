@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A flag: a nested chain of subspaces, each contained in the next, a point in a line in a plane and so on, or for a
+# polytope a vertex on an edge on a face on a cell. Flags are the maximal chains a Coxeter group acts on simply
+# transitively, and the flags of the 24-cell number its symmetry-group order, 1152. The form carries the vector space
+# the flag is built in.
+form flag
+  link space, like vector-space

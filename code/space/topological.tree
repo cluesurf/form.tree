@@ -1,36 +1,11 @@
+load @/code/structure/set
+  find set
 
-structure topological-space
-  head type
-
-  link set, like set, have type
-  link topology, like set, have type
-
-  # Topology properties
-  assert contains-empty-and-full
-    head type, have type
-    have set
-    have topology
-
-  assert closed-under-unions
-    head type, have type
-    have set
-    have topology
-
-  assert closed-under-intersections
-    head type, have type
-    have set
-    have topology
-
-property contains-empty-and-full
-  head type
-
-  take set, like set, have type
-  take topology, like set, have type
-
-  assert in
-    item empty-set
-    item topology
-
-  assert in
-    item set
-    item topology
+# A topological space: a set together with a choice of which subsets count as open, closed under arbitrary unions and
+# finite intersections, with the empty set and the whole set open. The open sets are what "near" means without any
+# notion of distance, the minimum needed to speak of continuity, limits, and connectedness. Every metric space is a
+# topological space, but topology keeps only the qualitative shape. The mesh, the hyperbolic honeycomb of the substrate,
+# is a topological space whose growth is one-way. The form carries the underlying set; the family of open sets and its
+# closure laws are the axioms.
+form topological-space
+  link set, like set

@@ -1,6 +1,10 @@
+load @/code/structure/set
+  find set
 
-field regular
-field context-free
-field context-sensitive
-field turing-complete
-field temporal-logic
+# A grammar: a finite set of rules for generating the strings of a language, the syntax half of computation. The Chomsky
+# hierarchy ranks grammars by power: regular (recognized by finite automata), context-free (by pushdown automata),
+# context-sensitive (by linear-bounded automata), and unrestricted (by Turing machines, the full computable languages).
+# Each rung recognizes strictly more languages than the last. The form carries the set of symbols; the production rules
+# and the start symbol are the grammar, and the automaton that recognizes each class is in the automaton folder.
+form grammar
+  link symbols, like set

@@ -1,0 +1,9 @@
+load @/code/structure/space/hilbert
+  find hilbert-space
+
+# Quantum theory: the physics of the very small, where states are vectors in a Hilbert space, observables are operators,
+# and measurement is probabilistic. Superposition, entanglement, and the uncertainty principle are its signatures. In
+# the substrate the smooth quantum amplitudes are emergent, the coarse-grained statistics of the discrete underlying
+# tones. The form carries the Hilbert space of states.
+form quantum-theory
+  link states, like hilbert-space

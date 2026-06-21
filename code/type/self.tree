@@ -1,16 +1,16 @@
-# The self type, the one primitive under all inductive types, and the bottom of
-# the shared foundation with the Seed kernel. A self type binds a value to its
-# own type, so its members are the terms that inhabit a family applied to
-# themselves. The self combinator names the fixed point of a family. The
-# universe, the type of types, is the self-type identity. Every later type, the
-# booleans, the naturals, the integers, the algebra tower, is a self type whose
-# body states its own induction principle. Nothing else is added as a primitive.
-structure self-type
-  head type
-  # The family whose fixed point this self type names.
-  link family, like type
-  # A value belongs to the self type when it inhabits the family applied to
-  # itself. This is the rule the kernel checks by normalization.
-  assert self-membership
-    head type, have type
-    have family
+load @/code/type/term
+  find term
+
+# The self type, the one primitive under all inductive types, and the bottom of the shared foundation with the kernel.
+# A self type binds a value to its own type, so its members are the terms that inhabit a family applied to themselves.
+# The self combinator names the fixed point of a family. Every later inductive type, the booleans, the naturals, the
+# integers, the algebra tower, is a self type whose body states its own induction principle, so the trusted core stays
+# tiny while expressing inductive and even inductive-inductive types, exactly what a self-hosting compiler needs for
+# its own syntax tree. Nothing else is added as a primitive.
+#
+# The rules. Formation: a self type is well-formed when its body, given a value standing for the type itself, is a
+# type. Introduction: a value inhabits the self type when it inhabits the body with itself substituted in. Elimination:
+# a value of the self type may be used at the body with the value substituted in. Introduction and elimination are
+# mutually inverse coercions the checker discharges by normalization.
+form self-type
+  link body, like term

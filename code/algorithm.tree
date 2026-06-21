@@ -1,0 +1,9 @@
+load @/code/machine/turing
+  find turing-machine
+
+# An algorithm: a finite, definite, effective procedure for solving a problem, a recipe a machine can follow without
+# insight. The Church-Turing thesis says every algorithm is realizable by a Turing machine, and complexity theory ranks
+# algorithms by the resources they consume. The substrate's collide-then-stream rule is an algorithm the universe runs.
+# The form carries the machine the algorithm runs on.
+form algorithm
+  link machine, like turing-machine

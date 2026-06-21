@@ -1,0 +1,9 @@
+load @/code/structure/algebra/clifford
+  find clifford-algebra
+
+# A geometric algebra: a Clifford algebra used as the language of geometry, where the single geometric product unifies
+# the dot product (its symmetric part) and the wedge product (its antisymmetric part). Vectors, areas, and volumes live
+# in one algebra, and rotations are conjugations by even versors. It is the same object as the Clifford algebra, named
+# for its geometric use. The form carries the underlying Clifford algebra.
+form geometric-algebra
+  link algebra, like clifford-algebra

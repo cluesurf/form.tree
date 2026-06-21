@@ -1,0 +1,13 @@
+load @/code/structure/set
+  find set
+
+load @/code/structure/function/binary
+  find binary-function
+
+# A total order: an order in which every two elements are comparable, one is at most the other, with no incomparable
+# pairs. It is reflexive, antisymmetric, transitive, and total. The integers carry a total order, and that one-way order
+# is the arrow of time, the unique orderable rung of the number tower. The form carries the set and the order relation;
+# reflexivity, antisymmetry, transitivity, and totality are the laws.
+form total-order
+  link set, like set
+  link relation, like binary-function

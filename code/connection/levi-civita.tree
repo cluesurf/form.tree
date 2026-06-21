@@ -1,0 +1,9 @@
+load @/code/manifold/riemannian
+  find riemannian-manifold
+
+# The Levi-Civita connection: on a Riemannian manifold, the unique way to differentiate vector fields that is
+# compatible with the metric and has no torsion, the canonical notion of parallel transport. It is what defines
+# straightness (geodesics) and curvature on a curved space, the mathematical object general relativity is built from.
+# The form carries the Riemannian manifold the connection lives on.
+form levi-civita-connection
+  link manifold, like riemannian-manifold

@@ -1,0 +1,23 @@
+load @/code/structure/set
+  find set
+
+# The ternary heptagrid, the regular tiling {7, 3}, regular heptagons three to a vertex. It grows even faster than the
+# pentagrid, and Margenstern chose it for the deepest theorem of the work, the undecidability of the hyperbolic tiling
+# problem, because its structure hosts the mantilla, a recursive lace of nested interwoven triangles that can encode any
+# computation. That it is hyperbolic is machine-checked by `seed test`. The form carries its set of tiles; its splitting
+# tree and addressing follow the same method as the pentagrid.
+
+# The heptagrid is hyperbolic by the Schläfli test: (7 - 2)(3 - 2) = 5 * 1 = 5, above 4.
+hold <the heptagrid is hyperbolic>
+  call is-above
+    call multiply
+      call subtract
+        code 7
+        code 2
+      call subtract
+        code 3
+        code 2
+    code 4
+
+form heptagrid
+  link tiles, like set

@@ -1,0 +1,3 @@
+# Claims about pushdown automata: that a language is context-free (recognized by a pushdown automaton), or that a given
+# automaton accepts a given language. The Chomsky hierarchy places these strictly above the regular languages, machine-
+# checked in the computation hierarchy file. The pushdown-automaton form is in the automaton folder.

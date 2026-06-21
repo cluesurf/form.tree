@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# A process algebra: an algebra of concurrent processes, with operators for running in sequence, in parallel, and in
+# choice, and an equational theory for when two processes behave the same (bisimulation). It is the algebraic face of
+# concurrency, the counterpart of Petri nets and transition systems. The form carries the set of processes.
+form process-algebra
+  link processes, like set

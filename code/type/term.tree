@@ -1,0 +1,64 @@
+# The kernel's term language, the syntax of every expression the type checker reasons about. The checker is
+# bidirectional and works by normalization: it evaluates a term to a normal form and compares normal forms. This file
+# declares the shape of every term constructor. The typing rules that relate them live alongside each construct (the
+# function, pair, identity, self, universe, and multiplicity files); here is the bare grammar, faithful to the kernel.
+# Each construct is a form whose fields are its subterms. A term is one of these forms.
+
+# A term: any expression in the kernel. The shape is the specific constructor, one of the forms below.
+form term
+  link shape, note private
+
+# A variable, a reference to an enclosing binding, addressed by how many binders out it sits (a de Bruijn index).
+form variable
+  link index, like natural
+
+# A metavariable, an inference hole the checker fills by unification while elaborating a program.
+form hole
+  link mark, like natural
+
+# A postulated constant: a base type or primitive named in the signature, with no definition to unfold.
+form constant
+  link name, like text
+
+# A universe, the type of types at a given level. See the universe file for the hierarchy.
+form sort
+  link level, like natural
+
+# A lambda, the introduction of a function type: a body living under one new binding.
+form lambda
+  link body, like term
+
+# An application, the elimination of a function type: a function applied to an argument.
+form application
+  link target, like term
+  link input, like term
+
+# An annotation, a term carried with its stated type, the seam where checking meets inference.
+form annotation
+  link subject, like term
+  link signature, like term
+
+# Reflexivity, the canonical proof that a value equals itself, inhabiting its identity type.
+form reflection
+  link space, like term
+  link value, like term
+
+# The identity eliminator (J): given a proof that two values are equal and a motive that holds at reflexivity, the
+# property holds along the whole proof. This is how every fact about equality is derived.
+form journey
+  link proof, like term
+  link motive, like term
+  link base, like term
+
+# A pair, the introduction of a dependent pair type: a first component and a second that may depend on it.
+form couple
+  link first, like term
+  link second, like term
+
+# The first projection of a pair.
+form front
+  link couple, like term
+
+# The second projection of a pair.
+form back
+  link couple, like term

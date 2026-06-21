@@ -1,0 +1,13 @@
+load @/code/type/term
+  find term
+
+# The typing judgment, the relation the whole checker computes: in a context (a list of typed bindings), a term has a
+# type. The judgment runs bidirectionally. In check mode it is given a term and an expected type and verifies the term
+# inhabits it; in infer mode it is given a term and produces its type. The two modes are mutually recursive: checking a
+# function against a function type checks its body against the codomain, and inferring an application infers the
+# function then checks the argument against the domain. Conversion (deciding two types are equal) is by normalization,
+# evaluating both to normal form and comparing, which is what makes a dependent judgment decidable. The form carries a
+# context and a term; the type and the mode are what the judgment determines.
+form judgment
+  link context, like term
+  link term, like term

@@ -1,0 +1,9 @@
+load @/code/algebra/boolean
+  find boolean-algebra
+
+# A logical connective: an operator that builds a compound proposition from simpler ones, and, or, not, implies, if-and-
+# only-if. The connectives are the operations of a Boolean algebra (classical) or a Heyting algebra (constructive), and
+# they are how the surface checker combines decidable conditions. The form carries the Boolean algebra the connectives
+# operate in.
+form connective
+  link algebra, like boolean-algebra

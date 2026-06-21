@@ -1,0 +1,10 @@
+load @/code/structure/field
+  find field
+
+# A field, the concept: a set where addition, subtraction, multiplication, and division (except by zero) all work, so
+# every nonzero element has a multiplicative inverse. The rationals, the reals, and the complex numbers are fields, and
+# they are the scalars an algebra is built over. The first two rungs of the number tower, the reals and the complex
+# numbers, are fields; the quaternions lose commutativity and become a division ring instead. The canonical field form
+# is in the structure folder.
+form field-concept
+  link structure, like field

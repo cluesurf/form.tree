@@ -8,34 +8,34 @@
 hold <the seven three tiling is hyperbolic>
   call is-above
     call multiply
-      mark 7
-      mark 3
+      code 7
+      code 3
     call multiply
-      mark 2
+      code 2
       call add
-        mark 7
-        mark 3
+        code 7
+        code 3
 
 # The {3, 6} tiling (six triangles at a vertex) is exactly flat, the boundary case: 3*6 = 18 equals 2*(3 + 6) = 18.
 hold <the three six tiling is flat>
   call is-equal
     call multiply
-      mark 3
-      mark 6
+      code 3
+      code 6
     call multiply
-      mark 2
+      code 2
       call add
-        mark 3
-        mark 6
+        code 3
+        code 6
 
 # The {3, 4} tiling (four triangles at a vertex, the octahedron) is spherical: 3*4 = 12 is below 2*(3 + 4) = 14.
 hold <the three four tiling is spherical>
   call is-below
     call multiply
-      mark 3
-      mark 4
+      code 3
+      code 4
     call multiply
-      mark 2
+      code 2
       call add
-        mark 3
-        mark 4
+        code 3
+        code 4

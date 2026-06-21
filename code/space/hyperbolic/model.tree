@@ -1,0 +1,11 @@
+load @/code/structure/manifold
+  find manifold
+
+# A model of hyperbolic space: a way to draw the curved space inside flat space so it can be reasoned about. The four
+# standard models are the Poincare disk (the whole plane inside a disk, angles true, lengths stretching toward the rim),
+# the Poincare upper half-space (a half-plane, conformal, with a flat boundary at infinity), the Klein disk (geodesics
+# drawn as straight chords, angles distorted), and the hyperboloid (the space as one sheet of a hyperbola in one-higher
+# Minkowski space, the most symmetric). Each shows the same space; the substrate's flat-lattice picture is a horosphere
+# in the upper half-space model. The form carries the manifold the model depicts.
+form hyperbolic-model
+  link manifold, like manifold

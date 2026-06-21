@@ -1,0 +1,9 @@
+load @/code/structure/field
+  find field
+
+# The rational numbers, the fractions, the smallest field containing the integers. Every rational is one integer over
+# another, and they are dense (between any two lies a third) yet incomplete (sequences of rationals can close in on a
+# gap, like the square root of two, that is not itself rational). Completing them by filling those gaps gives the reals.
+# The form carries the underlying field.
+form rational
+  link field, like field

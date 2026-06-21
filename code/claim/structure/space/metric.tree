@@ -1,2 +1,3 @@
-
-claim complete
+# Claims about a metric space: that the distance is non-negative, zero only on coincident points, symmetric, and obeys
+# the triangle inequality, and derived claims about open balls, convergence, and completeness. The metric-space form is
+# in the space folder; this note records the distance axioms a metric claim verifies.

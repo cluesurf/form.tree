@@ -1,0 +1,8 @@
+load @/code/structure/ring
+  find ring
+
+# A vertex operator algebra: the algebraic axiomatization of a two-dimensional conformal field theory, where states are
+# operators that can be inserted at points of a curve and expanded against each other. It is the structure behind the
+# monstrous moonshine connecting the largest sporadic group to modular functions. The form carries the underlying ring.
+form vertex-operator-algebra
+  link ring, like ring

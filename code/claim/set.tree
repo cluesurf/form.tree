@@ -1,28 +1,3 @@
-
-claim drive
-
-claim store
-
-claim chime
-
-claim union-idempotence
-  start a, field set
-
-  shift unite
-    mount a, share a
-    mount b, share a
-    store x
-  check equality
-    mount a, share x
-    mount b, share a
-
-claim intersection-idempotence
-  start a, field set
-
-  cause intersect
-    mount a, share a
-    mount b, share a
-    store x
-  check equality
-    mount a, share x
-    mount b, share a
+# Claims about sets: membership, containment, equality by extensionality (two sets are equal when they have the same
+# members), and the closure of sets under union, intersection, and complement. The set-theoretic axioms these rest on
+# are indexed in the theory folder; this note records the claims a set-level proof discharges.

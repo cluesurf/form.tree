@@ -1,11 +1,7 @@
+load @/code/group/homomorphism
+  find group-homomorphism
 
-field epimorphism
-  front g, field group
-  front h, field group
-
-  check homomorphism
-    mount g, share g
-    mount h, share h
-  check surjectivity
-    mount g, share g
-    mount h, share h
+# A group epimorphism: a surjective homomorphism, one whose image is the whole target, so the target is a quotient of
+# the source. The form carries the underlying homomorphism; surjectivity is the added condition.
+form group-epimorphism
+  link map, like group-homomorphism

@@ -1,0 +1,9 @@
+load @/code/theory/lattice
+  find lattice
+
+# A Boolean algebra: a lattice with a top and bottom and a complement for every element, the algebra of classical truth
+# (and, or, not) and of subsets (intersection, union, complement). Every Boolean algebra is the algebra of clopen sets
+# of a space (Stone's theorem). It is the two-valued logic the surface checker decides in. The form carries the
+# underlying lattice; the top, bottom, and complement are the added structure.
+form boolean-algebra
+  link lattice, like lattice

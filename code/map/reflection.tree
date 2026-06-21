@@ -1,0 +1,9 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A reflection: the map that flips a space across a hyperplane mirror, fixing the mirror and reversing the perpendicular
+# direction, an involution (applying it twice returns the start). Reflections are the generators of the Coxeter and Weyl
+# groups, and reflecting a single 24-cell across its faces forever is exactly how the mesh tiles hyperbolic four-space.
+# The form carries the vector space the reflection acts on.
+form reflection
+  link space, like vector-space

@@ -1,0 +1,10 @@
+load @/code/structure/set
+  find set
+
+# An interaction net: a model of computation by local graph rewriting, where agents joined at ports rewrite two at a
+# time by fixed interaction rules, strongly confluent so the order of rewrites never changes the result. Interaction
+# nets are inherently parallel and LINEAR (each wire is used exactly once), which is exactly the linear multiplicity of
+# the kernel and exactly the discipline the substrate runs on. They are the runtime the vibe language compiles to. The
+# form carries the set of agents; the ports and interaction rules are the net.
+form interaction-net
+  link agents, like set

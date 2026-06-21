@@ -1,0 +1,9 @@
+load @/code/automaton/cellular
+  find cellular-automaton
+
+# A quantum cellular automaton: a cellular automaton whose cells carry quantum states and whose local update is unitary,
+# so the whole array evolves reversibly and coherently, in superposition. It is the discrete model of quantum field
+# dynamics, and it is reversible by construction, the quantum analog of the substrate's reversible collide-then-stream
+# rule. The form carries the underlying cellular automaton; the unitary local rule is the added structure.
+form quantum-cellular-automaton
+  link automaton, like cellular-automaton

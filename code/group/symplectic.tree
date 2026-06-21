@@ -1,0 +1,8 @@
+load @/code/group
+  find group
+
+# The symplectic group: the linear maps preserving a symplectic form, an antisymmetric pairing, the symmetries of phase
+# space in mechanics where position and momentum pair up. It is the classical group of the C family of Dynkin diagrams.
+# The form carries the underlying group; preserving the symplectic form is the defining condition.
+form symplectic-group
+  link group, like group

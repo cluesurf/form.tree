@@ -1,0 +1,21 @@
+load @/code/type/term
+  find term
+
+# The identity type, the observational equality the kernel computes with. For two values of one type, the identity
+# type is the type of proofs that they are equal. Reflexivity gives the canonical proof that a value equals itself, and
+# the eliminator, the J rule, says a property that holds at reflexivity holds along any proof of equality, which is how
+# every fact about equality is derived. On top of this intensional core the kernel makes equality observational: the
+# identity at a function type reduces to pointwise identity, so two functions equal at every argument are equal, and
+# function extensionality is the identity function rather than a postulate. The same computation gives the pair case
+# componentwise, and the dependent pair case by transport. This is the observational discipline: full function and
+# pair extensionality and quotients, while type-checking stays decidable, without the cost of cubical machinery.
+# Univalence is deliberately out of scope; this is a programming language's logic, not a synthetic homotopy theory.
+#
+# The rules. Reflexivity: every value equals itself. Elimination (J): a motive true at reflexivity is true along any
+# equality proof. Function extensionality, computed not postulated: the identity at a function type reduces to the
+# pointwise identity. Transport: a proof that two values are equal carries any structure indexed by the first to the
+# same structure indexed by the second, the dependent companion of the eliminator.
+form identity-type
+  link space, like term
+  link left, like term
+  link right, like term

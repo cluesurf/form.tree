@@ -1,0 +1,11 @@
+load @/code/structure/space/vector
+  find vector-space
+
+# A bilinear map: a function of two vector arguments, linear in each separately, the shape of every product in algebra,
+# the inner product, the cross product, the multiplication of an algebra, the quadratic form's polarization. The norm
+# that the composition algebras carry is built from a bilinear form. The form carries the two source spaces and the
+# target.
+form bilinear-map
+  link left, like vector-space
+  link right, like vector-space
+  link target, like vector-space

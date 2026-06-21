@@ -1,12 +1,13 @@
+load @/code/structure/set
+  find set
 
-structure magma
-  head type
+load @/code/structure/function/binary
+  find binary-function
 
-  link set, like set, have type
-  link operation, like binary-operation, have type
-
-  # Closure under the operation
-  assert set-closure
-    head type, have type
-    have set
-    have operation
+# A magma: the barest algebraic structure, a set with one binary operation closed on it and nothing more, no
+# associativity, no identity, no inverse. Every richer structure (semigroup, monoid, group) is a magma with laws added.
+# The octonions under multiplication are very nearly a bare magma, keeping only alternativity, which is why they sit at
+# the wild top of the tower. The form carries the set and the operation; closure is the single law.
+form magma
+  link set, like set
+  link operation, like binary-function

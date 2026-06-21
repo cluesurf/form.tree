@@ -1,0 +1,8 @@
+load @/code/algebra/lie
+  find lie-algebra
+
+# The Heisenberg algebra: the Lie algebra of position and momentum, where the bracket of position with momentum is a
+# central constant (the canonical commutation relation, the algebraic heart of the uncertainty principle). Its unique
+# irreducible representation is quantum mechanics. The form carries the underlying Lie algebra.
+form heisenberg-algebra
+  link algebra, like lie-algebra

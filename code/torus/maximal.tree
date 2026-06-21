@@ -1,0 +1,10 @@
+load @/code/group
+  find group
+
+# The maximal torus: the largest subgroup of a Lie group that is a product of circles, a maximal set of rotations that
+# all commute and can be performed independently at once. Its dimension is the rank of the group, the number of
+# independent simultaneous spins. The rank of D4, the rotations of the eight-dimensional arena, is four, and that four
+# is read as the four dimensions of spacetime. So the maximal torus is where the dimension of spacetime is counted. The
+# form carries the underlying group; being a maximal commuting product of circles is the defining condition.
+form maximal-torus
+  link group, like group

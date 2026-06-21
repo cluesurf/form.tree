@@ -1,0 +1,10 @@
+load @/code/group
+  find group
+
+# The orthogonal group: the group of linear maps that preserve length, the rotations and reflections of a space with a
+# fixed inner product. In n dimensions it is O(n). It splits into the rotations (determinant one) and the
+# length-preserving reflections (determinant minus one). The orthogonal group of the eight-dimensional arena, O(8), is
+# where the rotations giving D4 live. The form carries the underlying group; preserving the inner product is the
+# defining condition.
+form orthogonal-group
+  link group, like group

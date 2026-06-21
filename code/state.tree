@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A state: a complete description of a system at one moment, a point in the space of all the system's possibilities. A
+# cell of the substrate is in a state (one of its ternary tones), and the whole mesh is in a state (the tones of all its
+# cells), which the two-step rule advances each beat. In quantum mechanics a state is a vector in a Hilbert space. The
+# form carries the set of possible states.
+form state
+  link space, like set

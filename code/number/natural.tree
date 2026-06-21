@@ -13,11 +13,11 @@ task additive-identity
   hold <zero is a right identity for addition>
     call is-equal
       call add
-        loan n
-        mark 0
-      loan n
+        read n
+        code 0
+      read n
   send back
-    loan n
+    read n
 
 # Addition commutes: a + b = b + a, for every a and b.
 task additive-commutativity
@@ -27,13 +27,13 @@ task additive-commutativity
   hold <addition commutes>
     call is-equal
       call add
-        loan a
-        loan b
+        read a
+        read b
       call add
-        loan b
-        loan a
+        read b
+        read a
   send back
-    loan a
+    read a
 
 # Addition associates: (a + b) + c = a + (b + c), for every a, b, c.
 task additive-associativity
@@ -45,16 +45,16 @@ task additive-associativity
     call is-equal
       call add
         call add
-          loan a
-          loan b
-        loan c
+          read a
+          read b
+        read c
       call add
-        loan a
+        read a
         call add
-          loan b
-          loan c
+          read b
+          read c
   send back
-    loan a
+    read a
 
 # Every natural is non-negative: n >= 0, for every n. This is the base of the order, the floor the arrow runs up from.
 # (The `natural-number` refinement is what carries the n >= 0 assumption to the prover.)
@@ -63,63 +63,72 @@ task non-negativity
   like natural-number
   hold <every natural is at least zero>
     call is-minimum
-      loan n
-      mark 0
+      read n
+      code 0
   send back
-    loan n
+    read n
 
-# Multiplication facts (the universal multiplication laws are non-linear, so these stand as concrete witnesses for
-# now, pending the inductive lowering).
-hold <two times three is six>
-  call is-equal
-    call multiply
-      mark 2
-      mark 3
-    mark 6
-hold <three times three is nine>
-  call is-equal
-    call multiply
-      mark 3
-      mark 3
-    mark 9
-
-# A genuinely INDUCTIVE law, proved by Peano induction (the `fold` tactic) over a recursive definition, not by a
-# closed certificate. The triangular-number recurrence: sum 0 = 0, sum (m+1) = sum m + (m+1).
-task sum
-  take n, like natural-number
-  like natural-number
-  send back
-    fork test
-      hook test
-        call is-equal
-          loan n
-          mark 0
-      hook hold
-        mark 0
-      hook miss
-        call add
-          call sum
-            call subtract
-              loan n
-              mark 1
-          loan n
-
-# Gauss's formula, for EVERY n: twice the sum from 1 to n equals n times (n + 1). Proved by induction on n -- base
-# 2*sum(0) = 0, step 2*sum(k+1) = 2*sum(k) + 2*(k+1), which the hypothesis and the ring normalizer close.
-task triangular-number-formula
-  take n, like natural-number
-  like natural-number
-  hold <twice the sum from one to n is n times n plus one>
+# Multiplication distributes over addition: a (b + c) = a b + a c, for EVERY a, b, c. A universal law (not a witness),
+# proved by the commutative-ring normalizer. With commutativity and associativity of addition above, this makes the
+# naturals a commutative semiring, the algebraic floor the integers and the whole tower are built on.
+task left-distributivity
+  take a, like natural
+  take b, like natural
+  take c, like natural
+  like natural
+  hold <multiplication distributes over addition>
     call is-equal
       call multiply
-        mark 2
-        call sum
-          loan n
-      call multiply
-        loan n
+        read a
         call add
-          loan n
-          mark 1
-    fold n
+          read b
+          read c
+      call add
+        call multiply
+          read a
+          read b
+        call multiply
+          read a
+          read c
   send back
-    loan n
+    read a
+
+# Multiplication commutes: a b = b a, for every a and b. The semiring is commutative.
+task multiplicative-commutativity
+  take a, like natural
+  take b, like natural
+  like natural
+  hold <multiplication commutes>
+    call is-equal
+      call multiply
+        read a
+        read b
+      call multiply
+        read b
+        read a
+  send back
+    read a
+
+# Multiplication associates: (a b) c = a (b c), for every a, b, c.
+task multiplicative-associativity
+  take a, like natural
+  take b, like natural
+  take c, like natural
+  like natural
+  hold <multiplication associates>
+    call is-equal
+      call multiply
+        call multiply
+          read a
+          read b
+        read c
+      call multiply
+        read a
+        call multiply
+          read b
+          read c
+  send back
+    read a
+
+# The inductive summation identities (the triangular numbers, the sum of odds, squares, and cubes), each a closed form
+# proved for every n by Peano induction, live in the sum file.

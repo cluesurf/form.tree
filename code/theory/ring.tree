@@ -1,0 +1,4 @@
+# Ring theory: the study of rings, their ideals, quotients, and modules, the algebra of systems with addition and
+# multiplication. The integers, polynomial rings, and matrix rings are its central examples, and every rung of the
+# number tower is a ring. The canonical ring form is in the structure folder and the checked ring identities are in the
+# number and polynomial files.

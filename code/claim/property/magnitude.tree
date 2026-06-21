@@ -1,0 +1,3 @@
+# Claims about magnitude: that a quantity is bounded, non-negative, or that one magnitude dominates another. The
+# machine-checked magnitude claims in this library are the order laws and the sum-of-squares inequalities (every square
+# is non-negative, the arithmetic-geometric-mean inequality), proved in the order and number files.

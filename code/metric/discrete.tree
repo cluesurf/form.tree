@@ -1,0 +1,9 @@
+load @/code/space/metric
+  find metric-space
+
+# The discrete metric: the simplest distance, zero from a point to itself and one to every other point, treating a set
+# as a scatter of equidistant dots. On the mesh the natural metric is the graph distance (the number of edges in the
+# shortest path between two cells), the discrete distance the substrate's geometry measures. The form carries the metric
+# space.
+form discrete-metric
+  link space, like metric-space

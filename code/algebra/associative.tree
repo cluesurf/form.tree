@@ -1,0 +1,18 @@
+load @/code/structure/field
+  find field
+
+load @/code/structure/set
+  find set
+
+load @/code/structure/function/binary
+  find binary-function
+
+# An associative algebra: an algebra whose product associates, so (a b) c equals a (b c) and the order of grouping never
+# matters. Associativity is the law that survives the first two rungs of the tower and dies on the third. The reals, the
+# complex numbers, and the quaternions are all associative; the octonions are the first to lose it, keeping only the
+# weaker alternativity. The 24-cell's points, the unit quaternions, compose exactly and associatively, which is why the
+# directions of the substrate form a group rather than a mere loop.
+form associative-algebra
+  link field, like field
+  link set, like set
+  link multiply, like binary-function

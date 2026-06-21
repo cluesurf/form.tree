@@ -1,10 +1,9 @@
+load @/code/structure/space/inner-product
+  find inner-product-space
 
-structure hilbert-space
-  head type
-
-  link inner-product-space, like inner-product-space, have type
-
-  # Completeness property
-  assert completeness
-    head type, have type
-    have inner-product-space
+# A Hilbert space: an inner-product space that is complete, so every sequence whose terms grow arbitrarily close
+# converges to a limit inside the space. Completeness is what lets analysis run: limits, infinite sums, and the spectral
+# theory of operators. The state space of a quantum system is a Hilbert space. The form carries the inner-product space;
+# completeness is the added axiom.
+form hilbert-space
+  link space, like inner-product-space

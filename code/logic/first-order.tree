@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# First-order logic: the logic of quantifiers over individuals, with predicates, functions, and the connectives, able to
+# say "for all x" and "there exists x" about elements but not about sets of them. It is the standard language of
+# mathematics, complete (every valid sentence is provable) and compact (a theory has a model if every finite part does).
+# The form carries the set of symbols (the signature); the quantifiers, connectives, and inference rules are the logic.
+form first-order-logic
+  link symbols, like set

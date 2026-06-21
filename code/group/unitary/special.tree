@@ -1,42 +1,9 @@
+load @/code/group
+  find group
 
-structure special-unitary-group
-  head n, like integer
-
-  base group
-    bind type
-      like matrix
-        have n
-        have n
-
-  # Special unitary properties
-  assert unitarity
-    head type, have type
-    have set
-
-  assert determinant-one
-    head type, have type
-    have set
-
-property unitarity
-  head type
-
-  take set, like set, have type
-
-  all u, in set
-    assert equal
-      do matrix-multiplication
-        item u
-        do matrix-conjugate-transpose
-          item u
-      item identity-matrix
-
-property determinant-one
-  head type
-
-  take set, like set, have type
-
-  all u, in set
-    assert equal
-      do determinant
-        item u
-      item 1
+# The special unitary group: the group of unitary matrices of determinant one, the rotations of complex vector space
+# that preserve length and orientation. SU(2) double-covers the rotations of three-space and is the unit quaternions;
+# SU(3) is the gauge group of the strong force. The form carries the underlying group; being unitary with determinant
+# one is the defining condition.
+form special-unitary-group
+  link group, like group

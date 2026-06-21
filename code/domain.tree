@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# A domain: the set of inputs a function accepts, the things it is defined on, paired with the codomain of possible
+# outputs. More broadly a domain of discourse is the universe a logical language quantifies over. The form carries the
+# set that is the domain.
+form domain
+  link set, like set

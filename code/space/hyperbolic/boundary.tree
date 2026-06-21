@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# The boundary at infinity: the set of ideal points a hyperbolic space approaches but never reaches, the rim of the
+# Poincare disk, the horizon. Geodesics run out to ideal points, and the boundary carries its own geometry (a sphere one
+# dimension down) on which the space's symmetries act. In the substrate this ideal boundary is the thin skin of the
+# baseball, the cusp where the bulk meets physical reality. The form carries the set of ideal points.
+form ideal-boundary
+  link points, like set

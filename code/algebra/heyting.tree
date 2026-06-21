@@ -1,0 +1,9 @@
+load @/code/theory/lattice
+  find lattice
+
+# A Heyting algebra: a lattice with an implication operation, the algebra of intuitionistic (constructive) logic, where
+# the law of excluded middle need not hold and a proof of not-not-P need not give a proof of P. It is to constructive
+# logic what a Boolean algebra is to classical logic, and the kernel's proof-relevant logic is constructive in this
+# spirit. The form carries the underlying lattice; the implication is the added operation.
+form heyting-algebra
+  link lattice, like lattice

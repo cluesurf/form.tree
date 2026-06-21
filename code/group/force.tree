@@ -1,0 +1,9 @@
+load @/code/group
+  find group
+
+# A gauge group: the symmetry group of a force, the transformations of the internal fields that leave the physics
+# unchanged. The Standard Model's forces are the circle group (electromagnetism), the special unitary group of order two
+# (the weak force), and of order three (the strong force). In the substrate these internal symmetries are emergent, the
+# coarse-grained shadow of the discrete cell symmetry. The form carries the underlying group.
+form gauge-group
+  link group, like group

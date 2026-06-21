@@ -1,0 +1,10 @@
+load @/code/structure/field
+  find field
+
+# A field extension: a larger field containing a smaller one, the way the complex numbers extend the reals by adjoining
+# a square root of minus one. The extension's dimension as a vector space over the base is its degree. Galois theory
+# studies the symmetries of an extension, the permutations of the new roots that fix the base. The complex numbers are
+# the degree-two extension of the reals, the first step of the tower. The form carries the base and the extending field.
+form field-extension
+  link base, like field
+  link extension, like field

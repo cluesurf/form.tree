@@ -1,0 +1,8 @@
+load @/code/manifold/analytic
+  find analytic-manifold
+
+# A Taylor series: the expansion of a smooth function as an infinite polynomial in its derivatives at a point, the best
+# polynomial approximation of every degree at once. A function equal to its Taylor series everywhere is analytic, the
+# rigid smoothness where local data fixes the whole. The form carries the analytic manifold the function lives on.
+form taylor-series
+  link domain, like analytic-manifold

@@ -1,0 +1,9 @@
+load @/code/structure/manifold
+  find manifold
+
+# A manifold, the concept: a space that looks locally like flat space but may be globally curved, the stage curved
+# geometry and general relativity are written on. The hyperbolic four-space the substrate tiles is a manifold of
+# constant negative curvature. The canonical manifold form is in the structure folder; this concept file marks it as a
+# pillar of the geometry layer.
+form manifold-concept
+  link structure, like manifold

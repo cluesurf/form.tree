@@ -17,36 +17,36 @@ form cayley-dickson-double
 # dimensions run 1, 2, 4, 8, 16: the reals, the complex numbers, the quaternions, the octonions, the sedenions.
 hold <the complex numbers double the reals>
   call is-equal
-    mark 2
+    code 2
     call multiply
-      mark 2
-      mark 1
+      code 2
+      code 1
 hold <the quaternions double the complex numbers>
   call is-equal
-    mark 4
+    code 4
     call multiply
-      mark 2
-      mark 2
+      code 2
+      code 2
 hold <the octonions double the quaternions>
   call is-equal
-    mark 8
+    code 8
     call multiply
-      mark 2
-      mark 4
+      code 2
+      code 4
 hold <the sedenions double the octonions>
   call is-equal
-    mark 16
+    code 16
     call multiply
-      mark 2
-      mark 8
+      code 2
+      code 8
 
 # The norm survives exactly while the input stays associative, through dimension eight, and dies at sixteen. So the
 # octonions at eight sit strictly below the sedenions at sixteen where it fails: eight is below sixteen.
 hold <the octonions at eight are below the cliff at sixteen>
   call is-below
-    mark 8
-    mark 16
+    code 8
+    code 16
 hold <the sedenions are past the reversible ceiling>
   call is-above
-    mark 16
-    mark 8
+    code 16
+    code 8

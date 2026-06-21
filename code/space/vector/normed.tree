@@ -1,67 +1,14 @@
+load @/code/structure/space/vector
+  find vector-space
 
-structure normed-vector-space
-  head type
+load @/code/structure/function/unary
+  find unary-function
 
-  link vector-space, like vector-space, have type
-  link norm, like unary-function, have type
-
-  # Norm properties
-  assert set-non-negativity
-    head type, have type
-    have vector-space/set
-    have norm
-
-  assert definiteness
-    head type, have type
-    have vector-space
-    have norm
-
-  assert scalability
-    head type, have type
-    have vector-space
-    have norm
-
-  assert triangle-inequality
-    head type, have type
-    have vector-space
-    have norm
-
-property set-non-negativity
-  head type
-
-  take set, like set, have type
-  take norm, like unary-function, have type
-
-  all a, in set
-    assert non-negativity
-      have a
-      have norm
-
-property non-negativity
-  head type
-
-  take a, like type
-  take norm, like unary-function, have type
-
-  assert greater-or-equal
-    do norm
-      item a
-    item 0
-
-property triangle-inequality
-  head type
-
-  take vector-space, like vector-space, have type
-  take norm, like unary-function, have type
-
-  all u, v, in vector-space/set
-    assert less-or-equal
-      do norm
-        do vector-space/operation
-          item u
-          item v
-      do vector-space/operation
-        do norm
-          item u
-        do norm
-          item v
+# A normed vector space: a vector space with a norm, a length assigned to each vector that is zero only for the zero
+# vector, scales with scalar multiplication, and obeys the triangle inequality. The norm is exactly the multiplicative
+# length the composition algebras carry, and demanding it multiply through the product is the reversibility condition
+# that caps the tower at the octonions. The form carries the vector space and the norm; the three norm axioms are the
+# laws.
+form normed-vector-space
+  link space, like vector-space
+  link norm, like unary-function

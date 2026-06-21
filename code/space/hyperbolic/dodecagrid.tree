@@ -1,0 +1,9 @@
+load @/code/structure/manifold
+  find manifold
+
+# The dodecagrid, the regular honeycomb {5, 3, 4}, hyperbolic three-space tiled by right-angled dodecahedra, four around
+# each edge. It is the three-dimensional analogue of the pentagrid, and the splitting method extends to it (though its
+# navigation language is no longer regular, becoming non-context-free). The dodecagrid hosts a weakly universal cellular
+# automaton in three dimensions. The form carries the underlying hyperbolic manifold.
+form dodecagrid
+  link space, like manifold

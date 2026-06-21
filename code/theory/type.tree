@@ -1,0 +1,11 @@
+load @/code/type/term
+  find term
+
+# Type theory, the foundation of mathematics this library is checked in, an alternative to set theory where the
+# primitive is the typed term rather than the untyped set. A proposition is a type and a proof is a term inhabiting it,
+# so checking a proof is type-checking. The committed stack is a quantitative dependent type theory (multiplicities tie
+# erasure, linearity, and uniqueness into one), with a predicative cumulative universe-polymorphic hierarchy, self types
+# for inductive data, and observational equality. Its files are in the type folder. The form carries the kernel's term
+# language; the judgments and the four layers (surface, refinement, kernel, equality) are developed there.
+form type-theory
+  link term, like term

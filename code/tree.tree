@@ -1,0 +1,8 @@
+load @/code/structure/set
+  find set
+
+# A tree: a connected graph with no cycles, a branching structure with a root and no loops, the shape of a hierarchy.
+# The splitting method turns a hyperbolic tiling into a tree whose nodes are tiles and whose Fibonacci addresses
+# navigate it, and the syntax of every expression is a tree. The form carries the set of nodes.
+form tree
+  link nodes, like set

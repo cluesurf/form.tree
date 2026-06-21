@@ -1,0 +1,9 @@
+load @/code/structure/manifold
+  find manifold
+
+# A fibration: a space that is locally a product of a base and a fiber, a way of bundling a copy of the fiber over each
+# point of the base so they twist together globally. The four Hopf fibrations, one per division algebra, bundle spheres
+# over spheres, and the octonionic one (the fifteen-sphere over the eight-sphere with seven-sphere fibers) is the
+# topological shadow of the dimension-eight ceiling. The form carries the total manifold.
+form fibration
+  link space, like manifold

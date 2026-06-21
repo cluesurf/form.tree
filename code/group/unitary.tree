@@ -1,0 +1,9 @@
+load @/code/group
+  find group
+
+# The unitary group: the complex linear maps preserving a Hermitian inner product, the length-preserving symmetries of
+# complex vector space, the rotations of quantum state space. U(1) is the circle, the phase of a quantum amplitude.
+# Its determinant-one subgroup is the special unitary group, the gauge groups of the weak and strong forces. The form
+# carries the underlying group; preserving the Hermitian inner product is the defining condition.
+form unitary-group
+  link group, like group

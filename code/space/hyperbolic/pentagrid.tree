@@ -1,0 +1,46 @@
+# The pentagrid, the regular tiling {5, 4}, right-angled pentagons four to a vertex, the canonical hyperbolic grid and
+# the origin of Margenstern's whole program (the "five is missing" joke: a regular pentagon tiles no flat plane, but in
+# the hyperbolic plane, where angles can be smaller, a right-angled pentagon tiles perfectly). It is the stage for the
+# splitting method, Fibonacci addressing, fast SAT, and a weakly universal cellular automaton. Two arithmetic facts are
+# machine-checked by `seed test`: that it is hyperbolic, and the Fibonacci growth of its tile tree.
+
+# The pentagrid is hyperbolic by the Schläfli test: (p - 2)(q - 2) is above 4. Here (5 - 2)(4 - 2) = 3 * 2 = 6, above 4.
+# A spherical or flat grid would fail this.
+hold <the pentagrid is hyperbolic>
+  call is-above
+    call multiply
+      call subtract
+        code 5
+        code 2
+      call subtract
+        code 4
+        code 2
+    code 4
+
+# The tile tree grows by the Fibonacci recurrence: each generation count is the sum of the two before it. The pentagrid
+# counts run 1, 2, 3, 5, 8, 13. Three is two plus one, five is three plus two, eight is five plus three, thirteen is
+# eight plus five. A wrong count breaks the recurrence.
+hold <the third pentagrid generation is the first two summed>
+  call is-equal
+    call add
+      code 1
+      code 2
+    code 3
+hold <the fourth pentagrid generation is the prior two summed>
+  call is-equal
+    call add
+      code 2
+      code 3
+    code 5
+hold <the fifth pentagrid generation is the prior two summed>
+  call is-equal
+    call add
+      code 3
+      code 5
+    code 8
+hold <the sixth pentagrid generation is the prior two summed>
+  call is-equal
+    call add
+      code 5
+      code 8
+    code 13

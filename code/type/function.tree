@@ -1,0 +1,22 @@
+load @/code/type/term
+  find term
+
+load @/code/type/multiplicity
+  find multiplicity
+
+# The dependent function type, the pi type, the one way the theory forms a type that depends on a value. A pi type
+# gathers a domain type, a multiplicity saying how the argument may be used, and a codomain type that may mention the
+# argument. An ordinary function is the special case where the codomain ignores the argument. The multiplicity on the
+# domain is what makes this a quantitative theory: an erased argument is a type or proof present only for checking, a
+# linear argument is used exactly once, a shared argument any number of times. The universe a pi inhabits is the
+# maximum of its domain's and codomain's, except at the impredicative bottom, where a pi landing in Type 0 stays in
+# Type 0 whatever the domain.
+#
+# The rules. Introduction: a lambda inhabits a pi type when, given an argument of the domain, its body inhabits the
+# codomain. Elimination: applying a function of a pi type to an argument of the domain yields the codomain at that
+# argument. Computation (beta): applying a lambda to an argument substitutes the argument into the body, the engine of
+# normalization.
+form function-type
+  link domain, like term
+  link usage, like multiplicity
+  link codomain, like term

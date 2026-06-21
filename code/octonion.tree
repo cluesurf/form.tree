@@ -16,32 +16,32 @@ form octonion
 # last dimension that keeps it.
 hold <the octonions at eight are below the sedenions at sixteen>
   call is-below
-    mark 8
-    mark 16
+    code 8
+    code 16
 hold <sixteen exceeds the ceiling of eight>
   call is-above
-    mark 16
-    mark 8
+    code 16
+    code 8
 
 # The one-substance floor (the lower jaw): the half-spinor and the vector meet at eight. Half-spinor size is
 # two-to-the-(n/2 minus 1), so it is 4 at dimension six (below the vector six), two cubed at dimension eight (equal to
 # the vector eight), and 16 at dimension ten (above the vector ten). The crossing happens exactly at eight.
 hold <below eight the spinor is smaller than the vector>
   call is-below
-    mark 4
-    mark 6
+    code 4
+    code 6
 hold <at eight the half-spinor two cubed equals the vector eight>
   call is-equal
     call multiply
       call multiply
-        mark 2
-        mark 2
-      mark 2
-    mark 8
+        code 2
+        code 2
+      code 2
+    code 8
 hold <above eight the spinor is larger than the vector>
   call is-above
-    mark 16
-    mark 10
+    code 16
+    code 10
 
 # The norm is multiplicative for EVERY pair of octonions, Degen's eight-square identity. With p and q octonions of
 # integer coordinates, the squared norm of the product p q equals the product of the squared norms. This is the
@@ -78,300 +78,300 @@ task octonion-norm-is-multiplicative
                     call subtract
                       call subtract
                         call multiply
-                          loan a0
-                          loan c0
+                          read a0
+                          read c0
                         call multiply
-                          loan a1
-                          loan c1
+                          read a1
+                          read c1
                       call multiply
-                        loan a2
-                        loan c2
+                        read a2
+                        read c2
                     call multiply
-                      loan a3
-                      loan c3
+                      read a3
+                      read c3
                   call subtract
                     call subtract
                       call subtract
                         call multiply
-                          loan d0
-                          loan b0
+                          read d0
+                          read b0
                         call multiply
                           call subtract
-                            mark 0
-                            loan d1
-                          loan b1
+                            code 0
+                            read d1
+                          read b1
                       call multiply
                         call subtract
-                          mark 0
-                          loan d2
-                        loan b2
+                          code 0
+                          read d2
+                        read b2
                     call multiply
                       call subtract
-                        mark 0
-                        loan d3
-                      loan b3
+                        code 0
+                        read d3
+                      read b3
                 call subtract
                   call subtract
                     call subtract
                       call subtract
                         call multiply
-                          loan a0
-                          loan c0
+                          read a0
+                          read c0
                         call multiply
-                          loan a1
-                          loan c1
+                          read a1
+                          read c1
                       call multiply
-                        loan a2
-                        loan c2
+                        read a2
+                        read c2
                     call multiply
-                      loan a3
-                      loan c3
+                      read a3
+                      read c3
                   call subtract
                     call subtract
                       call subtract
                         call multiply
-                          loan d0
-                          loan b0
+                          read d0
+                          read b0
                         call multiply
                           call subtract
-                            mark 0
-                            loan d1
-                          loan b1
+                            code 0
+                            read d1
+                          read b1
                       call multiply
                         call subtract
-                          mark 0
-                          loan d2
-                        loan b2
+                          code 0
+                          read d2
+                        read b2
                     call multiply
                       call subtract
-                        mark 0
-                        loan d3
-                      loan b3
+                        code 0
+                        read d3
+                      read b3
               call multiply
                 call subtract
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan a0
-                          loan c1
+                          read a0
+                          read c1
                         call multiply
-                          loan a1
-                          loan c0
+                          read a1
+                          read c0
                       call multiply
-                        loan a2
-                        loan c3
+                        read a2
+                        read c3
                     call multiply
-                      loan a3
-                      loan c2
+                      read a3
+                      read c2
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan d0
-                          loan b1
+                          read d0
+                          read b1
                         call multiply
                           call subtract
-                            mark 0
-                            loan d1
-                          loan b0
+                            code 0
+                            read d1
+                          read b0
                       call multiply
                         call subtract
-                          mark 0
-                          loan d2
-                        loan b3
+                          code 0
+                          read d2
+                        read b3
                     call multiply
                       call subtract
-                        mark 0
-                        loan d3
-                      loan b2
+                        code 0
+                        read d3
+                      read b2
                 call subtract
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan a0
-                          loan c1
+                          read a0
+                          read c1
                         call multiply
-                          loan a1
-                          loan c0
+                          read a1
+                          read c0
                       call multiply
-                        loan a2
-                        loan c3
+                        read a2
+                        read c3
                     call multiply
-                      loan a3
-                      loan c2
+                      read a3
+                      read c2
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan d0
-                          loan b1
+                          read d0
+                          read b1
                         call multiply
                           call subtract
-                            mark 0
-                            loan d1
-                          loan b0
+                            code 0
+                            read d1
+                          read b0
                       call multiply
                         call subtract
-                          mark 0
-                          loan d2
-                        loan b3
+                          code 0
+                          read d2
+                        read b3
                     call multiply
                       call subtract
-                        mark 0
-                        loan d3
-                      loan b2
+                        code 0
+                        read d3
+                      read b2
             call multiply
               call subtract
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan a0
-                        loan c2
+                        read a0
+                        read c2
                       call multiply
-                        loan a1
-                        loan c3
+                        read a1
+                        read c3
                     call multiply
-                      loan a2
-                      loan c0
+                      read a2
+                      read c0
                   call multiply
-                    loan a3
-                    loan c1
+                    read a3
+                    read c1
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan d0
-                        loan b2
+                        read d0
+                        read b2
                       call multiply
                         call subtract
-                          mark 0
-                          loan d1
-                        loan b3
+                          code 0
+                          read d1
+                        read b3
                     call multiply
                       call subtract
-                        mark 0
-                        loan d2
-                      loan b0
+                        code 0
+                        read d2
+                      read b0
                   call multiply
                     call subtract
-                      mark 0
-                      loan d3
-                    loan b1
+                      code 0
+                      read d3
+                    read b1
               call subtract
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan a0
-                        loan c2
+                        read a0
+                        read c2
                       call multiply
-                        loan a1
-                        loan c3
+                        read a1
+                        read c3
                     call multiply
-                      loan a2
-                      loan c0
+                      read a2
+                      read c0
                   call multiply
-                    loan a3
-                    loan c1
+                    read a3
+                    read c1
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan d0
-                        loan b2
+                        read d0
+                        read b2
                       call multiply
                         call subtract
-                          mark 0
-                          loan d1
-                        loan b3
+                          code 0
+                          read d1
+                        read b3
                     call multiply
                       call subtract
-                        mark 0
-                        loan d2
-                      loan b0
+                        code 0
+                        read d2
+                      read b0
                   call multiply
                     call subtract
-                      mark 0
-                      loan d3
-                    loan b1
+                      code 0
+                      read d3
+                    read b1
           call multiply
             call subtract
               call add
                 call subtract
                   call add
                     call multiply
-                      loan a0
-                      loan c3
+                      read a0
+                      read c3
                     call multiply
-                      loan a1
-                      loan c2
+                      read a1
+                      read c2
                   call multiply
-                    loan a2
-                    loan c1
+                    read a2
+                    read c1
                 call multiply
-                  loan a3
-                  loan c0
+                  read a3
+                  read c0
               call add
                 call subtract
                   call add
                     call multiply
-                      loan d0
-                      loan b3
+                      read d0
+                      read b3
                     call multiply
                       call subtract
-                        mark 0
-                        loan d1
-                      loan b2
+                        code 0
+                        read d1
+                      read b2
                   call multiply
                     call subtract
-                      mark 0
-                      loan d2
-                    loan b1
+                      code 0
+                      read d2
+                    read b1
                 call multiply
                   call subtract
-                    mark 0
-                    loan d3
-                  loan b0
+                    code 0
+                    read d3
+                  read b0
             call subtract
               call add
                 call subtract
                   call add
                     call multiply
-                      loan a0
-                      loan c3
+                      read a0
+                      read c3
                     call multiply
-                      loan a1
-                      loan c2
+                      read a1
+                      read c2
                   call multiply
-                    loan a2
-                    loan c1
+                    read a2
+                    read c1
                 call multiply
-                  loan a3
-                  loan c0
+                  read a3
+                  read c0
               call add
                 call subtract
                   call add
                     call multiply
-                      loan d0
-                      loan b3
+                      read d0
+                      read b3
                     call multiply
                       call subtract
-                        mark 0
-                        loan d1
-                      loan b2
+                        code 0
+                        read d1
+                      read b2
                   call multiply
                     call subtract
-                      mark 0
-                      loan d2
-                    loan b1
+                      code 0
+                      read d2
+                    read b1
                 call multiply
                   call subtract
-                    mark 0
-                    loan d3
-                  loan b0
+                    code 0
+                    read d3
+                  read b0
         call add
           call add
             call add
@@ -381,362 +381,362 @@ task octonion-norm-is-multiplicative
                     call subtract
                       call subtract
                         call multiply
-                          loan d0
-                          loan a0
+                          read d0
+                          read a0
                         call multiply
-                          loan d1
-                          loan a1
+                          read d1
+                          read a1
                       call multiply
-                        loan d2
-                        loan a2
+                        read d2
+                        read a2
                     call multiply
-                      loan d3
-                      loan a3
+                      read d3
+                      read a3
                   call subtract
                     call subtract
                       call subtract
                         call multiply
-                          loan b0
-                          loan c0
+                          read b0
+                          read c0
                         call multiply
-                          loan b1
+                          read b1
                           call subtract
-                            mark 0
-                            loan c1
+                            code 0
+                            read c1
                       call multiply
-                        loan b2
+                        read b2
                         call subtract
-                          mark 0
-                          loan c2
+                          code 0
+                          read c2
                     call multiply
-                      loan b3
+                      read b3
                       call subtract
-                        mark 0
-                        loan c3
+                        code 0
+                        read c3
                 call add
                   call subtract
                     call subtract
                       call subtract
                         call multiply
-                          loan d0
-                          loan a0
+                          read d0
+                          read a0
                         call multiply
-                          loan d1
-                          loan a1
+                          read d1
+                          read a1
                       call multiply
-                        loan d2
-                        loan a2
+                        read d2
+                        read a2
                     call multiply
-                      loan d3
-                      loan a3
+                      read d3
+                      read a3
                   call subtract
                     call subtract
                       call subtract
                         call multiply
-                          loan b0
-                          loan c0
+                          read b0
+                          read c0
                         call multiply
-                          loan b1
+                          read b1
                           call subtract
-                            mark 0
-                            loan c1
+                            code 0
+                            read c1
                       call multiply
-                        loan b2
+                        read b2
                         call subtract
-                          mark 0
-                          loan c2
+                          code 0
+                          read c2
                     call multiply
-                      loan b3
+                      read b3
                       call subtract
-                        mark 0
-                        loan c3
+                        code 0
+                        read c3
               call multiply
                 call add
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan d0
-                          loan a1
+                          read d0
+                          read a1
                         call multiply
-                          loan d1
-                          loan a0
+                          read d1
+                          read a0
                       call multiply
-                        loan d2
-                        loan a3
+                        read d2
+                        read a3
                     call multiply
-                      loan d3
-                      loan a2
+                      read d3
+                      read a2
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan b0
+                          read b0
                           call subtract
-                            mark 0
-                            loan c1
+                            code 0
+                            read c1
                         call multiply
-                          loan b1
-                          loan c0
+                          read b1
+                          read c0
                       call multiply
-                        loan b2
+                        read b2
                         call subtract
-                          mark 0
-                          loan c3
+                          code 0
+                          read c3
                     call multiply
-                      loan b3
+                      read b3
                       call subtract
-                        mark 0
-                        loan c2
+                        code 0
+                        read c2
                 call add
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan d0
-                          loan a1
+                          read d0
+                          read a1
                         call multiply
-                          loan d1
-                          loan a0
+                          read d1
+                          read a0
                       call multiply
-                        loan d2
-                        loan a3
+                        read d2
+                        read a3
                     call multiply
-                      loan d3
-                      loan a2
+                      read d3
+                      read a2
                   call subtract
                     call add
                       call add
                         call multiply
-                          loan b0
+                          read b0
                           call subtract
-                            mark 0
-                            loan c1
+                            code 0
+                            read c1
                         call multiply
-                          loan b1
-                          loan c0
+                          read b1
+                          read c0
                       call multiply
-                        loan b2
+                        read b2
                         call subtract
-                          mark 0
-                          loan c3
+                          code 0
+                          read c3
                     call multiply
-                      loan b3
+                      read b3
                       call subtract
-                        mark 0
-                        loan c2
+                        code 0
+                        read c2
             call multiply
               call add
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan d0
-                        loan a2
+                        read d0
+                        read a2
                       call multiply
-                        loan d1
-                        loan a3
+                        read d1
+                        read a3
                     call multiply
-                      loan d2
-                      loan a0
+                      read d2
+                      read a0
                   call multiply
-                    loan d3
-                    loan a1
+                    read d3
+                    read a1
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan b0
+                        read b0
                         call subtract
-                          mark 0
-                          loan c2
+                          code 0
+                          read c2
                       call multiply
-                        loan b1
+                        read b1
                         call subtract
-                          mark 0
-                          loan c3
+                          code 0
+                          read c3
                     call multiply
-                      loan b2
-                      loan c0
+                      read b2
+                      read c0
                   call multiply
-                    loan b3
+                    read b3
                     call subtract
-                      mark 0
-                      loan c1
+                      code 0
+                      read c1
               call add
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan d0
-                        loan a2
+                        read d0
+                        read a2
                       call multiply
-                        loan d1
-                        loan a3
+                        read d1
+                        read a3
                     call multiply
-                      loan d2
-                      loan a0
+                      read d2
+                      read a0
                   call multiply
-                    loan d3
-                    loan a1
+                    read d3
+                    read a1
                 call add
                   call add
                     call subtract
                       call multiply
-                        loan b0
+                        read b0
                         call subtract
-                          mark 0
-                          loan c2
+                          code 0
+                          read c2
                       call multiply
-                        loan b1
+                        read b1
                         call subtract
-                          mark 0
-                          loan c3
+                          code 0
+                          read c3
                     call multiply
-                      loan b2
-                      loan c0
+                      read b2
+                      read c0
                   call multiply
-                    loan b3
+                    read b3
                     call subtract
-                      mark 0
-                      loan c1
+                      code 0
+                      read c1
           call multiply
             call add
               call add
                 call subtract
                   call add
                     call multiply
-                      loan d0
-                      loan a3
+                      read d0
+                      read a3
                     call multiply
-                      loan d1
-                      loan a2
+                      read d1
+                      read a2
                   call multiply
-                    loan d2
-                    loan a1
+                    read d2
+                    read a1
                 call multiply
-                  loan d3
-                  loan a0
+                  read d3
+                  read a0
               call add
                 call subtract
                   call add
                     call multiply
-                      loan b0
+                      read b0
                       call subtract
-                        mark 0
-                        loan c3
+                        code 0
+                        read c3
                     call multiply
-                      loan b1
+                      read b1
                       call subtract
-                        mark 0
-                        loan c2
+                        code 0
+                        read c2
                   call multiply
-                    loan b2
+                    read b2
                     call subtract
-                      mark 0
-                      loan c1
+                      code 0
+                      read c1
                 call multiply
-                  loan b3
-                  loan c0
+                  read b3
+                  read c0
             call add
               call add
                 call subtract
                   call add
                     call multiply
-                      loan d0
-                      loan a3
+                      read d0
+                      read a3
                     call multiply
-                      loan d1
-                      loan a2
+                      read d1
+                      read a2
                   call multiply
-                    loan d2
-                    loan a1
+                    read d2
+                    read a1
                 call multiply
-                  loan d3
-                  loan a0
+                  read d3
+                  read a0
               call add
                 call subtract
                   call add
                     call multiply
-                      loan b0
+                      read b0
                       call subtract
-                        mark 0
-                        loan c3
+                        code 0
+                        read c3
                     call multiply
-                      loan b1
+                      read b1
                       call subtract
-                        mark 0
-                        loan c2
+                        code 0
+                        read c2
                   call multiply
-                    loan b2
+                    read b2
                     call subtract
-                      mark 0
-                      loan c1
+                      code 0
+                      read c1
                 call multiply
-                  loan b3
-                  loan c0
+                  read b3
+                  read c0
       call multiply
         call add
           call add
             call add
               call add
                 call multiply
-                  loan a0
-                  loan a0
+                  read a0
+                  read a0
                 call multiply
-                  loan a1
-                  loan a1
+                  read a1
+                  read a1
               call multiply
-                loan a2
-                loan a2
+                read a2
+                read a2
             call multiply
-              loan a3
-              loan a3
+              read a3
+              read a3
           call add
             call add
               call add
                 call multiply
-                  loan b0
-                  loan b0
+                  read b0
+                  read b0
                 call multiply
-                  loan b1
-                  loan b1
+                  read b1
+                  read b1
               call multiply
-                loan b2
-                loan b2
+                read b2
+                read b2
             call multiply
-              loan b3
-              loan b3
+              read b3
+              read b3
         call add
           call add
             call add
               call add
                 call multiply
-                  loan c0
-                  loan c0
+                  read c0
+                  read c0
                 call multiply
-                  loan c1
-                  loan c1
+                  read c1
+                  read c1
               call multiply
-                loan c2
-                loan c2
+                read c2
+                read c2
             call multiply
-              loan c3
-              loan c3
+              read c3
+              read c3
           call add
             call add
               call add
                 call multiply
-                  loan d0
-                  loan d0
+                  read d0
+                  read d0
                 call multiply
-                  loan d1
-                  loan d1
+                  read d1
+                  read d1
               call multiply
-                loan d2
-                loan d2
+                read d2
+                read d2
             call multiply
-              loan d3
-              loan d3
+              read d3
+              read d3
   send back
-    loan a0
+    read a0

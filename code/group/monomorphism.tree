@@ -1,11 +1,8 @@
+load @/code/group/homomorphism
+  find group-homomorphism
 
-field monomorphism
-  front g, field group
-  front h, field group
-
-  check homomorphism
-    mount g, share g
-    mount h, share h
-  check injectivity
-    mount g, share g
-    mount h, share h
+# A group monomorphism: an injective group homomorphism, one that maps distinct elements to distinct images, so it
+# embeds the source group as a subgroup of the target. Its kernel is trivial (only the identity maps to the identity).
+# The form carries the underlying homomorphism; injectivity is the added condition.
+form group-monomorphism
+  link map, like group-homomorphism

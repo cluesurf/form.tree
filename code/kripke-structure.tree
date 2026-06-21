@@ -1,0 +1,9 @@
+load @/code/structure/set
+  find set
+
+# A Kripke structure: a set of possible worlds linked by an accessibility relation, with each world labeled by which
+# propositions hold there, the semantics of modal and temporal logic. Necessity means truth in all accessible worlds,
+# possibility in some. It is the standard model for verifying that a system satisfies a temporal specification. The form
+# carries the set of worlds; the accessibility relation and the labeling are the structure.
+form kripke-structure
+  link worlds, like set

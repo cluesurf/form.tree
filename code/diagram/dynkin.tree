@@ -1,0 +1,12 @@
+load @/code/structure/set
+  find set
+
+# A Dynkin diagram: the small graph that classifies a simple Lie algebra, one node per simple root, with edges encoding
+# the angles between them. The diagram is the complete fingerprint of the algebra, and the finite list of possible
+# diagrams (the A, B, C, D families and the exceptionals) is the classification of all simple Lie algebras. The diagram
+# of D4 is the unique one with a threefold symmetry: a central node joined to three outer nodes that can be rotated into
+# each other. That threefold symmetry is triality, the interchange of the vector and the two spinor representations,
+# unique to dimension eight, and it is why the 24-cell and the octonions sit where they do. The form carries the nodes;
+# the edges and their multiplicities are the diagram.
+form dynkin-diagram
+  link nodes, like set

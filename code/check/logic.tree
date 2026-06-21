@@ -1,16 +1,4 @@
-
-check disjunction
-  start block, field set
-
-  fetch x, share block
-
-  check truth
-    mount value, share x
-
-check conjunction
-  start block, field set
-
-  drive x, share block
-
-  check truth
-    mount value, share x
+# Checking a logical claim: deciding whether a proposition follows from premises. At the surface this is the decidable
+# fragment (the refinement prover and the arithmetic deciders); in the kernel it is type-checking a proof term against
+# the proposition it claims to prove. A propositional check reduces to truth tables; a first-order check rests on the
+# axioms in the theory folder. This note records what a logic check verifies.

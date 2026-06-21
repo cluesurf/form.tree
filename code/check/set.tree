@@ -1,10 +1,3 @@
-
-check containment
-  start element
-  start set, field set
-
-  fetch x, share set
-
-  check equality
-    mount a, share element
-    mount b, share x
+# Checking a set claim: deciding membership, containment, or equality of sets. Membership is the primitive; containment
+# is membership for every element; equality is two-way containment (extensionality). This note records what a set check
+# verifies; the canonical set form is in the structure folder.

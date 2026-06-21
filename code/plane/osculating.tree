@@ -1,0 +1,8 @@
+load @/code/manifold/riemannian
+  find riemannian-manifold
+
+# The osculating plane: at a point of a curve in space, the plane that best fits the curve there, spanned by its
+# velocity and acceleration, the plane the curve momentarily bends within. It is part of the moving frame that measures
+# how a curve twists and turns. The form carries the manifold the curve lives in.
+form osculating-plane
+  link manifold, like riemannian-manifold

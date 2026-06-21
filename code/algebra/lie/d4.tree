@@ -10,17 +10,17 @@ form d4
 # The one-substance demand: the half-spinor and the vector have the same size at dimension eight, two cubed: 8 = 2*2*2.
 hold <the spinor meets the vector at eight>
   call is-equal
-    mark 8
+    code 8
     call multiply
       call multiply
-        mark 2
-        mark 2
-      mark 2
+        code 2
+        code 2
+      code 2
 
 # Its root system is the 24-cell: twenty-four roots, the twenty-four directions, pairing into twelve lines, 24 = 2*12.
 hold <D four has twenty-four roots>
   call is-equal
-    mark 24
+    code 24
     call multiply
-      mark 2
-      mark 12
+      code 2
+      code 12

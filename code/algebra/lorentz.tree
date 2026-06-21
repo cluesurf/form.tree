@@ -1,0 +1,9 @@
+load @/code/algebra/lie
+  find lie-algebra
+
+# The Lorentz algebra: the Lie algebra of the symmetries of spacetime, the rotations and boosts that preserve the
+# spacetime interval. It is the infinitesimal form of the Lorentz group, and its representations classify the spins of
+# particles. In the substrate the continuous Lorentz symmetry is emergent, the coarse-grained shadow of the discrete F4
+# symmetry of the cell restored in the large. The form carries the underlying Lie algebra.
+form lorentz-algebra
+  link algebra, like lie-algebra
