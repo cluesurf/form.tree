@@ -474,3 +474,53 @@ rule at-most-is-total
           read a
       make yes
   fold a, b
+
+# The order is ANTISYMMETRIC: if a is at most b AND b is at most a, then a = b. The two outer tones cannot each sit no
+# higher than the other unless they are the same. Proved by simultaneous case analysis on both tones; the off-diagonal
+# pairs are ruled out because one of the two hypotheses is false there, leaving only the equal cases.
+rule at-most-is-antisymmetric
+  mark a, like tone
+  mark b, like tone
+  have hab
+    call is-equal
+      call at-most
+        read a
+        read b
+      make yes
+  have hba
+    call is-equal
+      call at-most
+        read b
+        read a
+      make yes
+  show hold
+    call is-equal
+      read a
+      read b
+  fold a, b
+
+# The order is TRANSITIVE: if a is at most b AND b is at most c, then a is at most c. The order carries through the
+# middle. Proved by simultaneous case analysis on all three tones; impossible antecedent combinations are discharged.
+rule at-most-is-transitive
+  mark a, like tone
+  mark b, like tone
+  mark c, like tone
+  have hab
+    call is-equal
+      call at-most
+        read a
+        read b
+      make yes
+  have hbc
+    call is-equal
+      call at-most
+        read b
+        read c
+      make yes
+  show hold
+    call is-equal
+      call at-most
+        read a
+        read c
+      make yes
+  fold a, b, c

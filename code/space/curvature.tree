@@ -1,0 +1,168 @@
+# The three geometries, modeled and classified by the kernel. A space of constant curvature is exactly one of three:
+# positive (the sphere, a triangle's angles sum to MORE than two right angles), zero (the flat plane, exactly two), or
+# negative (the hyperbolic plane, LESS). For a regular tiling {p,q} (q regular p-gons at each vertex) the trichotomy is
+# exact and integer: the angles close up, tile flat, or overflow and curve away, exactly as the excess (p-2)(q-2) is
+# below, equal to, or above four. This file DEFINES that classifier on the actual naturals and PROVES the geometry of
+# representative tilings by computation. The substrate {3,4,3,4} is the four-dimensional hyperbolic case.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+form curvature
+  case sphere
+  case flat
+  case horn
+
+# The geometry of a tiling from its angle-excess e = (p-2)(q-2): excess 0..3 is the sphere, exactly 4 is flat, 5 and up
+# is hyperbolic. Defined by stripping four units off the excess: what remains decides the curvature.
+task geometry-of-excess
+  take e, like natural
+  like curvature
+  fork case, read e
+    case zero
+      send back
+        make sphere
+    case succ
+      link e1
+      fork case, read e1
+        case zero
+          send back
+            make sphere
+        case succ
+          link e2
+          fork case, read e2
+            case zero
+              send back
+                make sphere
+            case succ
+              link e3
+              fork case, read e3
+                case zero
+                  send back
+                    make sphere
+                case succ
+                  link e4
+                  fork case, read e4
+                    case zero
+                      send back
+                        make flat
+                    case succ
+                      send back
+                        make horn
+
+# The tetrahedron {3,3}: excess (3-2)(3-2) = 1, below four, SPHERICAL. The angles close into a closed surface.
+rule tetrahedron-three-three-is-spherical
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make zero
+      make sphere
+  calm
+
+# The octahedron {3,4}: excess (3-2)(4-2) = 2, below four, SPHERICAL.
+rule octahedron-three-four-is-spherical
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      make sphere
+  calm
+
+# The square tiling {4,4}: excess (4-2)(4-2) = 4, exactly four, FLAT. Four right angles tile the plane.
+rule square-tiling-four-four-is-flat
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+      make flat
+  calm
+
+# The triangular tiling {3,6}: excess (3-2)(6-2) = 4, exactly four, FLAT. Six triangles fill a vertex.
+rule triangular-tiling-three-six-is-flat
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+      make flat
+  calm
+
+# The hexagonal tiling {6,3}: excess (6-2)(3-2) = 4, exactly four, FLAT.
+rule hexagonal-tiling-six-three-is-flat
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+      make flat
+  calm
+
+# The heptagrid {7,3}: excess (7-2)(3-2) = 5, above four, HYPERBOLIC. Margenstern's tiling; angles overflow.
+rule heptagrid-seven-three-is-hyperbolic
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make zero
+      make horn
+  calm
+
+# The order-4 pentagonal tiling {5,4}: excess (5-2)(4-2) = 6, above four, HYPERBOLIC. The dodecagrid's planar cousin.
+rule pentagrid-five-four-is-hyperbolic
+  show hold
+    call is-equal
+      call geometry-of-excess
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+      make horn
+  calm

@@ -1,0 +1,89 @@
+# Functions and their composition, a foundational layer proved by the kernel through observational equality (funext). A
+# function equality is settled pointwise and then LIFTED to the functions themselves: if f and g agree at every input
+# they ARE equal as functions. This file models endofunctions on the ternary tone and proves the foundational facts: the
+# identity is a left and right unit, and a self-inverse map composed with itself IS the identity function (not merely
+# equal at each point). The same observational equality is what makes the substrate's symmetries first-class objects.
+
+form tone
+  case low
+  case middle
+  case high
+
+# The identity function.
+task ident
+  take x, like tone
+  like tone
+  send back
+    read x
+
+# The mirror reflection (a self-inverse endofunction).
+task mirror
+  take x, like tone
+  like tone
+  fork case, read x
+    case low
+      send back
+        make high
+    case middle
+      send back
+        make middle
+    case high
+      send back
+        make low
+
+# Mirror composed with itself: apply the reflection twice.
+task twice-mirror
+  take x, like tone
+  like tone
+  send back
+    call mirror
+      call mirror
+        read x
+
+# Identity composed before mirror: mirror after identity.
+task mirror-after-ident
+  take x, like tone
+  like tone
+  send back
+    call mirror
+      call ident
+        read x
+
+# POINTWISE: applying mirror twice returns the input, twice-mirror x = ident x at every tone.
+rule twice-mirror-pointwise
+  mark x, like tone
+  show hold
+    call is-equal
+      call twice-mirror
+        read x
+      call ident
+        read x
+  fold x
+
+# FUNCTION EQUALITY: twice-mirror IS the identity function. Lifted from the pointwise equality by funext: agreeing at
+# every input makes them the same function. The reflection is an involution as a function, not just at each value.
+rule twice-mirror-is-identity-function
+  show hold
+    call is-equal
+      read twice-mirror
+      read ident
+  melt twice-mirror-pointwise
+
+# POINTWISE: composing with the identity first changes nothing, mirror-after-ident x = mirror x at every tone.
+rule mirror-after-ident-pointwise
+  mark x, like tone
+  show hold
+    call is-equal
+      call mirror-after-ident
+        read x
+      call mirror
+        read x
+  fold x
+
+# FUNCTION EQUALITY: identity is a right unit of composition, mirror after identity IS mirror, as functions.
+rule ident-is-right-unit
+  show hold
+    call is-equal
+      read mirror-after-ident
+      read mirror
+  melt mirror-after-ident-pointwise

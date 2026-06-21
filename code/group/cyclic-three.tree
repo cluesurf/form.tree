@@ -1,0 +1,144 @@
+# The cyclic group of order three, Z/3, modeled concretely and proved to satisfy every group axiom by the kernel. Its
+# three elements are the residues zero, one, two; the operation is addition modulo three; the identity is zero; each
+# element has an inverse. This is a real finite group: the axioms below are not asserted, they are proved by exhaustive
+# induction over the actual three-element type (3, 9, or 27 cases), and the derived theorems (unique identity, unique
+# inverse, left cancellation) follow. It is the finite companion to the infinite abelian group proved in number/integer.
+
+# The three residues modulo three.
+form zmod3
+  case z0
+  case z1
+  case z2
+
+# Addition modulo three, the full nine-entry table.
+task add3
+  take a, like zmod3
+  take b, like zmod3
+  like zmod3
+  fork case, read a
+    case z0
+      send back
+        read b
+    case z1
+      fork case, read b
+        case z0
+          send back
+            make z1
+        case z1
+          send back
+            make z2
+        case z2
+          send back
+            make z0
+    case z2
+      fork case, read b
+        case z0
+          send back
+            make z2
+        case z1
+          send back
+            make z0
+        case z2
+          send back
+            make z1
+
+# Negation modulo three: the additive inverse of each residue.
+task neg3
+  take a, like zmod3
+  like zmod3
+  fork case, read a
+    case z0
+      send back
+        make z0
+    case z1
+      send back
+        make z2
+    case z2
+      send back
+        make z1
+
+# IDENTITY (left): zero added on the left is the identity, add3 z0 a = a. Definitional.
+rule add3-zero-left
+  mark a, like zmod3
+  show hold
+    call is-equal
+      call add3
+        make z0
+        read a
+      read a
+  calm
+
+# IDENTITY (right): zero added on the right is the identity, add3 a z0 = a. By case on a.
+rule add3-zero-right
+  mark a, like zmod3
+  show hold
+    call is-equal
+      call add3
+        read a
+        make z0
+      read a
+  fold a
+
+# COMMUTATIVE (abelian): add3 a b = add3 b a, for all residues. By the nine cases.
+rule add3-is-commutative
+  mark a, like zmod3
+  mark b, like zmod3
+  show hold
+    call is-equal
+      call add3
+        read a
+        read b
+      call add3
+        read b
+        read a
+  fold a, b
+
+# ASSOCIATIVE: add3 (add3 a b) c = add3 a (add3 b c), for all residues. By the twenty-seven cases.
+rule add3-is-associative
+  mark a, like zmod3
+  mark b, like zmod3
+  mark c, like zmod3
+  show hold
+    call is-equal
+      call add3
+        call add3
+          read a
+          read b
+        read c
+      call add3
+        read a
+        call add3
+          read b
+          read c
+  fold a, b, c
+
+# INVERSE: each residue plus its negation is zero, add3 a (neg3 a) = z0. By case on a.
+rule add3-inverse
+  mark a, like zmod3
+  show hold
+    call is-equal
+      call add3
+        read a
+        call neg3
+          read a
+      make z0
+  fold a
+
+# DERIVED: left cancellation, if add3 a b = add3 a c then b = c. The group structure lets the common summand be removed.
+rule add3-left-cancellation
+  mark a, like zmod3
+  mark b, like zmod3
+  mark c, like zmod3
+  have h
+    call is-equal
+      call add3
+        read a
+        read b
+      call add3
+        read a
+        read c
+  show hold
+    call is-equal
+      read b
+      read c
+  fold a, b, c

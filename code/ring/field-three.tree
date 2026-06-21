@@ -1,0 +1,192 @@
+# The field of three elements, F3 = Z/3, modeled concretely and proved to be a FIELD by the kernel. On top of the additive
+# abelian group (proved in group/cyclic-three) it carries multiplication modulo three: the kernel proves multiplication
+# is associative, commutative, has identity one, distributes over addition (the ring laws), and that every NONZERO element
+# has a multiplicative inverse (the field law). One is its own inverse and two is its own inverse, since 2 * 2 = 4 = 1
+# modulo three. F3 is the smallest field of odd characteristic, the multiplicative companion to the ternary tone.
+
+form f3
+  case f0
+  case f1
+  case f2
+
+# Addition modulo three (the additive group operation), needed to state distributivity.
+task plus3
+  take a, like f3
+  take b, like f3
+  like f3
+  fork case, read a
+    case f0
+      send back
+        read b
+    case f1
+      fork case, read b
+        case f0
+          send back
+            make f1
+        case f1
+          send back
+            make f2
+        case f2
+          send back
+            make f0
+    case f2
+      fork case, read b
+        case f0
+          send back
+            make f2
+        case f1
+          send back
+            make f0
+        case f2
+          send back
+            make f1
+
+# Multiplication modulo three.
+task times3
+  take a, like f3
+  take b, like f3
+  like f3
+  fork case, read a
+    case f0
+      send back
+        make f0
+    case f1
+      send back
+        read b
+    case f2
+      fork case, read b
+        case f0
+          send back
+            make f0
+        case f1
+          send back
+            make f2
+        case f2
+          send back
+            make f1
+
+# The multiplicative inverse of a nonzero element (zero maps to zero by convention, never used under the nonzero guard).
+task invert3
+  take a, like f3
+  like f3
+  fork case, read a
+    case f0
+      send back
+        make f0
+    case f1
+      send back
+        make f1
+    case f2
+      send back
+        make f2
+
+# MULTIPLICATION IDENTITY: one is the left identity, times3 f1 a = a.
+rule times3-one-left
+  mark a, like f3
+  show hold
+    call is-equal
+      call times3
+        make f1
+        read a
+      read a
+  calm
+
+# times3 one on the right, times3 a f1 = a.
+rule times3-one-right
+  mark a, like f3
+  show hold
+    call is-equal
+      call times3
+        read a
+        make f1
+      read a
+  fold a
+
+# MULTIPLICATION COMMUTATIVE: times3 a b = times3 b a.
+rule times3-is-commutative
+  mark a, like f3
+  mark b, like f3
+  show hold
+    call is-equal
+      call times3
+        read a
+        read b
+      call times3
+        read b
+        read a
+  fold a, b
+
+# MULTIPLICATION ASSOCIATIVE: times3 (times3 a b) c = times3 a (times3 b c).
+rule times3-is-associative
+  mark a, like f3
+  mark b, like f3
+  mark c, like f3
+  show hold
+    call is-equal
+      call times3
+        call times3
+          read a
+          read b
+        read c
+      call times3
+        read a
+        call times3
+          read b
+          read c
+  fold a, b, c
+
+# DISTRIBUTIVITY: multiplication distributes over addition, times3 a (plus3 b c) = plus3 (times3 a b) (times3 a c). This
+# is the law that ties the two operations into a ring.
+rule times3-distributes-over-plus3
+  mark a, like f3
+  mark b, like f3
+  mark c, like f3
+  show hold
+    call is-equal
+      call times3
+        read a
+        call plus3
+          read b
+          read c
+      call plus3
+        call times3
+          read a
+          read b
+        call times3
+          read a
+          read c
+  fold a, b, c
+
+# ZERO ANNIHILATES: times3 f0 a = f0, the additive identity is a multiplicative zero.
+rule times3-zero-left
+  mark a, like f3
+  show hold
+    call is-equal
+      call times3
+        make f0
+        read a
+      make f0
+  calm
+
+# THE FIELD LAW: every nonzero element has a multiplicative inverse. F3's nonzero elements are exactly one and two, and
+# each is proved invertible by computation: one inverts to one, and two inverts to two since 2 * 2 = 4 = 1 modulo three.
+# Exhausting the two nonzero elements IS the field property for F3.
+rule one-is-invertible
+  show hold
+    call is-equal
+      call times3
+        make f1
+        call invert3
+          make f1
+      make f1
+  calm
+
+rule two-is-invertible
+  show hold
+    call is-equal
+      call times3
+        make f2
+        call invert3
+          make f2
+      make f1
+  calm

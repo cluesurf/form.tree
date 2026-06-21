@@ -1,15 +1,184 @@
-load @/code/vibe/tone
-  find tone
+# The lean, the second base element: the order on the tone, low below middle below high. The order turns a tone into a
+# signed charge and gives creation a direction, outward from the resting middle toward the two poles. It is the same
+# one-way order the integers carry, the source of the arrow of time.
+#
+# This file does not assert a single instance like "0 is below 2". It DEFINES the order as a function on the three signed
+# ranks and PROVES the four laws that make it a total order, plus the law unique to the lean: that flipping a tone's sign
+# REVERSES the order. Every theorem is universally quantified over the actual rank type and checked by induction. The
+# ranks are kept local because cross-file casing on an imported inductive type is not yet supported, so the order's proof
+# must live where its constructors do; this is the lean's own statement of the same order tone carries.
 
-# The lean, the order on the tone, the second base element. It puts the low value below the middle below the high. The order turns a tone into a signed charge and gives growth its direction, outward from the middle. It is the same one-way order the integers carry, the source of the arrow of time.
-form lean
-  link tone, like tone
+# A pole, one of the three signed ranks the lean orders: the low value below the middle below the high.
+form pole
+  case minus
+  case zero
+  case plus
 
-# The lean, proof-checked by `seed test`: the order on the ternary tone, low below middle below high. It is the same
-# one-way order the integers carry, so its witnesses agree with the integer order: the low end is below the high. The
-# order itself, as a relation on the tone, is built and proved REFLEXIVE and TOTAL in `code/vibe/tone` (`at-most`), and
-# the lean's signed charge is the `charge` map there, whose sign the tone mirror flips.
-hold low-tone-is-below-high-tone
-  call is-below
-    code 0
-    code 2
+# A truth value, to carry the order relation.
+form flag
+  case yes
+  case no
+
+# below a b is yes when a sits no higher than b in the lean: minus below zero below plus.
+task below
+  take a, like pole
+  take b, like pole
+  like flag
+  fork case, read a
+    case minus
+      send back
+        make yes
+    case zero
+      fork case, read b
+        case minus
+          send back
+            make no
+        case zero
+          send back
+            make yes
+        case plus
+          send back
+            make yes
+    case plus
+      fork case, read b
+        case minus
+          send back
+            make no
+        case zero
+          send back
+            make no
+        case plus
+          send back
+            make yes
+
+# Sign negation: the lean read backward. It flips minus and plus and fixes the resting zero.
+task flip
+  take a, like pole
+  like pole
+  fork case, read a
+    case minus
+      send back
+        make plus
+    case zero
+      send back
+        make zero
+    case plus
+      send back
+        make minus
+
+# disjunction, to state totality.
+task either
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        make yes
+    case no
+      send back
+        read b
+
+# REFLEXIVE: every rank sits no higher than itself, below a a = yes.
+rule below-is-reflexive
+  mark a, like pole
+  show hold
+    call is-equal
+      call below
+        read a
+        read a
+      make yes
+  fold a
+
+# ANTISYMMETRIC: if a is below b and b is below a, then a = b. The order has no two-way ties except equality.
+rule below-is-antisymmetric
+  mark a, like pole
+  mark b, like pole
+  have hab
+    call is-equal
+      call below
+        read a
+        read b
+      make yes
+  have hba
+    call is-equal
+      call below
+        read b
+        read a
+      make yes
+  show hold
+    call is-equal
+      read a
+      read b
+  fold a, b
+
+# TRANSITIVE: if a is below b and b is below c, then a is below c. The order carries through the middle.
+rule below-is-transitive
+  mark a, like pole
+  mark b, like pole
+  mark c, like pole
+  have hab
+    call is-equal
+      call below
+        read a
+        read b
+      make yes
+  have hbc
+    call is-equal
+      call below
+        read b
+        read c
+      make yes
+  show hold
+    call is-equal
+      call below
+        read a
+        read c
+      make yes
+  fold a, b, c
+
+# TOTAL: any two ranks are comparable, either a is below b or b is below a. With the three laws above, the lean is a
+# genuine total order, not merely a partial one.
+rule below-is-total
+  mark a, like pole
+  mark b, like pole
+  show hold
+    call is-equal
+      call either
+        call below
+          read a
+          read b
+        call below
+          read b
+          read a
+      make yes
+  fold a, b
+
+# The law unique to the lean: sign negation is ANTITONE, it reverses the order. below a b = below (flip b) (flip a), for
+# every pair of ranks. Flipping the sign of both sides turns "a no higher than b" into "flip-b no higher than flip-a".
+# This is what it means for the lean to give charge a direction: reversing the sign reverses the sense of the order.
+rule flip-reverses-the-order
+  mark a, like pole
+  mark b, like pole
+  show hold
+    call is-equal
+      call below
+        read a
+        read b
+      call below
+        call flip
+          read b
+        call flip
+          read a
+  fold a, b
+
+# Sign negation is its own inverse: flip (flip a) = a. The lean read backward twice is the lean again.
+rule flip-is-an-involution
+  mark a, like pole
+  show hold
+    call is-equal
+      call flip
+        call flip
+          read a
+      read a
+  fold a

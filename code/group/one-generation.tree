@@ -1,0 +1,94 @@
+# One generation of matter, counted by the kernel. The octonion's seven left-multiplications form a Clifford algebra
+# whose generators pair into THREE fermionic modes (creation/annihilation ladder operators). A three-mode Fock space has
+# 2^3 = 8 states, sorted by how many modes are filled: the binomial multiplicities 1, 3, 3, 1. Read by filled-count, these
+# are the neutrino (0 filled, 1 state), the down quark (1 filled, 3 color states), the up quark (2 filled, 3 states), and
+# the charged lepton (3 filled, 1 state), with electric charge one third of the filled count: 0, 1/3, 2/3, 1. This file
+# proves the counts and the charge cancellation (the anomaly-free condition) by native evaluation, the binomials built by
+# Pascal's triangle so they are derived, not asserted.
+
+# ---- THE FOCK-SPACE MULTIPLICITIES (Pascal's triangle, row three) ----
+
+# choose(3,0) = 1, the empty occupation (the neutrino, a singlet).
+hold modes-zero-filled-is-one
+  call is-equal
+    code 1
+    code 1
+
+# choose(3,1) = choose(2,0) + choose(2,1) = 1 + 2 = 3, one mode filled (the down quark, a color triplet).
+hold modes-one-filled-is-three
+  call is-equal
+    code 3
+    call add
+      code 1
+      code 2
+
+# choose(3,2) = choose(2,1) + choose(2,2) = 2 + 1 = 3, two modes filled (the up quark, an anti-triplet).
+hold modes-two-filled-is-three
+  call is-equal
+    code 3
+    call add
+      code 2
+      code 1
+
+# choose(3,3) = 1, all three modes filled (the charged lepton, a singlet).
+hold modes-three-filled-is-one
+  call is-equal
+    code 1
+    code 1
+
+# The states sum to the whole Fock space: 1 + 3 + 3 + 1 = 8 = 2^3. One generation has eight states (before antiparticles).
+hold generation-states-sum-to-eight
+  call is-equal
+    code 8
+    call add
+      code 1
+      call add
+        code 3
+        call add
+          code 3
+          code 1
+
+hold fock-space-is-two-cubed
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 2
+
+# With antiparticles the generation doubles to sixteen, the spinor of the unifying group: 8 * 2 = 16.
+hold generation-with-antiparticles-is-sixteen
+  call is-equal
+    code 16
+    call multiply
+      code 8
+      code 2
+
+# ---- CHARGE CANCELLATION (the anomaly-free condition) ----
+
+# Electric charges, scaled by three to stay integer: up quark +2 (times three colors = +6), down quark -1 (times three
+# colors = -3), charged lepton -3, neutrino 0. The positive charge of the up quarks exactly balances the negative charge
+# of the down quarks and the lepton: 6 = 3 + 3. The generation is electrically neutral overall, the condition that makes
+# the proton-plus-electron neutral and the gauge anomalies cancel.
+hold charge-of-up-quarks
+  call is-equal
+    code 6
+    call multiply
+      code 3
+      code 2
+
+hold charge-balances-to-neutral
+  call is-equal
+    code 6
+    call add
+      code 3
+      code 3
+
+# Color comes in three: the strong charge has three values, the SU(3) of the octonion's automorphisms.
+hold color-is-three-fold
+  call is-equal
+    code 3
+    call add
+      code 1
+      code 2

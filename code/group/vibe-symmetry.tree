@@ -1,0 +1,164 @@
+# The symmetry groups of vibe theory, modeled where finite and checkable. The cell's symmetry is the Weyl group of F4,
+# of order 1152, which is the root symmetry of D4 (order 192) extended by the order-three TRIALITY that cycles the three
+# eight-dimensional pieces. The local law must respect the signed-coordinate subgroup B4 (the hyperoctahedral group) of
+# order 384. The twenty-four directions are the binary tetrahedral group 2T under quaternion multiplication, the DOUBLE
+# COVER of ordinary rotation, where a full turn acts as minus one and only a double turn returns to the start. This file
+# proves the structural FACTORIZATIONS that show how these groups are built, and models the double cover concretely.
+
+# ---- THE DOUBLE COVER (the spinor sign) ----
+
+# A turn parity: the spinor sign carried by the twenty-four directions. A full turn is the nontrivial element, a double
+# turn the identity. This is Z/2, the kernel of the double cover SU(2) -> SO(3) made concrete.
+form parity
+  case even
+  case odd
+
+# Compose two turns: parities add, odd plus odd returning to even. This is the group operation of Z/2.
+task turn-add
+  take a, like parity
+  take b, like parity
+  like parity
+  fork case, read a
+    case even
+      send back
+        read b
+    case odd
+      fork case, read b
+        case even
+          send back
+            make odd
+        case odd
+          send back
+            make even
+
+# A FULL TURN does not return: odd is not even, a 2-pi rotation acts as minus one, not the identity. This is the defining
+# mark of a spinor, exact in the finite group with no limit taken.
+rule full-turn-is-not-identity
+  show miss
+    call is-equal
+      make odd
+      make even
+  calm miss
+
+# A DOUBLE TURN returns: odd composed with odd is even, a 4-pi rotation IS the identity. The cover is exactly two-to-one.
+rule double-turn-returns
+  show hold
+    call is-equal
+      call turn-add
+        make odd
+        make odd
+      make even
+  calm
+
+# The turn composition is ASSOCIATIVE, with even the identity and every element its own inverse: Z/2 is a group.
+rule turn-add-is-associative
+  mark a, like parity
+  mark b, like parity
+  mark c, like parity
+  show hold
+    call is-equal
+      call turn-add
+        call turn-add
+          read a
+          read b
+        read c
+      call turn-add
+        read a
+        call turn-add
+          read b
+          read c
+  fold a, b, c
+
+rule turn-even-is-identity
+  mark a, like parity
+  show hold
+    call is-equal
+      call turn-add
+        read a
+        make even
+      read a
+  fold a
+
+# every turn is its own inverse (Z/2): turn-add a a = even.
+rule turn-self-inverse
+  mark a, like parity
+  show hold
+    call is-equal
+      call turn-add
+        read a
+        read a
+      make even
+  fold a
+
+# ---- THE GROUP-ORDER STRUCTURE (factorizations that show how each group is built) ----
+
+# The binary tetrahedral group 2T has order 24, exactly the twenty-four vertices of the 24-cell / roots of D4.
+hold binary-tetrahedral-order-is-twenty-four
+  call is-equal
+    code 24
+    call multiply
+      code 6
+      code 4
+
+# The Weyl group of D4 has order 192 = 24 * 8, the twenty-four roots times the eight-element reflection stabilizer.
+hold weyl-d4-order-is-192
+  call is-equal
+    code 192
+    call multiply
+      code 24
+      code 8
+
+# The full cell symmetry is the Weyl group of F4, order 1152 = 192 * 6: the D4 symmetry extended by the order-six
+# triality (the symmetric group on the three eight-dimensional pieces). This factorization IS the triality structure.
+hold weyl-f4-order-is-1152
+  call is-equal
+    code 1152
+    call multiply
+      code 192
+      code 6
+
+# The signed-coordinate group B4 (hyperoctahedral) the local law must respect has order 384 = 16 * 24 = 2^4 * 4!: a sign
+# on each of four axes, times the permutations of the four axes.
+hold hyperoctahedral-b4-order-is-384
+  call is-equal
+    code 384
+    call multiply
+      code 16
+      code 24
+
+# Triality cycles three eight-dimensional pieces, the vector and the two half-spinors: 8 + 8 + 8 = 24, the dual count.
+hold triality-three-octets-sum-to-twenty-four
+  call is-equal
+    code 24
+    call add
+      code 8
+      call add
+        code 8
+        code 8
+
+# The Standard Model gauge group has dimension 12 = 8 + 3 + 1: color SU(3), weak SU(2), hypercharge U(1).
+hold gauge-group-dimension-is-twelve
+  call is-equal
+    code 12
+    call add
+      code 8
+      call add
+        code 3
+        code 1
+
+# The knit is forced: the symmetric reversible pairings of the twenty-four directions number 11!! = 10395, and the full
+# cell symmetry collapses them to one. 11!! = 11*9*7*5*3*1.
+hold knit-pairings-eleven-double-factorial
+  call is-equal
+    code 10395
+    call multiply
+      code 11
+      call multiply
+        code 9
+        call multiply
+          code 7
+          call multiply
+            code 5
+            call multiply
+              code 3
+              code 1

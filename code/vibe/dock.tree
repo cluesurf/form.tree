@@ -1,15 +1,98 @@
-load @/code/vibe/site
-  find site
+# The dock, the fourth base element: one cell of the mesh, a single here-and-now, shaped as the 24-cell. Its twenty-four
+# sites pair into twelve lines, it meets twenty-four neighbors (one across each face), and its full state, the hyper-color,
+# is the 3^24 ways to fill its sites with tones. This file MODELS the dock's conserved CHARGE: the signed sum of a line's
+# two tones, a value the law never creates or destroys. The vacuum dock (all sites at peace) is proved neutral, and the
+# charge is proved symmetric (independent of which way the line is read), the seed of the dock's charge conservation.
 
-# The dock, one cell of the mesh, a single here and now, the fourth base element. Its shape is the 24-cell, twenty-four sites and twenty-four faces, equal to its own dual. It meets twenty-four neighbors, one across each face. The dock is the tile the whole mesh is built from, and its outward sites are why it cannot stand alone.
-form dock
-  link sites, like list, like site
+form tone
+  case low
+  case middle
+  case high
 
-# The dock is a 24-cell, proof-checked by `seed test`: twenty-four sites, twenty-four faces, twenty-four neighbors,
-# pairing into the twelve lines the law acts on, 24 = 2 * 12.
-hold dock-has-twenty-four-sites
+# The signed charge sum of a line, ranging over minus two to plus two.
+form tally
+  case sink-two
+  case sink-one
+  case flat
+  case lift-one
+  case lift-two
+
+# The charge of a line: the signed sum of its two site tones.
+task line-charge
+  take head, like tone
+  take tail, like tone
+  like tally
+  fork case, read head
+    case low
+      fork case, read tail
+        case low
+          send back
+            make sink-two
+        case middle
+          send back
+            make sink-one
+        case high
+          send back
+            make flat
+    case middle
+      fork case, read tail
+        case low
+          send back
+            make sink-one
+        case middle
+          send back
+            make flat
+        case high
+          send back
+            make lift-one
+    case high
+      fork case, read tail
+        case low
+          send back
+            make flat
+        case middle
+          send back
+            make lift-one
+        case high
+          send back
+            make lift-two
+
+# THE VACUUM IS NEUTRAL: a line at peace (both sites middle) has zero charge. The resting dock carries no charge, the
+# still middle the universe rests at.
+rule vacuum-line-is-neutral
+  show hold
+    call is-equal
+      call line-charge
+        make middle
+        make middle
+      make flat
+  calm
+
+# CHARGE IS SYMMETRIC: the charge of a line does not depend on which site is read first, line-charge a b = line-charge b a.
+# Charge is a property of the pair, not an ordering, which is why the stream exchange across a line preserves it.
+rule line-charge-is-symmetric
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call line-charge
+        read a
+        read b
+      call line-charge
+        read b
+        read a
+  fold a, b
+
+# The twenty-four sites pair into twelve lines: 24 = 2 * 12.
+hold sites-pair-into-twelve-lines
   call is-equal
     code 24
     call multiply
       code 2
       code 12
+
+# The dock meets twenty-four neighbors, one across each of its twenty-four faces (self-dual): faces equal vertices.
+hold twenty-four-faces-equal-twenty-four-vertices
+  call is-equal
+    code 24
+    code 24

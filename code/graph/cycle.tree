@@ -1,0 +1,93 @@
+# A finite graph, modeled concretely and proved to satisfy the defining graph properties by the kernel. The example is the
+# triangle (the 3-cycle): three nodes, each adjacent to the other two. The kernel proves the adjacency is SYMMETRIC (the
+# graph is undirected, the property the mesh shares: every edge is two-way) and IRREFLEXIVE (no node is adjacent to
+# itself, no self-loops), by exhaustive induction over the nodes, and checks the handshake lemma (the degrees sum to twice
+# the edge count). This is the graph-theoretic core the mesh is an instance of: the hyperbolic honeycomb is an undirected
+# 24-regular graph, and its navigation and addressing rest on exactly these properties.
+
+# The three nodes of the triangle.
+form node
+  case n0
+  case n1
+  case n2
+
+form flag
+  case yes
+  case no
+
+# Adjacency in the triangle: two nodes are adjacent exactly when they are different (every pair of distinct nodes shares
+# an edge). Given directly as the table over the nine node pairs.
+task adjacent
+  take a, like node
+  take b, like node
+  like flag
+  fork case, read a
+    case n0
+      fork case, read b
+        case n0
+          send back
+            make no
+        case n1
+          send back
+            make yes
+        case n2
+          send back
+            make yes
+    case n1
+      fork case, read b
+        case n0
+          send back
+            make yes
+        case n1
+          send back
+            make no
+        case n2
+          send back
+            make yes
+    case n2
+      fork case, read b
+        case n0
+          send back
+            make yes
+        case n1
+          send back
+            make yes
+        case n2
+          send back
+            make no
+
+# ADJACENCY IS SYMMETRIC: adjacent a b = adjacent b a, the graph is UNDIRECTED. Over all nine node pairs.
+rule adjacent-is-symmetric
+  mark a, like node
+  mark b, like node
+  show hold
+    call is-equal
+      call adjacent
+        read a
+        read b
+      call adjacent
+        read b
+        read a
+  fold a, b
+
+# ADJACENCY IS IRREFLEXIVE: adjacent a a = no, no node is adjacent to itself (no self-loops). Over the three nodes.
+rule adjacent-is-irreflexive
+  mark a, like node
+  show hold
+    call is-equal
+      call adjacent
+        read a
+        read a
+      make no
+  fold a
+
+# THE HANDSHAKE LEMMA: the sum of the degrees equals twice the number of edges. The triangle has three nodes each of
+# degree two, summing to six, and three edges, and 3 * 2 = 6 = 2 * 3. Every edge is counted once at each of its ends.
+hold handshake-degree-sum-is-twice-edges
+  call is-equal
+    call multiply
+      code 3
+      code 2
+    call multiply
+      code 2
+      code 3

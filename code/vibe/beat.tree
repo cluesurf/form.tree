@@ -1,10 +1,106 @@
-# The beat, the eighth base element, one discrete tick of time. The knit and the wake each act once a beat. Time is the count of beats, and its one-way order, set by the lean and the wake, is the arrow.
-form beat
-  case tick
+# The beat, the eighth base element: one discrete tick of time. Time is the count of beats, and the one-way order on that
+# count is the arrow of time. A later beat is above an earlier one, and the order cannot be run backward.
+#
+# This file MODELS time as a count and the arrow as the STRICT ORDER on it. The count is a natural number, one tick its
+# successor. The before-relation is proved IRREFLEXIVE (no beat precedes itself), ASYMMETRIC (if a is before b then b is
+# not before a, the one-wayness that is the arrow), and TRANSITIVE, and each tick strictly advances. These are the laws
+# that make the arrow an arrow, not a single asserted inequality.
 
-# The beat, proof-checked by `seed test`: one discrete tick of time, and time is the count of beats, whose one-way
-# order is the arrow. A later beat is above an earlier: the count runs forward and cannot be reversed.
-hold later-beat-is-above-earlier-beat
-  call is-above
-    code 2
-    code 1
+# The count of beats: zero, or one tick later.
+form time
+  case start
+  case tick
+    link prior, like time
+
+form flag
+  case yes
+  case no
+
+# before a b is yes when beat a happens strictly before beat b.
+task before
+  take a, like time
+  take b, like time
+  like flag
+  fork case, read b
+    case start
+      send back
+        make no
+    case tick
+      link bp
+      fork case, read a
+        case start
+          send back
+            make yes
+        case tick
+          link ap
+          send back
+            call before
+              read ap
+              read bp
+
+# IRREFLEXIVE: no beat is before itself, before n n = no. Time does not precede itself.
+rule before-is-irreflexive
+  mark n, like time
+  show hold
+    call is-equal
+      call before
+        read n
+        read n
+      make no
+  fold n
+
+# EACH TICK ADVANCES: every beat is before its own next tick, before n (tick n) = yes.
+rule tick-advances
+  mark n, like time
+  show hold
+    call is-equal
+      call before
+        read n
+        make tick
+          bind prior
+            read n
+      make yes
+  fold n
+
+# ASYMMETRIC, the arrow itself: if a is before b then b is NOT before a. Time runs one way and cannot be reversed.
+rule before-is-asymmetric
+  mark a, like time
+  mark b, like time
+  have hab
+    call is-equal
+      call before
+        read a
+        read b
+      make yes
+  show hold
+    call is-equal
+      call before
+        read b
+        read a
+      make no
+  fold a, b
+
+# TRANSITIVE: if a is before b and b is before c then a is before c. The order carries forward through the beats.
+rule before-is-transitive
+  mark a, like time
+  mark b, like time
+  mark c, like time
+  have hab
+    call is-equal
+      call before
+        read a
+        read b
+      make yes
+  have hbc
+    call is-equal
+      call before
+        read b
+        read c
+      make yes
+  show hold
+    call is-equal
+      call before
+        read a
+        read c
+      make yes
+  fold a, b, c

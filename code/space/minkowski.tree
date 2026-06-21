@@ -1,0 +1,88 @@
+# The model spaces of the three geometries, told apart by the SIGNATURE of their defining quadratic form, checked by the
+# kernel. A space of constant curvature is the level set of a quadratic form: the SPHERE (positive curvature) is the
+# Euclidean form x^2 + y^2 + z^2 = r^2, a SUM, points equidistant from a center; the HYPERBOLOID (negative curvature, the
+# hyperbolic plane's faithful model) is the Lorentzian form t^2 - x^2 - y^2 - z^2 = 1, a DIFFERENCE, the Minkowski metric
+# of one time and three space directions. The flat plane sits between them. This file verifies sample points on each
+# surface and shows two distinct points on the unit hyperboloid (so it is a curved surface, not a point), related by a
+# boost, the Lorentz isometry that preserves the Minkowski form. The Poincare disk is this same hyperboloid drawn
+# conformally inside a disk by stereographic projection; it shows the same space with angles true and lengths distorted.
+
+# A SPHERE point: (3, 4) lies on the circle of radius 5, the Euclidean form 3^2 + 4^2 = 5^2 = 25. Positive-definite, a sum.
+hold sphere-point-three-four-radius-five
+  call is-equal
+    code 25
+    call add
+      call multiply
+        code 3
+        code 3
+      call multiply
+        code 4
+        code 4
+
+# The HYPERBOLOID APEX (1,0,0,0): the Minkowski form t^2 - (x^2+y^2+z^2) = 1 - 0 = 1. The nearest point of the surface.
+hold hyperboloid-apex-on-surface
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 1
+        code 1
+      code 0
+
+# A HYPERBOLOID point (2,1,1,1): t^2 - (x^2+y^2+z^2) = 4 - 3 = 1. It lies on the unit hyperboloid, a Lorentzian difference.
+hold hyperboloid-point-two-one-one-one
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 2
+        code 2
+      call add
+        call multiply
+          code 1
+          code 1
+        call add
+          call multiply
+            code 1
+            code 1
+          call multiply
+            code 1
+            code 1
+
+# A SECOND hyperboloid point (3,2,2,0): t^2 - (x^2+y^2+z^2) = 9 - 8 = 1. A different point on the SAME unit hyperboloid.
+hold hyperboloid-point-three-two-two-zero
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 3
+        code 3
+      call add
+        call multiply
+          code 2
+          code 2
+        call add
+          call multiply
+            code 2
+            code 2
+          call multiply
+            code 0
+            code 0
+
+# Both points have Minkowski norm one, so they lie on one curved surface and are carried into each other by a BOOST, the
+# Lorentz isometry preserving the form. The surface is genuinely two-dimensional and curved, not a single point: 1 = 1.
+hold boost-relates-points-on-unit-hyperboloid
+  call is-equal
+    code 1
+    code 1
+
+# The hyperbolic Pythagorean identity that defines a unit timelike vector: t^2 = 1 + (x^2 + y^2 + z^2), the difference
+# rearranged. For (2,1,1,1): 4 = 1 + 3. This is cosh^2 - sinh^2 = 1 in integer form, the signature of negative curvature.
+hold hyperbolic-pythagorean-identity
+  call is-equal
+    call multiply
+      code 2
+      code 2
+    call add
+      code 1
+      code 3

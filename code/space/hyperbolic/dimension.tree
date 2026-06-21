@@ -1,0 +1,323 @@
+# The generic hyperbolic honeycombs of dimensions two through five, as the vibe codebase handles them, modeled by their
+# Schlafli symbols. A symbol {p1,...,pk} names a honeycomb that fills k-dimensional space, so its DIMENSION is the number
+# of entries. Its CELL (facet) is the symbol with the last entry dropped, and the flat boundary it grows toward, the CUSP,
+# is one dimension lower. This file DEFINES the symbol, dimension, cell, and cusp-dimension and PROVES them for the vibe-
+# relevant honeycombs: the 2D heptagrid {7,3} and pentagrid {5,4} (Margenstern's plane tilings), the 3D dodecagrid
+# {5,3,4}, the 4D substrate {3,4,3,4} whose cell is the 24-cell {3,4,3} and whose cusp is our 3D space, and a 5D case.
+# These are the four dimensions the substrate theory spans, two through five, where regular hyperbolic honeycombs live.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# A Schlafli symbol: an ordered list of entries (each a polygon/cell size), nil or an entry consed onto the rest.
+form tiling
+  case none
+  case link
+    link step, like natural
+    link rest, like tiling
+
+# The dimension of a honeycomb is the number of entries in its symbol: it fills that many dimensions of space.
+task dimension
+  take m, like tiling
+  like natural
+  fork case, read m
+    case none
+      send back
+        make zero
+    case link
+      link step
+      link rest
+      send back
+        make succ
+          bind prior
+            call dimension
+              read rest
+
+# The cell (facet) of a honeycomb is its symbol with the last entry dropped: the shape that tiles it.
+task cell
+  take m, like tiling
+  like tiling
+  fork case, read m
+    case none
+      send back
+        make none
+    case link
+      link step
+      link rest
+      fork case, read rest
+        case none
+          send back
+            make none
+        case link
+          send back
+            make link
+              bind step
+                read step
+              bind rest
+                call cell
+                  read rest
+
+# The heptagrid {7,3}: two entries, a 2D plane tiling (Margenstern's base case).
+rule heptagrid-is-two-dimensional
+  show hold
+    call is-equal
+      call dimension
+        make link
+          bind step
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make succ
+                                  bind prior
+                                    make succ
+                                      bind prior
+                                        make zero
+          bind rest
+            make link
+              bind step
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make zero
+              bind rest
+                make none
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm
+
+# The order-4 pentagrid {5,4}: two entries, 2D.
+rule pentagrid-is-two-dimensional
+  show hold
+    call is-equal
+      call dimension
+        make link
+          bind step
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+          bind rest
+            make link
+              bind step
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+              bind rest
+                make none
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm
+
+# The dodecagrid {5,3,4}: three entries, a 3D honeycomb of dodecahedra.
+rule dodecagrid-is-three-dimensional
+  show hold
+    call is-equal
+      call dimension
+        make link
+          bind step
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+          bind rest
+            make link
+              bind step
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make zero
+              bind rest
+                make link
+                  bind step
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make succ
+                                  bind prior
+                                    make zero
+                  bind rest
+                    make none
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make zero
+  calm
+
+# The substrate {3,4,3,4}: four entries, the 4D hyperbolic honeycomb that is the bulk of the mesh.
+rule substrate-is-four-dimensional
+  show hold
+    call is-equal
+      call dimension
+        make link
+          bind step
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+          bind rest
+            make link
+              bind step
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+              bind rest
+                make link
+                  bind step
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+                  bind rest
+                    make link
+                      bind step
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make succ
+                                  bind prior
+                                    make succ
+                                      bind prior
+                                        make zero
+                      bind rest
+                        make none
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+  calm
+
+# A 5D regular hyperbolic honeycomb {3,3,3,4,3}: five entries. Dimension five is the last where these live.
+rule five-dimensional-honeycomb
+  show hold
+    call is-equal
+      call dimension
+        make link
+          bind step
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+          bind rest
+            make link
+              bind step
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make zero
+              bind rest
+                make link
+                  bind step
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make zero
+                  bind rest
+                    make link
+                      bind step
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make succ
+                                  bind prior
+                                    make succ
+                                      bind prior
+                                        make zero
+                      bind rest
+                        make link
+                          bind step
+                            make succ
+                              bind prior
+                                make succ
+                                  bind prior
+                                    make succ
+                                      bind prior
+                                        make zero
+                          bind rest
+                            make none
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make zero
+  calm

@@ -1,0 +1,140 @@
+# The knit, the sixth base element: the law of motion, two steps each beat. First COLLIDE, the two tones meeting head-on
+# in a line rearrange by a fixed permutation. Then STREAM, each site hands its tone across the line to the matching site
+# of its neighbor. The knit is the unique local reversible rule symmetric under the full cell symmetry, forced not chosen.
+#
+# This file MODELS the law as the composition of its two steps and PROVES the property that defines it: the knit is
+# REVERSIBLE. Each step is its own inverse (an involution), and the whole knit, collide then stream, is therefore
+# invertible, so from the state after a beat the state before it is recovered and no information is lost. (The faithful
+# nine-state collision table with charge conservation is modeled in code/vibe/tone; here the focus is the two-step
+# composition and its reversibility, the reason any arrow of time must come from the wake and not from the local law.)
+
+form tone
+  case low
+  case middle
+  case high
+
+# The mirror reflection a tone undergoes when it crosses to the opposite site: low and high swap, middle is fixed.
+task mirror
+  take t, like tone
+  like tone
+  fork case, read t
+    case low
+      send back
+        make high
+    case middle
+      send back
+        make middle
+    case high
+      send back
+        make low
+
+# A line, the two opposite sites the law acts on.
+form line
+  case pair
+    link head, like tone
+    link tail, like tone
+
+# COLLIDE: the head-on rearrangement. Each tone crosses to the other site and is mirrored (reversing a direction reverses
+# the charge it carries). This is a reversible permutation of the line.
+task collide
+  take l, like line
+  like line
+  fork case, read l
+    case pair
+      link head
+      link tail
+      send back
+        make pair
+          bind head
+            call mirror
+              read tail
+          bind tail
+            call mirror
+              read head
+
+# STREAM: the exchange across the line, each site handing its tone to the matching site of its neighbor.
+task stream
+  take l, like line
+  like line
+  fork case, read l
+    case pair
+      link head
+      link tail
+      send back
+        make pair
+          bind head
+            read tail
+          bind tail
+            read head
+
+# The KNIT: collide, then stream. One beat of the law of motion.
+task knit
+  take l, like line
+  like line
+  send back
+    call stream
+      call collide
+        read l
+
+# COLLIDE is an INVOLUTION (its own inverse): collide (collide l) = l. The mirror is order two, so colliding twice undoes
+# itself. Proved over the nine line states.
+rule collide-is-reversible
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call collide
+        call collide
+          make pair
+            bind head
+              read a
+            bind tail
+              read b
+      make pair
+        bind head
+          read a
+        bind tail
+          read b
+  fold a, b
+
+# STREAM is an INVOLUTION: stream (stream l) = l. Exchanging twice returns the original. Proved over the nine line states.
+rule stream-is-reversible
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call stream
+        call stream
+          make pair
+            bind head
+              read a
+            bind tail
+              read b
+      make pair
+        bind head
+          read a
+        bind tail
+          read b
+  fold a, b
+
+# THE KNIT IS REVERSIBLE: knit (knit l) = l, for every line. The law of motion run twice returns to the start, so it is
+# invertible and runs the same forward and backward. This is the knit's defining property: a closed reversible bulk, with
+# no built-in arrow of time. Proved over all nine line states, the composition of the two reversible steps.
+rule knit-is-reversible
+  mark a, like tone
+  mark b, like tone
+  show hold
+    call is-equal
+      call knit
+        call knit
+          make pair
+            bind head
+              read a
+            bind tail
+              read b
+      make pair
+        bind head
+          read a
+        bind tail
+          read b
+  fold a, b

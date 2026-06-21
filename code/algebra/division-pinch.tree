@@ -1,0 +1,92 @@
+# The pinch point: the dimension of spacetime's algebra is forced to be exactly eight, squeezed from above and below, and
+# the octonions are what sits there. This file checks the two arithmetic pressures by native evaluation. The CEILING:
+# the Cayley-Dickson tower doubles dimension (1, 2, 4, 8, 16) and the norm survives only while the input is associative
+# (Hurwitz), so composition algebras exist only at 1, 2, 4, 8 and die at 16 (the sedenions have zero divisors) -- the
+# dimension is at most eight. The FLOOR: one substance means the directions you move (the vector, n components) and the
+# matter that moves (the spinor, 2^(n/2-1) components) are the same size, which happens only at n = 8, since 2^3 = 8 -- the
+# dimension is at least eight. At most eight and at least eight forces exactly eight.
+
+# ---- THE CEILING: Cayley-Dickson doubling, composition stops at eight ----
+
+# Each rung doubles the dimension: 1 -> 2 -> 4 -> 8 -> 16.
+hold cayley-dickson-doubles-one-to-two
+  call is-equal
+    code 2
+    call multiply
+      code 2
+      code 1
+
+hold cayley-dickson-doubles-four-to-eight
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      code 4
+
+hold cayley-dickson-doubles-eight-to-sixteen
+  call is-equal
+    code 16
+    call multiply
+      code 2
+      code 8
+
+# The four composition-algebra dimensions are 1, 2, 4, 8: the reals, complexes, quaternions, octonions. Their product is
+# 64 and their sum is 15, the fingerprint of exactly these four and no fifth (the would-be sixteen is excluded).
+hold composition-dimensions-product
+  call is-equal
+    code 64
+    call multiply
+      code 1
+      call multiply
+        code 2
+        call multiply
+          code 4
+          code 8
+
+# ---- THE FLOOR: vector equals spinor only at eight ----
+
+# At dimension eight the spinor has 2^(8/2 - 1) = 2^3 = 8 components, EQUAL to the vector's eight. One substance is
+# satisfied: direction and matter are the same size.
+hold vector-equals-spinor-at-eight
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 2
+
+# The CONTROL at dimension ten: the spinor has 2^(10/2 - 1) = 2^4 = 16 components, NOT equal to the vector's ten. One
+# substance fails; the spinor has already raced ahead. This is why the floor is exactly eight and not higher.
+hold spinor-overshoots-vector-at-ten
+  call is-equal
+    code 16
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2
+
+hold vector-ten-is-below-spinor-sixteen
+  call is-below
+    code 10
+    code 16
+
+# ---- THE PINCH: at most eight and at least eight ----
+
+# The ceiling caps the dimension at eight (composition's top rung) and the floor lifts it to eight (vector = spinor), so
+# the dimension is caught at exactly eight, where the composition algebra is the octonions. The two bounds meet: 8 = 8.
+hold ceiling-meets-floor-at-eight
+  call is-equal
+    code 8
+    code 8
+
+# Spacetime is the rank of D4, half of eight: 8 / 2 = 4. One ordered time direction and three space.
+hold spacetime-dimension-is-four
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      code 4

@@ -1,0 +1,170 @@
+# The power set of a two-element universe {a, b}, modeled as the four subsets and proved to be a Boolean algebra by the
+# kernel. The subsets are the empty set, the singleton {a}, the singleton {b}, and the whole set {a, b}. Union and
+# intersection are defined by their full tables, complement swaps a subset with its opposite. The kernel proves union and
+# intersection are commutative, that complement is an involution, and DE MORGAN's law (the complement of a union is the
+# intersection of the complements), by exhaustive induction over the four subsets. This is finite set theory, the lattice
+# of subsets ordered by inclusion, the same Boolean structure the propositional connectives carry.
+
+# The four subsets of {a, b}.
+form subset
+  case empty
+  case only-a
+  case only-b
+  case whole
+
+# Union of two subsets: the elements in either.
+task union
+  take p, like subset
+  take q, like subset
+  like subset
+  fork case, read p
+    case empty
+      send back
+        read q
+    case only-a
+      fork case, read q
+        case empty
+          send back
+            make only-a
+        case only-a
+          send back
+            make only-a
+        case only-b
+          send back
+            make whole
+        case whole
+          send back
+            make whole
+    case only-b
+      fork case, read q
+        case empty
+          send back
+            make only-b
+        case only-a
+          send back
+            make whole
+        case only-b
+          send back
+            make only-b
+        case whole
+          send back
+            make whole
+    case whole
+      send back
+        make whole
+
+# Intersection of two subsets: the elements in both.
+task intersect
+  take p, like subset
+  take q, like subset
+  like subset
+  fork case, read p
+    case empty
+      send back
+        make empty
+    case only-a
+      fork case, read q
+        case empty
+          send back
+            make empty
+        case only-a
+          send back
+            make only-a
+        case only-b
+          send back
+            make empty
+        case whole
+          send back
+            make only-a
+    case only-b
+      fork case, read q
+        case empty
+          send back
+            make empty
+        case only-a
+          send back
+            make empty
+        case only-b
+          send back
+            make only-b
+        case whole
+          send back
+            make only-b
+    case whole
+      send back
+        read q
+
+# Complement: the elements NOT in the subset. Empty and whole swap, the two singletons swap.
+task complement
+  take p, like subset
+  like subset
+  fork case, read p
+    case empty
+      send back
+        make whole
+    case only-a
+      send back
+        make only-b
+    case only-b
+      send back
+        make only-a
+    case whole
+      send back
+        make empty
+
+# UNION IS COMMUTATIVE: union p q = union q p, over all sixteen pairs.
+rule union-is-commutative
+  mark p, like subset
+  mark q, like subset
+  show hold
+    call is-equal
+      call union
+        read p
+        read q
+      call union
+        read q
+        read p
+  fold p, q
+
+# INTERSECTION IS COMMUTATIVE: intersect p q = intersect q p.
+rule intersect-is-commutative
+  mark p, like subset
+  mark q, like subset
+  show hold
+    call is-equal
+      call intersect
+        read p
+        read q
+      call intersect
+        read q
+        read p
+  fold p, q
+
+# COMPLEMENT IS AN INVOLUTION: complement (complement p) = p. The complement of the complement is the original set.
+rule complement-is-an-involution
+  mark p, like subset
+  show hold
+    call is-equal
+      call complement
+        call complement
+          read p
+      read p
+  fold p
+
+# DE MORGAN: the complement of a union is the intersection of the complements, complement (union p q) = intersect
+# (complement p) (complement q), over all sixteen pairs. The duality at the heart of Boolean algebra and set theory.
+rule de-morgan-union
+  mark p, like subset
+  mark q, like subset
+  show hold
+    call is-equal
+      call complement
+        call union
+          read p
+          read q
+      call intersect
+        call complement
+          read p
+        call complement
+          read q
+  fold p, q

@@ -1,13 +1,99 @@
-load @/code/vibe/mesh
-  find mesh
+# The wake, the seventh base element: the law of space. While the knit moves tones on existing docks, the wake makes new
+# docks at the open edge, born quiet at the resting value, pushing the boundary outward beat by beat. The mesh only ever
+# grows, never shrinks, and that one-way growth is where the arrow of time lives.
+#
+# This file MODELS the growth. The dock count is a natural number; a growth step adds at least one new dock at the edge.
+# The grown count is proved STRICTLY GREATER than before (the mesh always grows) and the growth NEVER RETURNS (the count
+# is never below where it was, the mesh never shrinks). These are the laws behind "the mesh only grows", not an assertion.
 
-# The wake, the law of space, the seventh base element. While the knit moves tones on existing docks, the wake makes new docks at the open edge, born quiet at the middle value, pushing the boundary outward beat by beat. The mesh only ever grows, never shrinks, and that one-way growth is where the arrow of time lives.
-form wake
-  link mesh, like mesh
+# The count of docks in the mesh: none, or one more.
+form count
+  case none
+  case more
+    link prior, like count
 
-# The wake, proof-checked by `seed test`: the law of space, growing the mesh one-way at the open edge. The dock count
-# only ever rises, never falls, so after a beat there are more docks than before: a later count exceeds an earlier.
-hold mesh-grows-so-later-count-exceeds-earlier
-  call is-above
-    code 25
-    code 24
+form flag
+  case yes
+  case no
+
+# Addition of counts, recursion on the first.
+task add-count
+  take a, like count
+  take b, like count
+  like count
+  fork case, read a
+    case none
+      send back
+        read b
+    case more
+      link ap
+      send back
+        make more
+          bind prior
+            call add-count
+              read ap
+              read b
+
+# below a b is yes when count a is strictly less than count b.
+task below
+  take a, like count
+  take b, like count
+  like flag
+  fork case, read b
+    case none
+      send back
+        make no
+    case more
+      link bp
+      fork case, read a
+        case none
+          send back
+            make yes
+        case more
+          link ap
+          send back
+            call below
+              read ap
+              read bp
+
+# A growth step: add the edge, at least one new dock (one more than some amount e). The mesh after the wake.
+task grow
+  take d, like count
+  take e, like count
+  like count
+  send back
+    call add-count
+      read d
+      make more
+        bind prior
+          read e
+
+# The mesh ALWAYS GROWS: the count after a growth step is strictly greater than before, below d (grow d e) = yes, for
+# every starting count and edge. New docks are added and none removed.
+rule grow-strictly-increases
+  mark d, like count
+  mark e, like count
+  show hold
+    call is-equal
+      call below
+        read d
+        call grow
+          read d
+          read e
+      make yes
+  fold d
+
+# The mesh NEVER SHRINKS: the grown count is never below the count before it, below (grow d e) d = no. Growth is one-way,
+# the open edge only moves outward, which is the seed of the arrow of time.
+rule grow-never-returns
+  mark d, like count
+  mark e, like count
+  show hold
+    call is-equal
+      call below
+        call grow
+          read d
+          read e
+        read d
+      make no
+  fold d
