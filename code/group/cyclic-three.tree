@@ -10,6 +10,17 @@ form zmod3
   case z1
   case z2
 
+# TEMPLATE: one entry of a single-valued map on residues, `from` sent to `to`. Replaces every
+# `case .. / send back / make ..` block with one line per entry.
+tree map-residue
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # Addition modulo three, the full nine-entry table.
 task add3
   take a, like zmod3
@@ -21,41 +32,23 @@ task add3
         read b
     case z1
       fork case, read b
-        case z0
-          send back
-            make z1
-        case z1
-          send back
-            make z2
-        case z2
-          send back
-            make z0
+        fuse map-residue, z0, z1
+        fuse map-residue, z1, z2
+        fuse map-residue, z2, z0
     case z2
       fork case, read b
-        case z0
-          send back
-            make z2
-        case z1
-          send back
-            make z0
-        case z2
-          send back
-            make z1
+        fuse map-residue, z0, z2
+        fuse map-residue, z1, z0
+        fuse map-residue, z2, z1
 
 # Negation modulo three: the additive inverse of each residue.
 task neg3
   take a, like zmod3
   like zmod3
   fork case, read a
-    case z0
-      send back
-        make z0
-    case z1
-      send back
-        make z2
-    case z2
-      send back
-        make z1
+    fuse map-residue, z0, z0
+    fuse map-residue, z1, z2
+    fuse map-residue, z2, z1
 
 # IDENTITY (left): zero added on the left is the identity, add3 z0 a = a. Definitional.
 rule add3-zero-left

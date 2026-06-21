@@ -1,0 +1,182 @@
+# The D4 root system, the twenty-four roots of the rotation algebra of eight-dimensional space, modeled by the kernel.
+# Its roots are the vectors plus-or-minus e_i plus-or-minus e_j over the four axes, one for each ordered choice of two
+# axes and a sign on each: six axis pairs times four sign patterns is twenty-four roots. These twenty-four vectors ARE
+# the vertices of the 24-cell, the self-dual regular polytope that is the cell of the mesh, so this root system is the
+# geometry of Vibe Theory itself. The antipode pairs the roots into twelve opposite lines, the dock's twelve lines. The
+# reflections in the roots generate the Weyl group, which extends to F4, the full symmetry of the 24-cell of order one
+# thousand one hundred fifty-two. Under triality the twenty-four roots split into three eights, the vector and the two
+# spinor classes, the structure unique to dimension eight that gives the substrate free spin. This file constructs the
+# roots, the antipode, the positive system, and one simple reflection, and proves the laws that make them a root system.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find either
+
+# The twenty-four roots. Each name is an axis pair (the two nonzero coordinates) and a sign pattern: p for plus, m for
+# minus, on the lower axis then the higher. So e12-pm is e1 minus e2, e34-mm is minus e3 minus e4.
+form d4-root
+  case e12-pp
+  case e12-pm
+  case e12-mp
+  case e12-mm
+  case e13-pp
+  case e13-pm
+  case e13-mp
+  case e13-mm
+  case e14-pp
+  case e14-pm
+  case e14-mp
+  case e14-mm
+  case e23-pp
+  case e23-pm
+  case e23-mp
+  case e23-mm
+  case e24-pp
+  case e24-pm
+  case e24-mp
+  case e24-mm
+  case e34-pp
+  case e34-pm
+  case e34-mp
+  case e34-mm
+
+# TEMPLATE: one entry of a single-valued map out of a root. One definition serves the antipode, the reflection, and the
+# positive-system test, so each map reads as its permutation or value table.
+tree map-root
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# The antipode: negate a root, the point reflection through the origin. It flips both signs of the axis pair, so it pairs
+# the twenty-four roots into twelve opposite lines, exactly the twelve lines of the dock.
+task negate
+  take r, like d4-root
+  like d4-root
+  fork case, read r
+    fuse map-root, e12-pp, e12-mm
+    fuse map-root, e12-pm, e12-mp
+    fuse map-root, e12-mp, e12-pm
+    fuse map-root, e12-mm, e12-pp
+    fuse map-root, e13-pp, e13-mm
+    fuse map-root, e13-pm, e13-mp
+    fuse map-root, e13-mp, e13-pm
+    fuse map-root, e13-mm, e13-pp
+    fuse map-root, e14-pp, e14-mm
+    fuse map-root, e14-pm, e14-mp
+    fuse map-root, e14-mp, e14-pm
+    fuse map-root, e14-mm, e14-pp
+    fuse map-root, e23-pp, e23-mm
+    fuse map-root, e23-pm, e23-mp
+    fuse map-root, e23-mp, e23-pm
+    fuse map-root, e23-mm, e23-pp
+    fuse map-root, e24-pp, e24-mm
+    fuse map-root, e24-pm, e24-mp
+    fuse map-root, e24-mp, e24-pm
+    fuse map-root, e24-mm, e24-pp
+    fuse map-root, e34-pp, e34-mm
+    fuse map-root, e34-pm, e34-mp
+    fuse map-root, e34-mp, e34-pm
+    fuse map-root, e34-mm, e34-pp
+
+# The positive system: a root is positive when its first nonzero coordinate is plus, that is when the lower axis carries a
+# plus sign. Twelve roots are positive and twelve negative, the antipode of every positive root.
+task is-positive
+  take r, like d4-root
+  like flag
+  fork case, read r
+    fuse map-root, e12-pp, yes
+    fuse map-root, e12-pm, yes
+    fuse map-root, e12-mp, no
+    fuse map-root, e12-mm, no
+    fuse map-root, e13-pp, yes
+    fuse map-root, e13-pm, yes
+    fuse map-root, e13-mp, no
+    fuse map-root, e13-mm, no
+    fuse map-root, e14-pp, yes
+    fuse map-root, e14-pm, yes
+    fuse map-root, e14-mp, no
+    fuse map-root, e14-mm, no
+    fuse map-root, e23-pp, yes
+    fuse map-root, e23-pm, yes
+    fuse map-root, e23-mp, no
+    fuse map-root, e23-mm, no
+    fuse map-root, e24-pp, yes
+    fuse map-root, e24-pm, yes
+    fuse map-root, e24-mp, no
+    fuse map-root, e24-mm, no
+    fuse map-root, e34-pp, yes
+    fuse map-root, e34-pm, yes
+    fuse map-root, e34-mp, no
+    fuse map-root, e34-mm, no
+
+# A simple reflection of the Weyl group: the reflection perpendicular to e1 minus e2, which exchanges the first two axes.
+# It fixes the roots symmetric in those axes, swaps the two mixed signs of the e12 pair, and carries each e1-bearing root
+# to the matching e2-bearing root. The result is always a root, so the twenty-four roots are CLOSED under the reflection.
+task swap-one-two
+  take r, like d4-root
+  like d4-root
+  fork case, read r
+    fuse map-root, e12-pp, e12-pp
+    fuse map-root, e12-pm, e12-mp
+    fuse map-root, e12-mp, e12-pm
+    fuse map-root, e12-mm, e12-mm
+    fuse map-root, e13-pp, e23-pp
+    fuse map-root, e13-pm, e23-pm
+    fuse map-root, e13-mp, e23-mp
+    fuse map-root, e13-mm, e23-mm
+    fuse map-root, e14-pp, e24-pp
+    fuse map-root, e14-pm, e24-pm
+    fuse map-root, e14-mp, e24-mp
+    fuse map-root, e14-mm, e24-mm
+    fuse map-root, e23-pp, e13-pp
+    fuse map-root, e23-pm, e13-pm
+    fuse map-root, e23-mp, e13-mp
+    fuse map-root, e23-mm, e13-mm
+    fuse map-root, e24-pp, e14-pp
+    fuse map-root, e24-pm, e14-pm
+    fuse map-root, e24-mp, e14-mp
+    fuse map-root, e24-mm, e14-mm
+    fuse map-root, e34-pp, e34-pp
+    fuse map-root, e34-pm, e34-pm
+    fuse map-root, e34-mp, e34-mp
+    fuse map-root, e34-mm, e34-mm
+
+# THE ANTIPODE IS AN INVOLUTION: negate (negate r) = r. The root set is symmetric about the origin, so it really does
+# split into twelve opposite lines. Proved over all twenty-four roots.
+rule negate-is-an-involution
+  mark r, like d4-root
+  show hold
+    call is-equal
+      call negate, read r
+        link negate
+      read r
+  fold r
+
+# THE SIMPLE REFLECTION IS AN INVOLUTION: swap-one-two (swap-one-two r) = r. A reflection done twice is the identity, the
+# defining property of a Weyl generator, and every value it returns is again one of the twenty-four roots (closure).
+rule swap-one-two-is-an-involution
+  mark r, like d4-root
+  show hold
+    call is-equal
+      call swap-one-two, read r
+        link swap-one-two
+      read r
+  fold r
+
+# EVERY ROOT OR ITS ANTIPODE IS POSITIVE: either (is-positive r) (is-positive (negate r)) = yes, for every root. This is
+# what splits the twenty-four roots into the twelve positive roots and their twelve antipodes, the twelve lines.
+rule every-root-or-its-antipode-is-positive
+  mark r, like d4-root
+  show hold
+    call is-equal
+      call either
+        call is-positive
+          read r
+        call negate, read r
+          link is-positive
+      make yes
+  fold r

@@ -9,6 +9,17 @@ form f3
   case f1
   case f2
 
+# TEMPLATE: one entry of an F3 operation table, the second operand `from` sent to the result `to`. Replaces every
+# `case .. / send back / make ..` block in the addition and multiplication tables with one line per entry.
+tree map-f3
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # Addition modulo three (the additive group operation), needed to state distributivity.
 task plus3
   take a, like f3
@@ -20,26 +31,14 @@ task plus3
         read b
     case f1
       fork case, read b
-        case f0
-          send back
-            make f1
-        case f1
-          send back
-            make f2
-        case f2
-          send back
-            make f0
+        fuse map-f3, f0, f1
+        fuse map-f3, f1, f2
+        fuse map-f3, f2, f0
     case f2
       fork case, read b
-        case f0
-          send back
-            make f2
-        case f1
-          send back
-            make f0
-        case f2
-          send back
-            make f1
+        fuse map-f3, f0, f2
+        fuse map-f3, f1, f0
+        fuse map-f3, f2, f1
 
 # Multiplication modulo three.
 task times3
@@ -55,30 +54,18 @@ task times3
         read b
     case f2
       fork case, read b
-        case f0
-          send back
-            make f0
-        case f1
-          send back
-            make f2
-        case f2
-          send back
-            make f1
+        fuse map-f3, f0, f0
+        fuse map-f3, f1, f2
+        fuse map-f3, f2, f1
 
 # The multiplicative inverse of a nonzero element (zero maps to zero by convention, never used under the nonzero guard).
 task invert3
   take a, like f3
   like f3
   fork case, read a
-    case f0
-      send back
-        make f0
-    case f1
-      send back
-        make f1
-    case f2
-      send back
-        make f2
+    fuse map-f3, f0, f0
+    fuse map-f3, f1, f1
+    fuse map-f3, f2, f2
 
 # MULTIPLICATION IDENTITY: one is the left identity, times3 f1 a = a.
 rule times3-one-left

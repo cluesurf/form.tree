@@ -70,31 +70,29 @@ rule negate-zero-is-zero
       make zero-int
   calm hold
 
-rule negate-negsucc-is-possucc
-  mark p, like natural
-  show hold
-    call is-equal
-      call negate
-        make negsucc
-          bind prior
-            read p
-      make possucc
-        bind prior
-          read p
-  calm hold
+# TEMPLATE: negation maps a sign-magnitude constructor to its opposite, negate (`from` p) = (`to` p). The two definitional
+# facts (negsucc to possucc and possucc to negsucc) are mirror images, so one definition states both.
+tree negate-flips
+  take name
+  take from
+  take to
 
-rule negate-possucc-is-negsucc
-  mark p, like natural
-  show hold
-    call is-equal
-      call negate
-        make possucc
-          bind prior
-            read p
-      make negsucc
-        bind prior
-          read p
-  calm hold
+  hook fuse
+    rule {name}
+      mark p, like natural
+      show hold
+        call is-equal
+          call negate
+            make {from}
+              bind prior
+                read p
+          make {to}
+            bind prior
+              read p
+      calm hold
+
+fuse negate-flips, negate-negsucc-is-possucc, negsucc, possucc
+fuse negate-flips, negate-possucc-is-negsucc, possucc, negsucc
 
 rule from-natural-zero-is-zero
   show hold
@@ -609,55 +607,52 @@ rule combine-back-right
 
 # Reversed definitional steps of next/back, oriented so a sign-magnitude constructor REWRITES into a successor or
 # predecessor of the next-smaller integer. These let an induction on the natural magnitude peel one next/back per step.
-rule possucc-zero-is-next-zero
-  show hold
-    call is-equal
-      make possucc
-        bind prior
-          make zero
-      call next
-        make zero-int
-  calm hold
+# TEMPLATE: the zero-magnitude rewrite, (`cons` zero) = (`step` zero-int). The positive case rewrites possucc zero to
+# next zero-int, the negative case rewrites negsucc zero to back zero-int. One definition states both mirrors.
+tree cons-zero-step
+  take name
+  take cons
+  take step
 
-rule possucc-succ-is-next-possucc
-  mark p, like natural
-  show hold
-    call is-equal
-      make possucc
-        bind prior
-          make succ
+  hook fuse
+    rule {name}
+      show hold
+        call is-equal
+          make {cons}
             bind prior
-              read p
-      call next
-        make possucc
-          bind prior
-            read p
-  calm hold
+              make zero
+          call {step}
+            make zero-int
+      calm hold
 
-rule negsucc-zero-is-back-zero
-  show hold
-    call is-equal
-      make negsucc
-        bind prior
-          make zero
-      call back
-        make zero-int
-  calm hold
+fuse cons-zero-step, possucc-zero-is-next-zero, possucc, next
+fuse cons-zero-step, negsucc-zero-is-back-zero, negsucc, back
 
-rule negsucc-succ-is-back-negsucc
-  mark p, like natural
-  show hold
-    call is-equal
-      make negsucc
-        bind prior
-          make succ
+# TEMPLATE: the successor-magnitude rewrite, (`cons` (succ p)) = (`step` (`cons` p)). One next/back peeled per step, the
+# positive and negative mirrors share the shape.
+tree cons-succ-step
+  take name
+  take cons
+  take step
+
+  hook fuse
+    rule {name}
+      mark p, like natural
+      show hold
+        call is-equal
+          make {cons}
             bind prior
-              read p
-      call back
-        make negsucc
-          bind prior
-            read p
-  calm hold
+              make succ
+                bind prior
+                  read p
+          call {step}
+            make {cons}
+              bind prior
+                read p
+      calm hold
+
+fuse cons-succ-step, possucc-succ-is-next-possucc, possucc, next
+fuse cons-succ-step, negsucc-succ-is-back-negsucc, negsucc, back
 
 # Positive commute: combine (possucc p) z = climb z p, for every magnitude p and integer z. This is commutativity of
 # addition restricted to a positive left operand. By induction on the natural p, peeling a `next` each step: the base

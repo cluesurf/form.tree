@@ -224,27 +224,25 @@ rule at-most-min-left
       make on
   fold a, b
 
-# min n n = n (idempotence). By induction on n.
-rule min-self-is-self
-  mark n, like natural
-  show hold
-    call is-equal
-      call min
-        read n
-        read n
-      read n
-  fold n
+# TEMPLATE: idempotence of a binary natural operation, op n n = n. min and max share this proof by induction on n.
+tree binary-idempotent
+  take name
+  take op
 
-# max n n = n (idempotence). By induction on n.
-rule max-self-is-self
-  mark n, like natural
-  show hold
-    call is-equal
-      call max
-        read n
-        read n
-      read n
-  fold n
+  hook fuse
+    rule {name}
+      mark n, like natural
+      show hold
+        call is-equal
+          call {op}
+            read n
+            read n
+          read n
+      fold n
+
+# min n n = n and max n n = n (idempotence).
+fuse binary-idempotent, min-self-is-self, min
+fuse binary-idempotent, max-self-is-self, max
 
 # min 0 n = 0. Definitional.
 rule min-zero-left-is-zero
@@ -273,71 +271,57 @@ rule max-zero-left-is-self
 # case where every variable is a successor, closes with the diagonal hypothesis (all stepped down together). With
 # idempotence (above) this makes (min, max) the meet and join of a lattice on the naturals.
 
-# min is commutative.
-rule min-is-commutative
-  mark a, like natural
-  mark b, like natural
-  show hold
-    call is-equal
-      call min
-        read a
-        read b
-      call min
-        read b
-        read a
-  fold a, b
+# TEMPLATE: commutativity of a binary natural operation, op a b = op b a, proved by simultaneous induction. min and max
+# share the same proof shape, so one definition states both lattice commutativity laws.
+tree binary-commutative
+  take name
+  take op
 
-# max is commutative.
-rule max-is-commutative
-  mark a, like natural
-  mark b, like natural
-  show hold
-    call is-equal
-      call max
-        read a
-        read b
-      call max
-        read b
-        read a
-  fold a, b
+  hook fuse
+    rule {name}
+      mark a, like natural
+      mark b, like natural
+      show hold
+        call is-equal
+          call {op}
+            read a
+            read b
+          call {op}
+            read b
+            read a
+      fold a, b
 
-# min is associative.
-rule min-is-associative
-  mark a, like natural
-  mark b, like natural
-  mark c, like natural
-  show hold
-    call is-equal
-      call min
-        call min
-          read a
-          read b
-        read c
-      call min
-        read a
-        call min
-          read b
-          read c
-  fold a, b, c
+# min and max are each commutative.
+fuse binary-commutative, min-is-commutative, min
+fuse binary-commutative, max-is-commutative, max
 
-# max is associative.
-rule max-is-associative
-  mark a, like natural
-  mark b, like natural
-  mark c, like natural
-  show hold
-    call is-equal
-      call max
-        call max
-          read a
-          read b
-        read c
-      call max
-        read a
-        call max
-          read b
-          read c
-  fold a, b, c
+# TEMPLATE: associativity of a binary natural operation, op (op a b) c = op a (op b c). min and max share the proof.
+tree binary-associative
+  take name
+  take op
+
+  hook fuse
+    rule {name}
+      mark a, like natural
+      mark b, like natural
+      mark c, like natural
+      show hold
+        call is-equal
+          call {op}
+            call {op}
+              read a
+              read b
+            read c
+          call {op}
+            read a
+            call {op}
+              read b
+              read c
+      fold a, b, c
+
+# min and max are each associative.
+fuse binary-associative, min-is-associative, min
+fuse binary-associative, max-is-associative, max
 
 # Addition and the two step lemmas, included so the order-arithmetic bridge below is self-contained.
 task plus
@@ -429,43 +413,34 @@ rule plus-succ-left-steps
             read b
   calm hold
 
-rule max-succ-both-steps
-  mark a, like natural
-  mark b, like natural
-  show hold
-    call is-equal
-      call max
-        make succ
-          bind prior
-            read a
-        make succ
-          bind prior
-            read b
-      make succ
-        bind prior
-          call max
-            read a
-            read b
-  calm hold
+# TEMPLATE: the both-successor step lemma shared by min and max. For operator `op`, the operation on two successors is
+# the successor of the operation on the predecessors. min and max recurse identically here, so one definition serves both.
+tree succ-both-steps
+  take name
+  take op
 
-rule min-succ-both-steps
-  mark a, like natural
-  mark b, like natural
-  show hold
-    call is-equal
-      call min
-        make succ
-          bind prior
-            read a
-        make succ
-          bind prior
-            read b
-      make succ
-        bind prior
-          call min
-            read a
-            read b
-  calm hold
+  hook fuse
+    rule {name}
+      mark a, like natural
+      mark b, like natural
+      show hold
+        call is-equal
+          call {op}
+            make succ
+              bind prior
+                read a
+            make succ
+              bind prior
+                read b
+          make succ
+            bind prior
+              call {op}
+                read a
+                read b
+      calm hold
+
+fuse succ-both-steps, max-succ-both-steps, max
+fuse succ-both-steps, min-succ-both-steps, min
 
 rule max-plus-min-is-plus
   mark a, like natural

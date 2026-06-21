@@ -37,6 +37,23 @@ task ret
       bind value
         read x
 
+# TEMPLATE: the body of a bind over the Option shape. Run a context, propagate absence, and on a present value feed it to
+# the continuation task `step`. Replaces the repeated `fork case, read m / case none / make none / case some / send back`
+# block shared by bind and its return- and flip-inlined specializations.
+tree chain-body
+  take step
+
+  hook fuse
+    fork case, read m
+      case none
+        send back
+          make none
+      case some
+        link value
+        send back
+          call {step}
+            read value
+
 # bind: run a context, and if it has a value, feed it to the continuation. The general higher-order operation.
 task bind
   take m, like opt
@@ -45,29 +62,13 @@ task bind
       take x, like bit
       like opt
   like opt
-  fork case, read m
-    case none
-      send back
-        make none
-    case some
-      link value
-      send back
-        call f
-          read value
+  fuse chain-body, f
 
 # bind with RETURN as the continuation, the right-identity instance (return inlined so the kernel computes it).
 task chain-return
   take m, like opt
   like opt
-  fork case, read m
-    case none
-      send back
-        make none
-    case some
-      link value
-      send back
-        call ret
-          read value
+  fuse chain-body, ret
 
 # RIGHT IDENTITY: bind m return = m. Binding a context with return leaves it unchanged, for every option. Proved by
 # induction over the two shapes (absent stays absent, present rewraps to the same present value).
@@ -94,15 +95,7 @@ task flip-opt
 task chain-flip
   take m, like opt
   like opt
-  fork case, read m
-    case none
-      send back
-        make none
-    case some
-      link value
-      send back
-        call flip-opt
-          read value
+  fuse chain-body, flip-opt
 
 # LEFT IDENTITY (instance): bind (return a) k = k a, here for the continuation k = flip-opt. Wrapping a value with return
 # then binding is the same as applying the step directly, for every value a. Holds by computation.

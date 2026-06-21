@@ -237,10 +237,10 @@ rule reverse-of-append
   mark ys, like roll
   show hold
     call is-equal
-      call reverse
-        call append
-          read xs
-          read ys
+      call append
+        read xs
+        read ys
+        link reverse
       call append
         call reverse
           read ys
@@ -259,9 +259,8 @@ rule reverse-reverse-is-identity
   mark xs, like roll
   show hold
     call is-equal
-      call reverse
-        call reverse
-          read xs
+      call reverse, read xs
+        link reverse
       read xs
   fold xs
     cite reverse-nil-is-nil
@@ -302,9 +301,8 @@ rule length-of-reverse-is-length
   mark xs, like roll
   show hold
     call is-equal
-      call length
-        call reverse
-          read xs
+      call reverse, read xs
+        link length
       call length
         read xs
   fold xs

@@ -15,29 +15,28 @@ form root
   case nb
   case nc
 
+# TEMPLATE: one entry of a single-valued map on roots, `from` sent to `to`. Replaces every `case .. / send back / make ..`
+# block with one line per entry.
+tree map-root
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # Negation: each root and its opposite. The root system is closed under this.
 task negate
   take r, like root
   like root
   fork case, read r
-    case pa
-      send back
-        make na
-    case pb
-      send back
-        make nb
-    case pc
-      send back
-        make nc
-    case na
-      send back
-        make pa
-    case nb
-      send back
-        make pb
-    case nc
-      send back
-        make pc
+    fuse map-root, pa, na
+    fuse map-root, pb, nb
+    fuse map-root, pc, nc
+    fuse map-root, na, pa
+    fuse map-root, nb, pb
+    fuse map-root, nc, pc
 
 # The WEYL REFLECTION in the root a: it negates a, and swaps b with c = a+b (since reflecting b across a adds a). The
 # defining symmetry of the root system, a reflection that maps roots to roots.
@@ -45,24 +44,12 @@ task reflect-a
   take r, like root
   like root
   fork case, read r
-    case pa
-      send back
-        make na
-    case na
-      send back
-        make pa
-    case pb
-      send back
-        make pc
-    case pc
-      send back
-        make pb
-    case nb
-      send back
-        make nc
-    case nc
-      send back
-        make nb
+    fuse map-root, pa, na
+    fuse map-root, na, pa
+    fuse map-root, pb, pc
+    fuse map-root, pc, pb
+    fuse map-root, nb, nc
+    fuse map-root, nc, nb
 
 # NEGATION IS AN INVOLUTION: negate (negate r) = r. The set of roots is closed under negation, each root paired with its
 # opposite (the six roots are three lines, like the 24-cell's twelve).

@@ -13,20 +13,25 @@ form trit
   case maybe
   case yes
 
+# TEMPLATE: one entry of a single-valued map on trits, `from` sent to `to`. Replaces each `case .. / send back / make ..`
+# block with one line per entry.
+tree map-trit
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # Negation: swap the two ends, fix the unknown middle.
 task neg
   take a, like trit
   like trit
   fork case, read a
-    case no
-      send back
-        make yes
-    case maybe
-      send back
-        make maybe
-    case yes
-      send back
-        make no
+    fuse map-trit, no, yes
+    fuse map-trit, maybe, maybe
+    fuse map-trit, yes, no
 
 # Conjunction, the minimum of the two values.
 task con
@@ -39,15 +44,9 @@ task con
         make no
     case maybe
       fork case, read b
-        case no
-          send back
-            make no
-        case maybe
-          send back
-            make maybe
-        case yes
-          send back
-            make maybe
+        fuse map-trit, no, no
+        fuse map-trit, maybe, maybe
+        fuse map-trit, yes, maybe
     case yes
       send back
         read b
@@ -63,15 +62,9 @@ task dis
         read b
     case maybe
       fork case, read b
-        case no
-          send back
-            make maybe
-        case maybe
-          send back
-            make maybe
-        case yes
-          send back
-            make yes
+        fuse map-trit, no, maybe
+        fuse map-trit, maybe, maybe
+        fuse map-trit, yes, yes
     case yes
       send back
         make yes

@@ -12,6 +12,17 @@ form subset
   case only-b
   case whole
 
+# TEMPLATE: one entry of a subset operation, the second operand `from` sent to the result `to`. Replaces every
+# `case .. / send back / make ..` block in the union and intersection tables with one line per entry.
+tree map-subset
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # Union of two subsets: the elements in either.
 task union
   take p, like subset
@@ -23,32 +34,16 @@ task union
         read q
     case only-a
       fork case, read q
-        case empty
-          send back
-            make only-a
-        case only-a
-          send back
-            make only-a
-        case only-b
-          send back
-            make whole
-        case whole
-          send back
-            make whole
+        fuse map-subset, empty, only-a
+        fuse map-subset, only-a, only-a
+        fuse map-subset, only-b, whole
+        fuse map-subset, whole, whole
     case only-b
       fork case, read q
-        case empty
-          send back
-            make only-b
-        case only-a
-          send back
-            make whole
-        case only-b
-          send back
-            make only-b
-        case whole
-          send back
-            make whole
+        fuse map-subset, empty, only-b
+        fuse map-subset, only-a, whole
+        fuse map-subset, only-b, only-b
+        fuse map-subset, whole, whole
     case whole
       send back
         make whole
@@ -64,32 +59,16 @@ task intersect
         make empty
     case only-a
       fork case, read q
-        case empty
-          send back
-            make empty
-        case only-a
-          send back
-            make only-a
-        case only-b
-          send back
-            make empty
-        case whole
-          send back
-            make only-a
+        fuse map-subset, empty, empty
+        fuse map-subset, only-a, only-a
+        fuse map-subset, only-b, empty
+        fuse map-subset, whole, only-a
     case only-b
       fork case, read q
-        case empty
-          send back
-            make empty
-        case only-a
-          send back
-            make empty
-        case only-b
-          send back
-            make only-b
-        case whole
-          send back
-            make only-b
+        fuse map-subset, empty, empty
+        fuse map-subset, only-a, empty
+        fuse map-subset, only-b, only-b
+        fuse map-subset, whole, only-b
     case whole
       send back
         read q
@@ -99,18 +78,10 @@ task complement
   take p, like subset
   like subset
   fork case, read p
-    case empty
-      send back
-        make whole
-    case only-a
-      send back
-        make only-b
-    case only-b
-      send back
-        make only-a
-    case whole
-      send back
-        make empty
+    fuse map-subset, empty, whole
+    fuse map-subset, only-a, only-b
+    fuse map-subset, only-b, only-a
+    fuse map-subset, whole, empty
 
 # UNION IS COMMUTATIVE: union p q = union q p, over all sixteen pairs.
 rule union-is-commutative

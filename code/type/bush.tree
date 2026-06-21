@@ -96,9 +96,8 @@ rule mirror-mirror-is-identity
   mark t, like bush
   show hold
     call is-equal
-      call mirror
-        call mirror
-          read t
+      call mirror, read t
+        link mirror
       read t
   fold t
 
@@ -200,9 +199,8 @@ rule size-of-mirror-is-size
   mark t, like bush
   show hold
     call is-equal
-      call size
-        call mirror
-          read t
+      call mirror, read t
+        link size
       call size
         read t
   fold t

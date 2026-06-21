@@ -12,6 +12,17 @@ form z3
   case e1
   case e2
 
+# TEMPLATE: one entry of a single-valued map on elements, `from` sent to `to`. Replaces every
+# `case .. / send back / make ..` block with one line per entry.
+tree map-element
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # The group operation, addition modulo three.
 task op
   take a, like z3
@@ -23,41 +34,23 @@ task op
         read b
     case e1
       fork case, read b
-        case e0
-          send back
-            make e1
-        case e1
-          send back
-            make e2
-        case e2
-          send back
-            make e0
+        fuse map-element, e0, e1
+        fuse map-element, e1, e2
+        fuse map-element, e2, e0
     case e2
       fork case, read b
-        case e0
-          send back
-            make e2
-        case e1
-          send back
-            make e0
-        case e2
-          send back
-            make e1
+        fuse map-element, e0, e2
+        fuse map-element, e1, e0
+        fuse map-element, e2, e1
 
 # The homomorphism: negation, sending each element to its additive inverse.
 task f
   take a, like z3
   like z3
   fork case, read a
-    case e0
-      send back
-        make e0
-    case e1
-      send back
-        make e2
-    case e2
-      send back
-        make e1
+    fuse map-element, e0, e0
+    fuse map-element, e1, e2
+    fuse map-element, e2, e1
 
 # THE HOMOMORPHISM LAW: f respects the operation, f (op a b) = op (f a) (f b), over all nine pairs. Negation distributes
 # over addition because the group is abelian. This single law is the definition of a homomorphism.

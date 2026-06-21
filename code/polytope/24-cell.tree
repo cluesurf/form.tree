@@ -28,17 +28,24 @@ form vertex
     link sign-one, like sign
     link sign-two, like sign
 
+# TEMPLATE: one entry of a single-valued map on signs, `from` sent to `to`. Replaces every
+# `case .. / send back / make ..` block with one line per entry.
+tree map-sign
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
 # Flip a sign.
 task flip-sign
   take s, like sign
   like sign
   fork case, read s
-    case neg
-      send back
-        make pos
-    case pos
-      send back
-        make neg
+    fuse map-sign, neg, pos
+    fuse map-sign, pos, neg
 
 # The antipode of a vertex: the diametrically opposite point, both signs flipped, the other end of its line.
 task antipode
@@ -72,20 +79,12 @@ task same-sign
   fork case, read a
     case neg
       fork case, read b
-        case neg
-          send back
-            make yes
-        case pos
-          send back
-            make no
+        fuse map-sign, neg, yes
+        fuse map-sign, pos, no
     case pos
       fork case, read b
-        case neg
-          send back
-            make no
-        case pos
-          send back
-            make yes
+        fuse map-sign, neg, no
+        fuse map-sign, pos, yes
 
 task and-flag
   take a, like flag

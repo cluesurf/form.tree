@@ -143,6 +143,64 @@ form line
 # preserves the pair's signed sum. The two equal-pole pairs are inert. A pole meeting peace hops past it. A pole meeting
 # its opposite annihilates to two peaces, peace meeting peace creates an opposite pole pair, and a pole pair flips, the
 # neutral three-cycle peace-peace, high-low, low-high. Charge-conserving and reversible, with no adjustable parts.
+# TEMPLATE: one row of a nine-state line table that outputs a line. For a fixed head tone, give the resulting head and
+# tail tone against each of the three tail tones. One definition serves both the collide step and its inverse.
+tree line-row
+  take head-tone
+  take low-head
+  take low-tail
+  take middle-head
+  take middle-tail
+  take high-head
+  take high-tail
+
+  hook fuse
+    case {head-tone}
+      fork case, read tail
+        case low
+          send back
+            make pair
+              bind head
+                make {low-head}
+              bind tail
+                make {low-tail}
+        case middle
+          send back
+            make pair
+              bind head
+                make {middle-head}
+              bind tail
+                make {middle-tail}
+        case high
+          send back
+            make pair
+              bind head
+                make {high-head}
+              bind tail
+                make {high-tail}
+
+# TEMPLATE: one row of a nine-state line table that outputs a single value. For a fixed head tone, give the value
+# against each tail tone.
+tree value-row
+  take head-tone
+  take at-low
+  take at-middle
+  take at-high
+
+  hook fuse
+    case {head-tone}
+      fork case, read tail
+        case low
+          send back
+            make {at-low}
+        case middle
+          send back
+            make {at-middle}
+        case high
+          send back
+            make {at-high}
+
+
 task collide
   take l, like line
   like line
@@ -151,75 +209,9 @@ task collide
       link head
       link tail
       fork case, read head
-        case low
-          fork case, read tail
-            case low
-              send back
-                make pair
-                  bind head
-                    make low
-                  bind tail
-                    make low
-            case middle
-              send back
-                make pair
-                  bind head
-                    make middle
-                  bind tail
-                    make low
-            case high
-              send back
-                make pair
-                  bind head
-                    make middle
-                  bind tail
-                    make middle
-        case middle
-          fork case, read tail
-            case low
-              send back
-                make pair
-                  bind head
-                    make low
-                  bind tail
-                    make middle
-            case middle
-              send back
-                make pair
-                  bind head
-                    make high
-                  bind tail
-                    make low
-            case high
-              send back
-                make pair
-                  bind head
-                    make high
-                  bind tail
-                    make middle
-        case high
-          fork case, read tail
-            case low
-              send back
-                make pair
-                  bind head
-                    make low
-                  bind tail
-                    make high
-            case middle
-              send back
-                make pair
-                  bind head
-                    make middle
-                  bind tail
-                    make high
-            case high
-              send back
-                make pair
-                  bind head
-                    make high
-                  bind tail
-                    make high
+        fuse line-row, low, low, low, middle, low, middle, middle
+        fuse line-row, middle, low, middle, high, low, high, middle
+        fuse line-row, high, low, high, middle, high, high, high
 
 # The inverse collision, the permutation run backward. Since the neutral three-cycle is not order two, reversibility is
 # shown by an explicit inverse rather than by self-composition. Every other line state is fixed or in a two-cycle.
@@ -231,75 +223,9 @@ task uncollide
       link head
       link tail
       fork case, read head
-        case low
-          fork case, read tail
-            case low
-              send back
-                make pair
-                  bind head
-                    make low
-                  bind tail
-                    make low
-            case middle
-              send back
-                make pair
-                  bind head
-                    make middle
-                  bind tail
-                    make low
-            case high
-              send back
-                make pair
-                  bind head
-                    make high
-                  bind tail
-                    make low
-        case middle
-          fork case, read tail
-            case low
-              send back
-                make pair
-                  bind head
-                    make low
-                  bind tail
-                    make middle
-            case middle
-              send back
-                make pair
-                  bind head
-                    make low
-                  bind tail
-                    make high
-            case high
-              send back
-                make pair
-                  bind head
-                    make high
-                  bind tail
-                    make middle
-        case high
-          fork case, read tail
-            case low
-              send back
-                make pair
-                  bind head
-                    make middle
-                  bind tail
-                    make middle
-            case middle
-              send back
-                make pair
-                  bind head
-                    make middle
-                  bind tail
-                    make high
-            case high
-              send back
-                make pair
-                  bind head
-                    make high
-                  bind tail
-                    make high
+        fuse line-row, low, low, low, middle, low, high, low
+        fuse line-row, middle, low, middle, low, high, high, middle
+        fuse line-row, high, middle, middle, middle, high, high, high
 
 # The signed charge of a line: the sum of its two tone charges, a value in minus two to plus two. This is the quantity the
 # collision must conserve, the discrete charge the law never creates or destroys.
@@ -319,39 +245,9 @@ task pair-charge
       link head
       link tail
       fork case, read head
-        case low
-          fork case, read tail
-            case low
-              send back
-                make sink-two
-            case middle
-              send back
-                make sink-one
-            case high
-              send back
-                make flat
-        case middle
-          fork case, read tail
-            case low
-              send back
-                make sink-one
-            case middle
-              send back
-                make flat
-            case high
-              send back
-                make lift-one
-        case high
-          fork case, read tail
-            case low
-              send back
-                make flat
-            case middle
-              send back
-                make lift-one
-            case high
-              send back
-                make lift-two
+        fuse value-row, low, sink-two, sink-one, flat
+        fuse value-row, middle, sink-one, flat, lift-one
+        fuse value-row, high, flat, lift-one, lift-two
 
 # The collide step is REVERSIBLE: uncollide (collide (pair a b)) = pair a b, for every pair of tones. The law of motion is
 # invertible, so from the result of a beat the state before it is recovered and no information is lost. Proved by

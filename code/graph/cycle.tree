@@ -15,6 +15,17 @@ form flag
   case yes
   case no
 
+# TEMPLATE: one entry of the adjacency table. For a fixed second node `col`, send the yes or no answer. One definition
+# replaces every near-identical `case .. / send back / make ..` block.
+tree adjacent-entry
+  take col
+  take answer
+
+  hook fuse
+    case {col}
+      send back
+        make {answer}
+
 # Adjacency in the triangle: two nodes are adjacent exactly when they are different (every pair of distinct nodes shares
 # an edge). Given directly as the table over the nine node pairs.
 task adjacent
@@ -24,37 +35,19 @@ task adjacent
   fork case, read a
     case n0
       fork case, read b
-        case n0
-          send back
-            make no
-        case n1
-          send back
-            make yes
-        case n2
-          send back
-            make yes
+        fuse adjacent-entry, n0, no
+        fuse adjacent-entry, n1, yes
+        fuse adjacent-entry, n2, yes
     case n1
       fork case, read b
-        case n0
-          send back
-            make yes
-        case n1
-          send back
-            make no
-        case n2
-          send back
-            make yes
+        fuse adjacent-entry, n0, yes
+        fuse adjacent-entry, n1, no
+        fuse adjacent-entry, n2, yes
     case n2
       fork case, read b
-        case n0
-          send back
-            make yes
-        case n1
-          send back
-            make yes
-        case n2
-          send back
-            make no
+        fuse adjacent-entry, n0, yes
+        fuse adjacent-entry, n1, yes
+        fuse adjacent-entry, n2, no
 
 # ADJACENCY IS SYMMETRIC: adjacent a b = adjacent b a, the graph is UNDIRECTED. Over all nine node pairs.
 rule adjacent-is-symmetric

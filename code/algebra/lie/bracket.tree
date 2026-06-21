@@ -41,6 +41,29 @@ task flip-turn
           bind axis
             read axis
 
+# TEMPLATE: a diagonal entry of the bracket table, [a,a] = 0. Replaces each `case .. / send back / make still` block.
+tree bracket-still
+  take col
+
+  hook fuse
+    case {col}
+      send back
+        make still
+
+# TEMPLATE: an off-diagonal entry of the bracket table, the signed generator [a,b] = (sign) e_ax. Replaces each
+# `case .. / send back / make pos|neg / bind axis / make ..` block with one line per entry.
+tree bracket-turn
+  take col
+  take sign
+  take ax
+
+  hook fuse
+    case {col}
+      send back
+        make {sign}
+          bind axis
+            make {ax}
+
 # The Lie bracket of two generators, the cross product: [e1,e2]=e3, [e2,e3]=e1, [e3,e1]=e2, antisymmetric, zero on the
 # diagonal. The structure constants of so(3).
 task bracket
@@ -50,49 +73,19 @@ task bracket
   fork case, read a
     case a1
       fork case, read b
-        case a1
-          send back
-            make still
-        case a2
-          send back
-            make pos
-              bind axis
-                make a3
-        case a3
-          send back
-            make neg
-              bind axis
-                make a2
+        fuse bracket-still, a1
+        fuse bracket-turn, a2, pos, a3
+        fuse bracket-turn, a3, neg, a2
     case a2
       fork case, read b
-        case a1
-          send back
-            make neg
-              bind axis
-                make a3
-        case a2
-          send back
-            make still
-        case a3
-          send back
-            make pos
-              bind axis
-                make a1
+        fuse bracket-turn, a1, neg, a3
+        fuse bracket-still, a2
+        fuse bracket-turn, a3, pos, a1
     case a3
       fork case, read b
-        case a1
-          send back
-            make pos
-              bind axis
-                make a2
-        case a2
-          send back
-            make neg
-              bind axis
-                make a1
-        case a3
-          send back
-            make still
+        fuse bracket-turn, a1, pos, a2
+        fuse bracket-turn, a2, neg, a1
+        fuse bracket-still, a3
 
 # ALTERNATING: a generator brackets to zero with itself, [a,a] = 0. A rotation generates no turn against its own axis.
 rule bracket-is-alternating

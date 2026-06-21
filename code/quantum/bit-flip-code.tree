@@ -1,0 +1,352 @@
+# The three-bit repetition (bit-flip) code, the classical heart of quantum error correction, modeled and proved CORRECT
+# by the kernel. One logical bit is spread across three physical bits (off goes to all off, on goes to all on). Noise can
+# flip any single physical bit; a majority vote over the three recovers the logical value, so no single error survives.
+# The kernel proves, by exhaustive induction over the bit and over each error position, that decoding after no error or
+# after ANY single-bit error returns the original bit. It also proves the SYNDROME (a measurement of which bits disagree)
+# names the error position exactly, which is how real decoders locate and undo the fault without measuring the data. This
+# is the discrete, exactly-checkable core of stabilizer quantum codes: the same redundancy and syndrome decoding protect a
+# qubit against a single Pauli-X error, and the substrate's spread-encoded memory relies on the very same property.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# A bit, the logical value being protected.
+form bit
+  case off
+  case on
+
+# Flip a bit, the action of a single-bit error (a Pauli-X / NOT).
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Equality of two bits, on exactly when they match. Used by the syndrome to compare positions.
+task same
+  take a, like bit
+  take b, like bit
+  like flag
+  fork case, read a
+    case off
+      fork case, read b
+        case off
+          send back
+            make yes
+        case on
+          send back
+            make no
+    case on
+      fork case, read b
+        case off
+          send back
+            make no
+        case on
+          send back
+            make yes
+
+# A codeword: three physical bits carrying one logical bit.
+form word
+  case triple
+    link one, like bit
+    link two, like bit
+    link three, like bit
+
+# Encode a logical bit as three copies. off goes to off-off-off, on goes to on-on-on.
+task encode
+  take b, like bit
+  like word
+  send back
+    make triple
+      bind one
+        read b
+      bind two
+        read b
+      bind three
+        read b
+
+# Majority-vote decode: the value held by at least two of the three. If the first two agree, that is the answer; otherwise
+# the third bit breaks the tie, and it must agree with one of the first two.
+task decode
+  take w, like word
+  like bit
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      fork case, read one
+        case off
+          fork case, read two
+            case off
+              send back
+                make off
+            case on
+              send back
+                read three
+        case on
+          fork case, read two
+            case off
+              send back
+                read three
+            case on
+              send back
+                make on
+
+# TEMPLATE: the bit carried through one `bind` of an error operator. `keep` passes the position straight through; `turn`
+# runs it through `flip`. An error operator selects `turn` for exactly one position and `keep` for the other two, which
+# removes the repeated `call flip / read` and `read` lines from the three operators below.
+tree keep
+  take name
+
+  hook fuse
+    read {name}
+
+tree turn
+  take name
+
+  hook fuse
+    call flip
+      read {name}
+
+# Apply a single-bit error at position one: flip the first wire, keep the others. Each operator rebuilds the codeword with
+# one position turned, so the three differ only in which `bind` uses `turn`.
+task error-one
+  take w, like word
+  like word
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make triple
+          bind one
+            fuse turn, one
+          bind two
+            fuse keep, two
+          bind three
+            fuse keep, three
+
+task error-two
+  take w, like word
+  like word
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make triple
+          bind one
+            fuse keep, one
+          bind two
+            fuse turn, two
+          bind three
+            fuse keep, three
+
+task error-three
+  take w, like word
+  like word
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make triple
+          bind one
+            fuse keep, one
+          bind two
+            fuse keep, two
+          bind three
+            fuse turn, three
+
+# The SYNDROME of a codeword: which adjacent positions agree. A clean codeword has all three equal, so both checks read
+# yes; a single error breaks exactly the checks that touch the flipped bit, naming its position. We measure the two parity
+# checks (one against two, two against three) without reading the logical value.
+form syndrome
+  case checks
+    link low, like flag
+    link high, like flag
+
+# Measure the syndrome: compare the first pair and the second pair.
+task measure
+  take w, like word
+  like syndrome
+  fork case, read w
+    case triple
+      link one
+      link two
+      link three
+      send back
+        make checks
+          bind low
+            call same
+              read one
+              read two
+          bind high
+            call same
+              read two
+              read three
+
+# Is a syndrome clean (no error reported)? Both parity checks must pass, the signature yes-yes. A clean syndrome means the
+# decoder leaves the codeword alone; any other syndrome reports a fault to repair.
+task is-clean
+  take s, like syndrome
+  like flag
+  fork case, read s
+    case checks
+      link low
+      link high
+      send back
+        call both
+          read low
+          read high
+
+# NO ERROR: decoding a clean codeword returns the bit. decode (encode b) = b, for both bit values.
+rule decodes-clean-codeword
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call encode
+          read b
+      read b
+  fold b
+
+# CORRECTS A FLIP AT POSITION ONE: decode (error-one (encode b)) = b, for both bit values.
+rule corrects-error-at-one
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call error-one
+          call encode
+            read b
+      read b
+  fold b
+
+# CORRECTS A FLIP AT POSITION TWO.
+rule corrects-error-at-two
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call error-two
+          call encode
+            read b
+      read b
+  fold b
+
+# CORRECTS A FLIP AT POSITION THREE. With the two above, EVERY single-bit error is corrected: the code distance is three,
+# so it repairs any one flip and the logical bit always survives.
+rule corrects-error-at-three
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call error-three
+          call encode
+            read b
+      read b
+  fold b
+
+# THE SYNDROME NAMES THE ERROR AT POSITION ONE: a flip of the first bit makes the first parity check fail and the second
+# pass, the signature no-yes, for both bit values. This is how a real decoder locates the fault from parity alone, never
+# touching the data. Proved by induction over the bit.
+rule syndrome-of-error-at-one
+  mark b, like bit
+  show hold
+    call is-equal
+      call measure
+        call error-one
+          call encode
+            read b
+      make checks
+        bind low
+          make no
+        bind high
+          make yes
+  fold b
+
+# THE SYNDROME NAMES THE ERROR AT POSITION TWO: the middle bit touches both checks, so both fail, the signature no-no.
+rule syndrome-of-error-at-two
+  mark b, like bit
+  show hold
+    call is-equal
+      call measure
+        call error-two
+          call encode
+            read b
+      make checks
+        bind low
+          make no
+        bind high
+          make no
+  fold b
+
+# THE SYNDROME NAMES THE ERROR AT POSITION THREE: only the second check fails, the signature yes-no.
+rule syndrome-of-error-at-three
+  mark b, like bit
+  show hold
+    call is-equal
+      call measure
+        call error-three
+          call encode
+            read b
+      make checks
+        bind low
+          make yes
+        bind high
+          make no
+  fold b
+
+# A CLEAN CODEWORD HAS THE TRIVIAL SYNDROME: encode b measures to yes-yes, both checks pass, so no error is reported.
+rule syndrome-of-clean-codeword
+  mark b, like bit
+  show hold
+    call is-equal
+      call measure
+        call encode
+          read b
+      make checks
+        bind low
+          make yes
+        bind high
+          make yes
+  fold b
+
+# A FLIPPED CODEWORD IS NEVER CLEAN: each single error gives a non-clean syndrome, so any single fault is always DETECTED,
+# not merely correctable. Shown for position two (its syndrome is no-no), the position touching both checks; the other two
+# error syndromes (no-yes and yes-no) are non-clean for the same reason. Proved by induction over the bit.
+rule error-at-two-is-detected
+  mark b, like bit
+  show hold
+    call is-equal
+      call is-clean
+        call measure
+          call error-two
+            call encode
+              read b
+      make no
+  fold b
+
+# A CLEAN ENCODED CODEWORD READS AS CLEAN: is-clean (measure (encode b)) = yes, the no-error case of detection. The decoder
+# correctly reports nothing to fix when there is no fault.
+rule clean-codeword-reads-as-clean
+  mark b, like bit
+  show hold
+    call is-equal
+      call is-clean
+        call measure
+          call encode
+            read b
+      make yes
+  fold b

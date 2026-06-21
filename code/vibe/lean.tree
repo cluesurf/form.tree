@@ -12,58 +12,64 @@ load @cluesurf/form/code/atom/flag
   find flag
   find either
 
-# A pole, one of the three signed ranks the lean orders: the low value below the middle below the high.
+# A pole, one of the three signed ranks the lean orders: the negative value below the neutral below the positive.
 form pole
-  case minus
-  case zero
-  case plus
+  case negative
+  case neutral
+  case positive
 
-# below a b is yes when a sits no higher than b in the lean: minus below zero below plus.
+# TEMPLATE: one row of the order table. For a fixed first rank `row`, give the result against each second rank
+# (negative, neutral, positive). One definition replaces the three near-identical `fork case, read b` blocks.
+tree below-row
+  take row
+  take at-negative
+  take at-neutral
+  take at-positive
+
+  hook fuse
+    case {row}
+      fork case, read b
+        case negative
+          send back
+            make {at-negative}
+        case neutral
+          send back
+            make {at-neutral}
+        case positive
+          send back
+            make {at-positive}
+
+# below a b is yes when a sits no higher than b in the lean: negative below neutral below positive. The whole order
+# table reads as three rows: negative is below everything, neutral is below itself and positive, positive below only
+# itself.
 task below
   take a, like pole
   take b, like pole
   like flag
   fork case, read a
-    case minus
-      send back
-        make yes
-    case zero
-      fork case, read b
-        case minus
-          send back
-            make no
-        case zero
-          send back
-            make yes
-        case plus
-          send back
-            make yes
-    case plus
-      fork case, read b
-        case minus
-          send back
-            make no
-        case zero
-          send back
-            make no
-        case plus
-          send back
-            make yes
+    fuse below-row, negative, yes, yes, yes
+    fuse below-row, neutral, no, yes, yes
+    fuse below-row, positive, no, no, yes
 
-# Sign negation: the lean read backward. It flips minus and plus and fixes the resting zero.
+# TEMPLATE: one entry of a single-valued map on poles, `from` sent to `to`. Replaces every `case .. / send back / make ..`
+# block with one line per entry.
+tree map-pole
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# Sign negation: the lean read backward. It flips positive and negative and fixes the resting neutral.
 task flip
   take a, like pole
   like pole
   fork case, read a
-    case minus
-      send back
-        make plus
-    case zero
-      send back
-        make zero
-    case plus
-      send back
-        make minus
+    fuse map-pole, negative, positive
+    fuse map-pole, neutral, neutral
+    fuse map-pole, positive, negative
 
 # REFLEXIVE: every rank sits no higher than itself, below a a = yes.
 rule below-is-reflexive
