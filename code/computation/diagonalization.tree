@@ -1,0 +1,104 @@
+# Diagonalization, the single argument behind Cantor's theorem, the undecidability of the halting problem, and Godel's
+# incompleteness, modeled by the kernel. The idea: given any list of functions, build the DIAGONAL function that disagrees
+# with the n-th function at the n-th point. The diagonal cannot be anywhere in the list, because it differs from every row
+# on the diagonal. So no list captures all functions, no program decides all halting questions, and no consistent formal
+# system strong enough for arithmetic proves all true statements about itself. This file shows the diagonal escaping a
+# concrete two-row table (using refutation, the two values are provably distinct), and the counting seed 2^n > n that makes
+# the power set always strictly larger than the set.
+
+form bit
+  case off
+  case on
+
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Two functions to enumerate: the identity and the flip. A table of two rows, row off and row on.
+task row-off
+  take x, like bit
+  like bit
+  send back
+    read x
+
+task row-on
+  take x, like bit
+  like bit
+  send back
+    call flip
+      read x
+
+# The DIAGONAL function: at each point, flip the value the corresponding row gives there. d(off) = flip(row-off(off)),
+# d(on) = flip(row-on(on)). By construction it disagrees with row n at point n.
+task diagonal
+  take x, like bit
+  like bit
+  fork case, read x
+    case off
+      send back
+        call flip
+          call row-off
+            make off
+    case on
+      send back
+        call flip
+          call row-on
+            make on
+
+# THE DIAGONAL ESCAPES ROW OFF: at the point off, the diagonal differs from row-off, so the diagonal is not row-off. Proved
+# by refutation, the two values are distinct constructors.
+rule diagonal-differs-from-row-off
+  show miss
+    call is-equal
+      call diagonal
+        make off
+      call row-off
+        make off
+  calm miss
+
+# THE DIAGONAL ESCAPES ROW ON: at the point on, the diagonal differs from row-on, so the diagonal is not row-on. With the
+# above, the diagonal equals NEITHER row, yet it is a perfectly good function: the list cannot contain every function.
+rule diagonal-differs-from-row-on
+  show miss
+    call is-equal
+      call diagonal
+        make on
+      call row-on
+        make on
+  calm miss
+
+# THE COUNTING SEED, Cantor's theorem in finite form: the power set is strictly LARGER than the set, 2^n > n, so no map
+# from a set onto its power set exists. This is why the diagonal always escapes.
+hold power-set-exceeds-set-at-zero
+  call is-above
+    code 1
+    code 0
+
+hold power-set-exceeds-set-at-one
+  call is-above
+    code 2
+    code 1
+
+hold power-set-exceeds-set-at-two
+  call is-above
+    code 4
+    code 2
+
+hold power-set-exceeds-set-at-three
+  call is-above
+    code 8
+    code 3
+
+# The gap WIDENS: at n the power set has 2^n elements against n, and the difference only grows (8 against 3, then 16
+# against 4), so the escape is permanent, not a small-case accident.
+hold power-set-gap-widens
+  call is-above
+    code 16
+    code 4

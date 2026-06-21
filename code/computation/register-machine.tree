@@ -1,0 +1,91 @@
+# A register machine (a Minsky counter machine), modeled and run by the kernel. Two registers hold natural numbers; the
+# program that ADDS one register into the other repeats a single instruction: while the second register is nonzero,
+# decrement it and increment the first. When it halts, the first register holds the sum. This is the canonical
+# Turing-universal model built from the humblest parts (increment, decrement, test-for-zero), and it is exactly how the
+# substrate computes: the conserved CHARGE is the counter, the create move increments it, the annihilate move decrements
+# it, so the knit on the mesh runs a register machine and is therefore universal. Here the machine's runs are checked by
+# direct computation.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# The add-program's run: while the second counter is nonzero, move one unit from it to the first. Halts when the second is
+# zero, with the first holding the sum.
+task run
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read b
+    case zero
+      send back
+        read a
+    case succ
+      link bp
+      send back
+        call run
+          make succ
+            bind prior
+              read a
+          read bp
+
+# THE MACHINE ADDS (instance): starting with 2 and 3, it halts holding 5.
+rule machine-computes-two-plus-three
+  show hold
+    call is-equal
+      call run
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make zero
+  calm
+
+# THE MACHINE ADDS (instance): 0 plus 2 halts holding 2 (the second counter empties into the first).
+rule machine-computes-zero-plus-two
+  show hold
+    call is-equal
+      call run
+        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm
+
+# THE MACHINE HALTS at the vacuum: with the second counter already zero, it returns the first counter unchanged,
+# run a 0 = a.
+rule machine-halts-on-empty-counter
+  mark a, like natural
+  show hold
+    call is-equal
+      call run
+        read a
+        make zero
+      read a
+  calm

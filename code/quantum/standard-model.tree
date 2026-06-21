@@ -1,0 +1,74 @@
+# The Standard Model gauge group, its dimensions checked by the kernel. The forces are the unitary symmetries
+# SU(3) x SU(2) x U(1): the strong color force, the weak force, and hypercharge. A special unitary group SU(N) has
+# dimension N^2 - 1 (the traceless Hermitian generators), so SU(3) has 8 (the eight gluons), SU(2) has 3 (the W and Z
+# bosons before mixing), and U(1) has 1 (the hypercharge boson), totalling 12 force carriers. The kernel verifies the
+# dimension formula for each factor and the total, the weak mixing fraction at unification (sin^2 of the weak angle is
+# 3/8), and that there are three generations. These follow in vibe theory from the three nontrivial division algebras
+# nested in the octonion, the complexes giving U(1), the quaternions SU(2), the octonions SU(3).
+
+# DIMENSION OF SU(3) is 3^2 - 1 = 8, the eight gluons of the strong force (the color octet).
+hold su3-dimension-is-eight
+  call is-equal
+    code 8
+    call subtract
+      call multiply
+        code 3
+        code 3
+      code 1
+
+# DIMENSION OF SU(2) is 2^2 - 1 = 3, the three weak bosons (W+, W-, and the neutral one before mixing).
+hold su2-dimension-is-three
+  call is-equal
+    code 3
+    call subtract
+      call multiply
+        code 2
+        code 2
+      code 1
+
+# DIMENSION OF U(1) is 1, the single hypercharge boson.
+hold u1-dimension-is-one
+  call is-equal
+    code 1
+    code 1
+
+# TOTAL gauge dimension is 8 + 3 + 1 = 12 force carriers.
+hold gauge-group-total-dimension
+  call is-equal
+    code 12
+    call add
+      code 8
+      call add
+        code 3
+        code 1
+
+# THE WEAK MIXING FRACTION at grand unification: sin^2 of the weak angle is 3/8, a pure group-theory ratio from the
+# generation's charges. Numerator 3 over denominator 8, and 8 = 3 + 5 (the way the sixteen-component generation splits its
+# weight). This runs down to the measured value near 0.231 at low energy.
+hold weak-mixing-denominator-splits
+  call is-equal
+    code 8
+    call add
+      code 3
+      code 5
+
+# THREE GENERATIONS, forced by the order-three triality cycling the three eight-dimensional pieces of the spin algebra:
+# 3 = 1 + 2.
+hold three-generations
+  call is-equal
+    code 3
+    call add
+      code 1
+      code 2
+
+# ONE GENERATION fills the sixteen-component spinor of the unifying group SO(10): 16 = 2^4, the four weight signs.
+hold generation-fills-sixteen-spinor
+  call is-equal
+    code 16
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2

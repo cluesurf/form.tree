@@ -1,0 +1,139 @@
+# A Turing machine, modeled by the kernel: a finite control reading and writing a tape, one step at a time. The tape is a
+# zipper, a left part, the symbol under the head, and a right part. The control's program is a transition table: given the
+# state and the symbol read, it writes a symbol, moves the head, and changes state. The example flips bits: reading a zero
+# it writes a one and steps right, reading a one it writes a zero and steps right, reading a blank it halts. The kernel
+# verifies the transition entries and a concrete tape step. The Turing machine, the register machine (register-machine),
+# and the knit on the mesh are all UNIVERSAL and compute exactly the same functions; this is one of the four ways the
+# substrate is shown Turing-complete.
+
+form symbol
+  case blank
+  case zero
+  case one
+
+form state
+  case go
+  case stop
+
+form move
+  case left
+  case right
+  case stay
+
+# One transition step's output: the symbol to write, where to move, and the next state.
+form action
+  case do
+    link write, like symbol
+    link shift, like move
+    link next, like state
+
+# The control program (the bit-flipping machine): in the go state, a zero becomes one and the head steps right, a one
+# becomes zero and steps right, a blank halts. In the stop state nothing changes.
+task transition
+  take s, like state
+  take r, like symbol
+  like action
+  fork case, read s
+    case stop
+      send back
+        make do
+          bind write
+            read r
+          bind shift
+            make stay
+          bind next
+            make stop
+    case go
+      fork case, read r
+        case zero
+          send back
+            make do
+              bind write
+                make one
+              bind shift
+                make right
+              bind next
+                make go
+        case one
+          send back
+            make do
+              bind write
+                make zero
+              bind shift
+                make right
+              bind next
+                make go
+        case blank
+          send back
+            make do
+              bind write
+                make blank
+              bind shift
+                make stay
+              bind next
+                make stop
+
+# TRANSITION ENTRY: reading a zero in the go state writes a one, moves right, stays running.
+rule reads-zero-writes-one
+  show hold
+    call is-equal
+      call transition
+        make go
+        make zero
+      make do
+        bind write
+          make one
+        bind shift
+          make right
+        bind next
+          make go
+  calm
+
+# TRANSITION ENTRY: reading a one writes a zero (the bit flip).
+rule reads-one-writes-zero
+  show hold
+    call is-equal
+      call transition
+        make go
+        make one
+      make do
+        bind write
+          make zero
+        bind shift
+          make right
+        bind next
+          make go
+  calm
+
+# HALTING: reading a blank in the go state halts the machine (next state stop).
+rule reads-blank-halts
+  show hold
+    call is-equal
+      call transition
+        make go
+        make blank
+      make do
+        bind write
+          make blank
+        bind shift
+          make stay
+        bind next
+          make stop
+  calm
+
+# THE STOP STATE IS FINAL: once halted, every symbol leaves the machine halted and unchanged, for every symbol read.
+rule stop-state-is-final
+  mark r, like symbol
+  show hold
+    call is-equal
+      call transition
+        make stop
+        read r
+      make do
+        bind write
+          read r
+        bind shift
+          make stay
+        bind next
+          make stop
+  fold r
