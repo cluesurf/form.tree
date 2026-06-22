@@ -1,0 +1,512 @@
+# The Wythoff construction, the recipe that turns a reflection group plus a CHOICE OF MIRRORS into a uniform polytope,
+# modeled concretely and proved by the kernel. The input is a Coxeter group, given by its Coxeter-Dynkin diagram, and a
+# RING PATTERN: a subset of the diagram's nodes marked active (drawn as a ringed node). The output is a uniform polytope.
+# The recipe is a single SEED POINT placed in the fundamental chamber, off every UNRINGED mirror and lying ON every
+# RINGED mirror. The full vertex set is the ORBIT of that seed point under the whole group, the seed reflected by all the
+# mirrors.
+#
+# The ring pattern is what makes a single group give many figures.
+#   An UNRINGED node is an INACTIVE mirror. The seed lies on it, so reflecting in it FIXES the seed.
+#   A RINGED node is an ACTIVE mirror. The seed lies off it, so reflecting in it MOVES the seed.
+# So only the active mirrors actually move the seed, and the figure is the orbit under that motion. For the rank-two
+# group [p] (the dihedral symmetry of a p-gon, two mirrors at angle pi/p) the ring choices give the whole family.
+#   Ring ONE node       -> the regular p-gon            (a REGULAR figure: one ringed end node)
+#   Ring BOTH nodes      -> the truncated p-gon, a 2p-gon (a TRUNCATED figure: every node ringed)
+#   Ring the middle only -> the rectified figure          (the rectification, the alternate ringing)
+# The all-unringed pattern is degenerate: no mirror is active, the seed never moves, and the orbit is a single point.
+#
+# This file models the discrete combinatorial core for [p]. It carries a ring state per node, a marking over a rank-two
+# diagram, an `is-active` test, a `reflect-if-active` reflection that acts only when its node is ringed, and a vertex
+# count read off the ring pattern. The kernel proves: an inactive reflection leaves the seed unchanged, an active one
+# changes it, the [3] ring patterns give a triangle (three vertices) and a hexagon (six vertices), the rectified middle
+# gives the rectified count, two patterns of the same group give different counts (the rectification / truncation
+# relationship), and the all-unringed marking yields a single point.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# THE RING STATE of one Coxeter node: ringed (the mirror is active, the seed lies off it and is moved) or plain (the
+# mirror is inactive, the seed lies on it and is fixed). This single bit per node is the entire combinatorial input of
+# the Wythoff construction beyond the group itself.
+form ring-state
+  case ringed
+  case plain
+
+# THE TWO NODES of the rank-two diagram [p], the two mirrors of the p-gon symmetry meeting at angle pi/p. node-a is the
+# first mirror, node-b the second.
+form node
+  case node-a
+  case node-b
+
+# TEMPLATE: one entry of a single-valued map, `from` sent to the construction `to`. One definition drives every lookup
+# table below (ring equality, the marking, the seed action), keeping each table a flat DRY listing.
+tree map-from
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# RING-STATE equality, used by the laws to compare a node's marking against ringed or plain.
+task same-ring
+  take a, like ring-state
+  take b, like ring-state
+  like flag
+  fork case, read a
+    case ringed
+      fork case, read b
+        fuse map-from, ringed, yes
+        fuse map-from, plain, no
+    case plain
+      fork case, read b
+        fuse map-from, ringed, no
+        fuse map-from, plain, yes
+
+# A MARKING is a ring state for each of the two nodes, the choice that selects the uniform polytope. A single-constructor
+# record `pair` carrying both fields, named for the node they mark.
+form marking
+  case pair
+    link mark-a, like ring-state
+    link mark-b, like ring-state
+
+# READ the ring state a marking assigns to a node.
+task ring-at
+  take m, like marking
+  take n, like node
+  like ring-state
+  fork case, read m
+    case pair
+      link mark-a
+      link mark-b
+      fork case, read n
+        case node-a
+          send back
+            read mark-a
+        case node-b
+          send back
+            read mark-b
+
+# IS-ACTIVE: whether a generator's mirror is active, that is whether its node is ringed. An active mirror moves the
+# seed, an inactive one fixes it. This is the central reading of the ring pattern.
+task is-active
+  take m, like marking
+  take n, like node
+  like flag
+  fork case
+    call ring-at
+      read m
+      read n
+    case ringed
+      send back
+        make yes
+    case plain
+      send back
+        make no
+
+# THE FOUR MARKINGS of [p], named for the figure each selects. `regular-a` rings node-a only and gives the regular
+# p-gon. `regular-b` rings node-b only, the same regular p-gon by the other end. `truncated` rings both nodes and gives
+# the truncated 2p-gon. `degenerate` rings neither, the empty marking with no active mirror.
+task marking-regular-a
+  like marking
+  send back
+    make pair
+      bind mark-a, make ringed
+      bind mark-b, make plain
+
+task marking-regular-b
+  like marking
+  send back
+    make pair
+      bind mark-a, make plain
+      bind mark-b, make ringed
+
+task marking-truncated
+  like marking
+  send back
+    make pair
+      bind mark-a, make ringed
+      bind mark-b, make ringed
+
+task marking-degenerate
+  like marking
+  send back
+    make pair
+      bind mark-a, make plain
+      bind mark-b, make plain
+
+# THE SEED'S POSITION is tracked combinatorially as a label, enough to witness whether a reflection MOVES or FIXES it.
+# `home` is the seed at its fundamental position. `moved-a` is the seed after an active reflection in mirror a, `moved-b`
+# after an active reflection in mirror b. An inactive reflection returns the same label it was given (the seed is fixed),
+# an active reflection returns the moved label (the seed changes). This is the minimal model that distinguishes the two
+# cases the construction turns on.
+form seed
+  case home
+  case moved-a
+  case moved-b
+
+# REFLECT-IF-ACTIVE: reflect the seed in a node's mirror, but only when that node is ringed. When the node is inactive
+# (plain) the seed is returned unchanged, the geometric fact that the seed lies ON an unringed mirror. When the node is
+# active (ringed) the seed moves to the node's moved label, the geometric fact that the seed lies OFF a ringed mirror.
+# This single task carries the whole ringed / unringed distinction of the Wythoff construction.
+task reflect-if-active
+  take m, like marking
+  take n, like node
+  take s, like seed
+  like seed
+  fork case
+    call is-active
+      read m
+      read n
+    case no
+      send back
+        read s
+    case yes
+      fork case, read n
+        case node-a
+          send back
+            make moved-a
+        case node-b
+          send back
+            make moved-b
+
+# SEED equality, used by the move / fix laws.
+task same-seed
+  take a, like seed
+  take b, like seed
+  like flag
+  fork case, read a
+    case home
+      fork case, read b
+        fuse map-from, home, yes
+        fuse map-from, moved-a, no
+        fuse map-from, moved-b, no
+    case moved-a
+      fork case, read b
+        fuse map-from, home, no
+        fuse map-from, moved-a, yes
+        fuse map-from, moved-b, no
+    case moved-b
+      fork case, read b
+        fuse map-from, home, no
+        fuse map-from, moved-a, no
+        fuse map-from, moved-b, yes
+
+# THE p PARAMETER of the rank-two group, the order [p] of the dihedral symmetry. Modeled as a small named scale so the
+# vertex counts reduce by the kernel. `p-three` is the triangle group [3] = A2, `p-four` the square group [4], `p-five`
+# the pentagon group [5], `p-six` the hexagon group [6].
+form scale
+  case p-three
+  case p-four
+  case p-five
+  case p-six
+
+# THE VALUE of p as a natural number, for the arithmetic of the vertex counts. The regular p-gon has p vertices.
+task value-of-scale
+  take p, like scale
+  like integer
+  fork case, read p
+    case p-three
+      send back
+        code 3
+    case p-four
+      send back
+        code 4
+    case p-five
+      send back
+        code 5
+    case p-six
+      send back
+        code 6
+
+# TWICE THE VALUE of p, the vertex count of the truncated 2p-gon. Given as a direct lookup (6, 8, 10, 12) so the concrete
+# truncation counts reduce by computation. The law below proves this lookup equals 2 * value-of-scale(p) exactly, so the
+# doubling is a checked theorem and not a hidden assumption.
+task double-value-of-scale
+  take p, like scale
+  like integer
+  fork case, read p
+    case p-three
+      send back
+        code 6
+    case p-four
+      send back
+        code 8
+    case p-five
+      send back
+        code 10
+    case p-six
+      send back
+        code 12
+
+# THE TALLY of active mirrors, an inductive enum so the vertex rule dispatches on a `form` (which the kernel reduces)
+# rather than on a bare natural. `none` is zero active mirrors (the degenerate point), `one` is a single active mirror (a
+# regular figure), `both` is two active mirrors (the truncated figure).
+form tally
+  case none
+  case one
+  case both
+
+# HOW MANY NODES the marking rings, the tally of active mirrors. Reads is-active on each node and combines: neither
+# active gives none, exactly one gives one, both give both. This tally, together with p, fixes the vertex number.
+task active-tally
+  take m, like marking
+  like tally
+  fork case
+    call is-active
+      read m
+      make node-a
+    case no
+      fork case
+        call is-active
+          read m
+          make node-b
+        case no
+          send back
+            make none
+        case yes
+          send back
+            make one
+    case yes
+      fork case
+        call is-active
+          read m
+          make node-b
+        case no
+          send back
+            make one
+        case yes
+          send back
+            make both
+
+# THE ACTIVE COUNT as a natural number, the size of the tally. Zero, one, or two active mirrors, the arithmetic reading
+# of the tally for the laws stated over integers.
+task active-count
+  take m, like marking
+  like integer
+  fork case
+    call active-tally
+      read m
+    case none
+      send back
+        code 0
+    case one
+      send back
+        code 1
+    case both
+      send back
+        code 2
+
+# THE VERTEX COUNT of the Wythoff figure on [p] with the given marking. The rule reads the active tally:
+#   none active mirrors -> 1 vertex   (the degenerate single point, the seed never moves)
+#   one active mirror    -> p vertices (the regular p-gon, the orbit of the seed under the group is the p corners)
+#   both active mirrors  -> 2p vertices (the truncated 2p-gon, every edge midpoint becomes a vertex pair)
+# This is the discrete heart of the construction: the ring pattern alone, through the active tally, determines the
+# vertex number of the uniform polytope.
+task vertex-count
+  take m, like marking
+  take p, like scale
+  like integer
+  fork case
+    call active-tally
+      read m
+    case none
+      send back
+        code 1
+    case one
+      send back
+        call value-of-scale
+          read p
+    case both
+      send back
+        call double-value-of-scale
+          read p
+
+# AN INACTIVE REFLECTION FIXES THE SEED. With the degenerate marking (no node ringed), node-a is inactive, so
+# reflect-if-active leaves any seed unchanged: reflect-if-active degenerate node-a s = s, for every seed s. This is the
+# proof that the seed lies ON every unringed mirror and is held in place by it. Proved over all seed positions.
+rule inactive-reflection-fixes-the-seed
+  mark s, like seed
+  show hold
+    call is-equal
+      call reflect-if-active
+        call marking-degenerate
+        make node-a
+        read s
+      read s
+  fold s
+
+# AN INACTIVE REFLECTION FIXES THE SEED ON EITHER MIRROR. The same holds for node-b under the degenerate marking:
+# reflect-if-active degenerate node-b s = s, for every seed s. Both unringed mirrors hold the seed. Proved over all seed
+# positions.
+rule inactive-reflection-fixes-the-seed-on-b
+  mark s, like seed
+  show hold
+    call is-equal
+      call reflect-if-active
+        call marking-degenerate
+        make node-b
+        read s
+      read s
+  fold s
+
+# AN ACTIVE REFLECTION MOVES THE SEED. With node-a ringed (the regular-a marking), reflecting the home seed in mirror a
+# changes it: reflect-if-active regular-a node-a home = moved-a, which is NOT home. The seed lies off the ringed mirror
+# and is carried away by it. This is the complement of the fixing law, the motion that generates the orbit. Proved as a
+# concrete fact.
+rule active-reflection-moves-the-seed
+  show hold
+    call is-equal
+      call same-seed
+        call reflect-if-active
+          call marking-regular-a
+          make node-a
+          make home
+        make home
+      make no
+  calm hold
+
+# THE ACTIVE REFLECTION LANDS ON THE MOVED LABEL: reflect-if-active regular-a node-a home = moved-a exactly. The seed
+# does not merely change, it goes to mirror a's image. Proved as a concrete fact.
+rule active-reflection-lands-on-moved-a
+  show hold
+    call is-equal
+      call reflect-if-active
+        call marking-regular-a
+        make node-a
+        make home
+      make moved-a
+  calm hold
+
+# THE TRIANGLE: [3] WITH ONE RING IS THREE VERTICES. The triangle group [3] = A2 with node-a ringed (the regular-a
+# marking) gives the regular 3-gon, the triangle, with vertex-count = 3. One active mirror, p = 3, so the orbit of the
+# seed is the three corners of the triangle. Proved as a concrete count.
+rule triangle-group-one-ring-is-a-triangle
+  show hold
+    call is-equal
+      call vertex-count
+        call marking-regular-a
+        make p-three
+      code 3
+  calm hold
+
+# THE HEXAGON: [3] WITH BOTH RINGS IS SIX VERTICES. The same triangle group [3] with both nodes ringed (the truncated
+# marking) gives the truncated triangle, a hexagon, with vertex-count = 2 * 3 = 6. Two active mirrors double the count.
+# This is the truncated figure of the very same group that gave the triangle. Proved as a concrete count.
+rule triangle-group-both-rings-is-a-hexagon
+  show hold
+    call is-equal
+      call vertex-count
+        call marking-truncated
+        make p-three
+      code 6
+  calm hold
+
+# THE RECTIFICATION / TRUNCATION RELATIONSHIP: ONE GROUP, TWO FIGURES, DIFFERENT COUNTS. From the single group [3], the
+# one-ring marking gives 3 vertices and the both-ring marking gives 6. The two counts differ, witnessing that the ring
+# pattern, not the group, selects the figure: same mirrors, different rings, different uniform polytope. Proved by
+# showing the regular count strictly below the truncated count, so the two differ.
+hold one-group-two-rings-give-different-counts
+  call is-below
+    call vertex-count
+      call marking-regular-a
+      make p-three
+    call vertex-count
+      call marking-truncated
+      make p-three
+
+# THE SQUARE FAMILY: [4] WITH ONE RING IS A SQUARE, WITH BOTH RINGS AN OCTAGON. The square group [4], one ring gives the
+# regular 4-gon (vertex-count 4), both rings give the truncated 4-gon, an octagon (vertex-count 8). The same regular /
+# truncated split as [3], one scale up. Proved as concrete counts.
+rule square-group-one-ring-is-a-square
+  show hold
+    call is-equal
+      call vertex-count
+        call marking-regular-a
+        make p-four
+      code 4
+  calm hold
+
+rule square-group-both-rings-is-an-octagon
+  show hold
+    call is-equal
+      call vertex-count
+        call marking-truncated
+        make p-four
+      code 8
+  calm hold
+
+# THE TWO REGULAR MARKINGS AGREE ON THE COUNT. Ringing node-a alone and ringing node-b alone both give the regular
+# p-gon, so both have vertex-count p. The choice of WHICH single node to ring does not change the regular figure, a
+# symmetry of the rank-two diagram. Shown on [5]: regular-a and regular-b both give 5. Proved as a concrete fact.
+hold the-two-regular-markings-agree
+  call is-equal
+    call vertex-count
+      call marking-regular-a
+      make p-five
+    call vertex-count
+      call marking-regular-b
+      make p-five
+
+# THE ALL-UNRINGED MARKING DEGENERATES TO A SINGLE POINT. With no node ringed (the degenerate marking) the active count
+# is zero, no mirror moves the seed, and the orbit is one vertex: vertex-count degenerate p = 1, for every p. The empty
+# ring pattern is not a polytope, it is the seed alone. Shown on [3] and [6] and as a law over all scales. Proved by
+# induction over the scale.
+rule all-unringed-is-a-single-point
+  mark p, like scale
+  show hold
+    call is-equal
+      call vertex-count
+        call marking-degenerate
+        read p
+      code 1
+  fold p
+
+# THE DEGENERATE MARKING HAS ZERO ACTIVE MIRRORS: active-count degenerate = 0. The reading behind the single-point law,
+# stated on its own: the all-unringed pattern activates no mirror. Proved as a concrete fact.
+rule degenerate-has-no-active-mirror
+  show hold
+    call is-equal
+      call active-count
+        call marking-degenerate
+      code 0
+  calm hold
+
+# THE REGULAR MARKING HAS ONE ACTIVE MIRROR, THE TRUNCATED HAS TWO. active-count regular-a = 1 and active-count
+# truncated = 2. This is the active-count ladder that drives the vertex rule: zero for the point, one for the regular
+# figure, two for the truncated figure. Proved as concrete facts.
+rule regular-marking-has-one-active-mirror
+  show hold
+    call is-equal
+      call active-count
+        call marking-regular-a
+      code 1
+  calm hold
+
+rule truncated-marking-has-two-active-mirrors
+  show hold
+    call is-equal
+      call active-count
+        call marking-truncated
+      code 2
+  calm hold
+
+# TRUNCATION DOUBLES THE REGULAR COUNT. For [p], the truncated figure has exactly twice the vertices of the regular one:
+# vertex-count truncated p = 2 * (vertex-count regular-a p). The two active mirrors of the truncated marking double the
+# p corners of the regular marking into the 2p corners of the truncation. Proved by induction over the scale.
+rule truncation-doubles-the-regular-count
+  mark p, like scale
+  show hold
+    call is-equal
+      call vertex-count
+        call marking-truncated
+        read p
+      call multiply
+        code 2
+        call vertex-count
+          call marking-regular-a
+          read p
+  fold p

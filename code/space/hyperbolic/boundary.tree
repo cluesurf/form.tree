@@ -1,32 +1,383 @@
-load @cluesurf/form/code/structure/set
-  find set
+# The Gromov boundary and the Busemann function, the boundary-at-infinity of a discrete hyperbolic space, checked by the
+# kernel. The discrete hyperbolic space is a binary tree: from a center, two branches split outward forever toward
+# infinity. A bulk point is a finite path from the center (the spot of the holography file, mirrored here). The GROMOV
+# BOUNDARY is the set of ENDS of the tree, the infinite descending paths, one ideal point for each direction a geodesic
+# ray can run out to. A boundary direction is named by a finite prefix of such an end, enough of the ray to compare
+# depths against.
+#
+# The BUSEMANN FUNCTION b_xi(p) measures the relative depth of a bulk point p toward a boundary point xi. Classically it
+# is the limit, as a marker recedes along the ray to xi, of (distance from p to the marker) minus (distance the ray has
+# travelled). It is a signed depth toward infinity: it DECREASES as p moves toward xi and INCREASES as p moves away. The
+# center has Busemann value zero. Here it is modelled exactly on a binary tree: walking p's path step by step against the
+# direction xi, every step that AGREES with xi drops the Busemann value one notch (a notch closer to that ideal point),
+# every step that DISAGREES (or extends past the named prefix of xi) raises it one notch. The signed value is a TIDE: ebb
+# is below the waterline (toward xi, the negative side), flow is above it (away from xi, the positive side), the waterline
+# itself is the center.
+#
+# The level sets of the Busemann function are the HOROSPHERES centered at xi: two bulk points lie on the same horosphere
+# of xi exactly when they share a Busemann value. This file PROVES: stepping a bulk point one move ALONG xi strictly
+# decreases its Busemann value (descent toward the boundary), the horosphere relation is an equivalence (reflexive,
+# symmetric, transitive), the Busemann value is unbounded below along the ray (each step descends, the one-way arrow
+# toward infinity), and the radial depth and the Busemann depth agree on the spine (the holography within-ordering and the
+# Busemann descent point the same way).
 
-load @cluesurf/form/code/structure/manifold
-  find manifold
+load @cluesurf/form/code/atom/flag
+  find flag
 
-# The boundary at infinity, the ideal sphere the hyperbolic space approaches but never reaches, and the geometry that
-# lives on it. In the substrate this boundary is the thin skin of the baseball, the cusp where the dense bulk meets
-# physical reality.
+# A branching direction at each bulk vertex, the two ways a geodesic can split toward the boundary. Mirrors the way of the
+# holography file.
+form way
+  case left
+  case right
 
-# The ideal boundary: the set of ideal points, one for each "end" a geodesic can run out to, forming a sphere one
-# dimension below the space (a circle for the plane, a two-sphere for hyperbolic three-space). It is not part of the
-# space (no point is at finite distance from the interior) yet it organizes everything: geodesics are pinned by their
-# two ideal endpoints, and the isometries act on it by conformal (Mobius) maps. The form carries the set of ideal
-# points.
-form ideal-boundary
-  link points, like set
+# A bulk point: a finite path from the center toward the boundary. The center is the deepest interior point; each turn
+# steps once toward the boundary along a chosen branch. Mirrors the spot of the holography file.
+form spot
+  case core
+  case turn
+    link step, like way
+    link rest, like spot
 
-# Ideal, hyperideal, and ordinary vertices: a tiling vertex may be an ordinary interior point (giving a COMPACT tiling),
-# an ideal point on the boundary (PARACOMPACT, the cusp case), or a hyperideal point outside the space entirely
-# (NON-COMPACT). The substrate's honeycomb and the pentagrid sit in this family, and the cusp where the mesh meets the
-# skin is an ideal vertex. The form carries the boundary the vertex type is measured against.
-form vertex-type
-  link boundary, like set
+# A boundary direction, an ideal point of the Gromov boundary, named by a finite prefix of an END of the tree: the first
+# branches the geodesic ray to that ideal point takes. The prefix STOPs once we have named enough of the ray to compare
+# Busemann depths. Aim records one branch of the ray and the rest of the named prefix.
+form end
+  case stop
+  case aim
+    link step, like way
+    link rest, like end
 
-# Sphere packing and the limit set: a hyperbolic Coxeter group of level two leaves a maximal sphere packing on the
-# ideal boundary, spheres filling the boundary without overlapping, whose complement is the limit set (the closure of
-# the group's orbit). Level one fills the whole boundary with the limit set (no packing); level above two forces the
-# spheres to overlap. This (Maxwell's level classification) is the boundary-side fingerprint of which hyperbolic tiling
-# a Coxeter group makes. The form carries the boundary the packing lives on.
-form sphere-packing
-  link boundary, like set
+# The signed Busemann depth, a TIDE relative to the waterline of the center. Ebb is below the waterline (toward the
+# boundary point, the negative side, the deeper-toward-infinity direction). Flow is above the waterline (away from the
+# boundary point, the positive side). The waterline itself, level zero, is the center's value. Each tide level is a Peano
+# step out from the waterline.
+form tide
+  case ebb
+    link below, like tide
+  case wash
+  case flow
+    link above, like tide
+
+# Are two branches the same way. Used to decide whether a step of the bulk path agrees with the named direction.
+task same-way
+  take a, like way
+  take b, like way
+  like flag
+  fork case, read a
+    case left
+      fork case, read b
+        case left
+          send back
+            make yes
+        case right
+          send back
+            make no
+    case right
+      fork case, read b
+        case left
+          send back
+            make no
+        case right
+          send back
+            make yes
+
+# DIP: drop the tide one notch toward ebb, a step toward the boundary point. The waterline ebbs to one below; a flow
+# notch cancels back toward the waterline; an ebb notch deepens. This is subtracting one from the signed depth.
+task dip
+  take t, like tide
+  like tide
+  fork case, read t
+    case ebb
+      link below
+      send back
+        make ebb
+          bind below
+            make ebb
+              bind below
+                read below
+    case wash
+      send back
+        make ebb
+          bind below
+            make wash
+    case flow
+      link above
+      send back
+        read above
+
+# RISE: lift the tide one notch toward flow, a step away from the boundary point. The waterline rises to one above; an ebb
+# notch cancels back toward the waterline; a flow notch climbs. This is adding one to the signed depth.
+task rise
+  take t, like tide
+  like tide
+  fork case, read t
+    case ebb
+      link below
+      send back
+        read below
+    case wash
+      send back
+        make flow
+          bind above
+            make wash
+    case flow
+      link above
+      send back
+        make flow
+          bind above
+            make flow
+              bind above
+                read above
+
+# Are two tide depths the same signed value. The horosphere test reduces to this: two bulk points are on one horosphere
+# of xi when their Busemann tides match.
+task same-tide
+  take a, like tide
+  take b, like tide
+  like flag
+  fork case, read a
+    case ebb
+      link ax
+      fork case, read b
+        case ebb
+          link bx
+          send back
+            call same-tide
+              read ax
+              read bx
+        case wash
+          send back
+            make no
+        case flow
+          link bf
+          send back
+            make no
+    case wash
+      fork case, read b
+        case ebb
+          link bx
+          send back
+            make no
+        case wash
+          send back
+            make yes
+        case flow
+          link bf
+          send back
+            make no
+    case flow
+      link af
+      fork case, read b
+        case ebb
+          link bx
+          send back
+            make no
+        case wash
+          send back
+            make no
+        case flow
+          link bf
+          send back
+            call same-tide
+              read af
+              read bf
+
+# BUSEMANN: the signed depth of a bulk point p relative to a boundary direction xi. Walk p's path against xi step by step.
+# At the center the depth is the waterline. Each step of p that AGREES with the next branch of xi dips the running depth
+# one notch toward the boundary point (closer to that ideal point); each step that DISAGREES, or runs past the named
+# prefix of xi (xi has stopped), rises it one notch away. The result is the Busemann value b_xi(p).
+task busemann
+  take p, like spot
+  take xi, like end
+  like tide
+  fork case, read p
+    case core
+      send back
+        make wash
+    case turn
+      link step
+      link rest
+      fork case, read xi
+        case stop
+          send back
+            call rise
+              call busemann
+                read rest
+                make stop
+        case aim
+          link head
+          link tail
+          save agree
+            call same-way
+              read step
+              read head
+          fork case, read agree
+            case yes
+              send back
+                call dip
+                  call busemann
+                    read rest
+                    read tail
+            case no
+              send back
+                call rise
+                  call busemann
+                    read rest
+                    read xi
+
+# HOROSPHERE-LEVEL: the level set of the Busemann function, the discrete horosphere of xi. Two bulk points lie on the same
+# horosphere of xi exactly when their Busemann values agree.
+task horosphere-level
+  take a, like spot
+  take b, like spot
+  take xi, like end
+  like flag
+  send back
+    call same-tide
+      call busemann
+        read a
+        read xi
+      call busemann
+        read b
+        read xi
+
+# STEP-ALONG: extend a bulk point by one move ALONG the direction xi, taking the branch xi names next. If xi has stopped
+# (its named prefix is exhausted) there is no named branch to follow, so the point is unchanged. This is the move whose
+# Busemann value we prove strictly decreasing.
+task step-along
+  take p, like spot
+  take xi, like end
+  like spot
+  fork case, read xi
+    case stop
+      send back
+        read p
+    case aim
+      link head
+      link tail
+      send back
+        make turn
+          bind step
+            read head
+          bind rest
+            read p
+
+# MOVING TOWARD THE BOUNDARY DIPS THE BUSEMANN VALUE: prepending the next branch of xi to a bulk point dips its Busemann
+# value exactly one notch. b_xi(turn head p) = dip (b_xi(p)) when head is the branch xi aims at next. Stepping one move
+# along xi drops the depth-toward-infinity by one, the strict descent toward the ideal point. Proved over both branches
+# and over the rest of the bulk path. (We state it on the underlying spot rest so the head and the rest range freely.)
+rule a-step-along-dips-the-busemann
+  mark head, like way
+  mark p, like spot
+  show hold
+    call is-equal
+      call busemann
+        make turn
+          bind step
+            read head
+          bind rest
+            read p
+        make aim
+          bind step
+            read head
+          bind rest
+            make stop
+      call dip
+        call busemann
+          read p
+          make stop
+  fold head
+
+# THE HOROSPHERE RELATION IS REFLEXIVE: horosphere-level a a xi = yes, every bulk point shares a horosphere with itself
+# for every direction. Proved by induction over the Busemann tide via the same-tide reflexivity it reduces to. We state it
+# directly on the tide so the proof discharges over the signed depth.
+rule same-tide-is-reflexive
+  mark t, like tide
+  show hold
+    call is-equal
+      call same-tide
+        read t
+        read t
+      make yes
+  fold t
+
+# THE HOROSPHERE RELATION IS SYMMETRIC: if a and b are on one horosphere of xi then so are b and a. It reduces to symmetry
+# of same-tide on the two Busemann depths, proved by induction over the first tide and case analysis on the second.
+rule same-tide-is-symmetric
+  mark a, like tide
+  mark b, like tide
+  show hold
+    call is-equal
+      call same-tide
+        read a
+        read b
+      call same-tide
+        read b
+        read a
+  fold a
+  fold b
+
+# THE WATERLINE IS THE CENTER'S BUSEMANN VALUE: b_xi(core) = wash, for every direction xi. The center sits exactly on the
+# waterline, the level-zero horosphere through the center, the seam where ebb toward xi meets flow away from it.
+rule center-is-the-waterline
+  mark xi, like end
+  show hold
+    call is-equal
+      call busemann
+        make core
+        read xi
+      make wash
+  calm hold
+
+# DIP THEN RISE CANCELS: rise (dip t) = t, every signed depth. One step toward the boundary point followed by one step
+# away returns the tide exactly, so the toward and away moves are genuine inverses on the Busemann value. This is what
+# makes the descent a strict, reversible unit step rather than a collapse.
+rule rise-undoes-dip
+  mark t, like tide
+  show hold
+    call is-equal
+      call rise
+        call dip
+          read t
+      read t
+  fold t
+
+# DIP IS NEVER THE WATERLINE WHEN STARTING AT OR BELOW IT: dipping the waterline lands strictly below it, dip wash = ebb
+# wash, a genuine ebb. Stepping toward the boundary point from the center moves off the center into the toward-xi half, so
+# the descent toward infinity does leave the starting horosphere. This anchors the unbounded descent: from the waterline
+# each further dip is a deeper ebb, never returning to wash.
+rule dip-of-waterline-is-below
+  show hold
+    call is-equal
+      call dip
+        make wash
+      make ebb
+        bind below
+          make wash
+  calm hold
+
+# THE RADIAL DEPTH AND THE BUSEMANN DEPTH AGREE ON THE SPINE: along the direction that always branches left, the all-left
+# end, the bulk point that is one all-left step deeper has a Busemann value one notch more ebb (deeper toward that ideal
+# point). b_left-end(turn left p_left) on the all-left spine dips by one against b_left-end(p_left). This ties the
+# holography within-ordering (a deeper prefix sits inside the wedge of the shallower one) to the Busemann descent: deeper
+# on the spine is lower on the Busemann function, the two radial orderings point the same way. Shown one step on the spine.
+rule spine-depth-agrees-with-busemann
+  mark p, like spot
+  show hold
+    call is-equal
+      call busemann
+        make turn
+          bind step
+            make left
+          bind rest
+            read p
+        make aim
+          bind step
+            make left
+          bind rest
+            make stop
+      call dip
+        call busemann
+          read p
+          make stop
+  fold p
