@@ -1,0 +1,168 @@
+# The G2 root system, the smallest of the exceptional Lie algebras, modeled by the kernel. G2 has 12 roots in two
+# lengths: 6 LONG roots forming a hexagon, and 6 SHORT roots forming a second hexagon turned thirty degrees and scaled
+# down, the two interleaving into a twelve-pointed star. It is non-simply-laced (two root lengths, like F4), its Weyl
+# group is the dihedral group of order 12, and G2 is exactly the automorphism group of the octonions, the symmetry that
+# preserves octonion multiplication. This file constructs the 12 roots as a length together with a clock direction,
+# proves the antipode pairs them into 6 lines, and proves the long and short families are each closed under the antipode.
+# With A2, D4, F4, and E8 already modeled, this completes the exceptional ladder G2 in F4 in E8 next to the classical A2.
+
+# The two root lengths of the non-simply-laced G2.
+form length
+  case long
+  case short
+
+# A clock direction: six positions sixty degrees apart, the six corners of one hexagon.
+form clock
+  case c0
+  case c1
+  case c2
+  case c3
+  case c4
+  case c5
+
+# A G2 root: a length and a clock direction. Six long (one hexagon) plus six short (the other) is twelve roots.
+form g2-root
+  case at
+    link length, like length
+    link spin, like clock
+
+# TEMPLATE: one entry of a clock map, sending one direction to another. Serves the antipode (a half turn, three steps).
+tree map-clock
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# The half-turn on the clock: rotate three of six positions, sending each direction to its opposite. This is the antipode
+# within one hexagon.
+task half-turn
+  take s, like clock
+  like clock
+  fork case, read s
+    fuse map-clock, c0, c3
+    fuse map-clock, c1, c4
+    fuse map-clock, c2, c5
+    fuse map-clock, c3, c0
+    fuse map-clock, c4, c1
+    fuse map-clock, c5, c2
+
+# The antipode of a root: same length, opposite direction. It pairs the 12 roots into 6 antipodal lines.
+task negate
+  take r, like g2-root
+  like g2-root
+  fork case, read r
+    case at
+      link length
+      link spin
+      send back
+        make at
+          bind length
+            read length
+          bind spin
+            call half-turn
+              read spin
+
+# Whether a root is long, the length classification splitting the 12 into the 6 long and the 6 short.
+task is-long
+  take r, like g2-root
+  like flag
+  fork case, read r
+    case at
+      link length
+      link spin
+      fork case, read length
+        case long
+          send back
+            make yes
+        case short
+          send back
+            make no
+
+# The flag, imported for the length test.
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# THE HALF-TURN IS AN INVOLUTION: half-turn (half-turn s) = s, for every clock direction. Two half turns are a full turn,
+# the identity. This is why the antipode pairs the roots cleanly.
+rule half-turn-is-an-involution
+  mark s, like clock
+  show hold
+    call is-equal
+      call half-turn
+        call half-turn
+          read s
+      read s
+  fold s
+
+# THE ANTIPODE IS AN INVOLUTION: negate (negate r) = r, for every one of the 12 roots. The root set is symmetric about
+# the origin, splitting into 6 antipodal lines.
+rule negate-is-an-involution
+  mark length-of, like length
+  mark spin-of, like clock
+  show hold
+    call is-equal
+      call negate
+        call negate
+          make at
+            bind length
+              read length-of
+            bind spin
+              read spin-of
+      make at
+        bind length
+          read length-of
+        bind spin
+          read spin-of
+  fold length-of, spin-of
+
+# THE ANTIPODE PRESERVES LENGTH: is-long (negate r) = is-long r, for every root. The antipode of a long root is long and
+# of a short root is short, so the long hexagon and the short hexagon are each closed under the antipode, the two Weyl
+# orbits of G2.
+rule negate-preserves-length
+  mark length-of, like length
+  mark spin-of, like clock
+  show hold
+    call is-equal
+      call is-long
+        call negate
+          make at
+            bind length
+              read length-of
+            bind spin
+              read spin-of
+      call is-long
+        make at
+          bind length
+            read length-of
+          bind spin
+            read spin-of
+  fold length-of, spin-of
+
+# A LONG ROOT IS LONG AND A SHORT ROOT IS SHORT: concrete witnesses that both Weyl orbits are inhabited, so G2 genuinely
+# carries two root lengths (it is non-simply-laced).
+rule a-long-root-is-long
+  show hold
+    call is-equal
+      call is-long
+        make at
+          bind length
+            make long
+          bind spin
+            make c0
+      make yes
+  calm hold
+
+rule a-short-root-is-short
+  show hold
+    call is-equal
+      call is-long
+        make at
+          bind length
+            make short
+          bind spin
+            make c0
+      make no
+  calm hold
