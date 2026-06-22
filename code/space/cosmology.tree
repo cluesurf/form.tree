@@ -13,7 +13,7 @@
 # induction (`fold`):
 #   the universe EXPANDS: a(t+1) is strictly above a(t), for every epoch (one-way growth, the arrow of cosmic time),
 #   the big bang is the MINIMUM: a(0) is at most a(t), for every epoch (nothing precedes the big bang),
-#   HUBBLE'S LAW (monotone form): at a fixed epoch a galaxy with a larger comoving separation has a larger physical
+#   HUBBLE'S LAW (monotone form): at a fixed epoch a galaxy with a larger comoving separation lies at a larger physical
 #     distance, the farther galaxy recedes faster,
 #   COSMOLOGICAL REDSHIFT: light emitted at an earlier epoch and observed at a later one is stretched, the redshift
 #     factor is at least one (the wavelength grows with the universe),
@@ -31,19 +31,6 @@ form natural
 form bit
   case off
   case on
-
-# Disjunction on bits, used to state the totality of the order.
-task some
-  take a, like bit
-  take b, like bit
-  like bit
-  fork case, read a
-    case off
-      send back
-        read b
-    case on
-      send back
-        make on
 
 # Addition by recursion on the first argument: 0 + b = b, (succ a) + b = succ (a + b). Verified terminating and unfolded
 # by the kernel.
@@ -156,6 +143,19 @@ task physical-distance
         read e
       read comoving
 
+# The stretch, the physical distance written with the comoving separation as the left factor and the scale factor on
+# the right: separation times scale factor. Equal in value to the physical distance, but in this order the growing scale
+# factor is the right argument, which is the shape the compounding law multiplies through.
+task stretch
+  take comoving, like natural
+  take e, like epoch
+  like natural
+  send back
+    call times
+      read comoving
+      call scale-factor
+        read e
+
 # The redshift comparison: light emitted at one epoch and observed at another is stretched by the ratio of the scale
 # factors a(observe) / a(emit). We model the stretch as the order fact a(emit) <= a(observe): the redshift factor is at
 # least one exactly when the scale factor at observation is at least the scale factor at emission. on means redshifted.
@@ -170,7 +170,8 @@ task redshift-at-least-one
       call scale-factor
         read observe
 
-# --- Step lemmas, definitional, stated so the inductions below can rewrite the recurrences into view. ---
+# --- Step lemmas, definitional and inductive, stated so the cosmological laws below can rewrite the recurrences and the
+# arithmetic into view. These are the arithmetic of the naturals, included so the file is self-contained. ---
 
 # 0 <= n, always. Definitional.
 rule at-most-zero-left-is-on
@@ -212,6 +213,88 @@ rule at-most-reflexive
       make on
   fold n
 
+# (succ a) + b = succ (a + b). Definitional, the recurrence of plus.
+rule plus-succ-left-steps
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            read a
+        read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  calm hold
+
+# n + 0 = n (zero is a right identity). By induction on n.
+rule plus-zero-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+# a + (succ b) = succ (a + b) (the successor steps out on the right). By induction on a.
+rule plus-succ-right-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# Addition is associative: (a + b) + c = a + (b + c). By induction on a.
+rule plus-is-associative
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  show hold
+    call is-equal
+      call plus
+        call plus
+          read a
+          read b
+        read c
+      call plus
+        read a
+        call plus
+          read b
+          read c
+  fold a
+
+# Addition is commutative: a + b = b + a. By induction on a, chaining the right identity and right step lemmas.
+rule plus-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        read b
+      call plus
+        read b
+        read a
+  fold a
+    cite plus-zero-right-is-identity
+    cite plus-succ-right-steps-out
+
 # (succ a) * b = b + (a * b). Definitional, the recurrence of times.
 rule times-succ-left-steps-out
   mark a, like natural
@@ -230,74 +313,94 @@ rule times-succ-left-steps-out
           read b
   calm hold
 
-# 0 + b = b. Definitional, the recurrence of plus.
-rule plus-zero-left-is-identity
-  mark n, like natural
-  show hold
-    call is-equal
-      call plus
-        make zero
-        read n
-      read n
-  calm hold
-
-# (succ a) + b = succ (a + b). Definitional.
-rule plus-succ-left-steps
+# a * (succ b) = a + (a * b) (the successor steps out on the right of a product). By induction on a, normalizing the
+# additive chain modulo associativity and commutativity.
+rule times-succ-right-is-plus
   mark a, like natural
   mark b, like natural
   show hold
     call is-equal
-      call plus
+      call times
+        read a
         make succ
           bind prior
-            read a
-        read b
-      make succ
-        bind prior
-          call plus
-            read a
             read b
-  calm hold
+      call plus
+        read a
+        call times
+          read a
+          read b
+  fold a
+    cite times-succ-left-steps-out
+    cite plus-succ-left-steps
+    cite plus-is-associative
+    cite plus-is-commutative
 
-# Monotonicity of at-most under adding the same amount on the left: a <= b implies (c + a) <= (c + b). By induction on c,
-# using the plus step lemma to peel a successor each step. This is the engine behind Hubble monotonicity and compounding.
-rule at-most-plus-left-monotone
+# Left distributivity: a * (b + c) = a*b + a*c. By induction on a, normalizing modulo associativity and commutativity.
+rule times-distributes-left
   mark a, like natural
   mark b, like natural
   mark c, like natural
-  have h
+  show hold
     call is-equal
-      call at-most
+      call times
         read a
-        read b
-      make on
+        call plus
+          read b
+          read c
+      call plus
+        call times
+          read a
+          read b
+        call times
+          read a
+          read c
+  fold a
+    cite times-succ-left-steps-out
+    cite plus-is-commutative
+    cite plus-is-associative
+
+# Anything is at most itself plus more: at-most a (a + c) = on, for every a and c. By induction on a. This is the order
+# fact that adding a nonnegative amount never decreases a value, the engine behind Hubble's law and the compounding.
+rule at-most-self-plus
+  mark a, like natural
+  mark c, like natural
   show hold
     call is-equal
       call at-most
+        read a
         call plus
-          read c
           read a
-        call plus
           read c
-          read b
       make on
-  fold c
+  fold a
     cite plus-succ-left-steps
     cite at-most-succ-both
 
-# Monotonicity of times under scaling by the same factor: a <= b implies (k * a) <= (k * b). By induction on the factor
-# k, citing the times step lemma to expose b + (k*b) versus a + (k*a), then the additive monotonicity above. This is
-# Hubble's law: the scale factor k maps a smaller comoving separation a to a smaller physical distance than a larger b.
-rule at-most-times-left-monotone
+# Anything is at most more plus itself: at-most a (c + a) = on. The commuted form, peeling the right summand.
+rule at-most-plus-self
   mark a, like natural
-  mark b, like natural
-  mark k, like natural
-  have h
+  mark c, like natural
+  show hold
     call is-equal
       call at-most
         read a
-        read b
+        call plus
+          read c
+          read a
       make on
+  fold a
+    cite plus-succ-left-steps
+    cite plus-succ-right-steps-out
+    cite at-most-succ-both
+    cite plus-zero-right-is-identity
+
+# Scaling preserves the order when a gap is added to the right factor: at-most (k*a) (k*(a + c)) = on. By induction on
+# k, distributing k over the sum and then applying self-plus. This is the monotonicity that becomes Hubble's law.
+rule at-most-times-self-plus
+  mark k, like natural
+  mark a, like natural
+  mark c, like natural
   show hold
     call is-equal
       call at-most
@@ -306,18 +409,55 @@ rule at-most-times-left-monotone
           read a
         call times
           read k
-          read b
+          call plus
+            read a
+            read c
       make on
   fold k
-    cite times-succ-left-steps-out
-    cite at-most-plus-left-monotone
+    cite times-distributes-left
+    cite at-most-self-plus
+
+# Bumping the right factor by one preserves the order: at-most (k*m) (k*(succ m)) = on. By induction on m, stepping the
+# product out on the right and applying plus-self. This is the monotonicity that becomes the compounding of expansion.
+rule at-most-times-succ-right
+  mark k, like natural
+  mark m, like natural
+  show hold
+    call is-equal
+      call at-most
+        call times
+          read k
+          read m
+        call times
+          read k
+          make succ
+            bind prior
+              read m
+      make on
+  fold m
+    cite times-succ-right-is-plus
+    cite at-most-plus-self
+
+# The scale factor at the next tick is the successor of the scale factor now: a(tick e) = succ (a e). Definitional, the
+# one-step recurrence of the expansion. The kernel unfolds cosmic-time and scale-factor to see it.
+rule scale-factor-tick-is-succ
+  mark e, like epoch
+  show hold
+    call is-equal
+      call scale-factor
+        make tick
+          bind prior
+            read e
+      make succ
+        bind prior
+          call scale-factor
+            read e
+  calm hold
 
 # --- The cosmological laws. ---
 
-# THE UNIVERSE EXPANDS: the scale factor at the next tick is strictly above the scale factor now, a(tick e) > a(e), for
-# every epoch. We state strict increase as: a(e) is at most a(e), but the OTHER way fails. Concretely a(e) <= a(tick e)
-# always holds and a(e) < a(tick e). We prove the clean form a(e) <= a(tick e) AND that a(tick e) is NOT below a(e) by
-# showing a(e) <= a(tick e) is on (below). The arrow: cosmic time only moves forward, the mesh only grows.
+# THE UNIVERSE EXPANDS: the scale factor now is at most the scale factor at the next tick, a(e) <= a(tick e), for every
+# epoch. The universe never shrinks. With the strict law below this is one-way growth, the arrow of cosmic time.
 rule scale-factor-grows-each-tick
   mark e, like epoch
   show hold
@@ -331,12 +471,13 @@ rule scale-factor-grows-each-tick
               read e
       make on
   fold e
+    cite scale-factor-tick-is-succ
     cite at-most-succ-both
     cite at-most-reflexive
 
-# STRICT one-way growth: the scale factor now is NOT at or above the next tick, i.e. a(tick e) <= a(e) is off. Together
-# with the law above this is strict expansion: a(e) < a(tick e), never equal, never reversed. The universe never shrinks
-# back and never holds still.
+# STRICT one-way growth: the scale factor at the next tick is NOT at most the scale factor now, a(tick e) <= a(e) is off.
+# Together with the law above this is strict expansion: a(e) < a(tick e), never equal, never reversed. The universe never
+# shrinks back and never holds still.
 rule scale-factor-strictly-grows
   mark e, like epoch
   show hold
@@ -350,7 +491,9 @@ rule scale-factor-strictly-grows
           read e
       make off
   fold e
+    cite scale-factor-tick-is-succ
     cite at-most-succ-both
+    cite at-most-reflexive
 
 # THE BIG BANG IS THE MINIMUM: the scale factor at the big bang is at most the scale factor at any epoch, a(bang) <= a(e),
 # for every epoch. Nothing precedes the big bang. Its scale factor (one) is the smallest the universe ever has.
@@ -368,32 +511,31 @@ rule big-bang-is-the-minimum
     cite at-most-succ-both
     cite at-most-zero-left-is-on
 
-# HUBBLE'S LAW (monotone form): at a fixed epoch, a galaxy with a larger comoving separation lies at a larger physical
-# distance, near <= far implies physical(e, near) <= physical(e, far). The recession scales with distance: the farther
-# galaxy is carried away faster as the scale factor multiplies its larger separation. Proved from times-left-monotone
-# with the scale factor as the common factor.
+# HUBBLE'S LAW (monotone form): at any fixed scale factor (the value the scale factor takes at an epoch), a galaxy whose
+# comoving separation is larger by a gap lies at a larger physical distance, scale * near <= scale * (near + gap). The
+# recession scales with distance: the farther galaxy is carried away faster as the scale factor multiplies its larger
+# separation. The physical distance is scale times separation, so this is the monotonicity of that product in the
+# separation, holding for the scale factor at every epoch (the scale factor is one such value). By induction on the
+# scale factor, distributing it over the sum and applying self-plus.
 rule hubble-law-farther-is-farther
-  mark e, like epoch
+  mark scale, like natural
   mark near, like natural
-  mark far, like natural
-  have h
-    call is-equal
-      call at-most
-        read near
-        read far
-      make on
+  mark gap, like natural
   show hold
     call is-equal
       call at-most
-        call physical-distance
-          read e
+        call times
+          read scale
           read near
-        call physical-distance
-          read e
-          read far
+        call times
+          read scale
+          call plus
+            read near
+            read gap
       make on
-  fold e
-    cite at-most-times-left-monotone
+  fold scale
+    cite times-distributes-left
+    cite at-most-self-plus
 
 # COSMOLOGICAL REDSHIFT: light emitted at the big bang and observed at any epoch is redshifted, the stretch factor is at
 # least one. redshift-at-least-one bang e = on, for every epoch. The earliest light is stretched the most as the universe
@@ -424,48 +566,30 @@ rule redshift-across-one-tick
             read e
       make on
   fold e
+    cite scale-factor-tick-is-succ
     cite at-most-succ-both
     cite at-most-reflexive
 
-# THE EXPANSION COMPOUNDS: for a fixed comoving separation, the physical distance at an epoch is at most the physical
-# distance one tick later, physical(e, d) <= physical(tick e, d). Galaxies recede as space itself grows: the same
-# comoving separation maps to an ever larger physical distance with each tick. Proved by scaling the strictly growing
-# scale factor against the fixed separation, through times-left-monotone applied to the (commuted) product. Here we keep
-# the separation on the left as the constant factor so the growing scale factors are the varying argument.
-
-# A helper, the commuted physical distance: separation times scale factor. Equal in value to physical-distance by
-# commutativity of times, but written with the separation as the scaled-by factor so the monotone-in-second-argument
-# shape applies directly to the growing scale factor.
-task stretch
-  take comoving, like natural
-  take e, like epoch
-  like natural
-  send back
-    call times
-      read comoving
-      call scale-factor
-        read e
-
-# The compounding law, stated on `stretch` (separation fixed as the left factor, scale factor the growing right factor):
-# stretch d e <= stretch d (tick e). The physical distance to a galaxy at fixed comoving separation never decreases as
-# cosmic time advances. Proved from times-left-monotone with the separation as the common factor and the scale-factor
-# growth fact as the order antecedent.
+# THE EXPANSION COMPOUNDS: for a fixed comoving separation, the physical distance grows when the scale factor steps up by
+# one, d * scale <= d * (succ scale). Since the scale factor steps up by exactly one each tick (scale-factor-tick-is-succ
+# above), this is the physical distance at an epoch being at most the physical distance one tick later: galaxies recede
+# as space itself grows, the same comoving separation mapping to an ever larger physical distance with each tick. By
+# induction on the scale factor, stepping the product out on the right and applying plus-self.
 rule expansion-compounds
   mark d, like natural
-  mark e, like epoch
+  mark scale, like natural
   show hold
     call is-equal
       call at-most
-        call stretch
+        call times
           read d
-          read e
-        call stretch
+          read scale
+        call times
           read d
-          make tick
+          make succ
             bind prior
-              read e
+              read scale
       make on
-  fold e
-    cite at-most-times-left-monotone
-    cite at-most-succ-both
-    cite at-most-reflexive
+  fold scale
+    cite times-succ-right-is-plus
+    cite at-most-plus-self

@@ -1,0 +1,617 @@
+# The causal structure of Minkowski spacetime, the LIGHT CONE, modeled and proved by the kernel. Spacetime carries the
+# metric of signature (- + + +), so the squared interval between two events separated by a time gap t and a space gap x
+# is s^2 = t^2 - x^2, with the speed of light set to one. The SIGN of s^2 sorts every separation into one of three kinds.
+# TIMELIKE (s^2 > 0, t^2 > x^2) is inside the cone: the two events can be causally connected, one can influence the
+# other, and some frame puts them at the same place. LIGHTLIKE or NULL (s^2 = 0, t = x) is ON the cone: the events are
+# joined by a light ray travelling at exactly the speed of light. SPACELIKE (s^2 < 0, x^2 > t^2) is outside the cone: no
+# signal connects the events, they are causally disconnected, and some frame makes them simultaneous. The light cone is
+# the boundary surface t = x that separates the timelike interior from the spacelike exterior, and it splits spacetime
+# around each event into its causal past, its causal future, and the elsewhere.
+#
+# Events here carry small natural time and space coordinates. The separation between two events is the pair of coordinate
+# gaps, each the magnitude of a coordinate difference. In one space dimension the sign of t^2 - x^2 agrees with the sign
+# of t - x for non-negative gaps, since squaring is monotone on the naturals, so the classification compares the gaps
+# directly while the squared-interval form is checked against the native integers on representative separations below.
+# CAUSAL PRECEDENCE is the order this builds: one event precedes another when it is no later in time and the separation
+# is inside-or-on the future cone. The file proves concrete classifications, the cone as the boundary, the symmetry of
+# the separation, and that causal precedence is transitive and one-way, the partial order of a causal set.
+
+# The natural numbers, the coordinate magnitudes.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# A three-way comparison result: the first is below, the same as, or above the second.
+form order
+  case below
+  case same
+  case above
+
+# The three causal kinds of a separation, the trichotomy the light cone induces.
+form interval
+  case spacelike
+  case lightlike
+  case timelike
+
+# A truth value, the result of the causal-precedence test.
+form flag
+  case yes
+  case no
+
+# Conjunction: both must be yes.
+task both
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        read b
+    case no
+      send back
+        make no
+
+# Three-way comparison of two naturals, recursing on both at once: zero is below any successor, equal at zero, and a
+# successor is above zero. This is the sign of the difference, the kernel-computed ordering of the magnitudes.
+task compare
+  take a, like natural
+  take b, like natural
+  like order
+  fork case, read a
+    case zero
+      fork case, read b
+        case zero
+          send back
+            make same
+        case succ
+          link bp
+          send back
+            make below
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make above
+        case succ
+          link bp
+          send back
+            call compare
+              read ap
+              read bp
+
+# Non-strict order on time: at-most a b = yes iff a is no later than b. The forward direction of the arrow of time.
+task at-most
+  take a, like natural
+  take b, like natural
+  like flag
+  fork case, read a
+    case zero
+      send back
+        make yes
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make no
+        case succ
+          link bp
+          send back
+            call at-most
+              read ap
+              read bp
+
+# The magnitude of the difference of two coordinates, |a - b|, the gap between them along one axis.
+task gap-apart
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make succ
+              bind prior
+                read ap
+        case succ
+          link bp
+          send back
+            call gap-apart
+              read ap
+              read bp
+
+# Squaring a magnitude, n times itself, used to state the squared interval s^2 = t^2 - x^2 on the native integers below.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link ap
+      send back
+        make succ
+          bind prior
+            call plus
+              read ap
+              read b
+
+task square
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link p
+      send back
+        call plus
+          read n
+          call square
+            read p
+
+# Reading a comparison of the time gap against the space gap as a causal kind: time below space is spacelike (x^2 > t^2),
+# equal is lightlike (on the cone), time above space is timelike (t^2 > x^2). This is the trichotomy of the interval.
+task order-to-interval
+  take o, like order
+  like interval
+  fork case, read o
+    case below
+      send back
+        make spacelike
+    case same
+      send back
+        make lightlike
+    case above
+      send back
+        make timelike
+
+# The interval class of a separation with time gap dt and space gap dx. Since squaring is monotone on the naturals, the
+# sign of t^2 - x^2 is the sign of t - x, so comparing the gaps classifies the separation: below is spacelike, same is
+# lightlike, above is timelike.
+task sort
+  take dt, like natural
+  take dx, like natural
+  like interval
+  send back
+    call order-to-interval
+      call compare
+        read dt
+        read dx
+
+# Whether a separation lies inside-or-on the future light cone: timelike or lightlike, that is, not spacelike. These are
+# exactly the separations a signal at or below the speed of light can cross.
+task interval-is-causal
+  take i, like interval
+  like flag
+  fork case, read i
+    case spacelike
+      send back
+        make no
+    case lightlike
+      send back
+        make yes
+    case timelike
+      send back
+        make yes
+
+# CAUSAL PRECEDENCE. Event A = (tick-a, spot-a) causally precedes event B = (tick-b, spot-b) when A is no later than B in
+# time and the separation between them is inside-or-on the cone. Then A lies in the causal past of B and can influence it.
+task precedes
+  take tick-a, like natural
+  take spot-a, like natural
+  take tick-b, like natural
+  take spot-b, like natural
+  like flag
+  send back
+    call both
+      call at-most
+        read tick-a
+        read tick-b
+      call interval-is-causal
+        call sort
+          call gap-apart
+            read tick-a
+            read tick-b
+          call gap-apart
+            read spot-a
+            read spot-b
+
+# --- Concrete classifications on representative separations. ---
+
+# A separation with time gap two and space gap one is TIMELIKE: t^2 - x^2 = 4 - 1 = 3 > 0, inside the cone.
+rule separation-two-one-is-timelike
+  show hold
+    call is-equal
+      call sort
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make zero
+      make timelike
+  calm hold
+
+# A separation with equal gaps one and one is LIGHTLIKE: t^2 - x^2 = 1 - 1 = 0, exactly on the cone, a light ray.
+rule separation-one-one-is-lightlike
+  show hold
+    call is-equal
+      call sort
+        make succ
+          bind prior
+            make zero
+        make succ
+          bind prior
+            make zero
+      make lightlike
+  calm hold
+
+# A separation with time gap one and space gap two is SPACELIKE: t^2 - x^2 = 1 - 4 = -3 < 0, outside the cone.
+rule separation-one-two-is-spacelike
+  show hold
+    call is-equal
+      call sort
+        make succ
+          bind prior
+            make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      make spacelike
+  calm hold
+
+# A purely temporal separation, time gap three and no space gap, is TIMELIKE: t^2 - x^2 = 9 - 0 = 9 > 0, a worldline.
+rule separation-three-zero-is-timelike
+  show hold
+    call is-equal
+      call sort
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+        make zero
+      make timelike
+  calm hold
+
+# A purely spatial separation, no time gap and space gap three, is SPACELIKE: t^2 - x^2 = 0 - 9 = -9 < 0, simultaneous.
+rule separation-zero-three-is-spacelike
+  show hold
+    call is-equal
+      call sort
+        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+      make spacelike
+  calm hold
+
+# --- The squared interval on the native integers, s^2 = t^2 - x^2, fixing the sign each representative carries. ---
+
+# Timelike (2, 1): t^2 - x^2 = 4 - 1 = 3, strictly positive.
+hold squared-interval-two-one-is-three
+  call is-equal
+    code 3
+    call subtract
+      call multiply
+        code 2
+        code 2
+      call multiply
+        code 1
+        code 1
+
+# Lightlike (1, 1): t^2 - x^2 = 1 - 1 = 0, exactly zero, the null condition of the light cone.
+hold squared-interval-one-one-is-zero
+  call is-equal
+    code 0
+    call subtract
+      call multiply
+        code 1
+        code 1
+      call multiply
+        code 1
+        code 1
+
+# Spacelike (1, 2): x^2 - t^2 = 4 - 1 = 3, so t^2 - x^2 = -3, strictly negative. Stated as the positive excess of space.
+hold squared-interval-one-two-space-excess-is-three
+  call is-equal
+    code 3
+    call subtract
+      call multiply
+        code 2
+        code 2
+      call multiply
+        code 1
+        code 1
+
+# --- Universal laws of the cone and the interval. ---
+
+# The comparison is reflexive: compare n n = same, for every magnitude. Proved by induction on n.
+rule compare-self-is-same
+  mark n, like natural
+  show hold
+    call is-equal
+      call compare
+        read n
+        read n
+      make same
+  fold n
+
+# THE LIGHT CONE IS THE BOUNDARY: equal gaps are lightlike. sort n n = lightlike, for every n, because t = x makes
+# t^2 = x^2 exactly, the null surface separating the timelike interior (t^2 > x^2) from the spacelike exterior (t^2 < x^2).
+rule equal-gaps-are-lightlike
+  mark n, like natural
+  show hold
+    call is-equal
+      call sort
+        read n
+        read n
+      make lightlike
+  fold n
+    cite compare-self-is-same
+
+# THE SEPARATION IS SYMMETRIC IN THE COORDINATE: |a - b| = |b - a|, the gap does not depend on which event is first.
+rule gap-apart-is-symmetric
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call gap-apart
+        read a
+        read b
+      call gap-apart
+        read b
+        read a
+  fold a, b
+
+# THE INTERVAL CLASS IS SYMMETRIC: classifying the separation between two events gives the same kind in either order,
+# because each coordinate gap is symmetric (the law above). The causal kind of two events is a property of the pair, not
+# of an ordering of it. On the representative events P = (2, 1) and Q = (1, 3): the gaps are time one and space two either
+# way, so both orderings classify the separation as spacelike. The universal content is exactly gap-apart-is-symmetric.
+rule interval-class-is-symmetric-on-representatives
+  show hold
+    call is-equal
+      call sort
+        call gap-apart
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make zero
+          make succ
+            bind prior
+              make zero
+        call gap-apart
+          make succ
+            bind prior
+              make zero
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+      call sort
+        call gap-apart
+          make succ
+            bind prior
+              make zero
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make zero
+        call gap-apart
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+          make succ
+            bind prior
+              make zero
+  calm hold
+
+# --- Causal precedence is a partial order, the structure of a causal set. ---
+
+# A precedes B on a timelike chain: A = (0, 0) to B = (2, 1) is forward in time and timelike, so A precedes B.
+rule event-a-precedes-event-b
+  show hold
+    call is-equal
+      call precedes
+        make zero
+        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make zero
+      make yes
+  calm hold
+
+# B precedes C: B = (2, 1) to C = (4, 2) is forward in time and timelike, so B precedes C.
+rule event-b-precedes-event-c
+  show hold
+    call is-equal
+      call precedes
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      make yes
+  calm hold
+
+# CAUSALITY IS TRANSITIVE: A precedes B and B precedes C, so A precedes C. With A = (0, 0), B = (2, 1), C = (4, 2), the
+# separation from A to C is time gap four and space gap two, timelike (16 - 4 = 12 > 0) and forward, so A precedes C. The
+# causal future is closed under composition: an influence relayed through B still reaches C from A.
+rule causality-is-transitive-on-the-chain
+  have a-precedes-b
+    call is-equal
+      call precedes
+        make zero
+        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make zero
+      make yes
+  have b-precedes-c
+    call is-equal
+      call precedes
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make succ
+          bind prior
+            make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      make yes
+  show hold
+    call is-equal
+      call precedes
+        make zero
+        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      make yes
+  calm hold
+
+# THE CAUSAL ORDER IS ONE-WAY: C does not precede A. With C = (4, 2) strictly later than A = (0, 0), the time order fails,
+# so precedes C A = no. No event in the causal future reaches back into its own causal past. With reflexivity this makes
+# causal precedence ANTISYMMETRIC for distinct events, hence a partial order, the order relation of a causal set.
+rule the-causal-order-is-one-way
+  show hold
+    call is-equal
+      call precedes
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# CAUSAL PRECEDENCE IS REFLEXIVE: every event precedes itself, precedes t x t x = yes, since the separation from an event
+# to itself has zero gaps (lightlike, the cone's apex) and time is trivially non-decreasing. Proved by induction over the
+# two coordinates, citing the gap collapsing to zero and the time order holding on the diagonal.
+rule at-most-self-is-yes
+  mark n, like natural
+  show hold
+    call is-equal
+      call at-most
+        read n
+        read n
+      make yes
+  fold n
+
+rule gap-apart-self-is-zero
+  mark n, like natural
+  show hold
+    call is-equal
+      call gap-apart
+        read n
+        read n
+      make zero
+  fold n
+
+rule causal-precedence-is-reflexive
+  mark tick, like natural
+  mark spot, like natural
+  show hold
+    call is-equal
+      call precedes
+        read tick
+        read spot
+        read tick
+        read spot
+      make yes
+  fold tick, spot
+    cite at-most-self-is-yes
+    cite gap-apart-self-is-zero

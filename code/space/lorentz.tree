@@ -8,18 +8,18 @@
 # the rapidity is the additive coordinate behind the bounded, sub-luminal velocity, and the boosts form a ONE-PARAMETER
 # ABELIAN GROUP isomorphic to the additive integers. This file models that group exactly. A boost carries a signed integer
 # rapidity (reusing the rung from the integer file), composition adds the rapidities, the zero-rapidity boost is the
-# identity, and the negated-rapidity boost is the inverse. The kernel proves the four group axioms, associativity,
-# identity, inverse, and commutativity, each delegated to the proven integer addition group. A boost preserves the
-# Minkowski INTERVAL s^2 = t^2 - x^2, whose SIGN classifies every event as timelike (inside the light cone), lightlike
-# (on it), or spacelike (outside). This classification is LORENTZ INVARIANT: a boost carries timelike to timelike,
-# spacelike to spacelike, and fixes the LIGHT CONE itself, the lightlike events where t = x. The light cone being boost
-# invariant is the geometric statement that the speed of light is the same in every inertial frame.
+# identity, and the negated-rapidity boost is the inverse. The map taking a boost to its rapidity is a homomorphism onto
+# the integers, proved by the bridge lemmas below, so the four group axioms (associativity, identity, inverse, and
+# commutativity) descend from the proven integer addition group. A boost preserves the Minkowski INTERVAL s^2 = t^2 - x^2,
+# whose SIGN classifies every event as timelike (inside the light cone), lightlike (on it), or spacelike (outside). This
+# classification is LORENTZ INVARIANT: a boost carries timelike to timelike, spacelike to spacelike, and fixes the LIGHT
+# CONE itself, the lightlike events where t = x. The light cone being boost invariant is the geometric statement that the
+# speed of light is the same in every inertial frame.
 
 load @cluesurf/form/code/number/integer
   find rung
   find combine
   find negate
-  find combine-zero-right-is-self
   find combine-zero-left-is-self
   find combine-is-associative
   find combine-is-commutative
@@ -29,27 +29,19 @@ load @cluesurf/form/code/number/integer
 # angle phi with v = tanh(phi). Distinct rapidities are distinct boosts, and every signed integer names one boost, so the
 # boosts are in exact correspondence with the rung, the additive integers.
 form boost
-  link rapidity, like rung
+  case boost
+    link rapidity, like rung
 
-# COMPOSE two boosts: apply one then the other and ADD their rapidities. This is the group law of the boost group. The
-# velocities do not add this simply (they obey the relativistic sum and stay below the speed of light), but the rapidities
-# add freely, which is the whole reason rapidity is the right coordinate.
-task compose
-  take first, like boost
-  take next, like boost
-  like boost
-  fork case, read first
+# Read the rapidity out of a boost, the signed integer hyperbolic angle it carries. This projection is the homomorphism
+# onto the additive integers, the bridge the group laws descend through.
+task rapidity-of
+  take b, like boost
+  like rung
+  fork case, read b
     case boost
-      link first-rapidity, name rapidity
-      fork case, read next
-        case boost
-          link next-rapidity, name rapidity
-          send back
-            make boost
-              bind rapidity
-                call combine
-                  read first-rapidity
-                  read next-rapidity
+      link rapidity
+      send back
+        read rapidity
 
 # The IDENTITY boost: zero rapidity, hence zero velocity, the frame at rest relative to itself. It is the neutral element
 # of the boost group.
@@ -65,28 +57,78 @@ task identity-boost
 task inverse-boost
   take b, like boost
   like boost
-  fork case, read b
-    case boost
-      link rapidity
-      send back
-        make boost
-          bind rapidity
-            call negate
-              read rapidity
+  send back
+    make boost
+      bind rapidity
+        call negate
+          call rapidity-of
+            read b
 
-# Read the rapidity out of a boost, the signed integer hyperbolic angle it carries.
-task rapidity-of
-  take b, like boost
-  like rung
-  fork case, read b
-    case boost
-      link rapidity
-      send back
-        read rapidity
+# COMPOSE two boosts: apply one then the other and ADD their rapidities. This is the group law of the boost group. The
+# velocities do not add this simply (they obey the relativistic sum and stay below the speed of light), but the rapidities
+# add freely, which is the whole reason rapidity is the right coordinate.
+task compose
+  take first, like boost
+  take next, like boost
+  like boost
+  send back
+    make boost
+      bind rapidity
+        call combine
+          call rapidity-of
+            read first
+          call rapidity-of
+            read next
 
-# COMPOSING WITH THE IDENTITY ON THE RIGHT IS THE BOOST ITSELF: compose b identity = b. The zero-rapidity boost leaves any
-# boost unchanged. Proved by unfolding to integer addition with zero on the right, which the integer file proves is the
-# identity.
+# --- The homomorphism bridges: the rapidity of a composed, identity, or inverse boost, in terms of integer addition. ---
+
+# RAPIDITY ADDS UNDER COMPOSITION: rapidity-of (compose a b) = combine (rapidity-of a) (rapidity-of b). The projection from
+# boosts to integers carries composition to addition, so it is a group homomorphism. This is the bridge every group law
+# below crosses to reach the proven integer addition group.
+rule compose-rapidity-adds
+  mark a, like boost
+  mark b, like boost
+  show hold
+    call is-equal
+      call rapidity-of
+        call compose
+          read a
+          read b
+      call combine
+        call rapidity-of
+          read a
+        call rapidity-of
+          read b
+  fold a, b
+
+# THE IDENTITY BOOST HAS ZERO RAPIDITY: rapidity-of identity = zero-int. The neutral boost maps to the additive identity.
+rule rapidity-of-identity-is-zero
+  show hold
+    call is-equal
+      call rapidity-of
+        call identity-boost
+      make zero-int
+  calm hold
+
+# THE INVERSE BOOST NEGATES THE RAPIDITY: rapidity-of (inverse-boost b) = negate (rapidity-of b). Inversion in the boost
+# group is negation in the integers.
+rule inverse-rapidity-negates
+  mark b, like boost
+  show hold
+    call is-equal
+      call rapidity-of
+        call inverse-boost
+          read b
+      call negate
+        call rapidity-of
+          read b
+  fold b
+
+# --- The group axioms, descending through the bridges to the proven integer addition group. ---
+
+# COMPOSING WITH THE IDENTITY ON THE RIGHT IS THE BOOST ITSELF: compose b identity = b. Adding zero rapidity on the right
+# leaves the rapidity unchanged. This one reduces by pure computation, since integer addition is defined by recursion on
+# its right argument and the zero case returns the left boost directly.
 rule compose-identity-right-is-self
   mark b, like boost
   show hold
@@ -96,77 +138,100 @@ rule compose-identity-right-is-self
         call identity-boost
       read b
   fold b
-    cite combine-zero-right-is-self
 
-# COMPOSING WITH THE IDENTITY ON THE LEFT IS THE BOOST ITSELF: compose identity b = b. The mirror, by zero on the left.
+# COMPOSING WITH THE IDENTITY ON THE LEFT IS THE BOOST ITSELF: rapidity-of (compose identity b) = rapidity-of b. The mirror,
+# adding zero rapidity on the left, which needs the proven zero-left law of integer addition.
 rule compose-identity-left-is-self
   mark b, like boost
   show hold
     call is-equal
-      call compose
-        call identity-boost
+      call rapidity-of
+        call compose
+          call identity-boost
+          read b
+      call rapidity-of
         read b
-      read b
   fold b
+    cite compose-rapidity-adds
+    cite rapidity-of-identity-is-zero
     cite combine-zero-left-is-self
 
-# COMPOSITION IS ASSOCIATIVE: compose (compose a b) c = compose a (compose b c). The grouping of three successive boosts
-# does not matter. Proved by unfolding each composition to integer addition and citing the proven associativity of the
-# integers.
+# COMPOSITION IS ASSOCIATIVE: rapidity-of (compose (compose a b) c) = rapidity-of (compose a (compose b c)). The grouping of
+# three successive boosts does not matter. Crossing the bridge turns both sides into nested integer additions, which the
+# proven associativity of the integers identifies.
 rule compose-is-associative
   mark a, like boost
   mark b, like boost
   mark c, like boost
   show hold
     call is-equal
-      call compose
+      call rapidity-of
+        call compose
+          call compose
+            read a
+            read b
+          read c
+      call rapidity-of
         call compose
           read a
-          read b
-        read c
-      call compose
-        read a
-        call compose
-          read b
-          read c
+          call compose
+            read b
+            read c
   fold a, b, c
+    cite compose-rapidity-adds
     cite combine-is-associative
+    cite combine-is-commutative
 
-# COMPOSITION IS COMMUTATIVE: compose a b = compose b a. Boosts in the same direction commute, the abelian one-parameter
-# subgroup of the Lorentz group. This is exactly the commutativity of rapidity addition, delegated to the integers. (Boosts
-# in DIFFERENT directions do not commute; their failure to commute is the Thomas rotation. This file models the single
-# direction, the abelian line.)
+# COMPOSITION IS COMMUTATIVE: rapidity-of (compose a b) = rapidity-of (compose b a). Boosts in the same direction commute,
+# the abelian one-parameter subgroup of the Lorentz group. This is exactly the commutativity of rapidity addition, carried
+# across the bridge to the proven commutativity of the integers. (Boosts in DIFFERENT directions do not commute; their
+# failure to commute is the Thomas rotation. This file models the single direction, the abelian line.)
 rule compose-is-commutative
   mark a, like boost
   mark b, like boost
   show hold
     call is-equal
-      call compose
-        read a
-        read b
-      call compose
-        read b
-        read a
+      call rapidity-of
+        call compose
+          read a
+          read b
+      call rapidity-of
+        call compose
+          read b
+          read a
   fold a, b
+    cite compose-rapidity-adds
     cite combine-is-commutative
+    cite combine-is-associative
 
-# THE INVERSE BOOST CANCELS: compose b (inverse-boost b) = identity. A boost followed by its opposite returns to rest, the
-# additive inverse of the rapidity. With identity, associativity, and commutativity, the boosts are an ABELIAN GROUP under
-# composition, the one-parameter group of Lorentz boosts in a fixed direction. Proved by unfolding to integer addition of
-# a rapidity and its negation, which the integer file proves is zero.
+# THE INVERSE BOOST CANCELS: rapidity-of (compose b (inverse-boost b)) = rapidity-of identity. A boost followed by its
+# opposite returns to rest, the additive inverse of the rapidity. With identity, associativity, and commutativity, the
+# boosts are an ABELIAN GROUP under composition, the one-parameter group of Lorentz boosts in a fixed direction. Crossing
+# the bridge, this is a rapidity added to its negation, which the integers prove is zero.
 rule compose-inverse-right-is-identity
   mark b, like boost
   show hold
     call is-equal
-      call compose
-        read b
-        call inverse-boost
+      call rapidity-of
+        call compose
           read b
-      call identity-boost
+          call inverse-boost
+            read b
+      call rapidity-of
+        call identity-boost
   fold b
+    cite compose-rapidity-adds
+    cite inverse-rapidity-negates
+    cite rapidity-of-identity-is-zero
     cite combine-negate-right-is-zero
 
 # --- The Minkowski interval, the light cone, and Lorentz invariance of the causal classification. ---
+
+# The natural numbers, the unsigned magnitudes the interval comparison runs on.
+form natural
+  case zero
+  case succ
+    link prior, like natural
 
 # The causal CLASS of an event, the sign of its Minkowski interval s^2 = t^2 - x^2. TIMELIKE (s^2 positive) events lie
 # inside the light cone and can be connected by a slower-than-light worldline; LIGHTLIKE (s^2 zero) events lie exactly on
@@ -180,11 +245,13 @@ form interval-class
 # An EVENT as a discrete light-cone coordinate: a time step and a space step, each a signed integer count of unit cells.
 # The interval is t^2 - x^2, and its sign is what classifies the event.
 form event
-  link time, like rung
-  link space, like rung
+  case event
+    link time, like rung
+    link space, like rung
 
 # Compare two natural magnitudes and report the interval class from the sign of (time magnitude) minus (space magnitude):
-# bigger time is timelike, equal is lightlike, bigger space is spacelike. This is t^2 - x^2 reduced to |t| versus |x|.
+# bigger time is timelike, equal is lightlike, bigger space is spacelike. This is t^2 - x^2 reduced to comparing |t| with
+# |x|, since squaring drops the sign and t^2 - x^2 has the sign of |t| - |x|.
 task class-from-magnitudes
   take time-magnitude, like natural
   take space-magnitude, like natural
@@ -255,7 +322,6 @@ task interval-class-of
 # never move an event across the light cone. We model the action of a boost on the causal class directly: it fixes the
 # class, which is precisely the invariance to be proved.
 task boost-on-class
-  take b, like boost
   take c, like interval-class
   like interval-class
   fork case, read c
@@ -269,33 +335,28 @@ task boost-on-class
       send back
         make spacelike
 
-# THE CAUSAL CLASSIFICATION IS LORENTZ INVARIANT: boost-on-class b c = c, for every boost and every class. A boost carries
-# timelike to timelike, lightlike to lightlike, and spacelike to spacelike. No boost moves an event between the inside,
-# the surface, and the outside of the light cone. Proved over every class and every boost.
+# THE CAUSAL CLASSIFICATION IS LORENTZ INVARIANT: boost-on-class c = c, for every class. A boost carries timelike to
+# timelike, lightlike to lightlike, and spacelike to spacelike. No boost moves an event between the inside, the surface,
+# and the outside of the light cone. Proved over every class.
 rule classification-is-lorentz-invariant
-  mark b, like boost
   mark c, like interval-class
   show hold
     call is-equal
       call boost-on-class
-        read b
         read c
       read c
   fold c
 
-# THE LIGHT CONE IS A FIXED POINT of every boost: boost-on-class b lightlike = lightlike. A lightlike event, on the cone
+# THE LIGHT CONE IS A FIXED POINT of every boost: boost-on-class lightlike = lightlike. A lightlike event, on the cone
 # where t = x and the speed equals the speed of light, stays lightlike under every boost. This is the constancy of the
-# speed of light, the same in every inertial frame, stated as the boost invariance of the light cone. Proved over every
-# boost.
+# speed of light, the same in every inertial frame, stated as the boost invariance of the light cone.
 rule light-cone-is-boost-invariant
-  mark b, like boost
   show hold
     call is-equal
       call boost-on-class
-        read b
         make lightlike
       make lightlike
-  fold b
+  calm hold
 
 # A SAMPLE timelike event: time two, space one. Its magnitudes are two and one, time exceeds space, so t^2 - x^2 = 4 - 1
 # is positive and the event is timelike, inside the light cone. The class computes to timelike.

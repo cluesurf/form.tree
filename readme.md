@@ -33,6 +33,79 @@ The library descends from pure foundations up to physics:
 - **The vibe substrate.** The eight base elements of vibe theory (tone, lean, site, dock, mesh, knit, wake, beat), each modeled and proved to satisfy its defining laws, the reversible charge-conserving law of motion, and the forced derivation from one distinction up to the 24-cell.
 - **Quantum and physics.** Quantum error-correcting codes, the Pauli and spinor structure, the standard-model symmetry counts, holography and the cusp-bulk geometry, discrete quantum dynamics.
 
+### Library map
+
+A high-level map of what is modeled and proved, grouped by area. Each row is a concrete, machine-checked model (constructed objects plus computable operations plus proven laws), not a stub.
+
+**Foundations**
+
+| area | proves |
+|---|---|
+| Logic, sets, relations, order | boolean and ternary logic, set operations, equivalence and order laws, total and partial orders |
+| Numbers | Peano naturals and the full semiring, the integers, parity, divisibility, primes, modular arithmetic, the Fibonacci sequence, Zeckendorf representation |
+| Type theory | self-types, identity types, universes, multiplicity, refinement, the inductive list and tree |
+
+**Algebra**
+
+| area | proves |
+|---|---|
+| Group theory | cyclic groups, the quaternion group, homomorphisms, Lagrange's theorem (cosets partition the group) |
+| Division-algebra tower | complex, quaternion, octonion multiplication tables with their proven identities |
+| Lie algebras | su(2), so(4) = su(2)+su(2) (the factors commute), G2, the E8 Cartan matrix and Dynkin diagram, triality / Spin(8), the weight and root lattices |
+| Clifford algebras | Cl(2), Cl(3) (geometric algebra), Cl(1,3) the Dirac algebra (signature, anticommutation, the chirality element) |
+
+**Root systems, polytopes, exceptional structure**
+
+| area | proves |
+|---|---|
+| Root systems | A2, D4 (24 roots = the 24-cell), F4 (48 roots = 24-cell and its dual), the E8 root structure |
+| Regular polytopes | the 24-cell (self-dual), the 16-cell and tesseract (B4, with the demitesseract), the 600-cell and 120-cell (H4, by duality and Euler characteristic) |
+| Coxeter and reflection groups | the symmetric group as a Weyl group, the general Coxeter matrix and Dynkin diagram, the Wythoff construction, the binary tetrahedral group 2T, the McKay correspondence (ADE = binary polyhedral = Platonic) |
+
+**Geometry and hyperbolic space**
+
+| area | proves |
+|---|---|
+| Tessellations | the Schlafli classification (spherical / flat / hyperbolic by (p-2)(q-2) vs 4), triangle groups, pentagrid and heptagrid, the {5,3,4} dodecahedral and {3,4,3,4} 24-cell honeycombs |
+| Curvature | discrete Gauss-Bonnet (angle defect), Regge calculus (deficit angles, the icosahedron's total curvature) |
+| The splitting method | Margenstern's spanning tree, the white/black node Fibonacci recurrence, the preferred-son property |
+| Boundary and bulk | the cusp and horosphere, discrete AdS holography (the entanglement wedge), the Gromov boundary and Busemann function, Fuchsian groups and genus-g surfaces |
+
+**Lattices and packing**
+
+| area | proves |
+|---|---|
+| Lattices | the D4 lattice (kissing number 24, Voronoi cell the 24-cell), the E8 lattice (even unimodular, kissing 240), the Leech lattice (no roots, the Golay-code weight combinatorics) |
+
+**Quantum mechanics and information**
+
+| area | proves |
+|---|---|
+| Operators and states | the Pauli group (anticommutation), spinors, projective measurement (idempotence, orthogonality, completeness) |
+| Error correction | the three-qubit bit-flip code, the multi-qubit stabilizer formalism, the holographic code (erasure correction) |
+| Entanglement | the Bell states (perfect correlation), the Bell / CHSH inequality (the local bound), quantum teleportation, quantum tunneling |
+| Fields and gravity | the Fock-space ladder (the number operator), spin networks (SU(2) recoupling), the gauge group from the division-algebra tower, the standard-model particle content (charge quantization, anomaly cancellation) |
+
+**Relativity, cosmology and gravity**
+
+| area | proves |
+|---|---|
+| Special relativity | the Lorentz group via rapidity, the Minkowski interval and light cone (timelike / lightlike / spacelike), causal structure |
+| General relativity and cosmology | causal sets (spacetime as a partial order), the FLRW expanding universe (Hubble's law, redshift), the Schwarzschild horizon and Bekenstein-Hawking entropy |
+
+**Theory of computation**
+
+| area | proves |
+|---|---|
+| Universal models | the SKI combinators (S K K = the identity), the lambda calculus (beta reduction), the Toffoli gate (reversible universality), Turing and register machines |
+| Discrete dynamics | reversible cellular automata, interaction nets (strong confluence), the Garden of Eden and Hedlund's theorem |
+
+**The vibe substrate**
+
+| area | proves |
+|---|---|
+| The eight base elements | tone, lean, site, dock, mesh, knit, wake, beat, each modeled and proved to satisfy its defining laws, the reversible charge-conserving law of motion, and the forced derivation from one distinction up to the 24-cell |
+
 ### What a foundation is, and why it exists
 
 A foundation of mathematics is a single small system of rules from which all of mathematics can be built. Numbers, functions, spaces, groups, and proofs about them are all expressed in the one language, and every theorem reduces, in principle, to that base.

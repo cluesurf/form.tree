@@ -1,0 +1,474 @@
+# A causal set, the discrete spacetime of one approach to quantum gravity, machine-checked by the kernel. A causal set
+# (causet) replaces the smooth spacetime manifold of general relativity with a SET OF EVENTS carrying a single relation,
+# the causal order: x PRECEDES y means x lies in the causal past of y, that x can send influence forward to y. The whole
+# of spacetime, both its geometry and its causal structure, is meant to be recovered from this bare order plus a count of
+# the events. That is the slogan of the program, ORDER PLUS NUMBER EQUALS GEOMETRY: the partial order fixes the conformal
+# (light-cone) structure, the angles and the causal shape, while the NUMBER of events fixes the scale, the spacetime
+# volume. Counting events in a region recovers its volume, the discreteness that the continuum hides.
+#
+# The order is a partial order with three laws, each carrying a physical meaning. It is REFLEXIVE in the convention used
+# here, every event precedes itself, the trivial self-influence. It is TRANSITIVE, if x precedes y and y precedes z then
+# x precedes z, the composition of causal influence along a chain. It is ANTISYMMETRIC, if x precedes y and y precedes x
+# then x and y are the same event, which forbids closed causal loops: there are no causal paradoxes, no event in its own
+# strict past. Two events neither of which precedes the other are SPACELIKE, causally unrelated, an ANTICHAIN, and this is
+# the discrete image of events outside each other's light cones.
+#
+# The fourth law is LOCAL FINITENESS, the discreteness itself: between any two causally related events there are only
+# FINITELY many events. The set of events causally between two given ones is the ORDER INTERVAL, and its size is finite.
+# This is what lets the count stand in for a volume, and it is the property that distinguishes a causal set from a merely
+# continuous partial order like the real line.
+#
+# This file models the smallest nontrivial causet, a CAUSAL DIAMOND: a bottom event, two middle events left and right,
+# and a top event. The bottom precedes everything, the top is preceded by everything, and the two middle events each lie
+# between bottom and top but are SPACELIKE to each other (neither precedes the other). The order is a finite table, so
+# every law below is discharged by the kernel: reflexivity and antisymmetry and transitivity by exhaustive structural
+# induction over the events, the spacelike antichain by direct computation, and local finiteness by counting the interval
+# between bottom and top and proving it is exactly the finite set {left, right}, of size two.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# THE EVENTS of the causal diamond. The bottom is the past tip of the diamond, the top its future tip, and left and right
+# are the two spacelike-separated events on its waist. Four events, the smallest causet that has a genuine antichain.
+form event
+  case bottom
+  case left
+  case right
+  case top
+
+# Logical negation on the truth flag, used to phrase the spacelike condition (NOT preceding).
+task not
+  take a, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        make no
+    case no
+      send back
+        make yes
+
+# Material implication on flags, used to state the conditional order laws (transitivity, antisymmetry) as closed
+# computable facts: `then a b` is no only when the antecedent a holds and the consequent b fails.
+task then
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        read b
+    case no
+      send back
+        make yes
+
+# Event equality as a flag, the diagonal of the order. Two events are the same exactly when they are the same case.
+task is-same
+  take x, like event
+  take y, like event
+  like flag
+  fork case, read x
+    case bottom
+      fork case, read y
+        case bottom
+          send back
+            make yes
+        case left
+          send back
+            make no
+        case right
+          send back
+            make no
+        case top
+          send back
+            make no
+    case left
+      fork case, read y
+        case left
+          send back
+            make yes
+        case bottom
+          send back
+            make no
+        case right
+          send back
+            make no
+        case top
+          send back
+            make no
+    case right
+      fork case, read y
+        case right
+          send back
+            make yes
+        case bottom
+          send back
+            make no
+        case left
+          send back
+            make no
+        case top
+          send back
+            make no
+    case top
+      fork case, read y
+        case top
+          send back
+            make yes
+        case bottom
+          send back
+            make no
+        case left
+          send back
+            make no
+        case right
+          send back
+            make no
+
+# THE CAUSAL ORDER, the one relation of the causet, given as a finite flag table. `precedes x y` is yes when x is in the
+# causal past of y. The bottom precedes every event (it is the past tip). Left precedes only itself and the top. Right
+# precedes only itself and the top. The top precedes only itself (it is the future tip). Crucially `precedes left right`
+# and `precedes right left` are both NO: the two middle events are spacelike, an antichain. Reflexivity is built in, every
+# event precedes itself.
+task precedes
+  take x, like event
+  take y, like event
+  like flag
+  fork case, read x
+    case bottom
+      send back
+        make yes
+    case left
+      fork case, read y
+        case left
+          send back
+            make yes
+        case top
+          send back
+            make yes
+        case bottom
+          send back
+            make no
+        case right
+          send back
+            make no
+    case right
+      fork case, read y
+        case right
+          send back
+            make yes
+        case top
+          send back
+            make yes
+        case bottom
+          send back
+            make no
+        case left
+          send back
+            make no
+    case top
+      fork case, read y
+        case top
+          send back
+            make yes
+        case bottom
+          send back
+            make no
+        case left
+          send back
+            make no
+        case right
+          send back
+            make no
+
+# THE ORDER-INTERVAL MEMBERSHIP, `is-link a x b` (the event x is a LINK of the causal chain from a to b): x lies STRICTLY
+# between a and b, the open order interval. It holds when a precedes x and x precedes b, and x is distinct from both ends.
+# The set of such x for fixed a and b is the order interval, and local finiteness is the statement that it is always
+# finite. In the diamond the interval from bottom to top is exactly {left, right}.
+task is-link
+  take a, like event
+  take x, like event
+  take b, like event
+  like flag
+  send back
+    call both
+      call both
+        call precedes
+          read a
+          read x
+        call precedes
+          read x
+          read b
+      call both
+        call not
+          call is-same
+            read x
+            read a
+        call not
+          call is-same
+            read x
+            read b
+
+# A TALLY, a finite count built as zero and successor. Carrying the interval size as a tally (rather than a builtin
+# integer) keeps the count inside the structural fragment the kernel reduces, so the local-finiteness laws below discharge
+# by exhaustive reduction. The tally is exactly the natural-number count of events, the NUMBER of order-plus-number.
+form tally
+  case none
+  case more
+    link prior, like tally
+
+# Addition of tallies, by structural recursion on the first: it is the sum of two finite counts. This is how the per-event
+# contributions are summed into the size of the order interval.
+task add-tally
+  take a, like tally
+  take b, like tally
+  like tally
+  fork case, read a
+    case none
+      send back
+        read b
+    case more
+      link prior
+      send back
+        make more
+          bind prior
+            call add-tally
+              read prior
+              read b
+
+# A truth flag turned into a tally: one for yes, zero for no. The bridge from membership in the order interval to the
+# running count.
+task flag-tally
+  take f, like flag
+  like tally
+  fork case, read f
+    case yes
+      send back
+        make more
+          bind prior
+            make none
+    case no
+      send back
+        make none
+
+# A single event's contribution to the interval count: a tally of one when it is a strict link of the interval from a to
+# b, a tally of zero (none) otherwise.
+task link-count
+  take a, like event
+  take x, like event
+  take b, like event
+  like tally
+  send back
+    call flag-tally
+      call is-link
+        read a
+        read x
+        read b
+
+# THE INTERVAL SIZE, `between-count a b`: how many events lie strictly between a and b, the cardinality of the open order
+# interval, as a finite tally. It sums the per-event link count over all four events of the causet. Local finiteness is
+# the fact that this count is always a finite number, and for the diamond's bottom-to-top interval it is exactly two.
+task between-count
+  take a, like event
+  take b, like event
+  like tally
+  send back
+    call add-tally
+      call add-tally
+        call link-count
+          read a
+          make bottom
+          read b
+        call link-count
+          read a
+          make left
+          read b
+      call add-tally
+        call link-count
+          read a
+          make right
+          read b
+        call link-count
+          read a
+          make top
+          read b
+
+# PRECEDENCE IS REFLEXIVE: precedes e e = yes, for every event e. Every event lies in its own causal past in the reflexive
+# convention, the trivial self-influence and the diagonal of the order. Proved by structural induction over the events.
+rule precedes-is-reflexive
+  mark e, like event
+  show hold
+    call is-equal
+      call precedes
+        read e
+        read e
+      make yes
+  fold e
+
+# PRECEDENCE IS TRANSITIVE: if x precedes y and y precedes z then x precedes z, for all events x, y, z. Causal influence
+# composes along a chain. Stated as the closed flag fact then(both(precedes x y)(precedes y z))(precedes x z) = yes, and
+# discharged by exhaustive structural induction over all four-by-four-by-four event triples.
+rule precedes-is-transitive
+  mark x, like event
+  mark y, like event
+  mark z, like event
+  show hold
+    call is-equal
+      call then
+        call both
+          call precedes
+            read x
+            read y
+          call precedes
+            read y
+            read z
+        call precedes
+          read x
+          read z
+      make yes
+  fold x, y, z
+
+# PRECEDENCE IS ANTISYMMETRIC: if x precedes y and y precedes x then x and y are the same event, for all events x, y. This
+# is the no-causal-loop law, the statement that the causet has no closed causal curves and no event strictly in its own
+# past. Stated as then(both(precedes x y)(precedes y x))(is-same x y) = yes and proved by induction over all event pairs.
+rule precedes-is-antisymmetric
+  mark x, like event
+  mark y, like event
+  show hold
+    call is-equal
+      call then
+        call both
+          call precedes
+            read x
+            read y
+          call precedes
+            read y
+            read x
+        call is-same
+          read x
+          read y
+      make yes
+  fold x, y
+
+# THE MIDDLE EVENTS ARE SPACELIKE: left does not precede right. The two events on the waist of the diamond are causally
+# unrelated, outside each other's light cones, the discrete image of spacelike separation. Proved by direct computation.
+rule left-does-not-precede-right
+  show hold
+    call is-equal
+      call precedes
+        make left
+        make right
+      make no
+  calm hold
+
+# And symmetrically, right does not precede left. Together with the line above, left and right form a two-element
+# ANTICHAIN, the simplest nontrivial antichain, the set of mutually spacelike events.
+rule right-does-not-precede-left
+  show hold
+    call is-equal
+      call precedes
+        make right
+        make left
+      make no
+  calm hold
+
+# THE BOTTOM PRECEDES THE TOP: the past tip of the diamond is in the causal past of the future tip, so the bottom-to-top
+# order interval is a genuine causal interval whose finite content the next laws count.
+rule bottom-precedes-top
+  show hold
+    call is-equal
+      call precedes
+        make bottom
+        make top
+      make yes
+  calm hold
+
+# LEFT LIES IN THE INTERVAL FROM BOTTOM TO TOP: left is a strict link of the causal chain from bottom to top. It is one of
+# the two events of the order interval, on its waist.
+rule left-is-between-bottom-and-top
+  show hold
+    call is-equal
+      call is-link
+        make bottom
+        make left
+        make top
+      make yes
+  calm hold
+
+# RIGHT LIES IN THE INTERVAL FROM BOTTOM TO TOP: right is the other strict link of the chain from bottom to top, the
+# second event of the order interval.
+rule right-is-between-bottom-and-top
+  show hold
+    call is-equal
+      call is-link
+        make bottom
+        make right
+        make top
+      make yes
+  calm hold
+
+# THE ENDPOINTS ARE NOT IN THE OPEN INTERVAL: the bottom is not strictly between bottom and top, since the open interval
+# excludes its own ends. This confirms the interval is the OPEN one, the events strictly inside the causal diamond.
+rule bottom-is-not-strictly-between-bottom-and-top
+  show hold
+    call is-equal
+      call is-link
+        make bottom
+        make bottom
+        make top
+      make no
+  calm hold
+
+# And the top is likewise excluded from the open interval between bottom and top.
+rule top-is-not-strictly-between-bottom-and-top
+  show hold
+    call is-equal
+      call is-link
+        make bottom
+        make top
+        make top
+      make no
+  calm hold
+
+# LOCAL FINITENESS, THE DISCRETENESS LAW: the order interval between the bottom and the top contains exactly TWO events,
+# the finite set {left, right}. The kernel sums the per-event link counts over all four events and reduces the builtin
+# integers to two. A FINITE number of events between two related ones, the property that lets this count stand in for a
+# spacetime volume. This is the discreteness that recovers geometry from order and number.
+rule bottom-to-top-interval-has-two-events
+  show hold
+    call is-equal
+      call between-count
+        make bottom
+        make top
+      make more
+        bind prior
+          make more
+            bind prior
+              make none
+  calm hold
+
+# THE WAIST IS AN ANTICHAIN WITH AN EMPTY INTERVAL: there are zero events strictly between left and right. They are
+# spacelike, neither precedes the other, so the order interval between them is empty, count zero. An empty interval is the
+# signature of a causally unrelated pair, the finite (here, vanishing) content of an antichain.
+rule left-to-right-interval-is-empty
+  show hold
+    call is-equal
+      call between-count
+        make left
+        make right
+      make none
+  calm hold
+
+# THE INTERVAL FROM AN EVENT TO ITSELF IS EMPTY: the open order interval from the bottom to the bottom has zero events,
+# since the strict-between relation excludes the endpoints. A degenerate interval has no interior, count zero, the small
+# base case of local finiteness.
+rule bottom-to-bottom-interval-is-empty
+  show hold
+    call is-equal
+      call between-count
+        make bottom
+        make bottom
+      make none
+  calm hold

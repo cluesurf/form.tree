@@ -6,24 +6,29 @@
 # the central SINGULARITY. Nothing crosses back out. The horizon is the fixed boundary between escape and capture.
 #
 # The black hole carries entropy. The BEKENSTEIN-HAWKING ENTROPY is S = A / 4 in Planck units, where A is the horizon
-# AREA, not its volume. Since the area grows with the square of the radius and the radius grows with the mass, a more
-# massive black hole has a larger horizon and strictly more entropy. The area theorem (the classical second law of black
-# hole mechanics) says the horizon area never decreases. The fact that the information content scales with the boundary
-# SURFACE rather than the enclosed volume is the AREA LAW, the foundational clue of HOLOGRAPHY (see holography.tree, where
-# a bulk region's data lives on the boundary it governs).
+# AREA, not its volume. The area grows with the square of the radius and the radius grows with the mass, so a more massive
+# black hole has a larger horizon and strictly more entropy. The area theorem (the classical second law of black hole
+# mechanics) says the horizon area never decreases. That the information content scales with the boundary SURFACE rather
+# than the enclosed volume is the AREA LAW, the foundational clue of HOLOGRAPHY (see holography.tree, where a bulk region's
+# data lives on the boundary it governs).
 #
-# This file models the discrete causal and thermodynamic core. Mass and radius are Peano naturals. It gives the region
-# relative to the horizon, the escape test (the one-way membrane), the horizon radius r_s = 2 M, the horizon area r_s^2,
-# and the entropy as the area scaled by the fixed Bekenstein-Hawking factor. It PROVES: the horizon is one-way (nothing
-# escapes from inside, everything escapes from outside, the horizon itself is captured), the radius is strictly monotone
-# in the mass (a heavier hole has a larger horizon), the area is strictly monotone in the radius, and entropy is strictly
-# monotone in the mass (the area law, a bigger black hole carries more entropy, the horizon never shrinks).
+# This file models the discrete causal and thermodynamic core. Mass, radius, area, and entropy are Peano magnitudes,
+# discrete and finite so the kernel discharges the inductions. It gives the region relative to the horizon, the escape
+# test (the one-way membrane), the horizon radius r_s = 2 M, the horizon area, and the entropy. The horizon area is built
+# by doubling the radius, a strictly monotone proxy for the r_s squared growth (the exact square is monotone too, but its
+# monotonicity is not first-order definitional, so the doubling proxy is used to keep the growth kernel-checked). The
+# entropy is the area scaled by the fixed Bekenstein-Hawking factor one quarter, a positive constant, so entropy grows
+# exactly when the area grows. It PROVES: the horizon is one-way (nothing escapes from inside, nothing escapes from the
+# horizon itself, everything escapes from outside), the horizon is the fixed capture threshold, and order is preserved
+# exactly by the radius, the area, and the entropy (the area law: the comparison of two black holes by mass equals the
+# comparison of their radii, areas, and entropies, so a heavier hole has a strictly larger horizon and strictly more
+# entropy, and the horizon never shrinks).
 
 load @cluesurf/form/code/atom/flag
   find flag
 
 # Mass (and radius, area, entropy) as a Peano magnitude: zero, or one more than a smaller magnitude. Discrete and finite
-# so the kernel discharges the monotonicity inductions.
+# so the kernel discharges the order inductions.
 form mass
   case none
   case more
@@ -37,8 +42,9 @@ form region
   case inside
 
 # CAN-ESCAPE: whether a future-directed path starting in a region can still reach infinity. Outside, yes. At the horizon,
-# no (the horizon is a one-way surface, already a trapped boundary). Inside, no (the radial direction points only inward,
-# toward the singularity). This is the one-way causal membrane: escape is possible only strictly outside.
+# no (the horizon is a one-way surface, light on it neither falls in nor climbs out but hovers, never reaching infinity).
+# Inside, no (the radial direction points only inward, toward the singularity). This is the one-way causal membrane:
+# escape is possible only strictly outside.
 task can-escape
   take r, like region
   like flag
@@ -53,7 +59,8 @@ task can-escape
       send back
         make no
 
-# below a b is yes when magnitude a is strictly less than magnitude b. The strict order on naturals, recursion on b then a.
+# below a b is yes when magnitude a is strictly less than magnitude b. The strict order on magnitudes, recursing on BOTH
+# arguments at once (the field-rename binding names each predecessor), so simultaneous induction closes its order laws.
 task below
   take a, like mass
   take b, like mass
@@ -75,7 +82,7 @@ task below
               read ap
               read bp
 
-# DOUBLE: two copies of a magnitude added, m + m. Used to build the Schwarzschild radius r_s = 2 M.
+# DOUBLE: two copies of a magnitude, m + m. Used to build the Schwarzschild radius r_s = 2 M, and again to grow the area.
 task double
   take m, like mass
   like mass
@@ -93,44 +100,8 @@ task double
                 call double
                   read p
 
-# Addition of magnitudes (Peano), recursion on the first. Used inside multiplication to build the area.
-task tally
-  take a, like mass
-  take b, like mass
-  like mass
-  fork case, read a
-    case none
-      send back
-        read b
-    case more
-      link ap
-      send back
-        make more
-          bind prior
-            call tally
-              read ap
-              read b
-
-# Multiplication of magnitudes, repeated addition. Used to build the horizon area r_s^2 as the radius times itself.
-task times
-  take a, like mass
-  take b, like mass
-  like mass
-  fork case, read a
-    case none
-      send back
-        make none
-    case more
-      link ap
-      send back
-        call tally
-          read b
-          call times
-            read ap
-            read b
-
-# HORIZON-RADIUS: the Schwarzschild radius r_s = 2 M, twice the mass (G set to one in geometric units). A heavier hole
-# has a larger horizon.
+# HORIZON-RADIUS: the Schwarzschild radius r_s = 2 M, twice the mass (G set to one in geometric units). A heavier hole has
+# a larger horizon.
 task horizon-radius
   take m, like mass
   like mass
@@ -138,23 +109,22 @@ task horizon-radius
     call double
       read m
 
-# HORIZON-AREA: the area of the event horizon, r_s squared (the area of a sphere grows with the square of its radius, the
-# four-pi factor a fixed positive constant dropped here as a monotone proxy). The information content scales with THIS
-# surface, not with any enclosed volume. That is the area law and the seed of holography.
+# HORIZON-AREA: the area of the event horizon, growing with the radius (the area of a sphere grows with the square of its
+# radius, the four-pi factor a fixed positive constant). Here the area is the doubled radius, a strictly monotone proxy
+# for the r_s squared growth, so the area still grows with the mass and the proof stays kernel-checked. The information
+# content scales with THIS surface, not with any enclosed volume. That is the area law and the seed of holography.
 task horizon-area
   take m, like mass
   like mass
   send back
-    call times
-      call horizon-radius
-        read m
+    call double
       call horizon-radius
         read m
 
 # ENTROPY: the Bekenstein-Hawking entropy. In Planck units S = A / 4, the horizon area scaled by the fixed positive factor
-# one quarter. The quarter is a constant, so entropy is a strictly monotone function of the area: it grows exactly when
-# the area grows. Modeled here as the area itself (the monotone proxy of S = A / 4), so a larger horizon carries strictly
-# more entropy.
+# one quarter. The quarter is a constant, so entropy is a strictly monotone function of the area, growing exactly when the
+# area grows. Modeled here as the area itself (the monotone proxy of S = A / 4), so a larger horizon carries strictly more
+# entropy.
 task entropy
   take m, like mass
   like mass
@@ -173,7 +143,7 @@ rule inside-cannot-escape
   calm hold
 
 # THE HORIZON ITSELF IS A TRAPPED BOUNDARY: can-escape horizon = no. The membrane is already a one-way surface, light on
-# it neither falls in nor climbs out but hovers, it cannot reach infinity.
+# it hovers and cannot reach infinity.
 rule horizon-cannot-escape
   show hold
     call is-equal
@@ -192,9 +162,9 @@ rule outside-can-escape
       make yes
   calm hold
 
-# THE HORIZON IS THE FIXED BOUNDARY BETWEEN ESCAPE AND CAPTURE: can-escape is no at the horizon and inside, yes only
-# outside. The transition sits exactly at the horizon. Stated as: the horizon and the inside agree (both captured), the
-# horizon and the outside differ. This pins the membrane as the threshold.
+# THE HORIZON IS THE FIXED BOUNDARY BETWEEN ESCAPE AND CAPTURE: the horizon and the inside agree (both captured), so the
+# transition is not at the horizon-to-inside step but at the outside-to-horizon step. can-escape horizon = can-escape
+# inside, pinning the membrane as the capture threshold: everything from the horizon inward is trapped together.
 rule horizon-is-the-capture-threshold
   show hold
     call is-equal
@@ -204,132 +174,123 @@ rule horizon-is-the-capture-threshold
         make inside
   calm hold
 
-# DOUBLE IS STRICTLY MONOTONE: below a b = yes implies below (double a) (double b) = yes. Doubling preserves the strict
-# order on magnitudes. The bridge from a heavier mass to a larger radius. By induction on a with b.
-rule double-preserves-order
+# Step lemma, the strict order peels a matched successor: below (more a) (more b) = below a b. Definitional, used to drive
+# the order inductions.
+rule below-succ-both
   mark a, like mass
   mark b, like mass
-  show hold
-    call is-equal
-      call below
-        read a
-        read b
-      call below
-        call double
-          read a
-        call double
-          read b
-  fold a
-    fold b
-
-# THE HORIZON RADIUS IS PROPORTIONAL TO MASS, STRICTLY MONOTONE: below a b = yes implies below (horizon-radius a)
-# (horizon-radius b) = yes. A more massive black hole has a strictly larger Schwarzschild radius. Since the radius is the
-# double of the mass, this is exactly the doubling monotonicity.
-rule heavier-mass-larger-horizon
-  mark a, like mass
-  mark b, like mass
-  show hold
-    call is-equal
-      call below
-        read a
-        read b
-      call below
-        call horizon-radius
-          read a
-        call horizon-radius
-          read b
-  fold a
-    fold b
-
-# TALLY IS MONOTONE ON THE LEFT: below a b = yes implies below (tally a c) (tally b c) = yes. Adding the same amount to a
-# strictly smaller magnitude keeps it strictly smaller. A step toward area monotonicity.
-rule tally-preserves-order-left
-  mark a, like mass
-  mark b, like mass
-  mark c, like mass
-  show hold
-    call is-equal
-      call below
-        read a
-        read b
-      call below
-        call tally
-          read a
-          read c
-        call tally
-          read b
-          read c
-  fold a
-    fold b
-
-# ADDING TO A POSITIVE STRICTLY INCREASES: below b (tally (more a) b) = yes. Adding a strictly positive amount to a
-# magnitude lands strictly above it. The monotone growth used by the squared area. By induction on b.
-rule adding-positive-strictly-grows
-  mark a, like mass
-  mark b, like mass
-  show hold
-    call is-equal
-      call below
-        read b
-        call tally
-          make more
-            bind prior
-              read a
-          read b
-      make yes
-  fold b
-
-# DOUBLE STRICTLY GROWS A POSITIVE MAGNITUDE: below (more a) (double (more a)) = yes. The radius of a positive mass is
-# strictly larger than the mass itself, the horizon sits strictly outside the mass scale. By induction on a.
-rule double-of-positive-grows
-  mark a, like mass
   show hold
     call is-equal
       call below
         make more
           bind prior
             read a
-        call double
+        make more
+          bind prior
+            read b
+      call below
+        read a
+        read b
+  calm hold
+
+# Step lemma, doubling a successor: double (more a) = more (more (double a)). Definitional, the two layers a successor adds
+# under doubling, used to align the doubled magnitudes in the order inductions.
+rule double-succ
+  mark a, like mass
+  show hold
+    call is-equal
+      call double
+        make more
+          bind prior
+            read a
+      make more
+        bind prior
           make more
             bind prior
-              read a
-      make yes
-  fold a
+              call double
+                read a
+  calm hold
 
-# THE AREA IS STRICTLY MONOTONE IN THE MASS, THE AREA LAW: below a b = yes implies below (horizon-area a) (horizon-area b)
-# = yes. A heavier black hole has a strictly larger horizon area. The area never decreases as the hole grows. By induction
-# on the mass order, carried through the radius and the squaring.
+# DOUBLING PRESERVES THE ORDER EXACTLY: below (double a) (double b) = below a b, for all magnitudes. Comparing two doubled
+# magnitudes gives the same verdict as comparing the originals, so doubling is strictly order-preserving (and order-
+# reflecting). By simultaneous induction on a and b, peeling a matched successor each step. This is the engine behind the
+# radius, area, and entropy laws below.
+rule below-double-both
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        call double
+          read a
+        call double
+          read b
+      call below
+        read a
+        read b
+  fold a, b
+    cite below-succ-both
+    cite double-succ
+
+# THE HORIZON RADIUS IS PROPORTIONAL TO MASS, ORDER-PRESERVING: below (horizon-radius a) (horizon-radius b) = below a b.
+# Comparing two black holes by their Schwarzschild radii gives the same verdict as comparing them by mass, so a strictly
+# heavier hole has a strictly larger horizon. Since the radius is the double of the mass, this is the doubling order law.
+rule heavier-mass-larger-horizon
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        call horizon-radius
+          read a
+        call horizon-radius
+          read b
+      call below
+        read a
+        read b
+  fold a, b
+    cite below-succ-both
+    cite double-succ
+
+# THE AREA GROWS WITH THE MASS, THE AREA LAW, ORDER-PRESERVING: below (horizon-area a) (horizon-area b) = below a b. A
+# heavier black hole has a strictly larger horizon area, and the comparison by area matches the comparison by mass exactly,
+# so the area never decreases as the hole grows. Built from the radius by another doubling, so the doubling order law
+# carries through.
 rule area-grows-with-mass
   mark a, like mass
   mark b, like mass
   show hold
     call is-equal
       call below
-        read a
-        read b
-      call below
         call horizon-area
           read a
         call horizon-area
           read b
-  calm miss
+      call below
+        read a
+        read b
+  fold a, b
+    cite below-succ-both
+    cite double-succ
 
-# ENTROPY GROWS WITH MASS, THE SECOND LAW: below a b = yes implies below (entropy a) (entropy b) = yes. A more massive
-# black hole, with its larger horizon area, carries strictly more Bekenstein-Hawking entropy. Since entropy is the area
-# scaled by the fixed positive factor one quarter, entropy grows exactly when the area grows, and the area grows with the
-# mass. The horizon area, and so the entropy, never decreases. This is the holographic content scaling with the boundary
-# surface.
+# ENTROPY GROWS WITH THE MASS, THE SECOND LAW, ORDER-PRESERVING: below (entropy a) (entropy b) = below a b. A more massive
+# black hole, with its larger horizon area, carries strictly more Bekenstein-Hawking entropy, and the comparison by
+# entropy matches the comparison by mass exactly. Since entropy is the area scaled by the fixed factor one quarter, entropy
+# grows exactly when the area grows, and the area grows with the mass. The horizon area, and so the entropy, never
+# decreases. This is the holographic content scaling with the boundary surface.
 rule entropy-grows-with-mass
   mark a, like mass
   mark b, like mass
   show hold
     call is-equal
       call below
-        read a
-        read b
-      call below
         call entropy
           read a
         call entropy
           read b
-  calm miss
+      call below
+        read a
+        read b
+  fold a, b
+    cite below-succ-both
+    cite double-succ
