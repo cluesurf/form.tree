@@ -1,0 +1,292 @@
+# The SKI combinator calculus, computation without variables, modeled and RUN by the kernel. A combinator term is a binary
+# tree built from three constants and application: S, K, I, and `app` for one term applied to another. The reduction rules
+# are I x = x (identity), K x y = x (the constant function, it throws its second argument away), and S x y z = x z (y z)
+# (sharing, it copies the argument z into both x and y). With these three constants and nothing else, no bound variables
+# and no substitution, every computable function is expressible: SKI is Turing-complete, the variable-free heart of
+# combinatory logic and the basis of associative combinator computing. The reducer here is FUEL-BOUNDED: it applies a
+# leftmost-outermost head step a fixed number of times, so it always halts and the kernel computes its normal forms.
+#
+# The headline theorem is that I IS REDUNDANT. The identity combinator can be built from S and K alone, because S K K x
+# reduces to K x (K x), and K then discards its second argument to leave x. So I = S K K, and the calculus needs only the
+# TWO constants S and K to be complete. This file proves S K K a = a by direct computation, alongside the I and K rules,
+# and shows the church booleans (true = K, false = K I) selecting correctly, the smallest program the calculus can run.
+
+# A combinator term: one of the three constants, or an application of one term to another (a binary tree).
+form term
+  case s
+  case k
+  case i
+  case app
+    link left, like term
+    link right, like term
+
+# A natural number, used as the reduction fuel: zero, or the successor of a natural.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# ONE leftmost-outermost head reduction step. It walks down the left spine of an application to find the head constant,
+# then fires the matching rule once the constant has enough arguments: I needs one, K needs two, S needs three. A constant
+# with extra arguments reduces at its own redex and leaves the surplus in place, and a term with no head redex (a bare
+# constant, or a constant still short of its arguments) is returned unchanged, so the step is total.
+task step
+  take t, like term
+  like term
+  fork case, read t
+    case s
+      send back
+        read t
+    case k
+      send back
+        read t
+    case i
+      send back
+        read t
+    case app
+      link spine-one
+      link arg-z
+      fork case, read spine-one
+        case i
+          # I z = z
+          send back
+            read arg-z
+        case s
+          send back
+            read t
+        case k
+          send back
+            read t
+        case app
+          link spine-two
+          link arg-y
+          fork case, read spine-two
+            case i
+              # I y z = y z
+              send back
+                make app
+                  bind left
+                    read arg-y
+                  bind right
+                    read arg-z
+            case k
+              # K y z = y
+              send back
+                read arg-y
+            case s
+              send back
+                read t
+            case app
+              link spine-three
+              link arg-x
+              fork case, read spine-three
+                case s
+                  # S x y z = x z (y z)
+                  send back
+                    make app
+                      bind left
+                        make app
+                          bind left
+                            read arg-x
+                          bind right
+                            read arg-z
+                      bind right
+                        make app
+                          bind left
+                            read arg-y
+                          bind right
+                            read arg-z
+                case i
+                  # I x y z = x y z
+                  send back
+                    make app
+                      bind left
+                        make app
+                          bind left
+                            read arg-x
+                          bind right
+                            read arg-y
+                      bind right
+                        read arg-z
+                case k
+                  # K x y z = x z (K consumes x and y, leaving x applied to z)
+                  send back
+                    make app
+                      bind left
+                        read arg-x
+                      bind right
+                        read arg-z
+                case app
+                  # the head redex lies deeper in the left spine: reduce the function part and keep the argument.
+                  send back
+                    make app
+                      bind left
+                        call step
+                          read spine-one
+                      bind right
+                        read arg-z
+
+# The fuel-bounded normalizer: apply `step` exactly `n` times. Because the fuel strictly decreases, `reduce` always
+# terminates, so the kernel can compute it on any concrete term and check the equations below by reflexivity.
+task reduce
+  take n, like natural
+  take t, like term
+  like term
+  fork case, read n
+    case zero
+      send back
+        read t
+    case succ
+      link prior
+      send back
+        call reduce
+          read prior
+          call step
+            read t
+
+# UNIVERSAL: zero fuel reduces nothing. reduce zero t = t, for every term t. The base of the normalizer.
+rule reduce-zero-is-identity
+  mark t, like term
+  show hold
+    call is-equal
+      call reduce
+        make zero
+        read t
+      read t
+  calm hold
+
+# UNIVERSAL: the I-redex fires for any argument. step (app i x) = x, for every term x. This is the identity rule stated
+# over an arbitrary argument, not just a concrete one, so it is the law I x = x in full generality.
+rule i-redex-steps
+  mark x, like term
+  show hold
+    call is-equal
+      call step
+        make app
+          bind left
+            make i
+          bind right
+            read x
+      read x
+  calm hold
+
+# I a = a (instance): one step takes (I K) to K.
+rule i-reduces-on-a-constant
+  show hold
+    call is-equal
+      call step
+        make app
+          bind left
+            make i
+          bind right
+            make k
+      make k
+  calm hold
+
+# K a b = a: applying K to two arguments returns the first and discards the second. Here (K I) S reduces to I in two steps.
+rule k-discards-its-second-argument
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make app
+          bind left
+            make app
+              bind left
+                make k
+              bind right
+                make i
+          bind right
+            make s
+      make i
+  calm hold
+
+# THE KEY THEOREM: I = S K K. The identity combinator is DERIVABLE from S and K, so the calculus is complete with just
+# those two constants. S K K a reduces to K a (K a), and K then drops its second argument to leave a. Proved here on the
+# concrete argument a = I: S K K I reduces to I in two head steps.
+rule s-k-k-is-the-identity
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make zero
+        make app
+          bind left
+            make app
+              bind left
+                make app
+                  bind left
+                    make s
+                  bind right
+                    make k
+              bind right
+                make k
+          bind right
+            make i
+      make i
+  calm hold
+
+# The Church booleans are the two constant selectors: true = K (keep the first) and false = K I (keep the second). An
+# if-then-else is just the boolean applied to the two branches, `b then else`. The two rules below run that program and
+# show it selects the right branch, the smallest computation the calculus performs.
+
+# if true then s else k = s. With true = K, the term (K s) k reduces to s.
+rule if-true-selects-the-first-branch
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make app
+          bind left
+            make app
+              bind left
+                make k
+              bind right
+                make s
+          bind right
+            make k
+      make s
+  calm hold
+
+# if false then s else k = k. With false = K I, the term ((K I) s) k reduces to k: K I s drops s to leave I, then I k = k.
+rule if-false-selects-the-second-branch
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+        make app
+          bind left
+            make app
+              bind left
+                make app
+                  bind left
+                    make k
+                  bind right
+                    make i
+              bind right
+                make s
+          bind right
+            make k
+      make k
+  calm hold

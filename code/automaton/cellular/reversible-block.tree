@@ -1,0 +1,196 @@
+# A REVERSIBLE BLOCK CELLULAR AUTOMATON, the discrete substrate underneath every quantum cellular automaton, modeled and
+# proved reversible by the kernel. A block (Margolus-neighborhood) automaton partitions the lattice into disjoint blocks
+# and updates each block by one fixed LOCAL PERMUTATION of the block states. When that local rule is a bijection of the
+# finite block alphabet, the whole automaton is reversible: from the state after a beat the state before it is recovered
+# exactly, so no information is lost. This is the discrete analogue of unitary evolution, which is why reversible block
+# rules are the classical skeleton a quantum cellular automaton is quantized from.
+#
+# The block here is THREE binary cells in a row, eight block states. The forward rule `step` is the cyclic rotation that
+# carries each cell to its right neighbor, a permutation of order three (not order two), so reversibility cannot come from
+# self-composition and must be witnessed by an explicit inverse `unstep`, the opposite rotation. The rule is genuinely a
+# permutation: it moves states (shown by a concrete refutation), it loses nothing (both round-trip laws), and it conserves
+# the particle COUNT (the number of on cells), the discrete conservation law that makes the dynamics physical.
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# A cell, the smallest piece of the lattice: off or on, an absent or present particle.
+form cell
+  case off
+  case on
+
+# A block, the unit the local rule acts on: three cells in a row. The Margolus partition tiles the lattice with these
+# disjoint blocks, and one fixed permutation of the eight block states updates every block at once.
+form block
+  case row
+    link one, like cell
+    link two, like cell
+    link three, like cell
+
+# The particle COUNT of a block, the conserved charge: how many of the three cells are on, a value from none to all.
+# A reversible rule that permutes block states within each count class can never create or destroy particles.
+form count
+  case none
+  case one
+  case two
+  case all
+
+# THE FORWARD RULE, the local block permutation: a cyclic rotation that sends each cell to the position of its right
+# neighbor. The block (a, b, c) becomes (c, a, b). This is a bijection of the eight block states, the order-three rotation
+# that drives the automaton one beat forward.
+task step
+  take b, like block
+  like block
+  fork case, read b
+    case row
+      link one
+      link two
+      link three
+      send back
+        make row
+          bind one
+            read three
+          bind two
+            read one
+          bind three
+            read two
+
+# THE INVERSE RULE, the permutation run backward: the opposite rotation, sending each cell to the position of its left
+# neighbor. The block (a, b, c) becomes (b, c, a). Because the forward rotation has order three rather than two, the
+# inverse is a DIFFERENT rule, not the forward rule reused. Applying it after a beat undoes that beat exactly.
+task unstep
+  take b, like block
+  like block
+  fork case, read b
+    case row
+      link one
+      link two
+      link three
+      send back
+        make row
+          bind one
+            read two
+          bind two
+            read three
+          bind three
+            read one
+
+# TEMPLATE: one row of the count table, keyed on the first cell. For a fixed first cell give the resulting count against
+# each of the four states of the remaining two cells, written off-off, off-on, on-off, on-on. One template fuses both
+# halves of the eight-state count function below.
+tree count-row
+  take head
+  take off-off
+  take off-on
+  take on-off
+  take on-on
+
+  hook fuse
+    case {head}
+      fork case, read two
+        case off
+          fork case, read three
+            case off
+              send back
+                make {off-off}
+            case on
+              send back
+                make {off-on}
+        case on
+          fork case, read three
+            case off
+              send back
+                make {on-off}
+            case on
+              send back
+                make {on-on}
+
+# THE PARTICLE COUNT of a block, the charge the rule conserves: the number of on cells across the three positions, read
+# off the eight block states by the template. This is the discrete quantity the permutation never changes.
+task charge
+  take b, like block
+  like count
+  fork case, read b
+    case row
+      link one
+      link two
+      link three
+      fork case, read one
+        fuse count-row, off, none, one, one, two
+        fuse count-row, on, one, two, two, all
+
+# THE RULE IS REVERSIBLE, forward then backward: unstep (step b) = b, for every block b. Running the inverse rotation after
+# the forward rotation returns the original block, so the beat loses no information. Proved by exhaustive induction over the
+# block, all eight states resolving by computation. This is the discrete analogue of unitarity, the heart of the model.
+rule unstep-undoes-step
+  mark b, like block
+  show hold
+    call is-equal
+      call step, read b
+        link unstep
+      read b
+  fold b
+
+# THE RULE IS REVERSIBLE, backward then forward: step (unstep b) = b, for every block b. The inverse really is a two-sided
+# inverse, so the permutation is a genuine bijection of the eight block states in both directions.
+rule step-undoes-unstep
+  mark b, like block
+  show hold
+    call is-equal
+      call unstep, read b
+        link step
+      read b
+  fold b
+
+# THE RULE CONSERVES THE PARTICLE COUNT: charge (step b) = charge b, for every block b. The forward rotation only moves
+# particles between cells, it never creates or destroys one, so the number of on cells is the same before and after the
+# beat. This is the conservation law that makes the dynamics physical. Proved by induction over all eight block states.
+rule step-conserves-charge
+  mark b, like block
+  show hold
+    call is-equal
+      call charge
+        call step, read b
+      call charge, read b
+  fold b
+
+# THE INVERSE ALSO CONSERVES THE COUNT: charge (unstep b) = charge b. Both directions of time preserve the same charge,
+# as a reversible conservation law must.
+rule unstep-conserves-charge
+  mark b, like block
+  show hold
+    call is-equal
+      call charge
+        call unstep, read b
+      call charge, read b
+  fold b
+
+# The first cell of a block, a projection used to witness that the rule moves states.
+task head-cell
+  take b, like block
+  like cell
+  fork case, read b
+    case row
+      link one
+      link two
+      link three
+      send back
+        read one
+
+# THE RULE IS NOT THE IDENTITY: it genuinely moves states. On the block (on, off, off) the forward rotation yields
+# (off, on, off), so the first cell goes from on to off. Reading the first cell after the beat gives off, not on, two
+# distinct cell states, so the rule cannot be the identity. A reversible rule that did nothing would be trivial; this one
+# truly stirs the lattice while losing no information.
+rule step-is-not-identity
+  show miss
+    call is-equal
+      call head-cell
+        call step
+          make row
+            bind one
+              make on
+            bind two
+              make off
+            bind three
+              make off
+      make on
+  calm miss

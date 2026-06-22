@@ -1,0 +1,149 @@
+# Triality, the exceptional threefold symmetry of D four and Spin(8), modeled by the kernel. The double cover Spin(8) of the
+# rotation group of eight-dimensional space has three inequivalent eight-dimensional irreducible representations: the vector
+# 8v, the spinor 8s, and the cospinor 8c. They are the same size, eight, the one place in all dimensions where the vector and
+# the two half-spinors match, two cubed against eight. TRIALITY is the outer automorphism group of Spin(8), the symmetric
+# group on three letters, S3, that PERMUTES these three eight-dimensional pieces. It is unique to dimension eight and exists
+# in no other rank. It is the threefold symmetry of the D four Coxeter-Dynkin diagram, the three outer nodes around one
+# center, and it splits the twenty-four roots of the 24-cell into three classes of eight, 8v plus 8s plus 8c is twenty-four.
+# This threefold rotation of the substrate's directions is the structure that gives the mesh its free spin.
+#
+# This file models the three representations and the two generators of their symmetry: a CYCLE of order three, the rotation
+# vector to spinor to cospinor and back, and a SWAP of order two, the reflection exchanging spinor and cospinor while fixing
+# the vector. It proves the cycle has order three, the swap is an involution, the vector is the fixed point of the swap, and
+# the two generators satisfy the S3 relation that makes the group the symmetric group of order six, not the cyclic group.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# The three eight-dimensional irreducible representations of Spin(8): the vector 8v, the spinor 8s, and the cospinor 8c.
+form rep
+  case vector
+  case spinor
+  case cospinor
+
+# TEMPLATE: one entry of a single-valued map out of a representation, `from` sent to the construction `to`. One definition
+# serves both the cycle and the swap, so each reads as its permutation table.
+tree map-rep
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# The order-three triality rotation: vector to spinor, spinor to cospinor, cospinor back to vector. This is the three-cycle
+# generator of S3, the rotation of the three outer nodes of the D four diagram.
+task cycle
+  take r, like rep
+  like rep
+  fork case, read r
+    fuse map-rep, vector, spinor
+    fuse map-rep, spinor, cospinor
+    fuse map-rep, cospinor, vector
+
+# The order-two triality reflection: swap the spinor and the cospinor, fix the vector. This is the transposition generator of
+# S3. The vector is its fixed point, the asymmetry that singles out the vector representation among the three.
+task swap
+  take r, like rep
+  like rep
+  fork case, read r
+    fuse map-rep, vector, vector
+    fuse map-rep, spinor, cospinor
+    fuse map-rep, cospinor, spinor
+
+# THE CYCLE HAS ORDER THREE: cycle (cycle (cycle r)) = r, for every representation. Applying the triality rotation three
+# times returns each piece to itself. This is the threefold triality, the order-three relation of the three-cycle generator.
+rule cycle-has-order-three
+  mark r, like rep
+  show hold
+    call is-equal
+      call cycle, read r
+        link cycle
+        link cycle
+      read r
+  fold r
+
+# THE SWAP IS AN INVOLUTION: swap (swap r) = r, for every representation. Exchanging the spinor and the cospinor twice is the
+# identity, the defining property of the reflection generator.
+rule swap-is-an-involution
+  mark r, like rep
+  show hold
+    call is-equal
+      call swap, read r
+        link swap
+      read r
+  fold r
+
+# THE VECTOR IS THE FIXED POINT OF THE SWAP: swap vector = vector. The reflection fixes the vector and exchanges the two
+# half-spinors. This asymmetry is what distinguishes the vector representation from the spinor and the cospinor.
+rule vector-is-the-fixed-point-of-the-swap
+  show hold
+    call is-equal
+      call swap
+        make vector
+      make vector
+  calm hold
+
+# THE SPINOR AND THE COSPINOR ARE EXCHANGED BY THE SWAP: swap spinor = cospinor. The two half-spinors are the moved points
+# of the reflection, the pair triality treats as a mirror image.
+rule spinor-and-cospinor-are-exchanged-by-the-swap
+  show hold
+    call is-equal
+      call swap
+        make spinor
+      make cospinor
+  calm hold
+
+# THE S3 RELATION: swap (cycle (swap r)) = cycle (cycle r), for every representation. Conjugating the three-cycle by the
+# transposition inverts it, and the inverse of the cycle is the cycle squared. This is the dihedral relation s c s = c
+# inverse, which together with the order-three cycle and the involution swap presents the symmetric group S3 of order six.
+# It shows the triality group is NOT the cyclic group of order three: the swap genuinely reverses the rotation.
+rule triality-group-is-the-symmetric-group
+  mark r, like rep
+  show hold
+    call is-equal
+      call swap
+        call cycle
+          call swap
+            read r
+      call cycle, read r
+        link cycle
+  fold r
+
+# THE CYCLE-SWAP PRODUCT HAS ORDER TWO: swap (cycle (swap (cycle r))) = r, for every representation. The product of the
+# transposition and the three-cycle is itself a transposition, so it squares to the identity. This is a second reflection of
+# S3, confirming the group has the three transpositions and two rotations of the symmetric group, six elements in all.
+rule cycle-swap-product-has-order-two
+  mark r, like rep
+  show hold
+    call is-equal
+      call swap
+        call cycle
+          call swap
+            call cycle
+              read r
+      read r
+  fold r
+
+# TIE TO D FOUR AND THE 24-CELL: triality splits the twenty-four roots of D four into three classes of eight, the vector,
+# the spinor, and the cospinor, 8 plus 8 plus 8 is twenty-four. The three eights are the three pieces the cycle rotates.
+hold triality-splits-the-twenty-four-roots-into-three-eights
+  call is-equal
+    code 24
+    call add
+      call add
+        code 8
+        code 8
+      code 8
+
+# THE THREE REPRESENTATIONS HAVE THE SAME SIZE EIGHT, TWO CUBED: 8 = 2*2*2. This common size, the vector matching the
+# half-spinor, is the dimension-eight coincidence that lets triality permute the three on equal footing.
+hold the-three-representations-have-size-eight
+  call is-equal
+    code 8
+    call multiply
+      call multiply
+        code 2
+        code 2
+      code 2

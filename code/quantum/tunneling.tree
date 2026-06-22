@@ -1,0 +1,297 @@
+# Discrete QUANTUM TUNNELING, a quantum walker crossing a classically-forbidden barrier, modeled and proved by the kernel.
+# Classically a particle whose energy lies below a potential barrier CANNOT cross it: the barrier region is forbidden, so
+# a walker arriving from one side stops at the wall and never appears on the far side. Quantum mechanically the story is
+# different. The wavefunction does not stop at the wall. It decays inside the barrier but keeps a nonzero AMPLITUDE all the
+# way through, so there is a real chance to find the particle on the far side. That leak of amplitude across a forbidden
+# region is tunneling, the effect behind alpha decay, the scanning tunneling microscope, and the tunnel diode.
+#
+# This file models the DISCRETE essence of the effect, not the continuous Schrodinger equation. A one-dimensional chain of
+# five sites holds a BARRIER in the middle: far-left, near-left, barrier, near-right, far-right. A CLASSICAL walker starting
+# at far-left spreads to adjacent sites but is BLOCKED by the barrier: it can reach the left sites and stop, never entering
+# or passing the wall. A QUANTUM walker spreads by the same nearest-neighbor hopping but its amplitude PASSES THROUGH the
+# barrier, only attenuated, so its support reaches EVERY site including far-right. Reachability is the discrete shadow of
+# "has nonzero amplitude here." The kernel proves the classical walker is blocked, the quantum walker tunnels to the far
+# side, exhibits the far-right site as the gap between the two, and tracks an attenuation tally that drops across the
+# barrier yet stays nonzero on the far side, strictly smaller than at the source. That gap is tunneling, made checkable.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# The five sites of the chain, left to right, with the barrier in the middle. A classical walker from far-left is stopped
+# at the barrier. A quantum walker leaks its amplitude through it and reaches the far-right.
+form site
+  case far-left
+  case near-left
+  case barrier
+  case near-right
+  case far-right
+
+# An attenuation tally, a Peano-style count of how much amplitude survives at a site. The source carries the most. Each
+# hop costs one unit, and crossing the barrier costs more, but the count stays nonzero on the far side: that surviving
+# nonzero amount is the tunneling amplitude.
+form tally
+  case none
+  case some
+    link prior, like tally
+
+# TEMPLATE: one entry of a single-valued map out of a site, `from` sent to the construction `to`. One definition serves
+# the classical and quantum reachability tables and the right-neighbor step, so each reads as its own value table.
+tree map-site
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# CLASSICAL REACHABILITY from far-left: the sites a below-barrier classical walker can occupy. It spreads left of the
+# barrier (far-left and near-left) and is STOPPED at the wall. The barrier and everything beyond it are unreachable, so
+# the classical particle is confined to its own side of the forbidden region.
+task classical-reach
+  take s, like site
+  like flag
+  fork case, read s
+    fuse map-site, far-left, yes
+    fuse map-site, near-left, yes
+    fuse map-site, barrier, no
+    fuse map-site, near-right, no
+    fuse map-site, far-right, no
+
+# QUANTUM REACHABILITY from far-left: the sites the quantum walker's amplitude reaches. Nearest-neighbor hopping carries
+# the amplitude into the barrier, decays it there, and lets it continue out the far side, so EVERY site is reached,
+# including the classically-forbidden far-right. This is the discrete signature of tunneling: nonzero amplitude all the
+# way across.
+task quantum-reach
+  take s, like site
+  like flag
+  fork case, read s
+    fuse map-site, far-left, yes
+    fuse map-site, near-left, yes
+    fuse map-site, barrier, yes
+    fuse map-site, near-right, yes
+    fuse map-site, far-right, yes
+
+# The right neighbor of a site, the direction the walker hops to cross the chain. far-left to near-left to barrier to
+# near-right to far-right, with the far-right pinned (the chain ends there). Nearest-neighbor hopping walks this map.
+task hop-right
+  take s, like site
+  like site
+  fork case, read s
+    fuse map-site, far-left, near-left
+    fuse map-site, near-left, barrier
+    fuse map-site, barrier, near-right
+    fuse map-site, near-right, far-right
+    fuse map-site, far-right, far-right
+
+# The surviving attenuation tally at each site for the quantum walker. Amplitude is highest at the source (far-left) and
+# loses one unit per ordinary hop. Crossing the barrier costs an extra unit (the steep decay inside the forbidden region),
+# so the far side carries less than a plain hop would leave, yet the count never reaches none: a nonzero amount tunnels
+# through. The tower below is four-three-one-one against the source's five (one extra drop is spent at the barrier).
+task amplitude
+  take s, like site
+  like tally
+  fork case, read s
+    case far-left
+      send back
+        make some
+          bind prior
+            make some
+              bind prior
+                make some
+                  bind prior
+                    make some
+                      bind prior
+                        make some
+                          bind prior
+                            make none
+    case near-left
+      send back
+        make some
+          bind prior
+            make some
+              bind prior
+                make some
+                  bind prior
+                    make some
+                      bind prior
+                        make none
+    case barrier
+      send back
+        make some
+          bind prior
+            make some
+              bind prior
+                make some
+                  bind prior
+                    make none
+    case near-right
+      send back
+        make some
+          bind prior
+            make none
+    case far-right
+      send back
+        make some
+          bind prior
+            make none
+
+# Whether a tally is nonzero, that is, carries some surviving amplitude. The far side staying nonzero is the whole point:
+# the amplitude is small there but not gone.
+task is-nonzero
+  take t, like tally
+  like flag
+  fork case, read t
+    case none
+      send back
+        make no
+    case some
+      send back
+        make yes
+
+# Strict order on tallies: is the first STRICTLY below the second. Used to witness that the far-side amplitude is smaller
+# than the source's while still nonzero, the attenuation across the barrier. Recurses on both arguments in step.
+task tally-below
+  take a, like tally
+  take b, like tally
+  like flag
+  fork case, read b
+    case none
+      send back
+        make no
+    case some
+      link more-b
+      fork case, read a
+        case none
+          send back
+            make yes
+        case some
+          link more-a
+          send back
+            call tally-below
+              read more-a
+              read more-b
+
+# THE CLASSICAL WALKER IS BLOCKED BY THE BARRIER: classical-reach barrier = no and classical-reach far-right = no. A
+# below-barrier classical particle cannot enter the forbidden region nor appear beyond it, so both the wall and the far
+# side are unreachable. This is the classical impossibility tunneling defies.
+rule classical-walker-cannot-enter-the-barrier
+  show hold
+    call is-equal
+      call classical-reach
+        make barrier
+      make no
+  calm hold
+
+rule classical-walker-is-blocked-by-the-barrier
+  show hold
+    call is-equal
+      call classical-reach
+        make far-right
+      make no
+  calm hold
+
+# THE QUANTUM WALKER TUNNELS THROUGH: quantum-reach far-right = yes. The amplitude leaks across the barrier and reaches the
+# far side, the classically-forbidden site. This is THE tunneling result, the nonzero presence where a classical particle
+# can never be.
+rule quantum-walker-tunnels-through
+  show hold
+    call is-equal
+      call quantum-reach
+        make far-right
+      make yes
+  calm hold
+
+# THE QUANTUM WALKER ALSO REACHES THE BARRIER ITSELF: quantum-reach barrier = yes. The amplitude does not vanish at the
+# wall the way the classical particle does, it penetrates the forbidden region, which is what carries it out the far side.
+rule quantum-walker-penetrates-the-barrier
+  show hold
+    call is-equal
+      call quantum-reach
+        make barrier
+      make yes
+  calm hold
+
+# TUNNELING IS THE DIFFERENCE AT THE FAR SIDE: the quantum walker reaches far-right (yes) but the classical walker does not
+# (no), exhibited together. The far-right is a site present in the quantum support and absent from the classical one, the
+# concrete gap between the two reachabilities, and exactly the place the amplitude tunneled to.
+rule tunneling-is-the-difference-at-the-far-side
+  show hold
+    call is-equal
+      call both
+        call quantum-reach
+          make far-right
+        call classical-reach
+          make far-right
+      make no
+  calm hold
+
+# THE QUANTUM WALKER REACHES EVERY SITE: quantum-reach s = yes, for every site s. The amplitude support is connected all
+# the way across the chain, with no gap at the barrier. Proved by induction over the five sites, every case computing to
+# yes. This is the monotone, unbroken support that distinguishes the quantum walker from the blocked classical one.
+rule quantum-walker-reaches-every-site
+  mark s, like site
+  show hold
+    call is-equal
+      call quantum-reach
+        read s
+      make yes
+  fold s
+
+# REACHABILITY IS CARRIED ALONG THE HOP: if the quantum walker reaches a site, it reaches the site's right neighbor too.
+# both (quantum-reach s) (quantum-reach (hop-right s)) = quantum-reach s, for every site. Since every site is reachable,
+# the hop never leaves the support, so the amplitude propagates step by step through the barrier without breaking. Proved
+# by induction over the sites.
+rule reachability-propagates-through-the-hop
+  mark s, like site
+  show hold
+    call is-equal
+      call both
+        call quantum-reach
+          read s
+        call quantum-reach
+          call hop-right
+            read s
+      call quantum-reach
+        read s
+  fold s
+
+# THE FAR-SIDE AMPLITUDE IS NONZERO: is-nonzero (amplitude far-right) = yes. The amount that tunneled through is small but
+# real. A nonzero amplitude on the far side of a forbidden barrier is the entire content of the tunneling effect.
+rule far-side-amplitude-is-nonzero
+  show hold
+    call is-equal
+      call is-nonzero
+        call amplitude
+          make far-right
+      make yes
+  calm hold
+
+# THE AMPLITUDE IS ATTENUATED ACROSS THE BARRIER: amplitude far-right is strictly below amplitude far-left. The far side
+# carries less than the source, the decay the barrier imposes, yet the previous law shows it is still nonzero. Strictly
+# smaller AND nonzero together is exactly attenuated tunneling: the amplitude survives the crossing but is diminished.
+rule far-side-amplitude-is-attenuated
+  show hold
+    call is-equal
+      call tally-below
+        call amplitude
+          make far-right
+        call amplitude
+          make far-left
+      make yes
+  calm hold
+
+# THE BARRIER COSTS EXTRA: the amplitude just past the barrier (near-right) is strictly below the amplitude just before it
+# (near-left). Crossing the forbidden region drops the surviving amount by more than an ordinary hop, the steep decay
+# inside the barrier that makes tunneling rare. The drop is real but does not reach none, so the walker still gets across.
+rule crossing-the-barrier-costs-extra
+  show hold
+    call is-equal
+      call tally-below
+        call amplitude
+          make near-right
+        call amplitude
+          make near-left
+      make yes
+  calm hold

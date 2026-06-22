@@ -1,0 +1,423 @@
+# The handshake lemma, the foundational theorem of finite graph theory, modeled concretely and proved by the kernel. The
+# example graph is the SQUARE four-cycle: four vertices north, east, south, west, joined in a ring north-east-south-west
+# and back. It is undirected (the adjacency is SYMMETRIC), simple (IRREFLEXIVE, no vertex is joined to itself), and each
+# vertex has exactly two neighbors. The degree of a vertex is COMPUTED by counting its neighbors over all four vertices,
+# the degree-sum adds those four degrees, and the edge-count tallies the unordered pairs that are joined. Nothing here is
+# asserted by hand: the degrees and the edge count both reduce out of the same adjacency table. The handshake lemma then
+# says the sum of the degrees equals twice the number of edges, because every edge contributes one to the degree at each
+# of its two ends. For the four-cycle the degree-sum is four times two, which is eight, and there are four edges, and
+# eight is twice four. The corollary is that the count of ODD-degree vertices is always even: here every degree is two,
+# so there are zero odd vertices, and zero is even. This is the graph-theoretic core the mesh rests on: the hyperbolic
+# honeycomb is an undirected regular graph, and its addressing depends on exactly these properties.
+
+# A natural number: zero, or the successor of a natural. Used to count neighbors and edges.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition by recursion on the first argument: 0 + b = b, and (succ a) + b = succ (a + b). Verified terminating, the
+# kernel unfolds it, so the degree and edge sums below reduce to concrete successor towers.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# The four vertices of the square, in ring order.
+form vertex
+  case north
+  case east
+  case south
+  case west
+
+# A yes or no answer, one cell of the adjacency table.
+form flag
+  case yes
+  case no
+
+# TEMPLATE: one entry of the adjacency table. For a fixed second vertex `col`, send the yes or no `answer`. One
+# definition replaces every near-identical adjacency cell.
+tree adjacent-entry
+  take col
+  take answer
+
+  hook fuse
+    case {col}
+      send back
+        make {answer}
+
+# Adjacency in the four-cycle: each vertex is joined to the next and the previous around the ring north-east-south-west.
+# So north touches east and west, east touches north and south, south touches east and west, west touches south and
+# north. The table is given directly over the sixteen ordered pairs, and it is symmetric and has no diagonal yes.
+task adjacent
+  take a, like vertex
+  take b, like vertex
+  like flag
+  fork case, read a
+    case north
+      fork case, read b
+        fuse adjacent-entry, north, no
+        fuse adjacent-entry, east, yes
+        fuse adjacent-entry, south, no
+        fuse adjacent-entry, west, yes
+    case east
+      fork case, read b
+        fuse adjacent-entry, north, yes
+        fuse adjacent-entry, east, no
+        fuse adjacent-entry, south, yes
+        fuse adjacent-entry, west, no
+    case south
+      fork case, read b
+        fuse adjacent-entry, north, no
+        fuse adjacent-entry, east, yes
+        fuse adjacent-entry, south, no
+        fuse adjacent-entry, west, yes
+    case west
+      fork case, read b
+        fuse adjacent-entry, north, yes
+        fuse adjacent-entry, east, no
+        fuse adjacent-entry, south, yes
+        fuse adjacent-entry, west, no
+
+# Count one neighbor: a yes contributes one to a running degree, a no contributes nothing. `tally f n` adds one to n
+# when f is yes and leaves n alone when f is no.
+task tally
+  take f, like flag
+  take n, like natural
+  like natural
+  fork case, read f
+    case yes
+      send back
+        make succ
+          bind prior
+            read n
+    case no
+      send back
+        read n
+
+# THE DEGREE of a vertex: the number of vertices it is adjacent to, counted by tallying the adjacency flag against each
+# of the four vertices. This reduces out of the adjacency table, it is not asserted.
+task degree
+  take v, like vertex
+  like natural
+  send back
+    call tally
+      call adjacent
+        read v
+        make north
+      call tally
+        call adjacent
+          read v
+          make east
+        call tally
+          call adjacent
+            read v
+            make south
+          call tally
+            call adjacent
+              read v
+              make west
+            make zero
+
+# THE DEGREE-SUM: the sum of the degrees over all four vertices, the left side of the handshake lemma.
+task degree-sum
+  like natural
+  send back
+    call plus
+      call degree
+        make north
+      call plus
+        call degree
+          make east
+        call plus
+          call degree
+            make south
+          call degree
+            make west
+
+# TALLY ONE ORDERED PAIR toward the edge count: count the pair (a, b) only when they are adjacent AND a comes strictly
+# before b in ring order, so each undirected edge is counted exactly once. `is-before` fixes the order north < east <
+# south < west.
+task is-before
+  take a, like vertex
+  take b, like vertex
+  like flag
+  fork case, read a
+    case north
+      fork case, read b
+        fuse adjacent-entry, north, no
+        fuse adjacent-entry, east, yes
+        fuse adjacent-entry, south, yes
+        fuse adjacent-entry, west, yes
+    case east
+      fork case, read b
+        fuse adjacent-entry, north, no
+        fuse adjacent-entry, east, no
+        fuse adjacent-entry, south, yes
+        fuse adjacent-entry, west, yes
+    case south
+      fork case, read b
+        fuse adjacent-entry, north, no
+        fuse adjacent-entry, east, no
+        fuse adjacent-entry, south, no
+        fuse adjacent-entry, west, yes
+    case west
+      fork case, read b
+        fuse adjacent-entry, north, no
+        fuse adjacent-entry, east, no
+        fuse adjacent-entry, south, no
+        fuse adjacent-entry, west, no
+
+# Count the edge (a, b) toward the running edge total: add one when a and b are adjacent and a is before b, otherwise
+# leave the total alone. `both` is yes only when both flags are yes.
+task both
+  take f, like flag
+  take g, like flag
+  like flag
+  fork case, read f
+    case yes
+      send back
+        read g
+    case no
+      send back
+        make no
+
+# COUNT THE EDGES OUT OF ONE VERTEX a: tally the ordered pairs (a, b) that are adjacent and ordered, over all four b,
+# into a running total n.
+task edges-from
+  take a, like vertex
+  take n, like natural
+  like natural
+  send back
+    call tally
+      call both
+        call adjacent
+          read a
+          make north
+        call is-before
+          read a
+          make north
+      call tally
+        call both
+          call adjacent
+            read a
+            make east
+          call is-before
+            read a
+            make east
+        call tally
+          call both
+            call adjacent
+              read a
+              make south
+            call is-before
+              read a
+              make south
+          call tally
+            call both
+              call adjacent
+                read a
+                make west
+              call is-before
+                read a
+                make west
+            read n
+
+# THE EDGE-COUNT: the number of edges, counted once each by summing the ordered-and-adjacent pairs out of every vertex.
+# This reduces out of the adjacency table, it is not asserted.
+task edge-count
+  like natural
+  send back
+    call edges-from
+      make north
+      call edges-from
+        make east
+        call edges-from
+          make south
+          call edges-from
+            make west
+            make zero
+
+# ADJACENCY IS SYMMETRIC: adjacent a b = adjacent b a, the graph is UNDIRECTED. Proved over all sixteen vertex pairs by
+# exhaustive induction, both sides reducing through the adjacency table to the same flag.
+rule adjacent-is-symmetric
+  mark a, like vertex
+  mark b, like vertex
+  show hold
+    call is-equal
+      call adjacent
+        read a
+        read b
+      call adjacent
+        read b
+        read a
+  fold a, b
+
+# NO SELF-LOOPS: adjacent v v = no, the graph is SIMPLE, no vertex is joined to itself. Proved over all four vertices.
+rule no-self-loops
+  mark v, like vertex
+  show hold
+    call is-equal
+      call adjacent
+        read v
+        read v
+      make no
+  fold v
+
+# EACH DEGREE IS TWO: every vertex of the four-cycle has exactly two neighbors. The degree is COMPUTED from the
+# adjacency table and reduces to the successor tower for two, for every vertex, by exhaustive induction.
+rule every-degree-is-two
+  mark v, like vertex
+  show hold
+    call is-equal
+      call degree
+        read v
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+  fold v
+
+# THE HANDSHAKE LEMMA on the four-cycle: the sum of the degrees equals twice the number of edges. Both sides are
+# COMPUTED from the adjacency table. The degree-sum reduces to eight (four vertices of degree two), the edge-count
+# reduces to four (the four sides of the square), and twice four is eight. Because both counts come out of the same
+# adjacency, this is a genuine instance of the theorem, not a bare arithmetic equality.
+rule handshake-degree-sum-is-twice-edges
+  show hold
+    call is-equal
+      call degree-sum
+      call plus
+        call edge-count
+        call edge-count
+  calm hold
+
+# THE EDGE-COUNT IS FOUR, exhibited on its own: the square has four sides.
+rule edge-count-is-four
+  show hold
+    call is-equal
+      call edge-count
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+  calm hold
+
+# THE DEGREE-SUM IS EIGHT, exhibited on its own: four vertices each of degree two.
+rule degree-sum-is-eight
+  show hold
+    call is-equal
+      call degree-sum
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make succ
+                            bind prior
+                              make succ
+                                bind prior
+                                  make succ
+                                    bind prior
+                                      make zero
+  calm hold
+
+# Parity of a natural: off when even, on when odd, flipping on each successor. Used to test which degrees are odd.
+form bit
+  case off
+  case on
+
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+task parity
+  take n, like natural
+  like bit
+  fork case, read n
+    case zero
+      send back
+        make off
+    case succ
+      link p
+      send back
+        call flip
+          call parity
+            read p
+
+# Tally one odd vertex: add one to the running count when the vertex has ODD degree (parity of its degree is on),
+# otherwise leave the count alone.
+task tally-odd
+  take v, like vertex
+  take n, like natural
+  like natural
+  fork case, call parity, call degree, read v
+    case off
+      send back
+        read n
+    case on
+      send back
+        make succ
+          bind prior
+            read n
+
+# THE COUNT OF ODD-DEGREE VERTICES: tally the vertices whose degree is odd, over all four vertices.
+task odd-vertex-count
+  like natural
+  send back
+    call tally-odd
+      make north
+      call tally-odd
+        make east
+        call tally-odd
+          make south
+          call tally-odd
+            make west
+            make zero
+
+# THE HANDSHAKE COROLLARY: the number of odd-degree vertices is EVEN. In the four-cycle every degree is two, so no
+# vertex is odd, the odd-vertex-count reduces to zero, and zero is even (its parity is off). Computed from the same
+# adjacency, the general parity consequence of the handshake lemma exhibited here.
+rule odd-vertex-count-is-even
+  show hold
+    call is-equal
+      call parity
+        call odd-vertex-count
+      make off
+  calm hold
+
+# Sharper still: the odd-vertex-count is exactly zero, the four-cycle has no odd-degree vertex.
+rule odd-vertex-count-is-zero
+  show hold
+    call is-equal
+      call odd-vertex-count
+      make zero
+  calm hold

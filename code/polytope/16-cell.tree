@@ -1,0 +1,247 @@
+# The 16-cell and the tesseract, the two regular 4-polytopes dual to each other, modeled by the kernel. The 16-cell
+# {3,3,4} is the four-dimensional CROSS-POLYTOPE: its 8 vertices are the signed axis points plus-or-minus e_i, with 16
+# tetrahedral cells. The tesseract {4,3,3} is the four-dimensional HYPERCUBE: its 16 vertices are the sign patterns on
+# four coordinates, with 8 cubic cells. They are DUAL: the 8 vertices of the 16-cell match the 8 cells of the tesseract,
+# and the 16 cells of the 16-cell match the 16 vertices of the tesseract. Their root systems are B4 and C4. A beautiful
+# fact proved here: the DEMITESSERACT (the 8 tesseract vertices with an even number of minus signs) IS a 16-cell, so the
+# cross-polytope sits inside the hypercube as an alternation. Together with the self-dual 24-cell these are the regular
+# polychora that frame the four-dimensional geometry of the mesh.
+
+load @cluesurf/form/code/atom/sign
+  find sign
+  find flip-sign
+
+# The four coordinate axes of four-space.
+form axis
+  case ax1
+  case ax2
+  case ax3
+  case ax4
+
+# A 16-cell vertex: a signed axis point, plus-or-minus e_i. There are eight (four axes times two signs).
+form spike
+  case point
+    link sign, like sign
+    link axis, like axis
+
+# The antipode of a 16-cell vertex: flip its sign, fixing the axis. It pairs the eight vertices into four lines, the four
+# coordinate axes.
+task negate-spike
+  take s, like spike
+  like spike
+  fork case, read s
+    case point
+      link sign
+      link axis
+      send back
+        make point
+          bind sign
+            call flip-sign
+              read sign
+          bind axis
+            read axis
+
+# A tesseract vertex: a sign on each of the four coordinates. There are sixteen (two to the fourth).
+form quad
+  case corner
+    link a, like sign
+    link b, like sign
+    link c, like sign
+    link d, like sign
+
+# The antipode of a tesseract vertex: flip all four signs. It pairs the sixteen vertices into eight lines.
+task negate-quad
+  take q, like quad
+  like quad
+  fork case, read q
+    case corner
+      link a
+      link b
+      link c
+      link d
+      send back
+        make corner
+          bind a
+            call flip-sign
+              read a
+          bind b
+            call flip-sign
+              read b
+          bind c
+            call flip-sign
+              read c
+          bind d
+            call flip-sign
+              read d
+
+# The parity of a vertex, even or odd, the count of minus signs taken modulo two. The even-parity tesseract vertices form
+# the demitesseract.
+form parity
+  case even
+  case odd
+
+# Toggle parity, the effect of one more minus sign.
+task toggle
+  take p, like parity
+  like parity
+  fork case, read p
+    case even
+      send back
+        make odd
+    case odd
+      send back
+        make even
+
+# One sign's contribution to parity: a minus toggles, a plus leaves it.
+task add-sign
+  take p, like parity
+  take s, like sign
+  like parity
+  fork case, read s
+    case positive
+      send back
+        read p
+    case negative
+      send back
+        call toggle
+          read p
+
+# The parity of a tesseract vertex: fold the four signs, toggling once per minus.
+task parity-of
+  take q, like quad
+  like parity
+  fork case, read q
+    case corner
+      link a
+      link b
+      link c
+      link d
+      send back
+        call add-sign
+          call add-sign
+            call add-sign
+              call add-sign
+                make even
+                read a
+              read b
+            read c
+          read d
+
+# THE 16-CELL ANTIPODE IS AN INVOLUTION: negate-spike (negate-spike s) = s, for every one of the eight vertices. The
+# cross-polytope is centrally symmetric, its eight vertices in four antipodal pairs.
+rule cross-polytope-antipode-is-an-involution
+  mark s, like sign
+  mark x, like axis
+  show hold
+    call is-equal
+      call negate-spike
+        call negate-spike
+          make point
+            bind sign
+              read s
+            bind axis
+              read x
+      make point
+        bind sign
+          read s
+        bind axis
+          read x
+  fold s, x
+
+# THE TESSERACT ANTIPODE IS AN INVOLUTION: negate-quad (negate-quad q) = q, for every one of the sixteen vertices. Flipping
+# all four signs twice returns the vertex, so the hypercube is centrally symmetric.
+rule hypercube-antipode-is-an-involution
+  mark a, like sign
+  mark b, like sign
+  mark c, like sign
+  mark d, like sign
+  show hold
+    call is-equal
+      call negate-quad
+        call negate-quad
+          make corner
+            bind a
+              read a
+            bind b
+              read b
+            bind c
+              read c
+            bind d
+              read d
+      make corner
+        bind a
+          read a
+        bind b
+          read b
+        bind c
+          read c
+        bind d
+          read d
+  fold a, b, c, d
+
+# THE ANTIPODE PRESERVES PARITY: parity-of (negate-quad q) = parity-of q, for every tesseract vertex. Flipping all four
+# signs toggles parity four times, which is the identity. So the demitesseract (the even-parity vertices) is closed under
+# the antipode, exactly as the 16-cell is, which is why the demitesseract IS a 16-cell.
+rule antipode-preserves-parity
+  mark a, like sign
+  mark b, like sign
+  mark c, like sign
+  mark d, like sign
+  show hold
+    call is-equal
+      call parity-of
+        call negate-quad
+          make corner
+            bind a
+              read a
+            bind b
+              read b
+            bind c
+              read c
+            bind d
+              read d
+      call parity-of
+        make corner
+          bind a
+            read a
+          bind b
+            read b
+          bind c
+            read c
+          bind d
+            read d
+  fold a, b, c, d
+
+# A concrete demitesseract vertex (all plus, zero minus signs) is even, and a single-minus vertex is odd, so the parity
+# genuinely splits the sixteen tesseract vertices into two demitesseracts of eight.
+rule all-plus-is-even
+  show hold
+    call is-equal
+      call parity-of
+        make corner
+          bind a
+            make positive
+          bind b
+            make positive
+          bind c
+            make positive
+          bind d
+            make positive
+      make even
+  calm hold
+
+rule one-minus-is-odd
+  show hold
+    call is-equal
+      call parity-of
+        make corner
+          bind a
+            make negative
+          bind b
+            make positive
+          bind c
+            make positive
+          bind d
+            make positive
+      make odd
+  calm hold

@@ -1,0 +1,284 @@
+# The CHSH game and the Bell inequality, the exact discrete bound that quantum entanglement violates, modeled and PROVED
+# by the kernel. Two players, Alice and Bob, are placed far apart and cannot talk once the game starts. A referee hands
+# Alice a question bit x and Bob a question bit y. Each answers with one bit, Alice with a and Bob with b. They WIN the
+# round when a XOR b equals x AND y. The four question pairs (off, off), (off, on), (on, off), (on, on) are asked equally
+# often, so the score is the count of pairs won out of four. Because the players are separated, any classical recipe is a
+# pair of LOCAL strategies: Alice's answer depends only on x, Bob's only on y, with no shared question. There are exactly
+# four single-bit functions (constant off, constant on, identity, flip), so sixteen strategy pairs in all. This file
+# CONSTRUCTS the strategies, COMPUTES the winning predicate and the win count over the four questions, and PROVES the
+# headline Bell / CHSH bound: NO pair of local strategies wins all four rounds, so the win count is at most three. The
+# best classical play scores three of four, a win rate of three quarters, and that is exactly tight. This three-quarters
+# ceiling is what a theory of LOCAL HIDDEN VARIABLES (predetermined answers fixed in advance) can never beat. Quantum
+# players sharing an entangled pair (a Bell state from the companion file) reach a win rate near eighty-five percent, the
+# Tsirelson bound, beating three quarters. That excess is Bell's theorem: the measured correlations of entangled qubits
+# cannot be reproduced by any local recipe, so no local hidden variable model can underlie quantum mechanics. The win
+# count here is a Peano natural and the bound is the kernel's at-most order, so the whole statement reduces and checks.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# A bit, the value of a question or an answer, off or on.
+form bit
+  case off
+  case on
+
+# Exclusive or of two bits, on exactly when the two differ. This is the left side of the winning condition: the parity
+# of Alice's answer against Bob's answer.
+task exclusive-or
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      fork case, read b
+        case off
+          send back
+            make on
+        case on
+          send back
+            make off
+
+# Conjunction of two bits, on exactly when both are on. This is the right side of the winning condition: the product of
+# the two question bits, the target parity the answers must match.
+task and-bit
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make off
+    case on
+      send back
+        read b
+
+# Equality of two bits, yes when they match. Used to compare the answer parity against the target.
+task same-bit
+  take a, like bit
+  take b, like bit
+  like flag
+  fork case, read a
+    case off
+      fork case, read b
+        case off
+          send back
+            make yes
+        case on
+          send back
+            make no
+    case on
+      fork case, read b
+        case off
+          send back
+            make no
+        case on
+          send back
+            make yes
+
+# A local strategy: one of the four single-bit functions a separated player can use. With no shared question, a player's
+# answer is a fixed function of their own question alone, and there are exactly these four. `low` always answers off,
+# `high` always answers on, `copy` echoes the question, and `swap` flips it.
+form strategy
+  case low
+  case high
+  case copy
+  case swap
+
+# Apply a strategy to a question bit to get the answer bit. This is the whole content of a local player: a lookup with no
+# access to the other side's question.
+task apply-strategy
+  take s, like strategy
+  take q, like bit
+  like bit
+  fork case, read s
+    case low
+      send back
+        make off
+    case high
+      send back
+        make on
+    case copy
+      send back
+        read q
+    case swap
+      fork case, read q
+        case off
+          send back
+            make on
+        case on
+          send back
+            make off
+
+# Whether a strategy pair wins the round on questions x and y: the parity of the two answers equals the product of the
+# two questions. wins alice bob x y = ( (apply alice x) XOR (apply bob y) == x AND y ). This is the CHSH winning rule
+# written out exactly.
+task wins
+  take alice, like strategy
+  take bob, like strategy
+  take x, like bit
+  take y, like bit
+  like flag
+  send back
+    call same-bit
+      call exclusive-or
+        call apply-strategy
+          read alice
+          read x
+        call apply-strategy
+          read bob
+          read y
+      call and-bit
+        read x
+        read y
+
+# The win count is a Peano natural, zero through four, counting how many of the four questions a strategy pair wins.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Score one round: a win contributes one, a loss contributes zero, added on top of the running count. This folds the
+# yes / no of `wins` into the natural total.
+task score
+  take result, like flag
+  take rest, like natural
+  like natural
+  fork case, read result
+    case yes
+      send back
+        make succ
+          bind prior
+            read rest
+    case no
+      send back
+        read rest
+
+# The win count of a strategy pair over all four questions, (off, off), (off, on), (on, off), (on, on). Each round is
+# scored and added, so the result is a natural from zero to four. This is the CHSH score of a classical recipe.
+task win-count
+  take alice, like strategy
+  take bob, like strategy
+  like natural
+  send back
+    call score
+      call wins
+        read alice
+        read bob
+        make off
+        make off
+      call score
+        call wins
+          read alice
+          read bob
+          make off
+          make on
+        call score
+          call wins
+            read alice
+            read bob
+            make on
+            make off
+          call score
+            call wins
+              read alice
+              read bob
+              make on
+              make on
+            make zero
+
+# at-most a b = on iff a <= b, by recursion on both naturals at once. The kernel uses this to state the Bell bound as a
+# decidable inequality that reduces to `on`.
+task at-most
+  take a, like natural
+  take b, like natural
+  like bit
+  fork case, read a
+    case zero
+      send back
+        make on
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make off
+        case succ
+          link bp
+          send back
+            call at-most
+              read ap
+              read bp
+
+# Three, the classical CHSH ceiling, as a successor tower. The best local recipe wins exactly this many of the four rounds.
+task three
+  like natural
+  send back
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+
+# THE BELL / CHSH BOUND, the headline theorem: NO pair of local strategies wins all four rounds. For EVERY Alice strategy
+# and EVERY Bob strategy, the win count is at most three. at-most (win-count alice bob) three = on, for all sixteen pairs.
+# Proved by exhaustive induction over both strategy enums (`fold alice, bob`): the kernel walks all sixteen pairs, in each
+# one reduces the four-round win count to a concrete natural, and checks it is at most three. This is the exact ceiling a
+# local hidden variable theory cannot exceed, and the one entangled quantum players beat (Tsirelson, near eighty-five
+# percent), which is Bell's theorem.
+rule no-local-strategy-wins-all-four
+  mark alice, like strategy
+  mark bob, like strategy
+  show hold
+    call is-equal
+      call at-most
+        call win-count
+          read alice
+          read bob
+        call three
+      make on
+  fold alice, bob
+
+# TIGHTNESS: the bound is achieved. The pair where Alice copies her question and Bob always answers off wins exactly three
+# of the four rounds, so three is not just an upper bound but the true classical optimum. win-count copy low = three.
+# Witnessed by computation. Together with the bound above, the classical CHSH value is exactly three of four.
+rule a-strategy-achieves-three
+  show hold
+    call is-equal
+      call win-count
+        make copy
+        make low
+      call three
+  calm hold
+
+# THE WINNING PREDICATE IS EXACTLY THE CHSH CONDITION on a concrete round: on questions (on, on) the target parity is on,
+# so the answers must DIFFER. The pair copy / low answers on and off there, which differ, so this round is won. This pins
+# down that `wins` is the rule a XOR b = x AND y and nothing else.
+rule chsh-condition-on-the-hard-round
+  show hold
+    call is-equal
+      call wins
+        make copy
+        make low
+        make on
+        make on
+      make yes
+  calm hold
+
+# THE SAME HARD ROUND IS WHERE ALL-OFF FAILS: two constant-off players answer off and off, whose parity is off, but on
+# questions (on, on) the target is on, so they LOSE this round. No constant pair can win all four, the simplest face of
+# the bound. wins low low on on = no.
+rule constant-pair-loses-the-hard-round
+  show hold
+    call is-equal
+      call wins
+        make low
+        make low
+        make on
+        make on
+      make no
+  calm hold

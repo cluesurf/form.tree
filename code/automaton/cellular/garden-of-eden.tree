@@ -1,0 +1,379 @@
+# THE GARDEN OF EDEN and the HEDLUND characterization of a cellular automaton, modeled and proved by the kernel. A
+# cellular automaton is a grid of cells, each holding a state, all updating in lockstep by one fixed LOCAL RULE that reads
+# a cell and its neighbors. The global map carries a whole configuration to the next one. A GARDEN OF EDEN is a
+# configuration with NO PREDECESSOR: a pattern that can be a starting state but can never be produced by the rule from any
+# earlier state. Gardens of Eden exist exactly when the global map is NOT SURJECTIVE, when some configuration sits outside
+# the image of the rule and so is unreachable.
+#
+# The CURTIS-HEDLUND-LYNDON theorem (Hedlund's theorem) says what a cellular automaton IS in the abstract: precisely a map
+# on configuration space that is continuous and COMMUTES WITH THE SHIFT. Shift commutation is the content captured here, it
+# is the statement that the rule is the same everywhere, applied uniformly at every cell, so translating the configuration
+# and then stepping equals stepping and then translating.
+#
+# The configuration window here is THREE binary cells arranged in a cyclic row, eight strip states. The shift is the cyclic
+# rotation of the three cells. Two rules are studied on this window. The first is a non-surjective local rule (the next
+# cell is the conjunction of itself and its right neighbor), applied uniformly with cyclic neighborhoods; it commutes with
+# the shift, yet it misses some strips, so a Garden of Eden exists and is exhibited concretely. The second is the cyclic
+# rotation itself, a bijection of the eight strips; it commutes with the shift and, being surjective, admits NO Garden of
+# Eden, tying reversibility to the absence of unreachable configurations.
+load @cluesurf/form/code/atom/flag
+  find flag
+  find either
+
+# A cell, the smallest piece of the lattice: off or on, an absent or present mark.
+form cell
+  case off
+  case on
+
+# A strip, the finite configuration window the global map acts on: three cells in a cyclic row. With two states per cell
+# there are eight strips. The row is cyclic, so the right neighbor of the third cell is the first cell, which is what lets
+# the shift act and the local rule apply uniformly at every position.
+form strip
+  case row
+    link one, like cell
+    link two, like cell
+    link three, like cell
+
+# THE LOCAL RULE, the lookup table at one cell: the next state of a cell is the conjunction of the cell and its right
+# neighbor, on exactly when both are on. This is a fixed two-input rule, read off a neighborhood and applied identically
+# everywhere. Conjunction collapses information (it forgets the off-off, off-on, on-off cases into off), which is why the
+# global map it drives is not surjective.
+task local-rule
+  take here, like cell
+  take right, like cell
+  like cell
+  fork case, read here
+    case off
+      send back
+        make off
+    case on
+      fork case, read right
+        case off
+          send back
+            make off
+        case on
+          send back
+            make on
+
+# THE GLOBAL STEP, the local rule applied uniformly across the cyclic strip: each cell becomes the conjunction of itself
+# and its right neighbor, with the third cell wrapping to the first. This is the global map on the finite window, the same
+# rule at every position. Because conjunction is many-to-one, this map is not onto the eight strips.
+task step
+  take s, like strip
+  like strip
+  fork case, read s
+    case row
+      link one
+      link two
+      link three
+      send back
+        make row
+          bind one
+            call local-rule
+              read one
+              read two
+          bind two
+            call local-rule
+              read two
+              read three
+          bind three
+            call local-rule
+              read three
+              read one
+
+# THE SHIFT, the cyclic rotation of the strip: each cell moves one position to the left, the first cell wrapping to the
+# end. The strip (a, b, c) becomes (b, c, a). This is the hyperbolic translation of the line made finite, the symmetry the
+# Hedlund theorem says a cellular automaton must commute with.
+task shift
+  take s, like strip
+  like strip
+  fork case, read s
+    case row
+      link one
+      link two
+      link three
+      send back
+        make row
+          bind one
+            read two
+          bind two
+            read three
+          bind three
+            read one
+
+# TEMPLATE: one strip literal built from three cell states, used to enumerate the eight inputs of the predecessor search
+# and to exhibit concrete configurations.
+tree strip-of
+  take a
+  take b
+  take c
+
+  hook fuse
+    make row
+      bind one
+        make {a}
+      bind two
+        make {b}
+      bind three
+        make {c}
+
+# The three projections of a strip, reading one cell position each. They let the equality test compare two strips position
+# by position without destructuring both at once.
+task cell-one
+  take s, like strip
+  like cell
+  fork case, read s
+    case row
+      link one
+      link two
+      link three
+      send back
+        read one
+
+task cell-two
+  take s, like strip
+  like cell
+  fork case, read s
+    case row
+      link one
+      link two
+      link three
+      send back
+        read two
+
+task cell-three
+  take s, like strip
+  like cell
+  fork case, read s
+    case row
+      link one
+      link two
+      link three
+      send back
+        read three
+
+# Strip equality: two strips are equal when their three cells agree. The predecessor search compares a candidate image
+# against a target through this test.
+task is-same
+  take x, like strip
+  take y, like strip
+  like flag
+  send back
+    call both
+      call both
+        call cell-same
+          call cell-one
+            read x
+          call cell-one
+            read y
+        call cell-same
+          call cell-two
+            read x
+          call cell-two
+            read y
+      call cell-same
+        call cell-three
+          read x
+        call cell-three
+          read y
+
+# Cell equality, the per-position test the strip comparison is built from.
+task cell-same
+  take p, like cell
+  take q, like cell
+  like flag
+  fork case, read p
+    case off
+      fork case, read q
+        case off
+          send back
+            make yes
+        case on
+          send back
+            make no
+    case on
+      fork case, read q
+        case off
+          send back
+            make no
+        case on
+          send back
+            make yes
+
+# WHETHER A STRIP HAS A PREDECESSOR under the conjunction step: yes when SOME strip steps to the target, found by searching
+# all eight inputs. The search is a finite disjunction over every strip, comparing its image to the target. This is the
+# computable test for reachability, and a Garden of Eden is exactly a strip on which it returns no.
+task has-predecessor
+  take target, like strip
+  like flag
+  send back
+    call either
+      call either
+        call either
+          call image-hits
+            fuse strip-of, off, off, off
+            read target
+          call image-hits
+            fuse strip-of, off, off, on
+            read target
+        call either
+          call image-hits
+            fuse strip-of, off, on, off
+            read target
+          call image-hits
+            fuse strip-of, off, on, on
+            read target
+      call either
+        call either
+          call image-hits
+            fuse strip-of, on, off, off
+            read target
+          call image-hits
+            fuse strip-of, on, off, on
+            read target
+        call either
+          call image-hits
+            fuse strip-of, on, on, off
+            read target
+          call image-hits
+            fuse strip-of, on, on, on
+            read target
+
+# Whether the step of a candidate strip lands on the target: one term of the predecessor disjunction.
+task image-hits
+  take candidate, like strip
+  take target, like strip
+  like flag
+  send back
+    call is-same
+      call step
+        read candidate
+      read target
+
+# THE RULE COMMUTES WITH THE SHIFT, the Hedlund property: step (shift s) = shift (step s), for every strip. The conjunction
+# rule is the same at every cell, so translating the configuration and then stepping equals stepping and then translating.
+# Proved by exhaustive induction over the eight strips, each resolving by computation. This is the content of the
+# Curtis-Hedlund-Lyndon characterization carried here, the statement that the rule is uniform across the lattice.
+rule step-commutes-with-shift
+  mark s, like strip
+  show hold
+    call is-equal
+      call step
+        call shift
+          read s
+      call shift
+        call step
+          read s
+  fold s
+
+# A GARDEN OF EDEN EXISTS: the strip (on, on, off) has NO PREDECESSOR under the conjunction step. The image of the step over
+# all eight inputs is the five strips off-off-off, off-on-off, off-off-on, on-off-off, and on-on-on; the strip on-on-off is
+# not among them, so no strip steps to it. has-predecessor of this strip is no, witnessed by the search across the whole
+# input space. This is a concrete unreachable configuration, the proof that the conjunction global map is not surjective.
+rule garden-of-eden-has-no-predecessor
+  show hold
+    call is-equal
+      call has-predecessor
+        fuse strip-of, on, on, off
+      make no
+  calm hold
+
+# A REACHABLE CONFIGURATION HAS A PREDECESSOR: the all-off strip is the image of itself (and of others) under the
+# conjunction step, so has-predecessor returns yes. This shows the predecessor test is non-trivial, separating the
+# reachable strips from the Gardens of Eden rather than rejecting everything.
+rule reachable-strip-has-a-predecessor
+  show hold
+    call is-equal
+      call has-predecessor
+        fuse strip-of, off, off, off
+      make yes
+  calm hold
+
+# THE SHIFT ITSELF IS A REVERSIBLE RULE that commutes with the shift: a cellular automaton whose global map is the cyclic
+# rotation. shift (shift s) over the three-cell strip composed three times returns the original, so it is a bijection of the
+# eight strips. As a translation it trivially commutes with the shift, satisfying the Hedlund property. Being a bijection it
+# is surjective, so under this rule EVERY configuration has a predecessor and there is NO Garden of Eden. The two laws below
+# witness that absence.
+#
+# WHETHER A STRIP HAS A PREDECESSOR under the rotation rule: the same finite search, now stepping each candidate by the
+# shift. Because the shift is a bijection every target is hit, so this returns yes on every strip.
+task has-predecessor-by-shift
+  take target, like strip
+  like flag
+  send back
+    call either
+      call either
+        call either
+          call shift-hits
+            fuse strip-of, off, off, off
+            read target
+          call shift-hits
+            fuse strip-of, off, off, on
+            read target
+        call either
+          call shift-hits
+            fuse strip-of, off, on, off
+            read target
+          call shift-hits
+            fuse strip-of, off, on, on
+            read target
+      call either
+        call either
+          call shift-hits
+            fuse strip-of, on, off, off
+            read target
+          call shift-hits
+            fuse strip-of, on, off, on
+            read target
+        call either
+          call shift-hits
+            fuse strip-of, on, on, off
+            read target
+          call shift-hits
+            fuse strip-of, on, on, on
+            read target
+
+# Whether the shift of a candidate strip lands on the target: one term of the rotation predecessor disjunction.
+task shift-hits
+  take candidate, like strip
+  take target, like strip
+  like flag
+  send back
+    call is-same
+      call shift
+        read candidate
+      read target
+
+# THE REVERSIBLE RULE HAS NO GARDEN OF EDEN: every strip has a predecessor under the rotation, has-predecessor-by-shift s =
+# yes for every strip. The cyclic rotation is a bijection, so its global map is surjective and no configuration is
+# unreachable. Proved by exhaustive induction over the eight strips, each finding its preimage by computation. This ties
+# reversibility to the absence of Gardens of Eden: an invertible rule loses no configurations, so none are left orphaned.
+rule reversible-rule-has-no-garden-of-eden
+  mark a, like cell
+  mark b, like cell
+  mark c, like cell
+  show hold
+    call is-equal
+      call has-predecessor-by-shift
+        make row
+          bind one
+            read a
+          bind two
+            read b
+          bind three
+            read c
+      make yes
+  fold a, b, c
+
+# THE ROTATION IS A GENUINE PERMUTATION, not the identity: the shift maps (off, off, on) to (off, on, off), so the middle
+# cell goes from off to on. Reading the middle cell after the shift gives on, not off, two distinct cell states, so the
+# rotation cannot be the identity and truly moves the strips. With the no-Garden-of-Eden law above this confirms the
+# rotation is a bijection of the eight strips, the reversible counterpart to the collapsing conjunction rule.
+rule shift-is-not-identity
+  show miss
+    call is-equal
+      call cell-two
+        call shift
+          fuse strip-of, off, off, on
+      make off
+  calm miss

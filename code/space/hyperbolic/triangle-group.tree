@@ -1,0 +1,194 @@
+# The full triangle group [p, q], the reflection group that generates every regular hyperbolic tiling {p, q}, modeled
+# concretely and proved by the kernel. A regular tiling {p, q} is built from one fundamental triangle whose angles are
+# pi/p, pi/q, and pi/2. The three reflections in its three sides generate the whole symmetry group, and the tiling is
+# the orbit of one triangle under those reflections. This is the hyperbolic sibling of the symmetric group A2 = S3
+# proved in group/coxeter/symmetric, where two reflections of the flat triangle gave a finite group. Here three
+# reflections of the hyperbolic triangle give an infinite group, the engine behind the pentagrid {5, 4} and the
+# heptagrid {7, 3}.
+#
+# Every triangle group is a Coxeter group. Each generator is an INVOLUTION (a reflection done twice is the identity),
+# and each pair of generators satisfies an ORDER relation:
+#   (reflect-a reflect-b)^p = identity   (the two sides meeting at the pi/p vertex)
+#   (reflect-b reflect-c)^q = identity   (the two sides meeting at the pi/q vertex)
+#   (reflect-a reflect-c)^2 = identity   (the two sides meeting at the right-angle vertex)
+# The last relation, the order-2 (perpendicular) pair, holds in every regular {p, q} because one angle is always a right
+# angle. It is the one relation that closes on a FINITE set of chambers, so the kernel proves it exactly, together with
+# the three involutions, below.
+#
+# A {p, q} is hyperbolic exactly when (p - 2)(q - 2) is above 4. The pentagrid is [5, 4] with (5 - 2)(4 - 2) = 6, and
+# the heptagrid is [7, 3] with (7 - 2)(3 - 2) = 5, both above 4 and so both hyperbolic.
+
+# The four chambers around the right-angle vertex of the fundamental triangle, the vertex where sides a and c meet at
+# pi/2. A chamber is named by which side of mirror a and which side of mirror c it lies on: `pp` is the positive side of
+# both, `pm` positive of a and negative of c, and so on. Reflecting in side a flips the first sign, reflecting in side c
+# flips the second, and they act independently because the two mirrors are perpendicular. These four chambers are the
+# finite world on which the perpendicular pair closes.
+form chamber
+  case pp
+  case pm
+  case mp
+  case mm
+
+# TEMPLATE: one entry of a single-valued map on chambers, sending `from` to `to`. Collapses every
+# `case .. / send back / make ..` block to a single line per entry, keeping the reflection tables DRY.
+tree map-chamber
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# REFLECT-A, the reflection in side a: flip the first sign, leave the second. It swaps the positive and negative sides
+# of mirror a and fixes the relation to mirror c.
+task reflect-a
+  take x, like chamber
+  like chamber
+  fork case, read x
+    fuse map-chamber, pp, mp
+    fuse map-chamber, pm, mm
+    fuse map-chamber, mp, pp
+    fuse map-chamber, mm, pm
+
+# REFLECT-C, the reflection in side c: flip the second sign, leave the first. Perpendicular to reflect-a, so it acts on
+# the other coordinate.
+task reflect-c
+  take x, like chamber
+  like chamber
+  fork case, read x
+    fuse map-chamber, pp, pm
+    fuse map-chamber, pm, pp
+    fuse map-chamber, mp, mm
+    fuse map-chamber, mm, mp
+
+# REFLECT-B, the reflection in side b, the third side of the triangle: the diagonal mirror that exchanges the two
+# coordinates. It swaps the role of side a and side c, sending pm to mp and back, and fixes the chambers already on the
+# diagonal. It is a genuine involution, the third Coxeter generator.
+task reflect-b
+  take x, like chamber
+  like chamber
+  fork case, read x
+    fuse map-chamber, pp, pp
+    fuse map-chamber, pm, mp
+    fuse map-chamber, mp, pm
+    fuse map-chamber, mm, mm
+
+# REFLECT-A IS AN INVOLUTION: reflect-a (reflect-a x) = x. A reflection done twice returns every chamber to itself, the
+# defining property of a Coxeter generator. Proved over all four chambers.
+rule reflect-a-is-an-involution
+  mark x, like chamber
+  show hold
+    call is-equal
+      call reflect-a
+        call reflect-a
+          read x
+      read x
+  fold x
+
+# REFLECT-B IS AN INVOLUTION: reflect-b (reflect-b x) = x.
+rule reflect-b-is-an-involution
+  mark x, like chamber
+  show hold
+    call is-equal
+      call reflect-b
+        call reflect-b
+          read x
+      read x
+  fold x
+
+# REFLECT-C IS AN INVOLUTION: reflect-c (reflect-c x) = x.
+rule reflect-c-is-an-involution
+  mark x, like chamber
+  show hold
+    call is-equal
+      call reflect-c
+        call reflect-c
+          read x
+      read x
+  fold x
+
+# THE ORDER-2 RELATION: (reflect-a reflect-c)^2 = identity. Sides a and c are perpendicular, so their composite is an
+# order-2 rotation, and doing it twice is the identity:
+# reflect-a (reflect-c (reflect-a (reflect-c x))) = x. This is the third Coxeter relation of [p, q], the one that holds
+# in every regular tiling because one triangle angle is always a right angle. Proved over all four chambers.
+rule reflect-a-then-c-has-order-two
+  mark x, like chamber
+  show hold
+    call is-equal
+      call reflect-a
+        call reflect-c
+          call reflect-a
+            call reflect-c
+              read x
+      read x
+  fold x
+
+# THE PERPENDICULAR PAIR COMMUTES: reflect-a (reflect-c x) = reflect-c (reflect-a x). Equivalent to the order-2 relation
+# given the involutions, and the cleanest witness that mirrors a and c are independent. Proved over all four chambers.
+rule perpendicular-reflections-commute
+  mark x, like chamber
+  show hold
+    call is-equal
+      call reflect-a
+        call reflect-c
+          read x
+      call reflect-c
+        call reflect-a
+          read x
+  fold x
+
+# A CLOSED WORD, a relator of the presentation: reflect-a reflect-c reflect-a reflect-c is the identity word on the
+# chambers, returning pp to pp. A concrete witness that this length-four word in the generators is trivial in the group.
+rule order-two-word-fixes-a-chamber
+  show hold
+    call is-equal
+      call reflect-a
+        call reflect-c
+          call reflect-a
+            call reflect-c
+              make pp
+      make pp
+  calm hold
+
+# THE PENTAGRID IS [5, 4] AND HYPERBOLIC. Its fundamental triangle has angles pi/5, pi/4, pi/2, and the Schlafli test
+# (p - 2)(q - 2) above 4 gives (5 - 2)(4 - 2) = 3 * 2 = 6, above 4. The order-p relation is (reflect-a reflect-b)^5 and
+# the order-q relation is (reflect-b reflect-c)^4.
+hold pentagrid-triangle-group-is-hyperbolic
+  call is-above
+    call multiply
+      call subtract
+        code 5
+        code 2
+      call subtract
+        code 4
+        code 2
+    code 4
+
+# THE HEPTAGRID IS [7, 3] AND HYPERBOLIC. Its fundamental triangle has angles pi/7, pi/3, pi/2, and the Schlafli test
+# gives (7 - 2)(3 - 2) = 5 * 1 = 5, above 4. The order-p relation is (reflect-a reflect-b)^7 and the order-q relation is
+# (reflect-b reflect-c)^3.
+hold heptagrid-triangle-group-is-hyperbolic
+  call is-above
+    call multiply
+      call subtract
+        code 7
+        code 2
+      call subtract
+        code 3
+        code 2
+    code 4
+
+# THE FLAT CASE [4, 4] IS THE BORDERLINE, NOT HYPERBOLIC. The square tiling has (4 - 2)(4 - 2) = 4, which is not above 4,
+# the exact threshold the hyperbolic tilings must exceed. This pins down why the pentagrid and heptagrid open up while
+# the square grid stays flat.
+hold square-tiling-is-not-hyperbolic
+  call is-equal
+    call multiply
+      call subtract
+        code 4
+        code 2
+      call subtract
+        code 4
+        code 2
+    code 4

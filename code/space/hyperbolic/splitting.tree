@@ -1,12 +1,591 @@
-load @cluesurf/form/code/structure/set
-  find set
+# Margenstern's SPLITTING METHOD, the central engine of "Cellular Automata in Hyperbolic Spaces", machine-checked. You
+# cannot draw the hyperbolic plane honestly, so you address it with a tree. Take a wedge (a quarter) of a regular tiling
+# and remove a single leading tile: the leftover is always a few smaller standard regions, a handful of quarters plus a
+# strip. Recurse forever, and the tiling unfolds as a SPANNING TREE in which every tile sits at exactly one node (the
+# bijection theorem). A quarter becomes a WHITE node (a 3-node) with three children, a strip becomes a BLACK node (a
+# 2-node) with two children. Counting tiles generation by generation, the white and black populations INTERLEAVE into the
+# Fibonacci sequence: the pentagrid grows at the golden ratio. Each tile carries a binary Fibonacci (Zeckendorf) address,
+# a string with no two adjacent ones, and among a node's children exactly one is the PREFERRED SON (the continuator), the
+# child whose address is the parent's address with "00" appended. THE PREFERRED SON PROPERTY, the backbone theorem of
+# Chapter 3, says every node has exactly one continuator. That single uniform rule collapses an infinite navigation
+# problem to a finite one, making the set of valid addresses a regular language a small automaton can recognize.
+#
+# This file MODELS node colors and child counts, the per-generation white and black populations with the actual
+# splitting recurrence, the merged Fibonacci stream, the binary address with its push and preferred-son operations, and
+# the Zeckendorf validity predicate. It PROVES: the two count recurrences (each color's next population), the FIBONACCI
+# recurrence on the interleaved stream (node at k+2 equals node at k+1 plus node at k), the PREFERRED SON PROPERTY for
+# both the white 3-node and the black 2-node (exactly one child of each is the continuator, over EVERY parent address),
+# and that the no-two-adjacent-ones validity test accepts a legal address and rejects an illegal one.
 
-# The splitting method, Margenstern's central tool, the instrument that makes an undrawable hyperbolic tiling
-# computable. Take a wedge (a quarter) of a regular tiling and remove a single leading tile: the leftover is always a
-# few smaller standard regions, a handful of quarters plus a strip. Recurse, and the tiling unfolds as a tree. Quarters
-# become white nodes with three children, strips become black nodes with two children, and every tile sits at exactly
-# one node, a perfect one-to-one map between tree and tiling (the bijection theorem). The growth per generation follows
-# a matrix whose dominant eigenvalue is the exponential growth rate. This tree is what turns navigation into a finite
-# problem. The form carries the set of tiles; the leader-quarter-strip recursion is the method.
-form splitting-method
-  link tiles, like set
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# A natural number, the population counts and Fibonacci values.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition by recursion on the first argument.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# Addition laws used below. Addition is commutative, needed to read the white recurrence across the interleaving.
+
+# Right identity: n + 0 = n.
+rule plus-zero-right-is-identity
+  mark n, like natural
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+# Successor steps out on the right: a + succ b = succ (a + b).
+rule plus-succ-right-steps-out
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+# Commutativity: a + b = b + a, by induction citing the two lemmas above.
+rule plus-is-commutative
+  mark a, like natural
+  mark b, like natural
+  show hold
+    call is-equal
+      call plus
+        read a
+        read b
+      call plus
+        read b
+        read a
+  fold a
+    cite plus-zero-right-is-identity
+    cite plus-succ-right-steps-out
+
+# THE TWO NODE TYPES. A white node comes from a quarter and is a 3-node, a black node comes from a strip and is a 2-node.
+form node-color
+  case white
+  case black
+
+# THE CHILD COUNT. A white node has three children, a black node has two. This branching, alternating by color, is what
+# drives the Fibonacci growth.
+task child-count
+  take c, like node-color
+  like natural
+  fork case, read c
+    case white
+      send back
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+    case black
+      send back
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+
+# THE BLACK POPULATION at generation n. The seed is a single white root, so black starts empty. Each step, every node of
+# the previous generation contributes one black child, so the next black population is the previous white plus black
+# populations: black(n+1) = white(n) + black(n). This is the Fibonacci recurrence sitting directly in the strip count.
+task black-count
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link m
+      send back
+        call plus
+          call white-count
+            read m
+          call black-count
+            read m
+
+# THE WHITE POPULATION at generation n. The root is one white node. Each step, the next white population is the previous
+# white population plus the freshly grown black population: white(n+1) = white(n) + black(n+1). Defined through the black
+# count so both recurrences hold by computation. Unfolded this is white(n) + white(n) + black(n), the 2-white-1-black
+# split of a quarter, the Margenstern pentagrid growth matrix.
+task white-count
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make succ
+          bind prior
+            make zero
+    case succ
+      link m
+      send back
+        call plus
+          call white-count
+            read m
+          call black-count
+            make succ
+              bind prior
+                read m
+
+# THE TOTAL POPULATION at generation n, white plus black. This is the tile count of the n-th horocyclic shell.
+task total-count
+  take n, like natural
+  like natural
+  send back
+    call plus
+      call white-count
+        read n
+      call black-count
+        read n
+
+# A parity, the index into the interleaved Fibonacci stream below.
+form parity
+  case even
+  case odd
+
+# THE MERGED FIBONACCI STREAM. Reading the white and black populations alternately, white(0), black(1), white(1),
+# black(2), white(2), and so on, produces 1, 1, 2, 3, 5, 8, the Fibonacci sequence itself. node-count addresses that
+# merged stream: at an even slot j it is white(j), at an odd slot j it is black(j+1).
+task node-count
+  take p, like parity
+  take j, like natural
+  like natural
+  fork case, read p
+    case even
+      send back
+        call white-count
+          read j
+    case odd
+      send back
+        call black-count
+          make succ
+            bind prior
+              read j
+
+# A binary digit of a Fibonacci (Zeckendorf) address: a zero bit or a one bit.
+form digit
+  case nil-bit
+  case one-bit
+
+# AN ADDRESS, a path from the root down the spanning tree, a string of digits. The root is the empty address; every other
+# address is a head digit on top of a tail address. This is the tile's Fibonacci coordinate.
+form address
+  case root
+  case more
+    link head, like digit
+    link tail, like address
+
+# PUSH a digit at the deep (leaf) end of an address, extending the path one step further down the tree.
+task push
+  take a, like address
+  take d, like digit
+  like address
+  fork case, read a
+    case root
+      send back
+        make more
+          bind head
+            read d
+          bind tail
+            make root
+    case more
+      link head
+      link tail
+      send back
+        make more
+          bind head
+            read head
+          bind tail
+            call push
+              read tail
+              read d
+
+# THE PREFERRED SON, the continuator: the child whose address is the parent's address with "00" appended. Push two zero
+# bits at the deep end. Margenstern's preferred-son rule, the single uniform navigation step.
+task preferred-son
+  take a, like address
+  like address
+  send back
+    call push
+      call push
+        read a
+        make nil-bit
+      make nil-bit
+
+# Equality of two digits.
+task same-digit
+  take x, like digit
+  take y, like digit
+  like flag
+  fork case, read x
+    case nil-bit
+      fork case, read y
+        case nil-bit
+          send back
+            make yes
+        case one-bit
+          send back
+            make no
+    case one-bit
+      fork case, read y
+        case nil-bit
+          send back
+            make no
+        case one-bit
+          send back
+            make yes
+
+# Equality of two addresses, digit by digit down the path.
+task same-address
+  take a, like address
+  take b, like address
+  like flag
+  fork case, read a
+    case root
+      fork case, read b
+        case root
+          send back
+            make yes
+        case more
+          send back
+            make no
+    case more
+      link head
+      link tail
+      fork case, read b
+        case root
+          send back
+            make no
+        case more
+          link head-b, name head
+          link tail-b, name tail
+          send back
+            call both
+              call same-digit
+                read head
+                read head-b
+              call same-address
+                read tail
+                read tail-b
+
+# Is the child the preferred son of the parent? True when the child's address equals the parent's with "00" appended.
+task is-preferred-son
+  take parent, like address
+  take child, like address
+  like flag
+  send back
+    call same-address
+      read child
+      call preferred-son
+        read parent
+
+# A flag counted as a number: one for yes, zero for no. Used to count how many children pass the preferred-son test.
+task one-if-yes
+  take f, like flag
+  like natural
+  fork case, read f
+    case yes
+      send back
+        make succ
+          bind prior
+            make zero
+    case no
+      send back
+        make zero
+
+# How many of a WHITE node's three children are the preferred son. Its children extend the parent by "00", "01" and "10",
+# so this sums the preferred-son test over those three addresses.
+task white-preferred-count
+  take parent, like address
+  like natural
+  send back
+    call plus
+      call plus
+        call one-if-yes
+          call is-preferred-son
+            read parent
+            call push
+              call push
+                read parent
+                make nil-bit
+              make nil-bit
+        call one-if-yes
+          call is-preferred-son
+            read parent
+            call push
+              call push
+                read parent
+                make nil-bit
+              make one-bit
+      call one-if-yes
+        call is-preferred-son
+          read parent
+          call push
+            call push
+              read parent
+              make one-bit
+            make nil-bit
+
+# How many of a BLACK node's two children are the preferred son. Its children extend the parent by "00" and "01".
+task black-preferred-count
+  take parent, like address
+  like natural
+  send back
+    call plus
+      call one-if-yes
+        call is-preferred-son
+          read parent
+          call push
+            call push
+              read parent
+              make nil-bit
+            make nil-bit
+      call one-if-yes
+        call is-preferred-son
+          read parent
+          call push
+            call push
+              read parent
+              make nil-bit
+            make one-bit
+
+# ZECKENDORF VALIDITY: the address is legal when no two one-bits are adjacent anywhere along it. A zero bit imposes no
+# constraint and we recurse. A one bit is fine if the next bit is a zero (recurse past it) or there is no next bit, and
+# illegal the moment it is followed by another one bit. The legal addresses are exactly this regular language.
+task is-valid
+  take a, like address
+  like flag
+  fork case, read a
+    case root
+      send back
+        make yes
+    case more
+      link head
+      link tail
+      fork case, read head
+        case nil-bit
+          send back
+            call is-valid
+              read tail
+        case one-bit
+          fork case, read tail
+            case root
+              send back
+                make yes
+            case more
+              link next, name head
+              link rest, name tail
+              fork case, read next
+                case one-bit
+                  send back
+                    make no
+                case nil-bit
+                  send back
+                    call is-valid
+                      read tail
+
+# THE BLACK COUNT RECURRENCE: black(n+1) = white(n) + black(n), for every generation. Each tile of the previous
+# generation, white or black, grows exactly one new strip, so the strip population obeys the Fibonacci recurrence. True
+# by the definition of black-count.
+rule black-count-recurrence
+  mark m, like natural
+  show hold
+    call is-equal
+      call black-count
+        make succ
+          bind prior
+            read m
+      call plus
+        call white-count
+          read m
+        call black-count
+          read m
+  calm hold
+
+# THE WHITE COUNT RECURRENCE: white(n+1) = white(n) + black(n+1), for every generation. The quarter population carries
+# forward and gains the freshly grown strips. True by the definition of white-count.
+rule white-count-recurrence
+  mark m, like natural
+  show hold
+    call is-equal
+      call white-count
+        make succ
+          bind prior
+            read m
+      call plus
+        call white-count
+          read m
+        call black-count
+          make succ
+            bind prior
+              read m
+  calm hold
+
+# THE MERGED STREAM IS FIBONACCI, even slot: node at the next even slot equals the odd slot before it plus the even slot
+# before it, node even (succ j) = node odd j + node even j, which is white(j+1) = black(j+1) + white(j). The white
+# population recurrence read across the interleaving. Holds by induction with the commutativity of addition.
+rule fibonacci-stream-even-step
+  mark j, like natural
+  show hold
+    call is-equal
+      call node-count
+        make even
+        make succ
+          bind prior
+            read j
+      call plus
+        call node-count
+          make odd
+          read j
+        call node-count
+          make even
+          read j
+  fold j
+    cite plus-is-commutative
+
+# THE MERGED STREAM IS FIBONACCI, odd slot: node at the next odd slot equals the even slot before it plus the odd slot
+# before it, node odd (succ j) = node even (succ j) + node odd j, which is black(j+2) = white(j+1) + black(j+1). The
+# black population recurrence read across the interleaving. Holds by computation.
+rule fibonacci-stream-odd-step
+  mark j, like natural
+  show hold
+    call is-equal
+      call node-count
+        make odd
+        make succ
+          bind prior
+            read j
+      call plus
+        call node-count
+          make even
+          make succ
+            bind prior
+              read j
+        call node-count
+          make odd
+          read j
+  calm hold
+
+# THE PREFERRED SON PROPERTY for the WHITE 3-node: exactly one of its three children is the continuator, for EVERY parent
+# address, white-preferred-count parent = one. This is Margenstern's backbone theorem of Chapter 3, proved by structural
+# induction over the whole infinite space of addresses: the child that extends the parent by "00" matches the preferred
+# son, the children extending by "01" and "10" do not.
+rule white-node-has-exactly-one-preferred-son
+  mark parent, like address
+  show hold
+    call is-equal
+      call white-preferred-count
+        read parent
+      make succ
+        bind prior
+          make zero
+  fold parent
+
+# THE PREFERRED SON PROPERTY for the BLACK 2-node: exactly one of its two children is the continuator, for EVERY parent
+# address, black-preferred-count parent = one. The "00" child is the preferred son, the "01" child is not. Proved by
+# structural induction over all addresses.
+rule black-node-has-exactly-one-preferred-son
+  mark parent, like address
+  show hold
+    call is-equal
+      call black-preferred-count
+        read parent
+      make succ
+        bind prior
+          make zero
+  fold parent
+
+# THE PREFERRED SON OF THE ROOT is the address "00". The continuator rule applied to the empty address.
+rule preferred-son-of-root-is-zero-zero
+  show hold
+    call is-equal
+      call preferred-son
+        make root
+      make more
+        bind head
+          make nil-bit
+        bind tail
+          make more
+            bind head
+              make nil-bit
+            bind tail
+              make root
+  calm hold
+
+# A LEGAL ADDRESS IS ACCEPTED: the address "101" has no two adjacent one-bits, so the Zeckendorf validity test passes.
+rule address-one-zero-one-is-valid
+  show hold
+    call is-equal
+      call is-valid
+        make more
+          bind head
+            make one-bit
+          bind tail
+            make more
+              bind head
+                make nil-bit
+              bind tail
+                make more
+                  bind head
+                    make one-bit
+                  bind tail
+                    make root
+      make yes
+  calm hold
+
+# AN ILLEGAL ADDRESS IS REJECTED: the address "110" has two adjacent one-bits, so the validity test fails. The
+# no-two-adjacent-ones constraint is exactly what makes the Fibonacci numeration unique.
+rule address-one-one-zero-is-invalid
+  show hold
+    call is-equal
+      call is-valid
+        make more
+          bind head
+            make one-bit
+          bind tail
+            make more
+              bind head
+                make one-bit
+              bind tail
+                make more
+                  bind head
+                    make nil-bit
+                  bind tail
+                    make root
+      make no
+  calm hold

@@ -1,0 +1,306 @@
+# The F4 root system, the forty-eight roots of the exceptional rank-four algebra, the full symmetry algebra of the mesh
+# cell, modeled by the kernel. F4 has two orbits of roots, set apart by length. The twenty-four LONG roots are the vectors
+# plus-or-minus e_i plus-or-minus e_j over the four axes, exactly the twenty-four D4 roots, the vertices of the 24-cell. The
+# twenty-four SHORT roots are the eight unit axis vectors plus-or-minus e_i together with the sixteen half vectors
+# one-half (plus-or-minus e1 plus-or-minus e2 plus-or-minus e3 plus-or-minus e4). Those twenty-four short roots are the
+# vertices of the DUAL 24-cell. So F4 is the union of the 24-cell and its dual 24-cell, which is the reason the 24-cell is
+# self-dual and the reason F4 is its full symmetry, the Weyl group of order one thousand one hundred fifty-two. The antipode
+# pairs the forty-eight roots into twenty-four opposite lines. The two lengths give two orbits of twenty-four roots each,
+# each one closed under the antipode. This file constructs the roots, the antipode, the length classification, and the
+# positive system, and proves the laws that make them a root system: the antipode is an involution, it preserves length so
+# the long and short orbits are each closed, every root or its antipode is positive, and both orbits are non-empty.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find either
+
+# The forty-eight roots of F4 in three families. The LONG family is the twenty-four D4 roots, named by an axis pair (the two
+# nonzero coordinates) and a sign pattern, p for plus and m for minus, on the lower axis then the higher: long-e12-pm is
+# e1 minus e2. The SHORT family splits in two. The AXIS roots are the eight unit vectors, axis-e1-p is plus e1, axis-e3-m is
+# minus e3. The HALF roots are the sixteen vectors one-half (plus-or-minus e1 plus-or-minus e2 plus-or-minus e3
+# plus-or-minus e4), named by a sign pattern on all four axes: half-pmpm is one-half (e1 minus e2 plus e3 minus e4).
+form f4-root
+  case long-e12-pp
+  case long-e12-pm
+  case long-e12-mp
+  case long-e12-mm
+  case long-e13-pp
+  case long-e13-pm
+  case long-e13-mp
+  case long-e13-mm
+  case long-e14-pp
+  case long-e14-pm
+  case long-e14-mp
+  case long-e14-mm
+  case long-e23-pp
+  case long-e23-pm
+  case long-e23-mp
+  case long-e23-mm
+  case long-e24-pp
+  case long-e24-pm
+  case long-e24-mp
+  case long-e24-mm
+  case long-e34-pp
+  case long-e34-pm
+  case long-e34-mp
+  case long-e34-mm
+  case axis-e1-p
+  case axis-e1-m
+  case axis-e2-p
+  case axis-e2-m
+  case axis-e3-p
+  case axis-e3-m
+  case axis-e4-p
+  case axis-e4-m
+  case half-pppp
+  case half-pppm
+  case half-ppmp
+  case half-ppmm
+  case half-pmpp
+  case half-pmpm
+  case half-pmmp
+  case half-pmmm
+  case half-mppp
+  case half-mppm
+  case half-mpmp
+  case half-mpmm
+  case half-mmpp
+  case half-mmpm
+  case half-mmmp
+  case half-mmmm
+
+# TEMPLATE: one entry of a single-valued map out of a root, `from` sent to the construction `to`. One definition serves the
+# antipode, the length test, and the positive-system test, so each map reads as its permutation or value table.
+tree map-root
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# The antipode: negate a root, the point reflection through the origin. It flips every sign, carrying each long root to the
+# opposite long root, each axis root to the opposite axis root, and each half root to the half root with all four signs
+# flipped. So it pairs the forty-eight roots into twenty-four opposite lines, and each length orbit maps onto itself.
+task negate
+  take r, like f4-root
+  like f4-root
+  fork case, read r
+    fuse map-root, long-e12-pp, long-e12-mm
+    fuse map-root, long-e12-pm, long-e12-mp
+    fuse map-root, long-e12-mp, long-e12-pm
+    fuse map-root, long-e12-mm, long-e12-pp
+    fuse map-root, long-e13-pp, long-e13-mm
+    fuse map-root, long-e13-pm, long-e13-mp
+    fuse map-root, long-e13-mp, long-e13-pm
+    fuse map-root, long-e13-mm, long-e13-pp
+    fuse map-root, long-e14-pp, long-e14-mm
+    fuse map-root, long-e14-pm, long-e14-mp
+    fuse map-root, long-e14-mp, long-e14-pm
+    fuse map-root, long-e14-mm, long-e14-pp
+    fuse map-root, long-e23-pp, long-e23-mm
+    fuse map-root, long-e23-pm, long-e23-mp
+    fuse map-root, long-e23-mp, long-e23-pm
+    fuse map-root, long-e23-mm, long-e23-pp
+    fuse map-root, long-e24-pp, long-e24-mm
+    fuse map-root, long-e24-pm, long-e24-mp
+    fuse map-root, long-e24-mp, long-e24-pm
+    fuse map-root, long-e24-mm, long-e24-pp
+    fuse map-root, long-e34-pp, long-e34-mm
+    fuse map-root, long-e34-pm, long-e34-mp
+    fuse map-root, long-e34-mp, long-e34-pm
+    fuse map-root, long-e34-mm, long-e34-pp
+    fuse map-root, axis-e1-p, axis-e1-m
+    fuse map-root, axis-e1-m, axis-e1-p
+    fuse map-root, axis-e2-p, axis-e2-m
+    fuse map-root, axis-e2-m, axis-e2-p
+    fuse map-root, axis-e3-p, axis-e3-m
+    fuse map-root, axis-e3-m, axis-e3-p
+    fuse map-root, axis-e4-p, axis-e4-m
+    fuse map-root, axis-e4-m, axis-e4-p
+    fuse map-root, half-pppp, half-mmmm
+    fuse map-root, half-pppm, half-mmmp
+    fuse map-root, half-ppmp, half-mmpm
+    fuse map-root, half-ppmm, half-mmpp
+    fuse map-root, half-pmpp, half-mpmm
+    fuse map-root, half-pmpm, half-mpmp
+    fuse map-root, half-pmmp, half-mppm
+    fuse map-root, half-pmmm, half-mppp
+    fuse map-root, half-mppp, half-pmmm
+    fuse map-root, half-mppm, half-pmmp
+    fuse map-root, half-mpmp, half-pmpm
+    fuse map-root, half-mpmm, half-pmpp
+    fuse map-root, half-mmpp, half-ppmm
+    fuse map-root, half-mmpm, half-ppmp
+    fuse map-root, half-mmmp, half-pppm
+    fuse map-root, half-mmmm, half-pppp
+
+# The length classification: yes for a LONG root, no for a SHORT root. The twenty-four long roots have squared length two,
+# the twenty-four short roots have squared length one. This flag names the two orbits, each of size twenty-four, and the
+# proof below shows the antipode preserves it, so each orbit is closed under negation.
+task is-long
+  take r, like f4-root
+  like flag
+  fork case, read r
+    fuse map-root, long-e12-pp, yes
+    fuse map-root, long-e12-pm, yes
+    fuse map-root, long-e12-mp, yes
+    fuse map-root, long-e12-mm, yes
+    fuse map-root, long-e13-pp, yes
+    fuse map-root, long-e13-pm, yes
+    fuse map-root, long-e13-mp, yes
+    fuse map-root, long-e13-mm, yes
+    fuse map-root, long-e14-pp, yes
+    fuse map-root, long-e14-pm, yes
+    fuse map-root, long-e14-mp, yes
+    fuse map-root, long-e14-mm, yes
+    fuse map-root, long-e23-pp, yes
+    fuse map-root, long-e23-pm, yes
+    fuse map-root, long-e23-mp, yes
+    fuse map-root, long-e23-mm, yes
+    fuse map-root, long-e24-pp, yes
+    fuse map-root, long-e24-pm, yes
+    fuse map-root, long-e24-mp, yes
+    fuse map-root, long-e24-mm, yes
+    fuse map-root, long-e34-pp, yes
+    fuse map-root, long-e34-pm, yes
+    fuse map-root, long-e34-mp, yes
+    fuse map-root, long-e34-mm, yes
+    fuse map-root, axis-e1-p, no
+    fuse map-root, axis-e1-m, no
+    fuse map-root, axis-e2-p, no
+    fuse map-root, axis-e2-m, no
+    fuse map-root, axis-e3-p, no
+    fuse map-root, axis-e3-m, no
+    fuse map-root, axis-e4-p, no
+    fuse map-root, axis-e4-m, no
+    fuse map-root, half-pppp, no
+    fuse map-root, half-pppm, no
+    fuse map-root, half-ppmp, no
+    fuse map-root, half-ppmm, no
+    fuse map-root, half-pmpp, no
+    fuse map-root, half-pmpm, no
+    fuse map-root, half-pmmp, no
+    fuse map-root, half-pmmm, no
+    fuse map-root, half-mppp, no
+    fuse map-root, half-mppm, no
+    fuse map-root, half-mpmp, no
+    fuse map-root, half-mpmm, no
+    fuse map-root, half-mmpp, no
+    fuse map-root, half-mmpm, no
+    fuse map-root, half-mmmp, no
+    fuse map-root, half-mmmm, no
+
+# The positive system: a root is positive when its first nonzero coordinate is plus. For a long root that is the sign of the
+# lower axis. For an axis root it is the lone sign. For a half root, all four coordinates are nonzero, so it is the sign of
+# the first axis, the leading letter of the pattern. Twenty-four roots are positive and twenty-four negative, the antipode
+# of each positive root.
+task is-positive
+  take r, like f4-root
+  like flag
+  fork case, read r
+    fuse map-root, long-e12-pp, yes
+    fuse map-root, long-e12-pm, yes
+    fuse map-root, long-e12-mp, no
+    fuse map-root, long-e12-mm, no
+    fuse map-root, long-e13-pp, yes
+    fuse map-root, long-e13-pm, yes
+    fuse map-root, long-e13-mp, no
+    fuse map-root, long-e13-mm, no
+    fuse map-root, long-e14-pp, yes
+    fuse map-root, long-e14-pm, yes
+    fuse map-root, long-e14-mp, no
+    fuse map-root, long-e14-mm, no
+    fuse map-root, long-e23-pp, yes
+    fuse map-root, long-e23-pm, yes
+    fuse map-root, long-e23-mp, no
+    fuse map-root, long-e23-mm, no
+    fuse map-root, long-e24-pp, yes
+    fuse map-root, long-e24-pm, yes
+    fuse map-root, long-e24-mp, no
+    fuse map-root, long-e24-mm, no
+    fuse map-root, long-e34-pp, yes
+    fuse map-root, long-e34-pm, yes
+    fuse map-root, long-e34-mp, no
+    fuse map-root, long-e34-mm, no
+    fuse map-root, axis-e1-p, yes
+    fuse map-root, axis-e1-m, no
+    fuse map-root, axis-e2-p, yes
+    fuse map-root, axis-e2-m, no
+    fuse map-root, axis-e3-p, yes
+    fuse map-root, axis-e3-m, no
+    fuse map-root, axis-e4-p, yes
+    fuse map-root, axis-e4-m, no
+    fuse map-root, half-pppp, yes
+    fuse map-root, half-pppm, yes
+    fuse map-root, half-ppmp, yes
+    fuse map-root, half-ppmm, yes
+    fuse map-root, half-pmpp, yes
+    fuse map-root, half-pmpm, yes
+    fuse map-root, half-pmmp, yes
+    fuse map-root, half-pmmm, yes
+    fuse map-root, half-mppp, no
+    fuse map-root, half-mppm, no
+    fuse map-root, half-mpmp, no
+    fuse map-root, half-mpmm, no
+    fuse map-root, half-mmpp, no
+    fuse map-root, half-mmpm, no
+    fuse map-root, half-mmmp, no
+    fuse map-root, half-mmmm, no
+
+# THE ANTIPODE IS AN INVOLUTION: negate (negate r) = r. The root set is symmetric about the origin, so the forty-eight roots
+# really do split into twenty-four opposite lines. Proved over all forty-eight roots.
+rule negate-is-an-involution
+  mark r, like f4-root
+  show hold
+    call is-equal
+      call negate, read r
+        link negate
+      read r
+  fold r
+
+# THE ANTIPODE PRESERVES LENGTH: is-long (negate r) = is-long r, for every root. The antipode of a long root is long and the
+# antipode of a short root is short, so the long orbit and the short orbit, each of twenty-four roots, are each CLOSED under
+# negation. This is what lets the two orbits be the 24-cell and its dual 24-cell, swapped into themselves by the antipode.
+rule negate-preserves-length
+  mark r, like f4-root
+  show hold
+    call is-equal
+      call negate, read r
+        link is-long
+      call is-long
+        read r
+  fold r
+
+# EVERY ROOT OR ITS ANTIPODE IS POSITIVE: either (is-positive r) (is-positive (negate r)) = yes, for every root. This is what
+# splits the forty-eight roots into the twenty-four positive roots and their twenty-four antipodes, the twenty-four lines.
+rule every-root-or-its-antipode-is-positive
+  mark r, like f4-root
+  show hold
+    call is-equal
+      call either
+        call is-positive
+          read r
+        call negate, read r
+          link is-positive
+      make yes
+  fold r
+
+# BOTH ORBITS ARE NON-EMPTY AND DISTINCT: a long root tests long and a short root tests short, so the two orbits of the
+# classification really are both inhabited and the long and short lengths genuinely differ. A concrete witness for each.
+rule a-long-root-is-long
+  show hold
+    call is-equal
+      call is-long
+        make long-e12-pp
+      make yes
+  calm hold
+
+rule a-short-root-is-short
+  show hold
+    call is-equal
+      call is-long
+        make half-pppp
+      make no
+  calm hold

@@ -1,0 +1,504 @@
+# The lambda calculus, the foundation of functional computation, modeled and RUN by the kernel. Where the SKI combinators
+# (computation/combinator.tree) compute with three variable-free constants, the lambda calculus computes with BOUND
+# VARIABLES and substitution. A term is one of three shapes: a variable, a lambda abstraction (an anonymous function of
+# one argument), or an application of one term to another. The single computation rule is BETA REDUCTION: applying a
+# lambda to an argument substitutes that argument into the lambda's body. These two systems are the two halves of the
+# same theory. Every lambda term translates to an SKI combinator term and back, so they compute exactly the same
+# functions, and both are Turing-complete. The lambda calculus is the named-variable face, SKI the variable-free face.
+#
+# DE BRUIJN INDICES. Naming bound variables invites capture: substituting a term that mentions `x` into a lambda that
+# also binds `x` silently changes its meaning. De Bruijn indices remove names entirely. A variable is a natural number
+# counting how many lambdas lie between its use and the lambda that binds it. Index 0 is the nearest enclosing lambda,
+# index 1 the one outside that, and so on. The identity function `lambda x . x` becomes `lambda (variable 0)`. The
+# constant function `lambda x . lambda y . x` becomes `lambda (lambda (variable 1))`: inside two lambdas, the outer
+# binder is one level out, so it is index 1. With indices there are no names to capture, so substitution is purely
+# mechanical: it only has to renumber the free indices as terms cross lambda boundaries.
+#
+# BETA REDUCTION. `apply (lambda body) arg` reduces to `substitute body arg`: the argument is dropped in for index 0
+# throughout the body, every other free index is decremented by one (its binder is gone), and indices inside the argument
+# are shifted up as it descends under lambdas. The `shift` and `substitute` tasks below are that machinery, written total
+# (every index case handled). The reducer is FUEL-BOUNDED: `reduce` applies a leftmost-outermost head `step` a fixed
+# number of times, so it always halts and the kernel computes normal forms. This is the same fuel discipline as
+# combinator.tree's `reduce`, and it lets every law below check by the kernel reducing both sides to one normal form.
+
+# A natural number: zero, or the successor of a natural. Used for de Bruijn indices AND for reduction fuel.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# A lambda term in de Bruijn form: a variable (an index counting enclosing lambdas), a lambda (an anonymous one-argument
+# function wrapping a body term), or an application of a function term to an argument term.
+form term
+  case variable
+    link index, like natural
+  case lambda
+    link body, like term
+  case apply
+    link function, like term
+    link argument, like term
+
+# a two-case truth value, defined locally as a matchable form so the kernel unfolds it under `fork case` (the native
+# boolean does not reduce through the proof checker). yes means the test holds, no means it does not.
+form flag
+  case yes
+  case no
+
+# a three-way comparison result: the left is below, equal to, or above the right.
+form ordering
+  case below
+  case equal
+  case above
+
+# compare two naturals three ways, by recursion on both. zero vs zero is equal, zero vs succ is below, succ vs zero is
+# above, and succ vs succ strips one level off each. Total and terminating (descends on both arguments together).
+task compare
+  take a, like natural
+  take b, like natural
+  like ordering
+  fork case, read a
+    case zero
+      fork case, read b
+        case zero
+          send back
+            make equal
+        case succ
+          send back
+            make below
+    case succ
+      link a-prior
+      fork case, read b
+        case zero
+          send back
+            make above
+        case succ
+          link b-prior
+          send back
+            call compare
+              read a-prior
+              read b-prior
+
+# is the index `i` at least the cutoff `c`? (c <= i). yes when comparing i to c gives equal or above, no when below.
+# Decides whether an index is FREE relative to a cutoff, the test `shift` needs at each variable.
+task at-least
+  take i, like natural
+  take c, like natural
+  like flag
+  send back
+    call at-or-above
+      call compare
+        read i
+        read c
+
+# is an ordering equal-or-above? (the "at least" test, separated so its scrutinee is a plain matched value).
+task at-or-above
+  take order, like ordering
+  like flag
+  fork case, read order
+    case below
+      send back
+        make no
+    case equal
+      send back
+        make yes
+    case above
+      send back
+        make yes
+
+# shift every FREE index in a term up by one, where "free" means at-or-above the cutoff `c`. Bound indices (those below
+# the cutoff, introduced by lambdas inside the term) are left alone. Descending under a lambda raises the cutoff by one.
+# This is the renumbering that keeps an argument's free variables pointing at the right binders as it moves under lambdas
+# during substitution. Total: every variable either shifts or stays, and the structural cases recurse on smaller terms.
+task shift
+  take c, like natural
+  take t, like term
+  like term
+  fork case, read t
+    case variable
+      send back
+        call shift-variable
+          call at-least
+            read index
+            read c
+          read index
+    case lambda
+      send back
+        make lambda
+          bind body
+            call shift
+              make succ
+                bind prior
+                  read c
+              read body
+    case apply
+      link shift-function
+      link shift-argument
+      send back
+        make apply
+          bind function
+            call shift
+              read c
+              read shift-function
+          bind argument
+            call shift
+              read c
+              read shift-argument
+
+# rebuild a variable after the shift test: yes increments the index (it is free, so it shifts up), no leaves it (it is
+# bound below the cutoff). Split out so the dispatch matches a plain flag, which the kernel unfolds transparently.
+task shift-variable
+  take move, like flag
+  take index, like natural
+  like term
+  fork case, read move
+    case yes
+      send back
+        make variable
+          bind index
+            make succ
+              bind prior
+                read index
+    case no
+      send back
+        make variable
+          bind index
+            read index
+
+# substitute the term `value` for the de Bruijn index `depth` throughout `t`. At a variable: if it equals `depth` the
+# value is dropped in (shifted up `depth` times on the way down, here `value` is pre-shifted by the caller at depth 0 and
+# re-shifted under each lambda); if it is a free index above `depth` it is decremented by one (the binder it counted past
+# is being removed); otherwise it is left unchanged. Descending under a lambda raises `depth` by one and shifts `value`
+# up by one so its free variables keep pointing outward. Beta reduction calls this at depth zero. Total over every index.
+task substitute
+  take depth, like natural
+  take value, like term
+  take t, like term
+  like term
+  fork case, read t
+    case variable
+      send back
+        call substitute-variable
+          read depth
+          read value
+          read index
+    case lambda
+      send back
+        make lambda
+          bind body
+            call substitute
+              make succ
+                bind prior
+                  read depth
+              call shift
+                make zero
+                read value
+              read body
+    case apply
+      send back
+        make apply
+          bind function
+            call substitute
+              read depth
+              read value
+              read function
+          bind argument
+            call substitute
+              read depth
+              read value
+              read argument
+
+# the predecessor of a natural (the index minus one), defaulting zero's predecessor to zero. Used to decrement a free
+# index whose binder is being removed by the substitution.
+task predecessor
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      send back
+        read prior
+
+# substitute at a single variable index, comparing it against the substitution depth three ways. EQUAL means the index
+# is the one being substituted, so the value is dropped in unchanged. ABOVE means a free index past the removed binder,
+# so it is decremented by one. BELOW means an index bound inside the body, left unchanged. This is the clean, total
+# de Bruijn variable rule, with no renumbering of the value itself (the lambda case already shifts the value as it
+# descends).
+task substitute-variable
+  take depth, like natural
+  take value, like term
+  take index, like natural
+  like term
+  send back
+    call dispatch-substitution
+      call compare
+        read index
+        read depth
+      read value
+      read index
+
+# dispatch on the three-way comparison of the index against the substitution depth. EQUAL means the index is the one
+# being substituted, so the value is dropped in unchanged. ABOVE means a free index past the removed binder, so it is
+# decremented. BELOW means an index bound inside the body, left unchanged. Split out from substitute-variable so the
+# scrutinee is a plain matched value, which the kernel unfolds transparently.
+task dispatch-substitution
+  take order, like ordering
+  take value, like term
+  take index, like natural
+  like term
+  fork case, read order
+    case equal
+      send back
+        read value
+    case above
+      send back
+        make variable
+          bind index
+            call predecessor
+              read index
+    case below
+      send back
+        make variable
+          bind index
+            read index
+
+# ONE leftmost-outermost head beta reduction step. The only redex is an application whose function is a lambda:
+# `apply (lambda body) arg` fires to `substitute 0 arg body`. If the function is not yet a lambda, the step reduces the
+# function part (walking down the left spine toward the head), keeping the argument in place. A bare variable or a lambda
+# has no head redex and is returned unchanged, so the step is total.
+task step
+  take t, like term
+  like term
+  fork case, read t
+    case variable
+      send back
+        read t
+    case lambda
+      send back
+        read t
+    case apply
+      link head-function
+      link head-argument
+      fork case, read head-function
+        case lambda
+          # the beta redex: substitute the argument for index 0 in the lambda's body.
+          link lambda-body
+          send back
+            call substitute
+              make zero
+              read head-argument
+              read lambda-body
+        case variable
+          send back
+            read t
+        case apply
+          # head redex lies deeper: reduce the function part, keep the argument.
+          send back
+            make apply
+              bind function
+                call step
+                  read head-function
+              bind argument
+                read head-argument
+
+# the fuel-bounded normalizer: apply `step` exactly `n` times. The fuel strictly decreases, so `reduce` always halts and
+# the kernel computes it on any concrete term, checking the equations below by reflexivity. Mirrors combinator.tree.
+task reduce
+  take n, like natural
+  take t, like term
+  like term
+  fork case, read n
+    case zero
+      send back
+        read t
+    case succ
+      link fuel-prior
+      send back
+        call reduce
+          read fuel-prior
+          call step
+            read t
+
+# UNIVERSAL: zero fuel reduces nothing. reduce zero t = t, for every term t. The base of the normalizer, definitional.
+rule reduce-zero-is-identity
+  mark t, like term
+  show hold
+    call is-equal
+      call reduce
+        make zero
+        read t
+      read t
+  calm hold
+
+# THE IDENTITY APPLIED. `(lambda (variable 0)) x` beta-reduces to `x` in one step, for a concrete argument x (here the
+# identity itself). This is `lambda x . x` run on an argument: substitute the argument for index 0 in the body `variable
+# 0`, which is exactly the argument. The defining computation of the lambda calculus.
+rule identity-applied-returns-its-argument
+  show hold
+    call is-equal
+      call step
+        make apply
+          bind function
+            make lambda
+              bind body
+                make variable
+                  bind index
+                    make zero
+          bind argument
+            make lambda
+              bind body
+                make variable
+                  bind index
+                    make zero
+      make lambda
+        bind body
+          make variable
+            bind index
+              make zero
+  calm hold
+
+# UNIVERSAL: the identity fires on ANY argument. step (apply (lambda (variable 0)) x) = x, for every term x. This is the
+# law `(lambda x . x) y = y` in full generality, not just a concrete instance: the body `variable 0` substitutes to the
+# argument unchanged for every x.
+rule identity-beta-reduces-any-argument
+  mark x, like term
+  show hold
+    call is-equal
+      call step
+        make apply
+          bind function
+            make lambda
+              bind body
+                make variable
+                  bind index
+                    make zero
+          bind argument
+            read x
+      read x
+  calm hold
+
+# THE CHURCH K COMBINATOR, the constant function `lambda x . lambda y . x`, in de Bruijn form `lambda (lambda (variable
+# 1))`: inside two lambdas, the outer binder is one level out, so the body is index 1. Applied to two arguments it returns
+# the FIRST and discards the second, matching SKI's K (combinator.tree's k-discards-its-second-argument). Here K applied
+# to (variable 0) and (variable 1) reduces in two head steps to the first argument (variable 0). The matching SKI rule is
+# K a b = a, the same constant-selection behaviour reached through substitution instead of a primitive rewrite.
+rule church-k-keeps-the-first-argument
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make apply
+          bind function
+            make apply
+              bind function
+                make lambda
+                  bind body
+                    make lambda
+                      bind body
+                        make variable
+                          bind index
+                            make succ
+                              bind prior
+                                make zero
+              bind argument
+                make variable
+                  bind index
+                    make zero
+          bind argument
+            make variable
+              bind index
+                make succ
+                  bind prior
+                    make zero
+      make variable
+        bind index
+          make zero
+  calm hold
+
+# CHURCH BOOLEANS, the lambda-calculus selectors. true = `lambda x . lambda y . x` = `lambda (lambda (variable 1))` (it
+# is literally the K combinator above) and false = `lambda x . lambda y . y` = `lambda (lambda (variable 0))`. An
+# if-then-else is the boolean applied to two branches, `b then else`, picking the then-branch when true and the else when
+# false. The two rules below RUN that program on concrete branches and show it selects correctly: a real lambda program.
+
+# if true then a else b = a. With true = lambda (lambda (variable 1)), the term (true a) b reduces to a (here a =
+# variable 0, b = variable 1) in two head steps. The same selection SKI does with true = K.
+rule church-true-selects-the-then-branch
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make apply
+          bind function
+            make apply
+              bind function
+                make lambda
+                  bind body
+                    make lambda
+                      bind body
+                        make variable
+                          bind index
+                            make succ
+                              bind prior
+                                make zero
+              bind argument
+                make variable
+                  bind index
+                    make zero
+          bind argument
+            make variable
+              bind index
+                make succ
+                  bind prior
+                    make zero
+      make variable
+        bind index
+          make zero
+  calm hold
+
+# if false then a else b = b. With false = lambda (lambda (variable 0)), the term (false a) b reduces to b (here a =
+# variable 0, b = variable 1) in two head steps. The same selection SKI does with false = K I.
+rule church-false-selects-the-else-branch
+  show hold
+    call is-equal
+      call reduce
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+        make apply
+          bind function
+            make apply
+              bind function
+                make lambda
+                  bind body
+                    make lambda
+                      bind body
+                        make variable
+                          bind index
+                            make zero
+              bind argument
+                make variable
+                  bind index
+                    make zero
+          bind argument
+            make variable
+              bind index
+                make succ
+                  bind prior
+                    make zero
+      make variable
+        bind index
+          make succ
+            bind prior
+              make zero
+  calm hold

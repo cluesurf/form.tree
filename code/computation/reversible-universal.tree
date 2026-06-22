@@ -1,0 +1,276 @@
+# The Toffoli gate and the UNIVERSALITY of reversible computation, modeled and proved by the kernel. Ordinary boolean
+# gates like AND and NAND throw information away: from a single output bit you cannot recover the two inputs, so they are
+# not reversible. The Toffoli gate (the controlled-controlled-NOT) repairs this. It takes three bits (a, b, c) and returns
+# (a, b, c xor (a and b)): the two controls pass through untouched and the target is flipped exactly when both controls are
+# on. Because the controls survive, the map is a bijection on the eight states, so it runs backward, and in fact it is its
+# OWN inverse. The remarkable fact this file proves is that this one reversible gate is UNIVERSAL for classical computation.
+# Feeding it constants on the spare wires recovers each ordinary gate: a blank target computes AND, two on controls compute
+# NOT, an on control copies (FANS OUT) a bit onto a blank target, and an on target computes NAND. Since AND and NOT alone
+# generate every boolean function, the Toffoli gate alone computes everything any circuit can, with no information ever
+# lost. The kernel discharges every claim by exhaustive induction over the bits (`fold`), the discrete heart of why a
+# reversible (and hence a quantum) computer is exactly as powerful as an irreversible one.
+
+# A bit, the unit of classical information: off or on.
+form bit
+  case off
+  case on
+
+# Negation: turn a bit to its opposite. The NOT gate, reversible on its own.
+task not-bit
+  take a, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Conjunction: on exactly when both bits are on. The AND gate, NOT reversible on its own (three inputs map to off).
+task and-bit
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make off
+    case on
+      send back
+        read b
+
+# Exclusive or: on exactly when the two bits differ. Its defining property is being its own inverse, which is what makes
+# the Toffoli target reversible: flipping the target by the same control twice cancels.
+task xor-bit
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      send back
+        call not-bit
+          read b
+
+# Not-and: on unless both bits are on. NAND is universal on its own for irreversible circuits, and the Toffoli gate
+# computes it directly with an on target, the bridge to that classical universality.
+task nand-bit
+  take a, like bit
+  take b, like bit
+  like bit
+  send back
+    call not-bit
+      call and-bit
+        read a
+        read b
+
+# A triple: the three wires the Toffoli gate acts on, two controls and a target.
+form triple
+  case wires
+    link first, like bit
+    link second, like bit
+    link target, like bit
+
+# Read the target wire out of a triple, the output line every universality result inspects.
+task target-of
+  take t, like triple
+  like bit
+  fork case, read t
+    case wires
+      link first
+      link second
+      link target
+      send back
+        read target
+
+# Read the first control wire out of a triple, used to show the controls pass through undisturbed.
+task first-of
+  take t, like triple
+  like bit
+  fork case, read t
+    case wires
+      link first
+      link second
+      link target
+      send back
+        read first
+
+# The Toffoli gate, the controlled-controlled-NOT: keep both controls, flip the target when BOTH controls are on. The
+# target becomes target xor (first and second). This is the whole gate, and everything below is a corollary of this line.
+task toffoli
+  take t, like triple
+  like triple
+  fork case, read t
+    case wires
+      link first
+      link second
+      link target
+      send back
+        make wires
+          bind first
+            read first
+          bind second
+            read second
+          bind target
+            call xor-bit
+              read target
+              call and-bit
+                read first
+                read second
+
+# TEMPLATE: run the Toffoli gate on a triple built from two control bits and a fixed target constant, then read the target
+# wire out. Every universality corollary feeds the gate two marked controls and one constant target, so this single
+# template captures the shared shape and the corollaries differ only in which target constant they supply.
+tree probe-target
+  take const
+
+  hook fuse
+    call target-of
+      call toffoli
+        make wires
+          bind first
+            read a
+          bind second
+            read b
+          bind target
+            make {const}
+
+# THE TOFFOLI GATE IS ITS OWN INVERSE: toffoli (toffoli t) = t, for every one of the eight triples. The two controls pass
+# through, and the target is flipped by the same control product twice, which cancels. So the gate is reversible and a
+# computer built from it can always be run backward, losing no information. Proved by induction over all three bits.
+rule toffoli-is-its-own-inverse
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call toffoli
+        call toffoli
+          make wires
+            bind first
+              read a
+            bind second
+              read b
+            bind target
+              read c
+      make wires
+        bind first
+          read a
+        bind second
+          read b
+        bind target
+          read c
+  fold a, b, c
+
+# TOFFOLI COMPUTES AND: with the target set to off, the target output is exactly a and b. The blank wire collects the
+# conjunction of the two controls, so the universal reversible gate contains the AND gate. Proved over all four control
+# settings.
+rule toffoli-computes-and
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      fuse probe-target, off
+      call and-bit
+        read a
+        read b
+  fold a, b
+
+# TOFFOLI COMPUTES NAND: with the target set to on, the target output is the not-and of the two controls. NAND alone is
+# universal for ordinary circuits, so this single setting already witnesses classical universality. Proved over all four
+# control settings.
+rule toffoli-computes-nand
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      fuse probe-target, on
+      call nand-bit
+        read a
+        read b
+  fold a, b
+
+# TOFFOLI COMPUTES NOT: with both controls on, the target is flipped, so the target output is not c. Driving the controls
+# high turns the gate into the NOT gate acting on the target. Proved over both target values.
+rule toffoli-computes-not
+  mark c, like bit
+  show hold
+    call is-equal
+      call target-of
+        call toffoli
+          make wires
+            bind first
+              make on
+            bind second
+              make on
+            bind target
+              read c
+      call not-bit
+        read c
+  fold c
+
+# TOFFOLI FANS OUT (COPIES) A BIT: with the second control on and the target off, the target output equals the first
+# control. A blank wire receives a copy of the control, the FANOUT a reversible circuit needs to reuse a value. Proved over
+# both values of the copied bit.
+rule toffoli-fans-out
+  mark a, like bit
+  show hold
+    call is-equal
+      call target-of
+        call toffoli
+          make wires
+            bind first
+              read a
+            bind second
+              make on
+            bind target
+              make off
+      read a
+  fold a
+
+# THE CONTROLS ARE NEVER DISTURBED: the first output wire of the gate is always the first input, whatever the other bits
+# are. This is the structural reason the gate is reversible (the inputs are recoverable from the outputs) and the reason
+# the control lines can carry data straight through a circuit. Proved over all eight inputs.
+rule toffoli-preserves-the-first-control
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call first-of
+        call toffoli
+          make wires
+            bind first
+              read a
+            bind second
+              read b
+            bind target
+              read c
+      read a
+  fold a, b, c
+
+# UNIVERSALITY, ASSEMBLED: the gate computes both NOT (controls high) and AND (target blank), and AND with NOT generate
+# every boolean function, so the Toffoli gate alone computes every boolean function, reversibly. As a concrete witness that
+# the two pieces compose, building NAND by hand from the gate's AND output and the gate's NOT equals the direct NAND, for
+# all four control settings. This closes the loop from the single reversible gate to all of classical computation.
+rule and-then-not-is-nand
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      call target-of
+        call toffoli
+          make wires
+            bind first
+              make on
+            bind second
+              make on
+            bind target
+              fuse probe-target, off
+      call nand-bit
+        read a
+        read b
+  fold a, b

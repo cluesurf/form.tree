@@ -1,10 +1,286 @@
-load @cluesurf/form/code/structure/set
-  find set
+# INTERACTION COMBINATORS, Lafont's universal model of associative and parallel computation, modeled and proved by the
+# kernel. Computation is a graph of AGENTS joined by wires. Every agent has one principal port and some auxiliary ports.
+# There are exactly three agent kinds: the CONSTRUCTOR (gamma), the DUPLICATOR (delta), and the ERASER (epsilon). The
+# whole of computation is the rewriting of an ACTIVE PAIR, two agents whose principal ports are wired to each other.
+#
+# An active pair rewrites by one of two local rules, fixed once and for all:
+# ANNIHILATION, when the two agents are the SAME kind. They cancel, and their auxiliary ports are wired straight through
+# to each other. A gamma against a gamma, a delta against a delta, an eraser against an eraser, all vanish to plain wires,
+# producing no new agent.
+# COMMUTATION, when the two agents are DIFFERENT kinds. They pass through each other, each one duplicating across the
+# other's auxiliary ports. A two-port agent meeting a two-port agent leaves FOUR agents behind, cross-wired.
+#
+# These two rules are strongly confluent, so the order of rewrites never changes the normal form. Each wire is used
+# exactly once, which is the linear discipline of the kernel and the substrate. Interaction nets are this rewriting read
+# as graph reduction, and the HVM runtime is interaction combinators executed in parallel. This file models the LOCAL
+# RULE on a single active pair, not the whole graph: which kinds annihilate, which commute, and the agent count each
+# rewrite leaves, with the conservation and symmetry laws proved by the kernel.
+load @cluesurf/form/code/atom/flag
+  find flag
+  find either
 
-# An interaction net: a model of computation by local graph rewriting, where agents joined at ports rewrite two at a
-# time by fixed interaction rules, strongly confluent so the order of rewrites never changes the result. Interaction
-# nets are inherently parallel and LINEAR (each wire is used exactly once), which is exactly the linear multiplicity of
-# the kernel and exactly the discipline the substrate runs on. They are the runtime the vibe language compiles to. The
-# form carries the set of agents; the ports and interaction rules are the net.
-form interaction-net
-  link agents, like set
+# The three agent kinds of the interaction-combinator alphabet. The constructor builds and applies, the duplicator copies,
+# the eraser deletes. Three is the whole alphabet: Lafont proved these three agents are universal, computing any
+# interaction net.
+form agent
+  case constructor
+  case duplicator
+  case eraser
+
+# An ACTIVE PAIR, the unit the local rule acts on: two agents wired principal port to principal port. This is the only
+# place a rewrite can fire. The pair is unordered, which the symmetry laws below make exact.
+form pair
+  case face
+    link one, like agent
+    link two, like agent
+
+# The rewrite class of an active pair: ANNIHILATE when the two agents are the same kind, COMMUTE when they differ. These
+# are the only two outcomes, the two rules of the model.
+form interaction
+  case annihilate
+  case commute
+
+# The agent count an active pair leaves after its rewrite. Annihilation leaves NONE (the agents vanish to wires).
+# Commutation leaves FOUR (each agent duplicates across the other). The input pair always holds TWO agents, so this enum
+# carries the three counts the conservation law compares: none, two, four.
+form count
+  case none
+  case two
+  case four
+
+# TEMPLATE: one row of a nine-entry agent table, keyed on the first agent. For a fixed first agent give the value against
+# each of the three second agents. One definition serves the same-kind test below as its full three-by-three table.
+tree agent-row
+  take head
+  take at-constructor
+  take at-duplicator
+  take at-eraser
+
+  hook fuse
+    case {head}
+      fork case, read two
+        case constructor
+          send back
+            make {at-constructor}
+        case duplicator
+          send back
+            make {at-duplicator}
+        case eraser
+          send back
+            make {at-eraser}
+
+# SAME KIND: whether two agents are the same agent kind, the test the annihilation rule fires on. Yes exactly on the
+# diagonal of the three-by-three table, no off it.
+task same-type
+  take one, like agent
+  take two, like agent
+  like flag
+  fork case, read one
+    fuse agent-row, constructor, yes, no, no
+    fuse agent-row, duplicator, no, yes, no
+    fuse agent-row, eraser, no, no, yes
+
+# Classify a same-kind flag as an interaction outcome: yes annihilates, no commutes. The shared bridge from the same-kind
+# test to the rewrite class, so the rule and the count read the one table once.
+task interaction-of-same
+  take is-same, like flag
+  like interaction
+  fork case, read is-same
+    case yes
+      send back
+        make annihilate
+    case no
+      send back
+        make commute
+
+# Classify a same-kind flag as the agent count after the rewrite: yes leaves none, no leaves four.
+task count-of-same
+  take is-same, like flag
+  like count
+  fork case, read is-same
+    case yes
+      send back
+        make none
+    case no
+      send back
+        make four
+
+# THE LOCAL REWRITE RULE: classify an active pair. Same kind annihilates, different kind commutes. This is the entire
+# dynamics of interaction combinators read on one active pair.
+task interact
+  take p, like pair
+  like interaction
+  fork case, read p
+    case face
+      link one
+      link two
+      send back
+        call same-type
+          read one
+          read two
+          link interaction-of-same
+
+# THE AGENT COUNT AFTER A REWRITE: how many agents the active pair leaves once its rule has fired. Annihilation leaves
+# none, commutation leaves four. This is the computable count the conservation law below tracks toward a normal form.
+task agent-count-after
+  take p, like pair
+  like count
+  fork case, read p
+    case face
+      link one
+      link two
+      send back
+        call same-type
+          read one
+          read two
+          link count-of-same
+
+# Read a count as a flag of being below two: none is below two, two and four are not. Used to state that annihilation
+# strictly shrinks the active pair from its two input agents.
+task is-below-two
+  take c, like count
+  like flag
+  fork case, read c
+    case none
+      send back
+        make yes
+    case two
+      send back
+        make no
+    case four
+      send back
+        make no
+
+# Read a count as a flag of being above two: four is above two, none and two are not. Used to state that commutation
+# strictly grows the active pair from its two input agents.
+task is-above-two
+  take c, like count
+  like flag
+  fork case, read c
+    case none
+      send back
+        make no
+    case two
+      send back
+        make no
+    case four
+      send back
+        make yes
+
+# Build the active pair of two agents, a small helper so the laws read as statements about agent pairs.
+task active-pair
+  take one, like agent
+  take two, like agent
+  like pair
+  send back
+    make face
+      bind one
+        read one
+      bind two
+        read two
+
+# SAME KIND IS SYMMETRIC: same-type a b = same-type b a, over all nine agent pairs. The annihilation test does not depend
+# on which agent of the active pair is read first, the first sign that the pair is unordered. Proved by simultaneous case
+# analysis on both agents.
+rule same-type-is-symmetric
+  mark a, like agent
+  mark b, like agent
+  show hold
+    call is-equal
+      call same-type
+        read a
+        read b
+      call same-type
+        read b
+        read a
+  fold a, b
+
+# THE REWRITE IS SYMMETRIC: interact (pair a b) = interact (pair b a), over all nine pairs. Swapping the two agents of an
+# active pair leaves its rewrite class unchanged, so the active pair is genuinely unordered, exactly as principal-to-
+# principal wiring is. Proved by simultaneous case analysis on both agents.
+rule interaction-is-symmetric
+  mark a, like agent
+  mark b, like agent
+  show hold
+    call is-equal
+      call interact
+        call active-pair
+          read a
+          read b
+      call interact
+        call active-pair
+          read b
+          read a
+  fold a, b
+
+# EQUAL AGENTS ANNIHILATE: an active pair of two agents of the same kind is classified annihilate, over all three kinds.
+# This is the annihilation rule, that like meets like and cancels, proved for every agent against itself.
+rule same-agents-annihilate
+  mark a, like agent
+  show hold
+    call is-equal
+      call interact
+        call active-pair
+          read a
+          read a
+      make annihilate
+  fold a
+
+# DISTINCT KINDS COMMUTE: a constructor against a duplicator is classified commute. This is the commutation rule on a
+# concrete different-kind pair, the case where the two agents pass through and duplicate across each other. Proved by
+# computation.
+rule distinct-agents-commute
+  show hold
+    call is-equal
+      call interact
+        call active-pair
+          make constructor
+          make duplicator
+      make commute
+  calm hold
+
+# ANNIHILATION SHRINKS THE PAIR: when an active pair of equal agents rewrites, its agent count after is below the two it
+# started with. is-below-two (agent-count-after (pair a a)) = yes, over all three kinds. Annihilation strictly reduces the
+# agent count, the progress toward a normal form. Proved by case analysis on the agent.
+rule annihilation-shrinks-the-pair
+  mark a, like agent
+  show hold
+    call is-equal
+      call is-below-two
+        call agent-count-after
+          call active-pair
+            read a
+            read a
+      make yes
+  fold a
+
+# COMMUTATION GROWS THE PAIR: when a distinct-kind active pair rewrites, its agent count after is above the two it started
+# with. is-above-two (agent-count-after (pair constructor duplicator)) = yes. Commutation strictly increases the agent
+# count, the duplication that an interaction net pays for crossing two kinds. Proved by computation on a concrete pair.
+rule commutation-grows-the-pair
+  show hold
+    call is-equal
+      call is-above-two
+        call agent-count-after
+          call active-pair
+            make constructor
+            make duplicator
+      make yes
+  calm hold
+
+# THE TWO REWRITES HAVE DIFFERENT COUNTS: the annihilation count (none) is not the commutation count (four), so the two
+# rules genuinely move different numbers of agents. A constructor pair annihilates to none, a constructor-duplicator pair
+# commutes to four, and none is not four. This refutation shows the model is not degenerate: the two rules do different
+# work.
+rule the-two-rewrites-differ
+  show miss
+    call is-equal
+      call agent-count-after
+        call active-pair
+          make constructor
+          make constructor
+      call agent-count-after
+        call active-pair
+          make constructor
+          make duplicator
+  calm miss

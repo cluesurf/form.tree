@@ -1,0 +1,138 @@
+# Quantum teleportation, the transmission of an unknown qubit through a shared entangled pair and two classical bits,
+# modeled by the kernel in the Pauli frame. A qubit's stabilizer information is two bits: how the X (bit) operator and the
+# Z (phase) operator act on it. Alice holds the unknown qubit and half of a Bell pair, Bob holds the other half. Alice
+# measures her two qubits jointly, which teleports the state to Bob but with a known BYPRODUCT Pauli error determined by
+# her two measurement outcomes. She sends those two classical bits to Bob, who applies the matching Pauli correction (X to
+# the power of one outcome, Z to the power of the other) and recovers the exact original qubit. This file PROVES the
+# protocol correct: for every measurement outcome and every qubit frame, Bob's correction exactly cancels the byproduct,
+# so the recovered frame equals the input. No information is cloned, and the qubit crosses with only two classical bits.
+
+# A classical bit, an outcome or a Pauli-frame coordinate.
+form bit
+  case off
+  case on
+
+# A bit flip, the X (NOT) action.
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Apply a byproduct: flip the target when the control bit is on, leave it when off. This is the controlled bit flip that
+# both the measurement byproduct and Bob's correction use, so the correction is exactly the byproduct undone.
+task apply-byproduct
+  take control, like bit
+  take target, like bit
+  like bit
+  fork case, read control
+    case off
+      send back
+        read target
+    case on
+      send back
+        call flip
+          read target
+
+# The two classical measurement outcomes Alice sends to Bob: the bit-flip byproduct (the X correction) and the phase
+# byproduct (the Z correction).
+form outcome
+  case sent
+    link flip-bit, like bit
+    link phase-bit, like bit
+
+# The qubit in the Pauli frame: the value coordinate (the X eigenvalue) and the phase coordinate (the Z eigenvalue). These
+# two bits are the full stabilizer description of the qubit being teleported.
+form frame
+  case qubit
+    link value, like bit
+    link phase, like bit
+
+# The byproduct of the joint measurement: it flips the value by the flip outcome and the phase by the phase outcome. This
+# is the Pauli error the teleported state arrives with, before Bob corrects it.
+task corrupt
+  take o, like outcome
+  take f, like frame
+  like frame
+  fork case, read o
+    case sent
+      link flip-bit
+      link phase-bit
+      fork case, read f
+        case qubit
+          link value
+          link phase
+          send back
+            make qubit
+              bind value
+                call apply-byproduct
+                  read flip-bit
+                  read value
+              bind phase
+                call apply-byproduct
+                  read phase-bit
+                  read phase
+
+# Bob's correction: apply X to the power of the flip outcome and Z to the power of the phase outcome. It is the same
+# controlled flips as the byproduct, so applying it after the byproduct cancels both, since a bit flip is its own inverse.
+task correct
+  take o, like outcome
+  take f, like frame
+  like frame
+  fork case, read o
+    case sent
+      link flip-bit
+      link phase-bit
+      fork case, read f
+        case qubit
+          link value
+          link phase
+          send back
+            make qubit
+              bind value
+                call apply-byproduct
+                  read flip-bit
+                  read value
+              bind phase
+                call apply-byproduct
+                  read phase-bit
+                  read phase
+
+# TELEPORTATION IS CORRECT: for every measurement outcome and every qubit frame, Bob's correction cancels the byproduct
+# exactly, so the recovered frame equals the input. correct o (corrupt o f) = f. The unknown qubit crosses faithfully on
+# two classical bits and a shared entangled pair, proved over all four outcomes and all four input frames.
+rule teleportation-recovers-the-input
+  mark flip-bit, like bit
+  mark phase-bit, like bit
+  mark value, like bit
+  mark phase, like bit
+  show hold
+    call is-equal
+      call correct
+        make sent
+          bind flip-bit
+            read flip-bit
+          bind phase-bit
+            read phase-bit
+        call corrupt
+          make sent
+            bind flip-bit
+              read flip-bit
+            bind phase-bit
+              read phase-bit
+          make qubit
+            bind value
+              read value
+            bind phase
+              read phase
+      make qubit
+        bind value
+          read value
+        bind phase
+          read phase
+  fold flip-bit, phase-bit, value, phase

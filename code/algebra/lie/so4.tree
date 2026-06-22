@@ -1,0 +1,108 @@
+# The rotation algebra so(4) of four-dimensional space, the symmetry algebra of the mesh, modeled by the kernel as the
+# direct sum of two copies of su(2). The great fact of dimension four is that so(4) SPLITS: so(4) = su(2) + su(2), the
+# self-dual and anti-self-dual parts, and the two factors COMMUTE. This split is exactly the two spinor classes of the
+# 24-cell (the D4 triality seen in the root system), the reason four-space carries free spin. This file builds an element
+# of so(4) as a pair of su(2) elements and reuses the proven su(2) bracket componentwise, so the bracket is the direct
+# sum. It then PROVES the defining law: a pure left rotation and a pure right rotation always commute.
+
+load @cluesurf/form/code/algebra/lie/su2
+  find elem
+  find bracket
+
+# A rotor: an element of so(4), a left su(2) part and a right su(2) part. The whole algebra is the direct sum of the two.
+form rotor
+  case pair
+    link left, like elem
+    link right, like elem
+
+# The so(4) bracket, the direct sum of the two su(2) brackets: bracket the left parts and the right parts independently.
+# Because the parts never mix, the two su(2) factors are automatically independent subalgebras.
+task so4-bracket
+  take a, like rotor
+  take b, like rotor
+  like rotor
+  fork case, read a
+    case pair
+      link left-a
+      link right-a
+      fork case, read b
+        case pair
+          link left-b
+          link right-b
+          send back
+            make pair
+              bind left
+                call bracket
+                  read left-a
+                  read left-b
+              bind right
+                call bracket
+                  read right-a
+                  read right-b
+
+# Lift a left su(2) element into so(4): a pure left rotation, with the right part at rest.
+task pure-left
+  take x, like elem
+  like rotor
+  send back
+    make pair
+      bind left
+        read x
+      bind right
+        make zero
+
+# Lift a right su(2) element into so(4): a pure right rotation, with the left part at rest.
+task pure-right
+  take x, like elem
+  like rotor
+  send back
+    make pair
+      bind left
+        make zero
+      bind right
+        read x
+
+# THE TWO FACTORS COMMUTE: the bracket of a pure left rotation and a pure right rotation is zero, for every pair of su(2)
+# elements. so4-bracket (pure-left a) (pure-right b) = the zero rotor. This is the heart of so(4) = su(2) + su(2): the
+# self-dual and anti-self-dual rotations are independent, which is why four-space carries two separate spins.
+rule left-and-right-commute
+  mark a, like elem
+  mark b, like elem
+  show hold
+    call is-equal
+      call so4-bracket
+        call pure-left
+          read a
+        call pure-right
+          read b
+      make pair
+        bind left
+          make zero
+        bind right
+          make zero
+  fold a, b
+
+# The bracket is also ALTERNATING in each factor (a rotor brackets to zero with itself), inherited directly from the two
+# su(2) alternating laws proved in su2.tree, since the so(4) bracket is their componentwise direct sum.
+
+# A PURE LEFT ROTATION CLOSES IN THE LEFT FACTOR: the bracket of two pure left rotations is again a pure left rotation,
+# its right part at rest. so4-bracket (pure-left a) (pure-left b) has right part zero, for every a and b. The left su(2)
+# is a genuine subalgebra, never leaking into the right factor.
+rule left-factor-is-closed
+  mark a, like elem
+  mark b, like elem
+  show hold
+    call is-equal
+      call so4-bracket
+        call pure-left
+          read a
+        call pure-left
+          read b
+      make pair
+        bind left
+          call bracket
+            read a
+            read b
+        bind right
+          make zero
+  calm hold

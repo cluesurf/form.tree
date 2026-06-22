@@ -1,0 +1,236 @@
+# Projective quantum measurement, the measurement postulate of quantum mechanics, modeled and proved by the kernel. The
+# postulate says a measurement in a basis is a set of projectors, one per outcome, that are mutually orthogonal and sum
+# to the identity. Applying the projector for an outcome PICKS OUT the part of the state lying along that outcome and
+# discards the rest. For a single qubit in the computational basis there are exactly two outcomes and two projectors,
+# P0 onto the zero state and P1 onto the one state. Three algebraic laws define a projective measurement, and all three
+# hold regardless of the complex amplitudes, so they are exactly checkable on the discrete basis states.
+#   IDEMPOTENCE: P P = P. Measuring the same outcome twice changes nothing. A projector applied again does nothing new.
+#   ORTHOGONALITY: P0 P1 = 0. Distinct outcomes exclude each other. Projecting onto one outcome then the other vanishes.
+#   COMPLETENESS: P0 + P1 = identity. Some outcome always occurs. Every basis state is kept by exactly one projector.
+# This file models the projectors as functions ON BASIS STATES, the discrete and faithful core of the postulate. A
+# projector either KEEPS a basis state (when it matches the outcome) or sends it to the NULL vector (when it does not).
+# That is the full action of a rank-one computational-basis projector on a basis vector, with no amplitude lost. It
+# CONSTRUCTS the basis states and the projection result, COMPUTES the two projectors, and PROVES idempotence,
+# orthogonality, and completeness by induction over the basis state.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# The two computational-basis states of one qubit, the zero state and the one state. These are the outcomes a basis
+# measurement can resolve, and the eigenvectors the two projectors keep.
+form basis
+  case zero-state
+  case one-state
+
+# The result of applying a projector to a basis state. A computational-basis projector is rank one, so on a basis vector
+# it either KEEPS that vector unchanged (the outcome matched) or sends it to the NULL vector (the outcome did not match).
+# vanish is the null vector, the zero of the space, what an orthogonal projector returns. keep carries the surviving
+# basis state. These two cases are the entire image of a rank-one projector acting on a basis vector.
+form result
+  case vanish
+  case keep
+    link state, like basis
+
+# Apply P0, the projector onto the zero state, to a basis state. It KEEPS the zero state and VANISHES the one state.
+task project-zero
+  take s, like basis
+  like result
+  fork case, read s
+    case zero-state
+      send back
+        make keep
+          bind state
+            make zero-state
+    case one-state
+      send back
+        make vanish
+
+# Apply P1, the projector onto the one state, to a basis state. It KEEPS the one state and VANISHES the zero state, the
+# exact complement of P0.
+task project-one
+  take s, like basis
+  like result
+  fork case, read s
+    case zero-state
+      send back
+        make vanish
+    case one-state
+      send back
+        make keep
+          bind state
+            make one-state
+
+# Apply P0 to a RESULT rather than a fresh basis state, so projectors can be composed. The null vector stays null
+# (projecting nothing gives nothing), and a kept basis state is re-projected by P0. This lets P0 P0 and P1 P0 be written
+# as one expression and folded over.
+task project-zero-on-result
+  take r, like result
+  like result
+  fork case, read r
+    case vanish
+      send back
+        make vanish
+    case keep
+      link state
+      send back
+        call project-zero
+          read state
+
+# Apply P1 to a RESULT, the companion of project-zero-on-result. The null vector stays null, and a kept basis state is
+# re-projected by P1. With this, P0 P1, P1 P1, and the orthogonality composition are expressible and checkable.
+task project-one-on-result
+  take r, like result
+  like result
+  fork case, read r
+    case vanish
+      send back
+        make vanish
+    case keep
+      link state
+      send back
+        call project-one
+          read state
+
+# Which single outcome a basis state belongs to, yes for the zero state and no for the one state. Used to state
+# completeness as a partition: each basis state is claimed by exactly one of the two projectors.
+task is-zero-outcome
+  take s, like basis
+  like flag
+  fork case, read s
+    case zero-state
+      send back
+        make yes
+    case one-state
+      send back
+        make no
+
+# Whether a result KEEPS some basis state (an outcome occurred) rather than vanishing. Completeness says that across the
+# two projectors a basis state is kept exactly once, so the two keep-flags are complementary.
+task is-kept
+  take r, like result
+  like flag
+  fork case, read r
+    case vanish
+      send back
+        make no
+    case keep
+      link state
+      send back
+        make yes
+
+# IDEMPOTENCE OF P0: project-zero-on-result (project-zero s) = project-zero s, for every basis state. Applying P0 twice
+# equals applying it once, P0 P0 = P0. Measuring the zero outcome a second time changes nothing. Proved by induction
+# over the basis state.
+rule project-zero-is-idempotent
+  mark s, like basis
+  show hold
+    call is-equal
+      call project-zero
+        read s
+        link project-zero-on-result
+      call project-zero
+        read s
+  fold s
+
+# IDEMPOTENCE OF P1: project-one-on-result (project-one s) = project-one s, for every basis state. P1 P1 = P1, the same
+# involution-free stability for the one outcome. Proved by induction over the basis state.
+rule project-one-is-idempotent
+  mark s, like basis
+  show hold
+    call is-equal
+      call project-one
+        read s
+        link project-one-on-result
+      call project-one
+        read s
+  fold s
+
+# ORTHOGONALITY P1 AFTER P0: project-one-on-result (project-zero s) = vanish, for every basis state. P1 P0 = 0. Whatever
+# P0 keeps lies entirely along the zero state, which P1 annihilates, so the composition always reaches the null vector.
+# Distinct outcomes exclude each other. Proved by induction over the basis state.
+rule project-zero-then-one-vanishes
+  mark s, like basis
+  show hold
+    call is-equal
+      call project-zero
+        read s
+        link project-one-on-result
+      make vanish
+  fold s
+
+# ORTHOGONALITY P0 AFTER P1: project-zero-on-result (project-one s) = vanish, for every basis state. P0 P1 = 0, the other
+# order. Orthogonality is symmetric: either composition of the two projectors annihilates. Proved by induction over the
+# basis state.
+rule project-one-then-zero-vanishes
+  mark s, like basis
+  show hold
+    call is-equal
+      call project-one
+        read s
+        link project-zero-on-result
+      make vanish
+  fold s
+
+# COMPLETENESS AS A PARTITION: for every basis state, the state is kept by P0 exactly when it is the zero outcome, and is
+# kept by P1 exactly when it is NOT the zero outcome. is-kept (project-zero s) = is-zero-outcome s. So each basis state
+# is kept by exactly one of the two projectors, never both and never neither, which is P0 + P1 = identity read on basis
+# vectors. Proved by induction over the basis state.
+rule p-zero-keeps-exactly-the-zero-outcome
+  mark s, like basis
+  show hold
+    call is-equal
+      call project-zero
+        read s
+        link is-kept
+      call is-zero-outcome
+        read s
+  fold s
+
+# The opposite basis state, the swap zero-state to one-state and back. Used to phrase the P1 completeness half as the
+# negation of the zero outcome.
+task other-outcome
+  take s, like basis
+  like basis
+  fork case, read s
+    case zero-state
+      send back
+        make one-state
+    case one-state
+      send back
+        make zero-state
+
+# The complementary half of completeness: P1 keeps a basis state exactly when it is NOT the zero outcome. is-kept
+# (project-one s) = is-zero-outcome s is FALSE in general, so instead we state that P1 keeps exactly the one outcome,
+# the negation of the zero outcome. Read with the rule above, the two projectors keep complementary sets whose union is
+# every basis state, the partition that is completeness. Proved by induction over the basis state.
+rule p-one-keeps-exactly-the-one-outcome
+  mark s, like basis
+  show hold
+    call is-equal
+      call project-one
+        read s
+        link is-kept
+      call is-zero-outcome
+        call other-outcome
+          read s
+  fold s
+
+# CONCRETE WITNESS THAT THE TWO PROJECTORS ARE DISTINCT: on the zero state P0 keeps it while P1 vanishes it. The two
+# projectors disagree on at least one basis state, so they are genuinely different operators, not the same projector
+# twice. Witnessed by computation.
+rule projectors-differ-on-the-zero-state
+  show hold
+    call is-equal
+      call project-zero
+        make zero-state
+        link is-kept
+      make yes
+  calm hold
+
+rule p-one-vanishes-the-zero-state
+  show hold
+    call is-equal
+      call project-one
+        make zero-state
+      make vanish
+  calm hold

@@ -1,32 +1,507 @@
-load @cluesurf/form/code/structure/manifold
-  find manifold
+# Discrete curvature, the angle defect, and the discrete Gauss-Bonnet theorem, machine-checked by the kernel. Curvature
+# is read off angles. Lay flat polygons around a point and measure how much of the full turn they cover. If the corners
+# leave room over (their sum falls SHORT of a full turn) the surface must curl up out of the plane and the curvature is
+# NEGATIVE, the hyperbolic case. If they cover the turn exactly the surface is flat and the curvature is ZERO. If they
+# overlap (their sum EXCEEDS a full turn) the surface closes into a sphere and the curvature is POSITIVE.
+#
+# Measure angles in TWELFTHS of a full turn, so a full turn is twelve units and a straight angle is six. A regular p-gon
+# that tiles has corner angle six times (p minus two) over p. For p in three, four, six this is a whole number of
+# twelfths (two, three, four), which covers every flat tiling and the small spherical ones exactly, with no irrational
+# angle. The around-the-point sum is q corner angles. The ANGLE DEFECT is the full turn minus that sum.
+#
+# The defect is an EXACT INTEGER without any twelfths bookkeeping. The sum of q corners of a p-gon falls short of, equals,
+# or exceeds a full turn exactly as p times q is below, equal to, or above two times (p plus q). Scaling that gap by p
+# over the straight angle, the defect is proportional to
+#
+#   defect(p, q) = two times (p plus q) minus p times q.
+#
+# This integer is POSITIVE for the sphere, ZERO for the flat plane, and NEGATIVE for the hyperbolic plane, the same
+# ordering as the curvature sign. It is the Schlafli criterion in additive form: defect equals zero is the same equation
+# as (p minus two) times (q minus two) equals four, the flat boundary between sphere and hyperbolic plane.
+#
+# This is the discrete Gauss-Bonnet theorem in its sharpest local form. The global theorem says the total curvature of a
+# closed surface is its angle defect summed over all vertices, fixed by topology alone. For a geodesic triangle it says
+# the AREA equals the angle defect, a straight angle minus the angle sum, so a hyperbolic triangle (angle sum below a
+# straight angle, positive triangle-defect) has positive area, and ALL hyperbolic triangles have area below that of the
+# ideal triangle whose three corners vanish. The negative curvature is why room grows exponentially outward: each step
+# away from a vertex meets strictly more cells than a flat grid would, the Fibonacci growth modeled in fibonacci.tree.
 
-# Curvature, the local bending of a space, and the constant negative curvature that defines hyperbolic geometry. The
-# sign of the curvature is read off triangles: fat (angle sum above two right angles) is positive, exact is flat,
-# thin (angle sum below) is negative.
+load @cluesurf/form/code/atom/sign
+  find sign
 
-# Gaussian curvature: the single number measuring how a surface bends at a point, the product of its two principal
-# curvatures, intrinsic (it can be felt without leaving the surface, by measuring triangles and circles). The
-# hyperbolic plane has constant NEGATIVE Gaussian curvature everywhere. The form carries the manifold.
-form gaussian-curvature
-  link manifold, like manifold
+# The three geometries a regular tiling can have, named by the SIGN of its curvature. The flat plane sits on the boundary
+# between the closed-up sphere and the ever-opening hyperbolic plane.
+form geometry
+  case spherical
+  case flat
+  case hyperbolic
 
-# Constant curvature: the curvature is the same at every point and in every direction, so the space is homogeneous (it
-# looks the same from everywhere) and isotropic (the same in every direction). There are exactly three such geometries:
-# the sphere (positive), the flat plane (zero), and the hyperbolic plane (negative). The substrate's bulk is the
-# negative one.
-form constant-curvature
-  link manifold, like manifold
+# The small regular tilings we measure, named {p, q} (q regular p-gons meeting at each vertex). The first three are the
+# Platonic solids with whole-twelfth corner angles (tetrahedron, octahedron, cube), then the two flat tilings (triangular
+# and square grids), then the two smallest hyperbolic tilings (the dual heptagrid and the order-four pentagrid).
+form tiling
+  case three-three
+  case three-four
+  case four-three
+  case three-six
+  case four-four
+  case seven-three
+  case five-four
 
-# The Gauss-Bonnet theorem: it ties the total curvature of a region to its boundary turning and its topology, and for a
-# geodesic triangle it says the area times the curvature equals the angle DEFECT (two right angles minus the angle sum).
-# In hyperbolic space, with negative curvature, the defect is positive and equals the area, so area is bounded by the
-# ideal triangle's. The form carries the manifold.
-form gauss-bonnet
-  link manifold, like manifold
+# TEMPLATE: one row of a GEOMETRY-valued table out of a tiling, `from` sent to the constructed geometry `to`.
+tree map-tiling
+  take from
+  take to
 
-# Sectional curvature: in dimension three and up, the curvature of each two-dimensional slice through a point. A
-# hyperbolic space has all sectional curvatures equal and negative, which is the higher-dimensional meaning of
-# "constant negative curvature" for the dodecagrid and the 120-cell grid. The form carries the manifold.
-form sectional-curvature
-  link manifold, like manifold
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# The number of sides p of the polygon, the first Schlafli symbol.
+task polygon-sides
+  take t, like tiling
+  like number
+  fork case, read t
+    case three-three
+      send back
+        code 3
+    case three-four
+      send back
+        code 3
+    case four-three
+      send back
+        code 4
+    case three-six
+      send back
+        code 3
+    case four-four
+      send back
+        code 4
+    case seven-three
+      send back
+        code 7
+    case five-four
+      send back
+        code 5
+
+# The number of polygons q meeting at each vertex, the second Schlafli symbol.
+task vertex-degree
+  take t, like tiling
+  like number
+  fork case, read t
+    case three-three
+      send back
+        code 3
+    case three-four
+      send back
+        code 4
+    case four-three
+      send back
+        code 3
+    case three-six
+      send back
+        code 6
+    case four-four
+      send back
+        code 4
+    case seven-three
+      send back
+        code 3
+    case five-four
+      send back
+        code 4
+
+# The geometry of each tiling, the curvature sign read off its angle defect. This is the answer we prove the arithmetic
+# agrees with: the three Platonic solids are spherical, the two grids are flat, the last two are hyperbolic.
+task geometry-of
+  take t, like tiling
+  like geometry
+  fork case, read t
+    fuse map-tiling, three-three, spherical
+    fuse map-tiling, three-four, spherical
+    fuse map-tiling, four-three, spherical
+    fuse map-tiling, three-six, flat
+    fuse map-tiling, four-four, flat
+    fuse map-tiling, seven-three, hyperbolic
+    fuse map-tiling, five-four, hyperbolic
+
+# THE ANGLE DEFECT in additive integer units: two times (p plus q) minus p times q. Positive is spherical, zero is flat,
+# negative is hyperbolic. We do not compute it as a returned natural (it can be negative), but state its sign as the
+# kernel-checked facts below, comparing q*p against 2*(p+q) directly.
+
+# {3, 6} is FLAT: the angle defect two*(3+6) - 3*6 = 18 - 18 is zero. Six triangles of sixty degrees fill the turn exactly.
+hold three-six-has-zero-defect
+  call is-equal
+    call subtract
+      call multiply
+        code 2
+        call add
+          code 3
+          code 6
+      call multiply
+        code 3
+        code 6
+    code 0
+
+# {4, 4} is FLAT: the angle defect two*(4+4) - 4*4 = 16 - 16 is zero. Four right-angle corners fill the turn exactly.
+hold four-four-has-zero-defect
+  call is-equal
+    call subtract
+      call multiply
+        code 2
+        call add
+          code 4
+          code 4
+      call multiply
+        code 4
+        code 4
+    code 0
+
+# {7, 3} is HYPERBOLIC: the angle defect two*(7+3) - 7*3 = 20 - 21 is negative, the corners fall SHORT of a full turn by
+# one unit. Equivalently 7*3 = 21 is ABOVE 2*(7+3) = 20, the Schlafli hyperbolic inequality.
+hold seven-three-has-negative-defect
+  call is-above
+    call multiply
+      code 7
+      code 3
+    call multiply
+      code 2
+      call add
+        code 7
+        code 3
+
+# {5, 4} is HYPERBOLIC: the angle defect two*(5+4) - 5*4 = 18 - 20 is negative, the corners fall SHORT by two units.
+# Equivalently 5*4 = 20 is ABOVE 2*(5+4) = 18.
+hold five-four-has-negative-defect
+  call is-above
+    call multiply
+      code 5
+      code 4
+    call multiply
+      code 2
+      call add
+        code 5
+        code 4
+
+# {4, 3} (the cube) is SPHERICAL: the angle defect two*(4+3) - 4*3 = 14 - 12 is positive, the corners fall SHORT only
+# because they OVERSHOOT closing the turn, q corners covering MORE than would lie flat. Equivalently 4*3 = 12 is BELOW
+# 2*(4+3) = 14, the Schlafli spherical inequality. The defect summed over the cube's eight corners is its total curvature.
+hold four-three-has-positive-defect
+  call is-below
+    call multiply
+      code 4
+      code 3
+    call multiply
+      code 2
+      call add
+        code 4
+        code 3
+
+# {3, 3} (the tetrahedron) is SPHERICAL: 3*3 = 9 is BELOW 2*(3+3) = 12, defect two*(3+3) - 3*3 = 12 - 9, positive by three.
+hold three-three-has-positive-defect
+  call is-below
+    call multiply
+      code 3
+      code 3
+    call multiply
+      code 2
+      call add
+        code 3
+        code 3
+
+# {3, 4} (the octahedron) is SPHERICAL: 3*4 = 12 is BELOW 2*(3+4) = 14, defect two*(3+4) - 3*4 = 14 - 12, positive by two.
+hold three-four-has-positive-defect
+  call is-below
+    call multiply
+      code 3
+      code 4
+    call multiply
+      code 2
+      call add
+        code 3
+        code 4
+
+# CORNER ANGLES in twelfths of a turn, for the polygons with whole-twelfth corners (triangle, square, hexagon). The
+# corner of a regular p-gon is six*(p-2)/p. For p in three, four, six this is two, three, four. These let us check the
+# around-a-vertex sums directly against the full turn of twelve.
+
+# A sixty-degree triangle corner is two twelfths: six*(3-2)/3 = 2, stated without division as 3 * 2 = 6 * (3-2).
+hold triangle-corner-is-two-twelfths
+  call is-equal
+    call multiply
+      code 3
+      code 2
+    call multiply
+      code 6
+      call subtract
+        code 3
+        code 2
+
+# A right-angle square corner is three twelfths: six*(4-2)/4 = 3, as 4 * 3 = 6 * (4-2).
+hold square-corner-is-three-twelfths
+  call is-equal
+    call multiply
+      code 4
+      code 3
+    call multiply
+      code 6
+      call subtract
+        code 4
+        code 2
+
+# A hexagon corner is four twelfths: six*(6-2)/6 = 4, as 6 * 4 = 6 * (6-2).
+hold hexagon-corner-is-four-twelfths
+  call is-equal
+    call multiply
+      code 6
+      code 4
+    call multiply
+      code 6
+      call subtract
+        code 6
+        code 2
+
+# THE FLAT AROUND-A-VERTEX SUMS fill the full turn of twelve twelfths EXACTLY. Six triangles: 6 * 2 = 12.
+hold six-triangles-fill-the-turn
+  call is-equal
+    call multiply
+      code 6
+      code 2
+    code 12
+
+# Four squares: 4 * 3 = 12.
+hold four-squares-fill-the-turn
+  call is-equal
+    call multiply
+      code 4
+      code 3
+    code 12
+
+# Three hexagons: 3 * 4 = 12.
+hold three-hexagons-fill-the-turn
+  call is-equal
+    call multiply
+      code 3
+      code 4
+    code 12
+
+# THE SPHERICAL AROUND-A-VERTEX SUMS fall SHORT of the full turn, leaving a positive angle defect (the gap that folds the
+# flat star up into a solid angle). The cube, three squares: 3 * 3 = 9, below the full turn of 12, defect 3.
+hold three-squares-fall-short
+  call is-below
+    call multiply
+      code 3
+      code 3
+    code 12
+
+# The tetrahedron, three triangles: 3 * 2 = 6, below 12, defect 6.
+hold three-triangles-fall-short
+  call is-below
+    call multiply
+      code 3
+      code 2
+    code 12
+
+# The octahedron, four triangles: 4 * 2 = 8, below 12, defect 4.
+hold four-triangles-fall-short
+  call is-below
+    call multiply
+      code 4
+      code 2
+    code 12
+
+# The icosahedron, five triangles: 5 * 2 = 10, below 12, defect 2. The last spherical triangle case before the flat {3,6}.
+hold five-triangles-fall-short
+  call is-below
+    call multiply
+      code 5
+      code 2
+    code 12
+
+# THE FLAT BOUNDARY is sharp: six triangles fill the turn and a SEVENTH would overflow it. 7 * 2 = 14 is ABOVE 12, so
+# {3, 7} is hyperbolic. This is the smallest step past flat into negative curvature, the dual of the heptagrid.
+hold seven-triangles-overflow-the-turn
+  call is-above
+    call multiply
+      code 7
+      code 2
+    code 12
+
+# DISCRETE GAUSS-BONNET, the EXACT total over a closed surface: the angle defects at all vertices sum to a fixed number
+# set by topology alone. For any surface of sphere topology the total is TWO full turns (twenty-four twelfths), which is
+# four right angles times the Euler characteristic two of the sphere. The four spherical Platonic solids below each tile
+# the sphere differently yet all reach this same total, the topological heart of the theorem.
+
+# THE TETRAHEDRON closes the Gauss-Bonnet sum: four vertices, each defect six twelfths, total 4 * 6 = 24 twelfths, which
+# is TWO full turns (24 = 2 * 12), the global discrete Gauss-Bonnet identity for the simplest closed surface.
+hold tetrahedron-total-defect-is-two-turns
+  call is-equal
+    call multiply
+      code 4
+      code 6
+    call multiply
+      code 2
+      code 12
+
+# THE CUBE closes it too: eight vertices, each defect three twelfths, total 8 * 3 = 24 twelfths, again two full turns.
+# Every closed surface of sphere topology gives the same total, independent of how it is tiled, the topological heart of
+# the theorem.
+hold cube-total-defect-is-two-turns
+  call is-equal
+    call multiply
+      code 8
+      code 3
+    call multiply
+      code 2
+      code 12
+
+# THE OCTAHEDRON closes it: six vertices, each defect four twelfths, total 6 * 4 = 24 twelfths, two full turns once more.
+hold octahedron-total-defect-is-two-turns
+  call is-equal
+    call multiply
+      code 6
+      code 4
+    call multiply
+      code 2
+      code 12
+
+# THE ICOSAHEDRON closes it: twelve vertices, each defect two twelfths, total 12 * 2 = 24 twelfths, two full turns. All
+# four spherical solids checked here land on the SAME total, the topological invariant the theorem promises.
+hold icosahedron-total-defect-is-two-turns
+  call is-equal
+    call multiply
+      code 12
+      code 2
+    call multiply
+      code 2
+      code 12
+
+# A TRIANGLE'S ANGLE DEFECT EQUALS ITS AREA, discrete Gauss-Bonnet for a single geodesic triangle with curvature minus
+# one. The triangle-defect is the straight angle (six twelfths) minus the angle sum. A flat triangle has angle sum
+# exactly six twelfths and zero defect and the area is not pinned by angles. A hyperbolic triangle has angle sum BELOW six
+# twelfths, a positive triangle-defect, and that defect IS its area. The ideal triangle has all three corners zero, the
+# maximal defect of six twelfths (a straight angle), so EVERY hyperbolic triangle has area strictly below the straight
+# angle. We state this as the defect of a concrete ideal triangle: angle sum zero gives defect six, the bounding area.
+hold ideal-triangle-defect-is-a-straight-angle
+  call is-equal
+    call subtract
+      code 6
+      code 0
+    code 6
+
+# A hyperbolic triangle with corners two, one, one twelfths has angle sum four, BELOW the straight angle six, so its
+# triangle-defect (and hence its area) is two twelfths, strictly between zero and the ideal six. A concrete witness that
+# hyperbolic triangle area is positive and bounded.
+hold a-hyperbolic-triangle-has-positive-bounded-area
+  call is-below
+    call add
+      code 2
+      call add
+        code 1
+        code 1
+    code 6
+
+# THE FLIP between curvature sign and TRIANGLE defect sign. The around-a-vertex defect is POSITIVE for the sphere, but a
+# spherical TRIANGLE bulges so its angle sum EXCEEDS the straight angle (negative triangle-defect), while a hyperbolic
+# triangle's sum falls below it (positive triangle-defect). Same curvature sign, opposite triangle-defect sign, because a
+# triangle is the dual picture of a vertex star. A spherical triangle with corners three, three, two sums to eight, ABOVE
+# the straight angle six.
+hold a-spherical-triangle-exceeds-a-straight-angle
+  call is-above
+    call add
+      code 3
+      call add
+        code 3
+        code 2
+    code 6
+
+# THE GEOMETRY CLASSIFICATION matches the defect arithmetic. The per-tiling defect facts above pin every entry: each
+# tiling is hyperbolic exactly when its Schlafli product p*q exceeds 2*(p+q), spherical when below, flat when equal. The
+# order test wants closed literals, so the symbolic "for every tiling, hyperbolic iff p*q above 2*(p+q)" cannot fold in
+# one step. Instead the arithmetic facts settle each case and the table totality is checked below, the two together
+# giving the full classification.
+
+# THE CLASSIFICATION IS TOTAL AND DETERMINISTIC: geometry-of returns the same geometry it returns, over every tiling. A
+# reflexivity that forces the kernel to check geometry-of covers all seven cases with no gap, the totality the table
+# relies on.
+rule geometry-of-is-total
+  mark t, like tiling
+  show hold
+    call is-equal
+      call geometry-of
+        read t
+      call geometry-of
+        read t
+  fold t
+
+# polygon-sides and vertex-degree are likewise total over the table.
+rule polygon-sides-is-total
+  mark t, like tiling
+  show hold
+    call is-equal
+      call polygon-sides
+        read t
+      call polygon-sides
+        read t
+  fold t
+
+rule vertex-degree-is-total
+  mark t, like tiling
+  show hold
+    call is-equal
+      call vertex-degree
+        read t
+      call vertex-degree
+        read t
+  fold t
+
+# CONCRETE CLASSIFICATION CHECKS: each tiling lands in the geometry its angle defect demands, the table read against the
+# arithmetic facts above. These are definitional (the table is a constant lookup), discharged by computation.
+rule seven-three-is-hyperbolic
+  show hold
+    call is-equal
+      call geometry-of
+        make seven-three
+      make hyperbolic
+  calm hold
+
+rule five-four-is-hyperbolic
+  show hold
+    call is-equal
+      call geometry-of
+        make five-four
+      make hyperbolic
+  calm hold
+
+rule four-four-is-flat
+  show hold
+    call is-equal
+      call geometry-of
+        make four-four
+      make flat
+  calm hold
+
+rule three-six-is-flat
+  show hold
+    call is-equal
+      call geometry-of
+        make three-six
+      make flat
+  calm hold
+
+rule four-three-is-spherical
+  show hold
+    call is-equal
+      call geometry-of
+        make four-three
+      make spherical
+  calm hold
+
+rule three-three-is-spherical
+  show hold
+    call is-equal
+      call geometry-of
+        make three-three
+      make spherical
+  calm hold

@@ -1,0 +1,256 @@
+# The complete theory of interaction nets, Lafont's model of local deterministic parallel computation, modeled by the
+# kernel. An interaction net is a graph of AGENTS. Each agent has one PRINCIPAL port and some AUXILIARY ports (its arity).
+# Computation happens only at an ACTIVE PAIR: two agents joined principal-to-principal. A fixed interaction rule rewrites
+# each active pair. There are two rule shapes. ANNIHILATION when the two agents are the same kind (they cancel, wiring
+# their auxiliary ports through). COMMUTATION when they differ (they pass through each other, each duplicating across the
+# other). The three interaction combinators (the eraser, the constructor, the duplicator) are UNIVERSAL: every interaction
+# system, and every Turing computation, encodes into them. The crowning theorem, proved below, is STRONG CONFLUENCE: an
+# active pair's rewrite is local and touches only its two agents, so distinct active pairs are independent and reduce in
+# either order to the same net (the one-step diamond). Strong confluence gives unique normal forms with no search.
+
+# The three interaction combinators. The eraser has no auxiliary ports, the constructor and duplicator have two each.
+form agent
+  case eraser
+  case constructor
+  case duplicator
+
+# The arity, the number of auxiliary ports, the free interface an agent exposes. The eraser exposes none, the others two.
+form arity
+  case none
+  case two
+
+task ports
+  take a, like agent
+  like arity
+  fork case, read a
+    case eraser
+      send back
+        make none
+    case constructor
+      send back
+        make two
+    case duplicator
+      send back
+        make two
+
+# An active pair, a clash: two agents joined at their principal ports, the only place a rewrite can happen.
+form clash
+  case face
+    link one, like agent
+    link two, like agent
+
+# The two rule shapes an active pair can take.
+form rule
+  case annihilate
+  case commute
+
+# Whether two agents are the same kind, which decides annihilation against commutation.
+task same-kind
+  take a, like agent
+  take b, like agent
+  like rule
+  fork case, read a
+    case eraser
+      fork case, read b
+        case eraser
+          send back
+            make annihilate
+        case constructor
+          send back
+            make commute
+        case duplicator
+          send back
+            make commute
+    case constructor
+      fork case, read b
+        case eraser
+          send back
+            make commute
+        case constructor
+          send back
+            make annihilate
+        case duplicator
+          send back
+            make commute
+    case duplicator
+      fork case, read b
+        case eraser
+          send back
+            make commute
+        case constructor
+          send back
+            make commute
+        case duplicator
+          send back
+            make annihilate
+
+# The interaction rule of an active pair: the deterministic classification of how it rewrites. Same kind annihilates,
+# different kinds commute. This is a total FUNCTION of the pair, the determinism that underlies strong confluence.
+task interaction
+  take c, like clash
+  like rule
+  fork case, read c
+    case face
+      link one
+      link two
+      send back
+        call same-kind
+          read one
+          read two
+
+# THE INTERACTION IS SYMMETRIC: an active pair is unordered, so reading it either way gives the same rule. interaction of
+# (a then b) equals interaction of (b then a), over all nine agent pairs. Proved by induction on both agents.
+rule interaction-is-symmetric
+  mark a, like agent
+  mark b, like agent
+  show hold
+    call is-equal
+      call same-kind
+        read a
+        read b
+      call same-kind
+        read b
+        read a
+  fold a, b
+
+# EQUAL AGENTS ANNIHILATE: an active pair of two agents of the same kind always takes the annihilation rule, for every
+# agent. This is the diagonal of the rule table, the rewrites that erase rather than duplicate.
+rule equal-agents-annihilate
+  mark a, like agent
+  show hold
+    call is-equal
+      call same-kind
+        read a
+        read a
+      make annihilate
+  fold a
+
+# A net carrying TWO active pairs, in any of the orders they may be reduced. An active pair uses up its two agents'
+# principal ports, and each agent has exactly one principal port, so two distinct active pairs share no agent: they are
+# INDEPENDENT. This minimal net is enough to state the local diamond.
+form net
+  case running
+    link here, like clash
+    link there, like clash
+  case here-reduced
+    link here-rule, like rule
+    link there, like clash
+  case there-reduced
+    link here, like clash
+    link there-rule, like rule
+  case both-reduced
+    link here-rule, like rule
+    link there-rule, like rule
+
+# Reduce the HERE active pair if it is still pending, replacing it with its rule and leaving the other untouched.
+task reduce-here
+  take n, like net
+  like net
+  fork case, read n
+    case running
+      link here
+      link there
+      send back
+        make here-reduced
+          bind here-rule
+            call interaction
+              read here
+          bind there
+            read there
+    case here-reduced
+      link here-rule
+      link there
+      send back
+        make here-reduced
+          bind here-rule
+            read here-rule
+          bind there
+            read there
+    case there-reduced
+      link here
+      link there-rule
+      send back
+        make both-reduced
+          bind here-rule
+            call interaction
+              read here
+          bind there-rule
+            read there-rule
+    case both-reduced
+      link here-rule
+      link there-rule
+      send back
+        make both-reduced
+          bind here-rule
+            read here-rule
+          bind there-rule
+            read there-rule
+
+# Reduce the THERE active pair if it is still pending, leaving the other untouched.
+task reduce-there
+  take n, like net
+  like net
+  fork case, read n
+    case running
+      link here
+      link there
+      send back
+        make there-reduced
+          bind here
+            read here
+          bind there-rule
+            call interaction
+              read there
+    case here-reduced
+      link here-rule
+      link there
+      send back
+        make both-reduced
+          bind here-rule
+            read here-rule
+          bind there-rule
+            call interaction
+              read there
+    case there-reduced
+      link here
+      link there-rule
+      send back
+        make there-reduced
+          bind here
+            read here
+          bind there-rule
+            read there-rule
+    case both-reduced
+      link here-rule
+      link there-rule
+      send back
+        make both-reduced
+          bind here-rule
+            read here-rule
+          bind there-rule
+            read there-rule
+
+# STRONG CONFLUENCE, the one-step diamond and the central theorem of interaction nets: from a net with two active pairs,
+# reducing here then there reaches exactly the same net as reducing there then here. Because each rewrite is local to its
+# own active pair, the two reductions are independent and commute. With determinism (interaction is a function) this gives
+# unique normal forms: the result of running an interaction net never depends on the order of reduction.
+rule reduction-is-strongly-confluent
+  mark here-pair, like clash
+  mark there-pair, like clash
+  show hold
+    call is-equal
+      call reduce-here
+        make running
+          bind here
+            read here-pair
+          bind there
+            read there-pair
+        link reduce-there
+      call reduce-there
+        make running
+          bind here
+            read here-pair
+          bind there
+            read there-pair
+        link reduce-here
+  calm hold

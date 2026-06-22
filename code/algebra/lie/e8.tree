@@ -1,0 +1,666 @@
+# E8, the largest exceptional Lie algebra, the top of the symmetry ladder, modeled by the kernel. E8 is a simple Lie
+# algebra of rank eight and dimension two hundred forty-eight. Its defining data is its DYNKIN DIAGRAM: eight nodes,
+# seven of them in a straight chain and one extra node hung off the third node from one end, the unique shape that the
+# classification of simple Lie algebras allows at this size. From the diagram comes the CARTAN MATRIX, the eight-by-eight
+# integer matrix A with a two on every diagonal entry, a minus one for each pair of nodes joined by an edge, and a zero
+# for each pair not joined. E8 is SIMPLY LACED, every edge is single, so the matrix is symmetric. Its two hundred forty
+# ROOTS split into two families: one hundred twelve integer-vector roots, the vectors plus-or-minus e_i plus-or-minus e_j
+# in eight dimensions, exactly the roots of D8, and one hundred twenty-eight half-integer spinor roots, one half times
+# eight signs with an even number of minus signs. Those two hundred forty roots together with the origin generate the E8
+# LATTICE, the unique even self-dual lattice in eight dimensions and the densest lattice packing of spheres known in its
+# dimension. E8 is exceptional, the end of the line beyond the infinite A, B, C, D families, and the same root system,
+# coarsened, is where the reversible tower of the substrate finally closes.
+#
+# This file CONSTRUCTS the diagram (the eight nodes and their adjacency table) and the Cartan matrix, and PROVES their
+# combinatorial laws by kernel induction over the nodes (symmetry, no self-loops, the diagonal of two). The two root
+# families are modeled honestly: the integer-root family is given a real computable predicate (a vector is a D8 root when
+# exactly two of its eight coordinates are nonzero), and the count two hundred forty is stated as an arithmetic fact, NOT
+# dressed up as a derivation.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# THE DYNKIN NODES. The eight simple roots of E8, one per node of the diagram. The labeling fixes the shape: n1, n2, n3,
+# n4, n5, n6, n7 form the long chain in that order, and n8 is the extra node attached to n5. So the edges are the six
+# chain bonds n1-n2, n2-n3, n3-n4, n4-n5, n5-n6, n6-n7, plus the branch bond n5-n8: seven edges over eight nodes, which
+# makes the diagram a tree.
+form node
+  case n1
+  case n2
+  case n3
+  case n4
+  case n5
+  case n6
+  case n7
+  case n8
+
+# Node equality, used by the adjacency table and the laws.
+task same-node
+  take a, like node
+  take b, like node
+  like flag
+  fork case, read a
+    case n1
+      fork case, read b
+        fuse map-node, n1, yes
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n2
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, yes
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n3
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, yes
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n4
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, yes
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n5
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, yes
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n6
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, yes
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n7
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, yes
+        fuse map-node, n8, no
+    case n8
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, yes
+
+# TEMPLATE: one entry of a single-valued map out of a node, `from` sent to the construction `to`. One definition drives
+# the equality table, the adjacency rows, and the Cartan rows, so each table reads as a flat lookup.
+tree map-node
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# THE ADJACENCY TABLE. Whether two nodes are joined by an edge in the E8 diagram. The seven edges are n1-n2, n2-n3,
+# n3-n4, n4-n5, n5-n6, n6-n7, and the branch n5-n8. Each row below lists which nodes the given node touches. The table is
+# written out in full, both directions of every edge, so the symmetry below is a real proof and not an assumption.
+task adjacent
+  take a, like node
+  take b, like node
+  like flag
+  fork case, read a
+    case n1
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, yes
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n2
+      fork case, read b
+        fuse map-node, n1, yes
+        fuse map-node, n2, no
+        fuse map-node, n3, yes
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n3
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, yes
+        fuse map-node, n3, no
+        fuse map-node, n4, yes
+        fuse map-node, n5, no
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n4
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, yes
+        fuse map-node, n4, no
+        fuse map-node, n5, yes
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n5
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, yes
+        fuse map-node, n5, no
+        fuse map-node, n6, yes
+        fuse map-node, n7, no
+        fuse map-node, n8, yes
+    case n6
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, yes
+        fuse map-node, n6, no
+        fuse map-node, n7, yes
+        fuse map-node, n8, no
+    case n7
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, no
+        fuse map-node, n6, yes
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+    case n8
+      fork case, read b
+        fuse map-node, n1, no
+        fuse map-node, n2, no
+        fuse map-node, n3, no
+        fuse map-node, n4, no
+        fuse map-node, n5, yes
+        fuse map-node, n6, no
+        fuse map-node, n7, no
+        fuse map-node, n8, no
+
+# THE CARTAN ENTRY VALUE. The Cartan matrix of a simply-laced algebra takes only three values: two on the diagonal,
+# minus one for an adjacent pair, zero otherwise. Rather than carry signed integers, the three outcomes are named
+# directly. The mapping to the integer matrix is two for `two-on-diagonal`, minus one for `minus-one-off-diagonal`, zero
+# for `zero-apart`.
+form cartan-value
+  case two-on-diagonal
+  case minus-one-off-diagonal
+  case zero-apart
+
+# Equality of Cartan values, for the symmetry and diagonal laws.
+task same-cartan-value
+  take a, like cartan-value
+  take b, like cartan-value
+  like flag
+  fork case, read a
+    case two-on-diagonal
+      fork case, read b
+        fuse map-cartan, two-on-diagonal, yes
+        fuse map-cartan, minus-one-off-diagonal, no
+        fuse map-cartan, zero-apart, no
+    case minus-one-off-diagonal
+      fork case, read b
+        fuse map-cartan, two-on-diagonal, no
+        fuse map-cartan, minus-one-off-diagonal, yes
+        fuse map-cartan, zero-apart, no
+    case zero-apart
+      fork case, read b
+        fuse map-cartan, two-on-diagonal, no
+        fuse map-cartan, minus-one-off-diagonal, no
+        fuse map-cartan, zero-apart, yes
+
+# TEMPLATE: one entry of a single-valued map out of a Cartan value.
+tree map-cartan
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# THE CARTAN MATRIX ENTRY. Built from the diagram: a node paired with itself gives two, an adjacent pair gives minus one,
+# any other pair gives zero. This reads the matrix straight off the adjacency table, so the matrix is DERIVED from the
+# diagram, not entered by hand.
+task cartan-entry
+  take a, like node
+  take b, like node
+  like cartan-value
+  fork case
+    call same-node
+      read a
+      read b
+    case yes
+      send back
+        make two-on-diagonal
+    case no
+      fork case
+        call adjacent
+          read a
+          read b
+        case yes
+          send back
+            make minus-one-off-diagonal
+        case no
+          send back
+            make zero-apart
+
+# THE DIAGRAM IS UNDIRECTED: adjacent a b = adjacent b a, over all sixty-four node pairs. The edges have no direction, so
+# the adjacency table must be symmetric. Proved by induction over both nodes.
+rule adjacent-is-symmetric
+  mark a, like node
+  mark b, like node
+  show hold
+    call is-equal
+      call adjacent
+        read a
+        read b
+      call adjacent
+        read b
+        read a
+  fold a, b
+
+# THE DIAGRAM IS SIMPLE, NO SELF-LOOPS: adjacent a a = no, for every node. A node is never joined to itself, so the
+# diagram is a simple graph. Proved over all eight nodes.
+rule no-node-is-adjacent-to-itself
+  mark a, like node
+  show hold
+    call is-equal
+      call adjacent
+        read a
+        read a
+      make no
+  fold a
+
+# THE CARTAN MATRIX IS SYMMETRIC: cartan-entry a b = cartan-entry b a, over all sixty-four pairs. This is the statement
+# that E8 is SIMPLY LACED. It follows from the symmetry of both the equality test and the adjacency table. Proved by
+# induction over both nodes.
+rule cartan-is-symmetric
+  mark a, like node
+  mark b, like node
+  show hold
+    call is-equal
+      call cartan-entry
+        read a
+        read b
+      call cartan-entry
+        read b
+        read a
+  fold a, b
+
+# THE CARTAN DIAGONAL IS TWO: cartan-entry a a = two-on-diagonal, for every node. Every simple root has squared length
+# two in the normalization that makes the matrix integral, so the whole diagonal is two. Proved over all eight nodes.
+rule cartan-diagonal-is-two
+  mark a, like node
+  show hold
+    call is-equal
+      call cartan-entry
+        read a
+        read a
+      make two-on-diagonal
+  fold a
+
+# AN OFF-DIAGONAL ENTRY IS MINUS ONE EXACTLY WHEN THE NODES ARE ADJACENT: for distinct nodes, the Cartan entry is
+# minus-one-off-diagonal if and only if they are joined by an edge. This ties the matrix to the diagram in both
+# directions and confirms there are no two-or-three-fold bonds (E8 has only single edges). Proved over all pairs.
+rule off-diagonal-cartan-tracks-adjacency
+  mark a, like node
+  mark b, like node
+  show hold
+    call is-equal
+      call adjacent
+        read a
+        read b
+      call same-cartan-value
+        call cartan-entry
+          read a
+          read b
+        make minus-one-off-diagonal
+  fold a, b
+
+# THE EDGE COUNT IS SEVEN. The seven edges of E8 are enumerated as concrete ordered pairs and each is confirmed adjacent.
+# Eight nodes joined by seven edges with the diagram connected makes it a TREE. Connectedness is visible in the chain
+# n1-n2-n3-n4-n5-n6-n7 with n8 hanging off n5: every node reaches every other along the bonds. The seven-edge count is
+# proved here; the connectedness is the stated reading of the fully constructed adjacency table above.
+rule the-seven-edges-are-present
+  show hold
+    call is-equal
+      call both
+        call both
+          call both
+            call adjacent
+              make n1
+              make n2
+            call adjacent
+              make n2
+              make n3
+          call both
+            call adjacent
+              make n3
+              make n4
+            call adjacent
+              make n4
+              make n5
+        call both
+          call both
+            call adjacent
+              make n5
+              make n6
+            call adjacent
+              make n6
+              make n7
+          call adjacent
+            make n5
+            make n8
+      make yes
+  calm hold
+
+# THERE IS NO EIGHTH KIND OF NON-EDGE PRETENDING TO BE AN EDGE: the two long-range pairs that would close the diagram
+# into a loop are confirmed NON-adjacent, so the seven edges are the only edges and the diagram stays a tree. n1-n7 (the
+# two ends of the chain) and n8-n4 (the branch tip to a chain node it does not touch) are both `no`.
+rule the-diagram-has-no-extra-bonds
+  show hold
+    call is-equal
+      call either
+        call adjacent
+          make n1
+          make n7
+        call adjacent
+          make n8
+          make n4
+      make no
+  calm hold
+
+# THE INTEGER-ROOT FAMILY. A coordinate of an eight-dimensional root vector is zero, plus one, or minus one. A D8 root
+# (the integer family of E8) is a vector with EXACTLY TWO nonzero coordinates, each plus or minus one: the vectors
+# plus-or-minus e_i plus-or-minus e_j. This is a real computable predicate, not a count.
+form coord
+  case zero
+  case plus-one
+  case minus-one
+
+# Whether a coordinate is nonzero.
+task is-nonzero
+  take c, like coord
+  like flag
+  fork case, read c
+    case zero
+      send back
+        make no
+    case plus-one
+      send back
+        make yes
+    case minus-one
+      send back
+        make yes
+
+# A bounded tally of how many coordinates are nonzero: none, one, exactly two, or more than two. Counting saturates at
+# `more-than-two`, which is all the integer-root test needs (a root has exactly two nonzero coordinates).
+form tally
+  case none
+  case one
+  case exactly-two
+  case more-than-two
+
+# Add one to a tally, saturating at more-than-two.
+task bump
+  take t, like tally
+  like tally
+  fork case, read t
+    case none
+      send back
+        make one
+    case one
+      send back
+        make exactly-two
+    case exactly-two
+      send back
+        make more-than-two
+    case more-than-two
+      send back
+        make more-than-two
+
+# Count a single coordinate into a running tally: bump when it is nonzero, leave it when it is zero.
+task count-coord
+  take c, like coord
+  take running, like tally
+  like tally
+  fork case, call is-nonzero, read c
+    case yes
+      send back
+        call bump
+          read running
+    case no
+      send back
+        read running
+
+# Count how many of the eight coordinates are nonzero, folding the eight coordinates through count-coord. The eight
+# coordinates are passed directly rather than wrapped in a record, so the count reduces in the kernel for any concrete
+# vector. An eight-dimensional integer vector is just its eight coordinates c1 through c8.
+task count-nonzero
+  take c1, like coord
+  take c2, like coord
+  take c3, like coord
+  take c4, like coord
+  take c5, like coord
+  take c6, like coord
+  take c7, like coord
+  take c8, like coord
+  like tally
+  send back
+    call count-coord
+      read c8
+      call count-coord
+        read c7
+        call count-coord
+          read c6
+          call count-coord
+            read c5
+            call count-coord
+              read c4
+              call count-coord
+                read c3
+                call count-coord
+                  read c2
+                  call count-coord
+                    read c1
+                    make none
+
+# THE INTEGER-ROOT PREDICATE: a vector is a D8 root, hence one of the one hundred twelve integer roots of E8, exactly
+# when it has exactly two nonzero coordinates.
+task is-integer-root
+  take c1, like coord
+  take c2, like coord
+  take c3, like coord
+  take c4, like coord
+  take c5, like coord
+  take c6, like coord
+  take c7, like coord
+  take c8, like coord
+  like flag
+  fork case
+    call count-nonzero
+      read c1
+      read c2
+      read c3
+      read c4
+      read c5
+      read c6
+      read c7
+      read c8
+    case exactly-two
+      send back
+        make yes
+    case none
+      send back
+        make no
+    case one
+      send back
+        make no
+    case more-than-two
+      send back
+        make no
+
+# e1 + e2 IS AN INTEGER ROOT. The vector with plus one in the first two coordinates and zero elsewhere has exactly two
+# nonzero entries, so the predicate accepts it. A concrete witness that the integer-root family is nonempty.
+rule e-one-plus-e-two-is-a-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make yes
+  calm hold
+
+# e1 - e3 IS AN INTEGER ROOT TOO, with one positive and one negative nonzero coordinate, so the predicate accepts the
+# mixed-sign case, the full plus-or-minus e_i plus-or-minus e_j shape.
+rule e-one-minus-e-three-is-a-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make zero
+        make minus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make yes
+  calm hold
+
+# e1 + e2 + e3 IS NOT AN INTEGER ROOT: three nonzero coordinates is one too many, so the predicate rejects it. This is
+# the negative control that shows the predicate has real content and is not accepting everything.
+rule three-nonzero-is-not-a-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make plus-one
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# THE ZERO VECTOR IS NOT A ROOT: no nonzero coordinates, so the origin is rejected. The roots never include zero, which
+# is what lets the roots plus the origin generate the E8 lattice.
+rule the-origin-is-not-a-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# THE ROOT COUNT. The two hundred forty roots of E8 split into the one hundred twelve integer roots (the D8 family above)
+# and the one hundred twenty-eight half-integer spinor roots (one half times eight signs with an even number of minus
+# signs). This is the honest arithmetic of the two family sizes, a stated count of the two families and NOT a derivation
+# of the number two hundred forty from the diagram.
+hold the-two-root-families-sum-to-two-hundred-forty
+  call is-equal
+    code 240
+    call add
+      code 112
+      code 128
+
+# THE INTEGER FAMILY IS TWICE THE D8 EDGE STRUCTURE: one hundred twelve is two times fifty-six, the choose-two of eight
+# axes times the four sign patterns, 8 choose 2 is 28, times 4 is 112. Stated as the arithmetic of the integer family.
+hold the-integer-family-has-one-hundred-twelve-roots
+  call is-equal
+    code 112
+    call multiply
+      code 4
+      call multiply
+        code 7
+        code 4
+
+# THE SPINOR FAMILY IS TWO TO THE SEVENTH: one hundred twenty-eight is the half of the two hundred fifty-six sign
+# patterns on eight coordinates that have an even number of minus signs, 2^7 = 128. Stated as the arithmetic of the
+# spinor family.
+hold the-spinor-family-has-one-hundred-twenty-eight-roots
+  call is-equal
+    code 128
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          call multiply
+            code 2
+            call multiply
+              code 2
+              call multiply
+                code 2
+                code 2
+
+# THE ALGEBRA DIMENSION: two hundred forty-eight, the two hundred forty roots plus the eight-dimensional Cartan
+# subalgebra (one direction per node). 240 + 8 = 248, the dimension of E8.
+hold e8-has-dimension-two-hundred-forty-eight
+  call is-equal
+    code 248
+    call add
+      code 240
+      code 8

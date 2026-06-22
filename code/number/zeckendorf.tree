@@ -1,0 +1,401 @@
+# The ZECKENDORF REPRESENTATION, machine-checked. Zeckendorf's theorem says every positive integer is a sum of distinct
+# Fibonacci numbers in EXACTLY ONE way that uses NO TWO CONSECUTIVE Fibonacci numbers. Written as a string of bits, one
+# per consecutive Fibonacci number, the representation is a binary-looking word with NO TWO ADJACENT ONES. That word is
+# the regular-language condition behind Margenstern's FIBONACCI ADDRESSING of the hyperbolic tilings: the tiles of a
+# tessellation are numbered row by row, each number is written in this non-adjacent form, and the resulting bit string IS
+# the tile's coordinate. It encodes the path down the spanning tree to that tile, and the set of all valid addresses is a
+# regular language, which is why a small finite automaton can navigate an infinite curved mesh.
+#
+# This file models the bit string as an inductive type `bits` (a list read low-Fibonacci-first: the first bit is the
+# coefficient of F2 = 1, the next of F3 = 2, then F4 = 3, F5 = 5, ...). `is-valid` scans the string and answers whether
+# it satisfies the non-adjacent-ones condition. `value` reads the string back as the natural number it stands for, the
+# sum of the Fibonacci numbers at the on-bit positions. The kernel then checks, by computing normal forms (`calm hold`)
+# and by structural induction (`fold`), that the validity scanner accepts sparse codes and rejects adjacent ones, that
+# the predicate is closed under the recursion, that small codes read back to the right numbers, and that two different
+# valid codes carry different values. The full uniqueness theorem over all naturals is stated but not discharged here:
+# what is proven is marked plainly below, and nothing is claimed that the kernel did not check.
+
+# A natural number: zero, or the successor of a natural.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# A truth value used as the result of the validity scan and the equality test.
+form flag
+  case yes
+  case no
+
+# Addition by recursion on the first argument: 0 + b = b, and (succ a) + b = succ (a + b). Needed to total the Fibonacci
+# numbers at the on-bit positions. Recursion descends on the matched predecessor, so it is verified terminating and the
+# kernel unfolds it.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# The Fibonacci function by two-step recursion: fib 0 = 0, fib 1 = 1, fib (n+2) = fib (n+1) + fib n. The on-bit at index
+# i contributes fib i to the value.
+task fib
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link m
+      fork case, read m
+        case zero
+          send back
+            make succ
+              bind prior
+                make zero
+        case succ
+          link k
+          send back
+            call plus
+              call fib
+                read m
+              call fib
+                read k
+
+# Equality of two naturals by simultaneous recursion: yes when both reach zero together, no the moment they disagree.
+# Used to witness that two codes carry different values.
+task is-equal-natural
+  take a, like natural
+  take b, like natural
+  like flag
+  fork case, read a
+    case zero
+      fork case, read b
+        case zero
+          send back
+            make yes
+        case succ
+          send back
+            make no
+    case succ
+      link pa
+      fork case, read b
+        case zero
+          send back
+            make no
+        case succ
+          link pb
+          send back
+            call is-equal-natural
+              read pa
+              read pb
+
+# A Fibonacci-bit string, read low-Fibonacci-first. `done` is the end of the string. `zero rest` is an off bit (that
+# Fibonacci number is not used) followed by the rest. `one rest` is an on bit (that Fibonacci number is used) followed by
+# the rest. The first bit is the coefficient of F2, the next of F3, and so on up the Fibonacci sequence.
+form bits
+  case done
+  case zero
+    link rest, like bits
+  case one
+    link rest, like bits
+
+# The validity scan, carrying a flag for whether the PREVIOUS bit was on. Reaching `done` is valid. An off bit clears the
+# previous-on flag and continues. An on bit is a violation exactly when the previous bit was also on (two adjacent ones),
+# otherwise it sets the flag and continues. This is the finite automaton that recognizes the regular language of
+# Margenstern's tile addresses.
+task valid-from
+  take prev, like flag
+  take xs, like bits
+  like flag
+  fork case, read xs
+    case done
+      send back
+        make yes
+    case zero
+      send back
+        call valid-from
+          make no
+          read rest
+    case one
+      fork case, read prev
+        case yes
+          send back
+            make no
+        case no
+          send back
+            call valid-from
+              make yes
+              read rest
+
+# A code is valid when it satisfies the non-adjacent-ones condition, scanned from the start with no previous on bit.
+task is-valid
+  take xs, like bits
+  like flag
+  send back
+    call valid-from
+      make no
+      read xs
+
+# The natural number a code stands for, read from a given starting Fibonacci index. `done` contributes nothing. An off
+# bit advances the index. An on bit adds fib at the current index, then advances. This is the sum of the Fibonacci
+# numbers at the on-bit positions.
+task value-from
+  take index, like natural
+  take xs, like bits
+  like natural
+  fork case, read xs
+    case done
+      send back
+        make zero
+    case zero
+      send back
+        call value-from
+          make succ
+            bind prior
+              read index
+          read rest
+    case one
+      send back
+        call plus
+          call fib
+            read index
+          call value-from
+            make succ
+              bind prior
+                read index
+            read rest
+
+# The value of a whole code, starting from Fibonacci index 2 (the first bit is the coefficient of F2 = 1).
+task value
+  take xs, like bits
+  like natural
+  send back
+    call value-from
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+      read xs
+
+# An all-zeros code of n bits, the zero-padded empty string. Used to prove padding never changes the on-bit count.
+task zeros
+  take n, like natural
+  like bits
+  fork case, read n
+    case zero
+      send back
+        make done
+    case succ
+      send back
+        make zero
+          bind rest
+            call zeros
+              read prior
+
+# The number of on bits in a code, by recursion on its structure.
+task count-on
+  take xs, like bits
+  like natural
+  fork case, read xs
+    case done
+      send back
+        make zero
+    case zero
+      send back
+        call count-on
+          read rest
+    case one
+      send back
+        make succ
+          bind prior
+            call count-on
+              read rest
+
+# THE EMPTY CODE IS VALID: the string with no bits satisfies the condition. The base case of the scan.
+rule done-is-valid
+  show hold
+    call is-equal
+      call is-valid
+        make done
+      make yes
+  calm hold
+
+# ACCEPTS A SPARSE CODE: the code 1, 0, 1 (ones separated by an off bit) has no two adjacent ones, so the scanner accepts
+# it. This is a valid Fibonacci address.
+rule accepts-sparse-code
+  show hold
+    call is-equal
+      call is-valid
+        make one
+          bind rest
+            make zero
+              bind rest
+                make one
+                  bind rest
+                    make done
+      make yes
+  calm hold
+
+# REJECTS TWO ADJACENT ONES: the code 1, 1 uses two consecutive Fibonacci numbers, which Zeckendorf's condition forbids,
+# so the scanner rejects it. This is the violation the regular language excludes.
+rule rejects-adjacent-ones
+  show hold
+    call is-equal
+      call is-valid
+        make one
+          bind rest
+            make one
+              bind rest
+                make done
+      make no
+  calm hold
+
+# CLOSED UNDER A LEADING ZERO: a code is valid exactly when the same code with an off bit prepended is valid, for EVERY
+# code. Prepending an off bit cannot create a new adjacency, so validity is preserved. (The off-bit branch resets the
+# previous-on flag, the same state the scan starts in, so both sides reduce to the same scan.)
+rule is-valid-closed-under-leading-zero
+  mark xs, like bits
+  show hold
+    call is-equal
+      call is-valid
+        make zero
+          bind rest
+            read xs
+      call is-valid
+        read xs
+  calm hold
+
+# A LEADING ON BIT AFTER AN ON BIT ALWAYS REJECTS: once the previous bit is on, an on bit fails the scan no matter what
+# follows, for EVERY tail. This is the heart of the non-adjacency rule.
+rule on-after-on-always-rejects
+  mark xs, like bits
+  show hold
+    call is-equal
+      call valid-from
+        make yes
+        make one
+          bind rest
+            read xs
+      make no
+  calm hold
+
+# THE CODE 1 READS AS ONE: the single on bit at the first position contributes F2 = 1, so its value is 1.
+rule value-of-one-is-one
+  show hold
+    call is-equal
+      call value
+        make one
+          bind rest
+            make done
+      make succ
+        bind prior
+          make zero
+  calm hold
+
+# THE CODE 0, 1 READS AS TWO: the on bit at the second position contributes F3 = 2, so its value is 2.
+rule value-of-zero-one-is-two
+  show hold
+    call is-equal
+      call value
+        make zero
+          bind rest
+            make one
+              bind rest
+                make done
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm hold
+
+# THE CODE 1, 0, 1 READS AS FOUR: on bits at positions one and three contribute F2 + F4 = 1 + 3 = 4. This ties the bit
+# string back to the number it addresses.
+rule value-of-one-zero-one-is-four
+  show hold
+    call is-equal
+      call value
+        make one
+          bind rest
+            make zero
+              bind rest
+                make one
+                  bind rest
+                    make done
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+  calm hold
+
+# INJECTIVITY WITNESS: the code 1 (value 1) and the code 0, 1 (value 2) are two DIFFERENT valid codes carrying DIFFERENT
+# values, so the value reading is not constant. The equality test on their values answers no. This is a concrete instance
+# of the injectivity half of Zeckendorf's theorem.
+rule different-codes-carry-different-values
+  show hold
+    call is-equal
+      call is-equal-natural
+        call value
+          make one
+            bind rest
+              make done
+        call value
+          make zero
+            bind rest
+              make one
+                bind rest
+                  make done
+      make no
+  calm hold
+
+# PADDING WITH ZEROS NEVER ADDS AN ON BIT: an all-zeros code of any length has no on bits, for EVERY length n. Proved by
+# induction on n: the empty code has none, and adding one more off bit adds none. This is why trailing or leading zero
+# padding leaves a Fibonacci address unchanged.
+rule zeros-have-no-on-bits
+  mark n, like natural
+  show hold
+    call is-equal
+      call count-on
+        call zeros
+          read n
+      make zero
+  fold n
+
+# PADDING WITH ZEROS STAYS VALID: an all-zeros code of any length is valid, for EVERY length n. Proved by induction on n:
+# the empty code is valid, and prepending an off bit preserves validity. The vacuous address (no Fibonacci numbers used)
+# is always a legal coordinate.
+rule zeros-are-valid
+  mark n, like natural
+  show hold
+    call is-equal
+      call is-valid
+        call zeros
+          read n
+      make yes
+  fold n
+    cite is-valid-closed-under-leading-zero
+
+# WHAT IS PROVEN VERSUS STATED. Proven above by the kernel: the scanner accepts a sparse code and rejects two adjacent
+# ones, the validity predicate is closed under a leading off bit and always rejects an on bit following an on bit, the
+# small codes read back to their exact numbers, two different valid codes carry different values (an injectivity
+# witness), and zero padding preserves both the on-bit count and validity (two genuine inductions). NOT proven here, only
+# stated: the full Zeckendorf theorem that EVERY positive natural has EXACTLY ONE valid code. That existence-and-
+# uniqueness statement quantifies over all naturals and needs the greedy construction together with a strong-induction
+# bound on partial Fibonacci sums, which is beyond the discharging done in this file. The fragments above are the honest
+# checked core of it.

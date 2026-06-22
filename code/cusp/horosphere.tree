@@ -1,0 +1,211 @@
+# The discrete horosphere of a regular hyperbolic tiling, machine-checked. Fix an ideal point at infinity, a CUSP. In a
+# regular {p,q} honeycomb the tiles fall into HOROCYCLIC LEVELS by combinatorial distance from that ideal point: each
+# level set is one discrete horosphere, a horocycle of cells wrapping around the cusp. The CUSP is the limit where the
+# levels bottom out (level zero), the BULK is everything deeper (the interior the levels grow into), and the levels form
+# a TREE: descending into the bulk is a one-way branching that multiplies cells, ascending toward the cusp is the inverse
+# predecessor. This matters for a hyperbolic substrate because the vibe mesh has exactly this cusp / bulk / boundary
+# shape: the arrow of growth points away from the cusp into the bulk, and the horocyclic rows expand EXPONENTIALLY (the
+# Fibonacci / Margenstern growth of the pentagrid), unlike a flat Euclidean grid.
+#
+# This file MODELS the level coordinate as a Peano depth, gives the two navigation moves (DEEPER into the bulk, ASCEND
+# toward the cusp), and PROVES: ascend is the left inverse of deeper on every level (cusp and bulk directions cancel),
+# the cusp is the unique minimum (nothing is shallower than level zero), descent strictly increases the level and never
+# returns (one-way bulk growth, the arrow), and the horocyclic row count strictly grows level by level with the same
+# two-step Fibonacci recurrence that governs the hyperbolic shells.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# The level coordinate: combinatorial depth from the cusp. The cusp is level zero; every other level is one deeper than
+# the level just shallower than it (one step further into the bulk).
+form level
+  case cusp
+  case deep
+    link prior, like level
+
+# DEEPER: one step into the bulk, away from the cusp. The successor on levels.
+task deeper
+  take l, like level
+  like level
+  send back
+    make deep
+      bind prior
+        read l
+
+# ASCEND: one step back toward the cusp. The predecessor on levels, with the cusp as a fixed point (you cannot rise
+# above the ideal point, so the cusp ascends to itself).
+task ascend
+  take l, like level
+  like level
+  fork case, read l
+    case cusp
+      send back
+        make cusp
+    case deep
+      link prior
+      send back
+        read prior
+
+# below a b is yes when level a is strictly shallower (closer to the cusp) than level b. The order on horocyclic depth.
+task below
+  take a, like level
+  take b, like level
+  like flag
+  fork case, read b
+    case cusp
+      send back
+        make no
+    case deep
+      link bp
+      fork case, read a
+        case cusp
+          send back
+            make yes
+        case deep
+          link ap
+          send back
+            call below
+              read ap
+              read bp
+
+# The horocyclic row count: how many cells sit on the discrete horosphere at a given level. The cusp horosphere is a
+# single seed cell, the next two-step is one cell, and from there each row is the sum of the two shallower rows: the
+# Fibonacci recurrence of the hyperbolic shells (Margenstern's splitting of the pentagrid), so the rows grow
+# exponentially into the bulk.
+task row
+  take l, like level
+  like level
+  fork case, read l
+    case cusp
+      send back
+        make deep
+          bind prior
+            make cusp
+    case deep
+      link m
+      fork case, read m
+        case cusp
+          send back
+            make deep
+              bind prior
+                make cusp
+        case deep
+          link k
+          send back
+            call tally
+              call row
+                read m
+              call row
+                read k
+
+# Addition of counts (Peano), recursion on the first. Used to sum the two shallower horocyclic rows.
+task tally
+  take a, like level
+  take b, like level
+  like level
+  fork case, read a
+    case cusp
+      send back
+        read b
+    case deep
+      link ap
+      send back
+        make deep
+          bind prior
+            call tally
+              read ap
+              read b
+
+# ASCEND IS THE LEFT INVERSE OF DEEPER: ascend (deeper l) = l, for every level. Stepping one cell into the bulk and then
+# one cell back toward the cusp returns exactly where you were. The cusp direction and the bulk direction cancel.
+rule ascend-undoes-deeper
+  mark l, like level
+  show hold
+    call is-equal
+      call ascend
+        call deeper
+          read l
+      read l
+  fold l
+
+# THE CUSP IS THE UNIQUE MINIMUM: nothing is strictly shallower than the cusp, below l cusp = no, for every level. The
+# cusp is the floor of the horocyclic order, the ideal point the levels bottom out at.
+rule nothing-is-below-the-cusp
+  mark l, like level
+  show hold
+    call is-equal
+      call below
+        read l
+        make cusp
+      make no
+  fold l
+
+# DESCENT STRICTLY INCREASES THE LEVEL: below l (deeper l) = yes, for every level. Going one cell into the bulk always
+# lands on a strictly deeper horosphere. The bulk grows away from the cusp.
+rule deeper-is-strictly-deeper
+  mark l, like level
+  show hold
+    call is-equal
+      call below
+        read l
+        call deeper
+          read l
+      make yes
+  fold l
+
+# DESCENT NEVER RETURNS: the deeper level is never shallower than the level before it, below (deeper l) l = no, for every
+# level. Growth into the bulk is one-way, the open horocyclic edge only moves outward. This is the arrow of the substrate.
+rule deeper-never-returns
+  mark l, like level
+  show hold
+    call is-equal
+      call below
+        call deeper
+          read l
+        read l
+      make no
+  fold l
+
+# THE ROW SATISFIES THE FIBONACCI RECURRENCE: the count on the horosphere two levels into the bulk is the sum of the two
+# shallower rows, row (deeper (deeper l)) = tally (row (deeper l)) (row l). This is the exponential expansion of the
+# hyperbolic shells: each horocyclic row is the sum of its two predecessors, so the bulk multiplies cells away from the
+# cusp the way the Margenstern pentagrid splitting does.
+rule row-grows-by-fibonacci
+  mark l, like level
+  show hold
+    call is-equal
+      call row
+        call deeper
+          call deeper
+            read l
+      call tally
+        call row
+          call deeper
+            read l
+        call row
+          read l
+  calm hold
+
+# THE FIRST TWO HOROCYCLIC ROWS ARE EACH A SINGLE CELL: row cusp = one and row (deeper cusp) = one. The cusp seed and the
+# row just into the bulk are both single cells, the base of the Fibonacci growth.
+rule cusp-row-is-one-cell
+  show hold
+    call is-equal
+      call row
+        make cusp
+      make deep
+        bind prior
+          make cusp
+  calm hold
+
+rule first-bulk-row-is-one-cell
+  show hold
+    call is-equal
+      call row
+        make deep
+          bind prior
+            make cusp
+      make deep
+        bind prior
+          make cusp
+  calm hold

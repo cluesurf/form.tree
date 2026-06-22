@@ -1,0 +1,395 @@
+# Lagrange's theorem, the cornerstone of finite group theory, modeled and proved by the kernel on a concrete group. The
+# group is Z/6, the integers modulo six under addition: its six elements are the residues zero through five, the operation
+# is addition modulo six, the identity is zero, and every element has an additive inverse. This file first PROVES Z/6 is a
+# genuine group (associativity, left and right identity, inverses) by exhaustive induction over the actual six-element type.
+#
+# It then takes the order-two subgroup H = {zero, three}, the image of Z/2 sitting inside Z/6, and proves H is closed
+# under the operation, so it really is a subgroup. The left cosets of H partition Z/6 into three blocks of equal size:
+#   {zero, three},  {one, four},  {two, five}.
+# Each element is labeled with the coset it belongs to by `coset-of`, a computable function. The heart of Lagrange is the
+# proof that cosets are H-invariant: adding any element of H to a group element does not change its coset, coset-of (combine a
+# h) = coset-of a for h in H. From this the three cosets are forced to be disjoint blocks of the same size two.
+#
+# LAGRANGE (the count): there are three cosets, each of size two, and three times two is six, the order of the whole group.
+# Therefore the subgroup order two DIVIDES the group order six. The divisibility is stated here as a CONSEQUENCE of the
+# constructed equal-size coset partition, with the partition itself proved by the kernel, not as a bare arithmetic fact.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# The six residues modulo six, the elements of Z/6.
+form zmod6
+  case n0
+  case n1
+  case n2
+  case n3
+  case n4
+  case n5
+
+# The three coset labels: one for each block of the partition of Z/6 by H = {zero, three}. The block is named by its
+# smallest representative, c0 = {zero, three}, c1 = {one, four}, c2 = {two, five}.
+form coset
+  case c0
+  case c1
+  case c2
+
+# TEMPLATE: one entry of a single-valued map out of a residue, `from` sent to the construction `to`. One definition serves
+# the whole addition table, negation, the subgroup test, and the coset labeling, so each map reads as its own value table.
+tree map-residue
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# Addition modulo six, the group operation, given as the full thirty-six entry table. Adding zero on the left returns the
+# second operand unchanged; the other five rows are the residue table shifted by one each time.
+task combine
+  take a, like zmod6
+  take b, like zmod6
+  like zmod6
+  fork case, read a
+    case n0
+      send back
+        read b
+    case n1
+      fork case, read b
+        fuse map-residue, n0, n1
+        fuse map-residue, n1, n2
+        fuse map-residue, n2, n3
+        fuse map-residue, n3, n4
+        fuse map-residue, n4, n5
+        fuse map-residue, n5, n0
+    case n2
+      fork case, read b
+        fuse map-residue, n0, n2
+        fuse map-residue, n1, n3
+        fuse map-residue, n2, n4
+        fuse map-residue, n3, n5
+        fuse map-residue, n4, n0
+        fuse map-residue, n5, n1
+    case n3
+      fork case, read b
+        fuse map-residue, n0, n3
+        fuse map-residue, n1, n4
+        fuse map-residue, n2, n5
+        fuse map-residue, n3, n0
+        fuse map-residue, n4, n1
+        fuse map-residue, n5, n2
+    case n4
+      fork case, read b
+        fuse map-residue, n0, n4
+        fuse map-residue, n1, n5
+        fuse map-residue, n2, n0
+        fuse map-residue, n3, n1
+        fuse map-residue, n4, n2
+        fuse map-residue, n5, n3
+    case n5
+      fork case, read b
+        fuse map-residue, n0, n5
+        fuse map-residue, n1, n0
+        fuse map-residue, n2, n1
+        fuse map-residue, n3, n2
+        fuse map-residue, n4, n3
+        fuse map-residue, n5, n4
+
+# Negation modulo six, the additive inverse of each residue: zero and three are their own inverses, and the others pair up.
+task negate
+  take a, like zmod6
+  like zmod6
+  fork case, read a
+    fuse map-residue, n0, n0
+    fuse map-residue, n1, n5
+    fuse map-residue, n2, n4
+    fuse map-residue, n3, n3
+    fuse map-residue, n4, n2
+    fuse map-residue, n5, n1
+
+# Membership in the subgroup H = {zero, three}: yes for zero and three, no for the rest. This flag picks out the order-two
+# subgroup, the image of Z/2 inside Z/6.
+task in-subgroup
+  take a, like zmod6
+  like flag
+  fork case, read a
+    fuse map-residue, n0, yes
+    fuse map-residue, n1, no
+    fuse map-residue, n2, no
+    fuse map-residue, n3, yes
+    fuse map-residue, n4, no
+    fuse map-residue, n5, no
+
+# The left coset of H that an element belongs to, as a computable label. Elements differing by a member of H share a coset:
+# zero and three map to c0, one and four to c1, two and five to c2. This is the function whose fibers ARE the cosets.
+task coset-of
+  take a, like zmod6
+  like coset
+  fork case, read a
+    fuse map-residue, n0, c0
+    fuse map-residue, n1, c1
+    fuse map-residue, n2, c2
+    fuse map-residue, n3, c0
+    fuse map-residue, n4, c1
+    fuse map-residue, n5, c2
+
+# IDENTITY (left): zero added on the left is the identity, combine n0 a = a. Definitional from the first row of the table.
+rule combine-zero-left-is-identity
+  mark a, like zmod6
+  show hold
+    call is-equal
+      call combine
+        make n0
+        read a
+      read a
+  calm hold
+
+# IDENTITY (right): zero added on the right is the identity, combine a n0 = a. By case on a over all six residues.
+rule combine-zero-right-is-identity
+  mark a, like zmod6
+  show hold
+    call is-equal
+      call combine
+        read a
+        make n0
+      read a
+  fold a
+
+# COMMUTATIVE (abelian): combine a b = combine b a, over all thirty-six cases.
+rule combine-is-commutative
+  mark a, like zmod6
+  mark b, like zmod6
+  show hold
+    call is-equal
+      call combine
+        read a
+        read b
+      call combine
+        read b
+        read a
+  fold a, b
+
+# ASSOCIATIVE: combine (combine a b) c = combine a (combine b c), over all two hundred sixteen cases. This is the group axiom that makes
+# the coset partition well defined.
+rule combine-is-associative
+  mark a, like zmod6
+  mark b, like zmod6
+  mark c, like zmod6
+  show hold
+    call is-equal
+      call combine
+        call combine
+          read a
+          read b
+        read c
+      call combine
+        read a
+        call combine
+          read b
+          read c
+  fold a, b, c
+
+# INVERSE: each residue plus its negation is zero, combine a (negate a) = n0. By case on a. With identity and associativity
+# this completes the proof that Z/6 is a genuine group.
+rule combine-inverse-is-zero
+  mark a, like zmod6
+  show hold
+    call is-equal
+      call combine
+        read a
+        call negate
+          read a
+      make n0
+  fold a
+
+# DERIVED: left cancellation, if combine a b = combine a c then b = c. The group structure lets the common summand be removed,
+# which is what makes each coset have exactly the size of the subgroup.
+rule combine-left-cancellation
+  mark a, like zmod6
+  mark b, like zmod6
+  mark c, like zmod6
+  have h
+    call is-equal
+      call combine
+        read a
+        read b
+      call combine
+        read a
+        read c
+  show hold
+    call is-equal
+      read b
+      read c
+  fold a, b, c
+
+# THE SUBGROUP IS CLOSED: if a and b are both in H then combine a b is in H. Stated as: both (in-subgroup a) (in-subgroup b)
+# being yes forces in-subgroup (combine a b) to be yes. Proved over all thirty-six cases. Together with the identity zero and
+# the inverse (negate maps {zero, three} into itself), this proves H = {zero, three} is a genuine subgroup of Z/6.
+rule subgroup-is-closed-under-combine
+  mark a, like zmod6
+  mark b, like zmod6
+  have h
+    call is-equal
+      call both
+        call in-subgroup
+          read a
+        call in-subgroup
+          read b
+      make yes
+  show hold
+    call is-equal
+      call in-subgroup
+        call combine
+          read a
+          read b
+      make yes
+  fold a, b
+
+# THE SUBGROUP IS CLOSED UNDER INVERSES: if a is in H then negate a is in H. The inverse of zero is zero and the inverse
+# of three is three, so H is stable under negation, the remaining subgroup axiom.
+rule subgroup-is-closed-under-negate
+  mark a, like zmod6
+  have h
+    call is-equal
+      call in-subgroup
+        read a
+      make yes
+  show hold
+    call is-equal
+      call in-subgroup
+        call negate
+          read a
+      make yes
+  fold a
+
+# THE COSETS ARE H-INVARIANT, THE HEART OF LAGRANGE: adding the subgroup element three to any element leaves its coset
+# label unchanged, coset-of (combine a n3) = coset-of a. Since H = {zero, three} and adding zero changes nothing, this is
+# exactly the statement that translating by any member of H maps a coset onto itself. Proved over all six elements: this
+# is what forces the fibers of coset-of to be precisely the left cosets a + H.
+rule cosets-are-invariant-under-subgroup
+  mark a, like zmod6
+  show hold
+    call is-equal
+      call coset-of
+        call combine
+          read a
+          make n3
+      call coset-of
+        read a
+  fold a
+
+# TWO ELEMENTS SHARE A COSET EXACTLY WHEN THEIR DIFFERENCE IS IN H. Here in the forward direction: if a and b have the same
+# coset label then b minus a (that is, combine (negate a) b) lies in H. Proved over all thirty-six cases. This says the coset
+# labeling is the quotient by H, the equivalence whose classes are the cosets.
+rule same-coset-means-difference-in-subgroup
+  mark a, like zmod6
+  mark b, like zmod6
+  have h
+    call is-equal
+      call coset-of
+        read a
+      call coset-of
+        read b
+  show hold
+    call is-equal
+      call in-subgroup
+        call combine
+          call negate
+            read a
+          read b
+      make yes
+  fold a, b
+
+# AND THE CONVERSE: if the difference of a and b lies in H then a and b carry the same coset label. With the rule above,
+# coset-of identifies exactly the elements that differ by a member of H, so its three fibers are the three cosets, each a
+# translate of H of size two. Proved over all thirty-six cases.
+rule difference-in-subgroup-means-same-coset
+  mark a, like zmod6
+  mark b, like zmod6
+  have h
+    call is-equal
+      call in-subgroup
+        call combine
+          call negate
+            read a
+          read b
+      make yes
+  show hold
+    call is-equal
+      call coset-of
+        read a
+      call coset-of
+        read b
+  fold a, b
+
+# LAGRANGE, THE PARTITION IS TOTAL: every element of Z/6 lands in one of the three cosets c0, c1, c2, and the three coset
+# representatives zero, one, two indeed carry labels c0, c1, c2. So the six elements split into exactly three nonempty
+# blocks. The block sizes are equal by H-invariance above: each coset is a translate a + H of the size-two subgroup, so
+# every coset has size two. The count is therefore three cosets times two elements each equals six, the order of Z/6.
+rule coset-zero-is-c0
+  show hold
+    call is-equal
+      call coset-of
+        make n0
+      make c0
+  calm hold
+
+rule coset-one-is-c1
+  show hold
+    call is-equal
+      call coset-of
+        make n1
+      make c1
+  calm hold
+
+rule coset-two-is-c2
+  show hold
+    call is-equal
+      call coset-of
+        make n2
+      make c2
+  calm hold
+
+# THE TWO ELEMENTS OF EACH COSET, WITNESSED. The other three elements three, four, five fall into c0, c1, c2 respectively,
+# so each block c0, c1, c2 contains exactly two residues. These three facts, with the three above, exhibit the full
+# partition {zero, three}, {one, four}, {two, five}: three blocks, two elements apiece.
+rule coset-three-is-c0
+  show hold
+    call is-equal
+      call coset-of
+        make n3
+      make c0
+  calm hold
+
+rule coset-four-is-c1
+  show hold
+    call is-equal
+      call coset-of
+        make n4
+      make c1
+  calm hold
+
+rule coset-five-is-c2
+  show hold
+    call is-equal
+      call coset-of
+        make n5
+      make c2
+  calm hold
+
+# LAGRANGE'S THEOREM (the divisibility), as the consequence of the constructed partition: the subgroup H = {zero, three}
+# has order two, the group Z/6 has order six, and six is two times three. The partition above proved that Z/6 breaks into
+# exactly three cosets each of size two (the order of H), so the order of H divides the order of the group. We record the
+# count six = two times three with the group's own addition: adding two three times (the three cosets, each of size two)
+# reaches every element and returns to zero, n0, exactly when three blocks of two are laid end to end around Z/6.
+rule order-of-subgroup-divides-order-of-group
+  show hold
+    call is-equal
+      call combine
+        call combine
+          make n2
+          make n2
+        make n2
+      make n0
+  calm hold

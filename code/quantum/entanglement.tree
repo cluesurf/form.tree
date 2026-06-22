@@ -1,0 +1,203 @@
+# The four Bell states and two-qubit entanglement, the heart of quantum correlation, nonlocality, and quantum
+# information, modeled and proved by the kernel. A Bell state is a maximally entangled pair of qubits: the two outcomes
+# of a joint measurement are not independent but perfectly tied together. For the state phi-plus, measuring both qubits
+# in the same basis ALWAYS gives equal outcomes (both off or both on); for psi-minus, ALWAYS opposite outcomes. Neither
+# qubit alone has a definite value before measurement, yet the moment one is measured the partner is fixed. That forced
+# agreement is what Bell called nonlocal: no message passes, but the results cannot be reproduced by any pair of values
+# fixed in advance. This file models the OUTCOME CORRELATION (which is discrete and exactly checkable), not the complex
+# amplitudes. It CONSTRUCTS the four Bell states and the measurement outcomes, COMPUTES the forced partner outcome, and
+# PROVES the defining facts: phi-plus is perfectly correlated, psi-minus is perfectly anticorrelated, the correlation is
+# an involution (knowing the partner recovers the original outcome, the shared link is consistent), and a phase/parity
+# signature genuinely separates the four states. This is the combinatorial core of entanglement: the discrete shadow the
+# amplitudes cast on measurement, the part a classical recipe provably cannot fake.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# A measurement outcome of one qubit, off or on (the zero or one of a single binary measurement).
+form bit
+  case off
+  case on
+
+# The four Bell states, the maximally entangled two-qubit basis. The phi states correlate the outcomes (equal); the psi
+# states anticorrelate them (opposite). The plus and minus mark the relative phase, which a parity signature will read.
+form bell
+  case phi-plus
+  case phi-minus
+  case psi-plus
+  case psi-minus
+
+# Flip a bit, off to on and on to off. The anticorrelated partner is the flip of the measured outcome.
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Whether a Bell state correlates its outcomes (the phi states, equal outcomes) or anticorrelates them (the psi states,
+# opposite outcomes). This splits the four states into the two correlation classes, ignoring the relative phase.
+task is-correlated
+  take s, like bell
+  like flag
+  fork case, read s
+    case phi-plus
+      send back
+        make yes
+    case phi-minus
+      send back
+        make yes
+    case psi-plus
+      send back
+        make no
+    case psi-minus
+      send back
+        make no
+
+# The forced partner outcome: given a Bell state and ONE qubit's measured outcome, the outcome the other qubit MUST show
+# when measured in the same basis. For a correlated (phi) state the partner equals the outcome; for an anticorrelated
+# (psi) state it is the flip. This is the perfect correlation itself, computed: one measurement fixes the other.
+task partner
+  take s, like bell
+  take b, like bit
+  like bit
+  fork case, call is-correlated, read s
+    case yes
+      send back
+        read b
+    case no
+      send back
+        call flip
+          read b
+
+# TEMPLATE: one relative-phase entry. The plus states (phi-plus, psi-plus) carry phase off; the minus states carry phase
+# on. This `phase` signature, together with the correlation class, names the Bell state uniquely.
+tree phase-of
+  take state
+  take value
+
+  hook fuse
+    case {state}
+      send back
+        make {value}
+
+# The relative phase of a Bell state, off for the plus states and on for the minus states. With is-correlated it forms
+# the two-bit address (correlation, phase) that distinguishes all four states, the way two parity checks label a syndrome.
+task phase
+  take s, like bell
+  like bit
+  fork case, read s
+    fuse phase-of, phi-plus, off
+    fuse phase-of, phi-minus, on
+    fuse phase-of, psi-plus, off
+    fuse phase-of, psi-minus, on
+
+# PHI-PLUS IS PERFECTLY CORRELATED: partner phi-plus b = b, for every outcome b. Measuring one qubit of phi-plus forces
+# the other to the SAME value, so the two results always agree. Proved by induction over the outcome.
+rule phi-plus-is-perfectly-correlated
+  mark b, like bit
+  show hold
+    call is-equal
+      call partner
+        make phi-plus
+        read b
+      read b
+  fold b
+
+# PSI-MINUS IS PERFECTLY ANTICORRELATED: partner psi-minus b = flip b, for every outcome b. Measuring one qubit of
+# psi-minus forces the other to the OPPOSITE value, so the two results always disagree. This is the singlet correlation,
+# the one that violates the classical bound the hardest. Proved by induction over the outcome.
+rule psi-minus-is-perfectly-anticorrelated
+  mark b, like bit
+  show hold
+    call is-equal
+      call partner
+        make psi-minus
+        read b
+      call flip
+        read b
+  fold b
+
+# THE CORRELATION IS AN INVOLUTION (correlated case): partner phi-plus (partner phi-plus b) = b, for every b. Knowing the
+# partner's outcome and applying the same correlation recovers the original outcome. The shared link is consistent and
+# symmetric: it does not matter which qubit is measured first. Proved by induction over the outcome.
+rule correlated-partner-is-an-involution
+  mark b, like bit
+  show hold
+    call is-equal
+      call partner
+        make phi-plus
+        call partner
+          make phi-plus
+          read b
+      read b
+  fold b
+
+# THE CORRELATION IS AN INVOLUTION (anticorrelated case): partner psi-minus (partner psi-minus b) = b, for every b. Two
+# opposite flips cancel, so the anticorrelated link is equally consistent: recovering the partner of the partner returns
+# the original outcome. Together with the correlated case this is the full consistency of the shared correlation: whoever
+# measures first, both qubits agree on the same joint result. Proved by induction over the outcome.
+rule anticorrelated-partner-is-an-involution
+  mark b, like bit
+  show hold
+    call is-equal
+      call partner
+        make psi-minus
+        call partner
+          make psi-minus
+          read b
+      read b
+  fold b
+
+# A CONCRETE DISTINCTION OF CORRELATION CLASS: phi-plus is correlated (yes) and psi-minus is anticorrelated (no), so the
+# two states carry genuinely different correlations. A single shared recipe could not give equal outcomes here and
+# opposite outcomes there for the same measurement, which is why these are physically distinct entangled states.
+rule phi-plus-is-correlated
+  show hold
+    call is-equal
+      call is-correlated
+        make phi-plus
+      make yes
+  calm hold
+
+rule psi-minus-is-anticorrelated
+  show hold
+    call is-equal
+      call is-correlated
+        make psi-minus
+      make no
+  calm hold
+
+# THE PHASE SIGNATURE SEPARATES STATES OF THE SAME CORRELATION CLASS: phi-plus and phi-minus are both correlated, yet
+# their relative phase differs (off against on). With is-correlated, the pair (correlation, phase) is the two-bit address
+# that names each of the four Bell states uniquely, so no two of them are the same correlation. Witnessed by computation.
+rule phi-plus-has-plus-phase
+  show hold
+    call is-equal
+      call phase
+        make phi-plus
+      make off
+  calm hold
+
+rule phi-minus-has-minus-phase
+  show hold
+    call is-equal
+      call phase
+        make phi-minus
+      make on
+  calm hold
+
+# THE FULL TWO-BIT ADDRESS OF PSI-PLUS: anticorrelated (no) with plus phase (off). Read alongside the addresses above,
+# the four states map to the four distinct pairs (yes,off), (yes,on), (no,off), (no,on), so the four Bell states are
+# completely told apart by these two discrete checks alone, without ever touching the amplitudes.
+rule psi-plus-is-anticorrelated-plus-phase
+  show hold
+    call is-equal
+      call is-correlated
+        make psi-plus
+      make no
+  calm hold

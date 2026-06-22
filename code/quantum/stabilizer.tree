@@ -1,0 +1,249 @@
+# The multi-qubit STABILIZER, the formalism behind quantum error correcting codes such as the toric and surface codes,
+# modeled and proved by the kernel. A stabilizer code is defined by a set of commuting Pauli operators called the
+# stabilizer generators; the protected codespace is their joint plus-one eigenspace. The structural fact that makes the
+# whole formalism work is that any two Pauli operators either COMMUTE or ANTICOMMUTE, never anything in between, and the
+# generators of a valid code must all pairwise COMMUTE so that their measurements are simultaneously consistent. For a
+# multi-qubit Pauli string, written as a tensor product of single-qubit Paulis, two strings commute exactly when the
+# number of qubits on which they anticommute is EVEN, because each anticommuting position contributes one sign flip and
+# an even number of flips cancels. This file CONSTRUCTS single-qubit Paulis and two-qubit strings, COMPUTES the
+# single-qubit commutation table and the even-parity string rule, and PROVES the laws: commutation is symmetric, the
+# identity commutes with everything, every operator commutes with itself, the string rule is symmetric, a concrete
+# stabilizer pair (the toric-code vertex and plaquette operators) commutes through an even anticommutation count, and a
+# concrete pair with an odd count anticommutes.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# The four single-qubit Pauli operators (up to phase), mirroring the Pauli group: the identity, the bit flip (X), the
+# bit-and-phase flip (Y), and the phase flip (Z).
+form pauli
+  case identity
+  case bit-flip
+  case both-flip
+  case phase-flip
+
+# A two-qubit Pauli STRING, a tensor product of one single-qubit Pauli on the first qubit and one on the second. A
+# stabilizer generator of a two-qubit code is exactly such a string.
+form string
+  case pair
+    link head, like pauli
+    link tail, like pauli
+
+# TEMPLATE: one row of the single-qubit commutation table. For a fixed first operator, give the commutation flag against
+# each of identity, bit-flip, both-flip, phase-flip. One fuse line per row keeps the four-by-four table DRY.
+tree commute-row
+  take row
+  take at-identity
+  take at-bit-flip
+  take at-both-flip
+  take at-phase-flip
+
+  hook fuse
+    case {row}
+      fork case, read b
+        case identity
+          send back
+            make {at-identity}
+        case bit-flip
+          send back
+            make {at-bit-flip}
+        case both-flip
+          send back
+            make {at-both-flip}
+        case phase-flip
+          send back
+            make {at-phase-flip}
+
+# Do two single-qubit Paulis COMMUTE? The identity commutes with every operator, and every operator commutes with
+# itself, so the diagonal and the identity row and column are all yes. Two DISTINCT non-identity Paulis anticommute, so
+# the remaining off-diagonal entries are no. This is the finite four-by-four table at the heart of the formalism.
+task commutes
+  take a, like pauli
+  take b, like pauli
+  like flag
+  fork case, read a
+    fuse commute-row, identity, yes, yes, yes, yes
+    fuse commute-row, bit-flip, yes, yes, no, no
+    fuse commute-row, both-flip, yes, no, yes, no
+    fuse commute-row, phase-flip, yes, no, no, yes
+
+# The EXCLUSIVE-OR of two commutation flags, yes exactly when they differ. Two strings commute when their per-qubit
+# commutation flags AGREE (both commute, an even count of zero anticommuting qubits, or both anticommute, an even count
+# of two), and anticommute when the flags differ (one anticommuting qubit, an odd count). Agreement is the negation of
+# exclusive-or, computed here directly as a flag equality.
+task agree
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        read b
+    case no
+      fork case, read b
+        case yes
+          send back
+            make no
+        case no
+          send back
+            make yes
+
+# Read the head (first-qubit) Pauli of a string.
+task head-of
+  take s, like string
+  like pauli
+  fork case, read s
+    case pair
+      link head
+      link tail
+      send back
+        read head
+
+# Read the tail (second-qubit) Pauli of a string.
+task tail-of
+  take s, like string
+  like pauli
+  fork case, read s
+    case pair
+      link head
+      link tail
+      send back
+        read tail
+
+# Do two two-qubit Pauli STRINGS commute? Compute the single-qubit commutation flag on the head qubit and on the tail
+# qubit, then take their agreement: the strings commute exactly when the two per-qubit flags agree, which is the
+# even-anticommutation rule for two qubits (zero or two anticommuting positions).
+task strings-commute
+  take p, like string
+  take q, like string
+  like flag
+  send back
+    call agree
+      call commutes
+        call head-of
+          read p
+        call head-of
+          read q
+      call commutes
+        call tail-of
+          read p
+        call tail-of
+          read q
+
+# SINGLE-QUBIT COMMUTATION IS SYMMETRIC: commutes a b = commutes b a, for every pair of operators. Commutation is a
+# relation, not an ordered operation, so the table is symmetric across its diagonal. Proved over all sixteen pairs.
+rule commutes-is-symmetric
+  mark a, like pauli
+  mark b, like pauli
+  show hold
+    call is-equal
+      call commutes
+        read a
+        read b
+      call commutes
+        read b
+        read a
+  fold a, b
+
+# THE IDENTITY COMMUTES WITH EVERY PAULI: commutes identity p = yes, for every operator. The identity is in the center
+# of the Pauli group, so it never obstructs a stabilizer measurement. Proved over all four operators.
+rule identity-commutes-with-everything
+  mark p, like pauli
+  show hold
+    call is-equal
+      call commutes
+        make identity
+        read p
+      make yes
+  fold p
+
+# EVERY PAULI COMMUTES WITH ITSELF: commutes p p = yes, for every operator. The diagonal of the table is all yes, which
+# is why a single stabilizer generator is always consistent with itself. Proved over all four operators.
+rule every-pauli-commutes-with-itself
+  mark p, like pauli
+  show hold
+    call is-equal
+      call commutes
+        read p
+        read p
+      make yes
+  fold p
+
+# THE STRING COMMUTATION RULE IS SYMMETRIC: strings-commute p q = strings-commute q p, over all two-qubit strings. The
+# proof ranges over the two strings, that is over four single-qubit Paulis, sixteen times sixteen pairs in all, and
+# follows from the symmetry of the single-qubit table together with the symmetry of agreement.
+rule strings-commute-is-symmetric
+  mark a, like pauli
+  mark b, like pauli
+  mark c, like pauli
+  mark d, like pauli
+  show hold
+    call is-equal
+      call strings-commute
+        make pair
+          bind head
+            read a
+          bind tail
+            read b
+        make pair
+          bind head
+            read c
+          bind tail
+            read d
+      call strings-commute
+        make pair
+          bind head
+            read c
+          bind tail
+            read d
+        make pair
+          bind head
+            read a
+          bind tail
+            read b
+  fold a, b, c, d
+
+# A CONCRETE STABILIZER PAIR COMMUTES: the string (bit-flip, bit-flip), the toric-code vertex operator X-X, and the
+# string (phase-flip, phase-flip), the plaquette operator Z-Z, COMMUTE. They anticommute on BOTH qubits (bit-flip and
+# phase-flip anticommute), an EVEN count of two, so the sign flips cancel and the strings commute. This even overlap is
+# exactly why the vertex and plaquette stabilizers of the toric code can be measured together and the code is
+# consistent. Proved by direct computation.
+rule toric-vertex-and-plaquette-commute
+  show hold
+    call is-equal
+      call strings-commute
+        make pair
+          bind head
+            make bit-flip
+          bind tail
+            make bit-flip
+        make pair
+          bind head
+            make phase-flip
+          bind tail
+            make phase-flip
+      make yes
+  calm hold
+
+# A CONCRETE ANTICOMMUTING PAIR: the string (bit-flip, identity) and the string (phase-flip, identity) ANTICOMMUTE. They
+# anticommute on the first qubit and commute (through the identity) on the second, an ODD count of one, so a single
+# uncanceled sign flip remains. A pair like this can never both belong to the stabilizer of a valid code; an odd overlap
+# is precisely the forbidden case. Proved by exhibiting strings-commute as no.
+rule odd-overlap-pair-anticommutes
+  show hold
+    call is-equal
+      call strings-commute
+        make pair
+          bind head
+            make bit-flip
+          bind tail
+            make identity
+        make pair
+          bind head
+            make phase-flip
+          bind tail
+            make identity
+      make no
+  calm hold

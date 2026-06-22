@@ -1,0 +1,175 @@
+# The bosonic Fock space, the algebraic heart of quantum field theory and the quantum harmonic oscillator, modeled by the
+# kernel. A single bosonic mode has a ladder of NUMBER STATES |0>, |1>, |2>, ..., each labeled by an OCCUPATION NUMBER n
+# (a natural number, how many quanta the mode holds). The vacuum |0> is the empty mode. Three operators act on the ladder.
+# The CREATION operator a-dagger raises a state to the one above it, |n> to |n+1>, adding a quantum. The ANNIHILATION
+# operator a lowers a state to the one below, |n> to |n-1>, removing a quantum, with the vacuum a fixed floor (annihilating
+# |0> stays at |0>, since a count cannot go below empty). The NUMBER operator N reads the occupation off a state, |n> to n.
+#
+# The defining relations of the algebra are the canonical commutation relations [N, a-dagger] = a-dagger and [N, a] = -a.
+# On occupation numbers these are INTEGER facts the kernel can prove, with no irrational sqrt(n) amplitudes: counting after
+# a raise exceeds counting before by exactly one quantum, N(a-dagger|n>) = (N|n>) + 1, and annihilation is the clean left
+# inverse of creation, a(a-dagger|n>) = |n>. This is second quantization, how a field becomes particles, the same raise and
+# lower the substrate's collision performs on the mesh.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# The OCCUPATION NUMBER of a mode: the empty count (the vacuum), or one more than a prior count. A Peano natural, finite
+# and computable, so the kernel reduces it by structural recursion.
+form occupation
+  case vacuum
+  case more
+    link prior, like occupation
+
+# The SUCCESSOR of an occupation: the next rung up the ladder, one more quantum.
+task successor
+  take n, like occupation
+  like occupation
+  send back
+    make more
+      bind prior
+        read n
+
+# A NUMBER STATE of the mode: |n>, a basis vector of the Fock space, carrying its occupation number.
+form state
+  case ket
+    link fill, like occupation
+
+# The VACUUM STATE |0>, the empty mode, the lowest rung of the ladder.
+task ground
+  like state
+  send back
+    make ket
+      bind fill
+        make vacuum
+
+# CREATION (a-dagger): raise the state to the one above, |n> to |n+1>, adding a quantum at the top of the ladder.
+task raise
+  take s, like state
+  like state
+  fork case, read s
+    case ket
+      link fill
+      send back
+        make ket
+          bind fill
+            call successor
+              read fill
+
+# ANNIHILATION (a): lower the state to the one below, |n> to |n-1>, removing a quantum. The vacuum is a fixed floor: there
+# is no quantum to remove from the empty mode, so a|0> stays |0>.
+task lower
+  take s, like state
+  like state
+  fork case, read s
+    case ket
+      link fill
+      fork case, read fill
+        case vacuum
+          send back
+            make ket
+              bind fill
+                make vacuum
+        case more
+          link prior
+          send back
+            make ket
+              bind fill
+                read prior
+
+# The NUMBER OPERATOR (N): read the occupation off a state, |n> to n. The eigenvalue of the number state.
+task number
+  take s, like state
+  like occupation
+  fork case, read s
+    case ket
+      link fill
+      send back
+        read fill
+
+# CREATION RAISES THE NUMBER BY ONE: number (raise s) = successor (number s), for every state. This is the commutator
+# [N, a-dagger] = a-dagger written on occupation numbers: counting after a raise is exactly one more than counting before.
+rule creation-raises-the-number
+  mark s, like state
+  show hold
+    call is-equal
+      call number
+        call raise
+          read s
+      call successor
+        call number
+          read s
+  fold s
+
+# ANNIHILATION LOWERS THE NUMBER BY ONE OFF THE VACUUM: number (lower (raise s)) = number s, for every state. A raise then
+# a lower brings the count back where it started. This is the integer face of [N, a] = -a together with the left inverse:
+# lowering undoes the unit that raising added, so the cycle conserves the occupation.
+rule annihilation-lowers-the-number
+  mark s, like state
+  show hold
+    call is-equal
+      call number
+        call lower
+          call raise
+            read s
+      call number
+        read s
+  fold s
+
+# ANNIHILATION UNDOES CREATION: lower (raise s) = s, for every state. Adding a quantum and immediately removing it leaves
+# the state exactly as it was. The annihilation operator is the clean LEFT INVERSE of the creation operator on the ladder.
+rule annihilation-undoes-creation
+  mark s, like state
+  show hold
+    call is-equal
+      call lower
+        call raise
+          read s
+      read s
+  fold s
+
+# THE VACUUM IS THE FLOOR: lower (ground) = ground. Annihilating the empty mode stays at the empty mode, since there is no
+# quantum to remove. This is the floor that keeps the occupation a natural number, the count that never goes below empty.
+rule vacuum-is-the-floor
+  show hold
+    call is-equal
+      call lower
+        call ground
+      call ground
+  calm hold
+
+# THE NUMBER OF THE VACUUM IS THE EMPTY COUNT: number (ground) = vacuum. The vacuum state carries occupation zero, the
+# zero-point of the ladder.
+rule number-of-the-vacuum-is-empty
+  show hold
+    call is-equal
+      call number
+        call ground
+      make vacuum
+  calm hold
+
+# RAISING DISAGREES WITH STAYING AT THE VACUUM: the number of raise (ground) is NOT the empty count. Creating a quantum on
+# the vacuum moves up the ladder, so its occupation is `more` (one), not `vacuum` (zero), the asymmetry at the bottom rung
+# that distinguishes |1> from |0>. Where the vacuum is a fixed floor for annihilation, it is NOT fixed for creation, the
+# order-dependence behind the +1 of the commutation relations.
+rule creation-leaves-the-vacuum
+  show miss
+    call is-equal
+      call number
+        call raise
+          call ground
+      make vacuum
+  calm miss
+
+# RAISE THEN LOWER IS THE IDENTITY ON THE WHOLE STATE: this is annihilation-undoes-creation read as the statement that the
+# round trip up and back down the ladder returns the exact basis vector, for every state including the vacuum (raise lifts
+# |0> to |1>, lower returns it to |0>). Together with the floor it pins down the full action of a a-dagger on the ladder.
+rule raise-then-lower-is-identity
+  mark s, like state
+  show hold
+    call is-equal
+      call lower
+        call raise
+          read s
+      read s
+  fold s

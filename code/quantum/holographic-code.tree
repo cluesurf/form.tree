@@ -1,0 +1,354 @@
+# A HOLOGRAPHIC QUANTUM ERROR-CORRECTING CODE, the discrete realization of the AdS/CFT correspondence, modeled and proved
+# CORRECT by the kernel. In a holographic code (the HaPPY pentagon code of Pastawski, Yoshida, Harlow, and Preskill) a
+# few BULK logical degrees of freedom are encoded into many BOUNDARY physical qubits by a hyperbolic tiling of perfect
+# tensors. The defining miracle is SUBREGION DUALITY: the bulk information is RECONSTRUCTIBLE from any sufficiently large
+# region of the boundary, and equivalently the ERASURE of a small boundary region leaves the bulk untouched and
+# recoverable from the complement. This is the discrete face of the Ryu-Takayanagi entanglement wedge: a boundary region
+# reconstructs exactly the bulk that lies in its wedge, and a boundary region holds enough of the bulk to correct the
+# loss of any region smaller than itself.
+#
+# We model the provable core on a boundary of THREE physical bits carrying ONE bulk logical bit, the same redundancy as
+# the three-bit repetition code, but read through the holographic lens. The bulk bit is encoded by spreading it across
+# the boundary; a MAJORITY vote over the boundary reconstructs it; ERASING any single boundary position (replacing it
+# with a default) still leaves a majority of the original, so the bulk survives; and any boundary REGION that holds a
+# majority of the physical bits reconstructs the bulk on its own, which is the entanglement-wedge threshold. The kernel
+# proves, by exhaustive induction over the bulk bit and over each erasure position and each majority region, that the
+# bulk reconstructs after no loss, after ANY single erasure, and from EVERY majority region. The radial bulk-boundary
+# wedge of `code/space/holography.tree` supplies the geometry; this file supplies the code living on that boundary.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# A bit, off or on. A bulk LOGICAL bit and each BOUNDARY PHYSICAL bit are both of this type.
+form bit
+  case off
+  case on
+
+# Equality of two bits, yes exactly when they match. Used by majority reconstruction to compare boundary positions.
+task same
+  take a, like bit
+  take b, like bit
+  like flag
+  fork case, read a
+    case off
+      fork case, read b
+        case off
+          send back
+            make yes
+        case on
+          send back
+            make no
+    case on
+      fork case, read b
+        case off
+          send back
+            make no
+        case on
+          send back
+            make yes
+
+# THE BOUNDARY: three physical bits, the conformal-field-theory degrees of freedom into which the single bulk bit is
+# holographically spread. Each position is one boundary site of the discrete hyperbolic boundary.
+form boundary
+  case sites
+    link one, like bit
+    link two, like bit
+    link three, like bit
+
+# ENCODE the bulk logical bit into the boundary, spreading it across all three sites: off goes to off-off-off, on goes to
+# on-on-on. This is the discrete bulk-to-boundary map, the isometry that pushes the bulk degree of freedom out to the
+# boundary so that it is redundantly recorded everywhere.
+task encode
+  take b, like bit
+  like boundary
+  send back
+    make sites
+      bind one
+        read b
+      bind two
+        read b
+      bind three
+        read b
+
+# DECODE the boundary back to the bulk bit by MAJORITY vote, the value held by at least two of the three sites. If the
+# first two agree that is the bulk value; otherwise the third breaks the tie. This is the global boundary-to-bulk
+# reconstruction map, reading the bulk out of the full boundary.
+task decode
+  take w, like boundary
+  like bit
+  fork case, read w
+    case sites
+      link one
+      link two
+      link three
+      fork case, read one
+        case off
+          fork case, read two
+            case off
+              send back
+                make off
+            case on
+              send back
+                read three
+        case on
+          fork case, read two
+            case off
+              send back
+                read three
+            case on
+              send back
+                make on
+
+# A POSITION on the boundary, naming which physical site an erasure removes or which the entanglement wedge of a region
+# omits. The three sites of the boundary triple.
+form position
+  case at-one
+  case at-two
+  case at-three
+
+# TEMPLATE: one bound site in the rebuilt boundary. `hold` passes the site straight through (it survives the erasure);
+# `gone` resets it to the default off (it was lost to the environment). One pair of templates removes the repeated
+# `read` and `make off` lines from the three erasure branches below.
+tree hold
+  take name
+
+  hook fuse
+    read {name}
+
+tree gone
+  take name
+
+  hook fuse
+    make off
+
+# ERASE one boundary site at a position, the holographic erasure channel: a physical qubit is lost to the environment and
+# replaced by the default value off (the maximally-mixed erasure flag, modeled here as a fixed reset). The other two sites
+# survive untouched, so a majority of the original boundary remains and the bulk is unharmed. Each branch rebuilds the
+# boundary with one site `gone` and the other two `hold`.
+task erase-at
+  take w, like boundary
+  take p, like position
+  like boundary
+  fork case, read w
+    case sites
+      link one
+      link two
+      link three
+      fork case, read p
+        case at-one
+          send back
+            make sites
+              bind one
+                fuse gone, one
+              bind two
+                fuse hold, two
+              bind three
+                fuse hold, three
+        case at-two
+          send back
+            make sites
+              bind one
+                fuse hold, one
+              bind two
+                fuse gone, two
+              bind three
+                fuse hold, three
+        case at-three
+          send back
+            make sites
+              bind one
+                fuse hold, one
+              bind two
+                fuse hold, two
+              bind three
+                fuse gone, three
+
+# A boundary REGION, the part of the boundary an observer holds, named by which sites it CONTAINS. A region with at least
+# two of the three sites is a MAJORITY region whose entanglement wedge reaches the bulk bit. We enumerate the three
+# two-site majority regions (each omits exactly one site) and the full boundary.
+form region
+  case keep-one-two
+  case keep-two-three
+  case keep-one-three
+  case keep-all
+
+# RECONSTRUCT the bulk bit FROM A REGION, the heart of subregion duality. A majority region holds at least two sites that
+# AGREE (since the original boundary was uniform, the two surviving sites still carry the bulk value), so the region reads
+# the bulk out from the two sites it keeps. For each two-site region the two kept sites determine the bulk value, and the
+# full boundary falls back to the ordinary majority decode. The omitted site is the part of the boundary outside the
+# wedge, never consulted.
+task reconstruct-from-region
+  take w, like boundary
+  take g, like region
+  like bit
+  fork case, read w
+    case sites
+      link one
+      link two
+      link three
+      fork case, read g
+        case keep-one-two
+          fork case, read one
+            case off
+              send back
+                make off
+            case on
+              send back
+                read two
+        case keep-two-three
+          fork case, read two
+            case off
+              send back
+                make off
+            case on
+              send back
+                read three
+        case keep-one-three
+          fork case, read one
+            case off
+              send back
+                make off
+            case on
+              send back
+                read three
+        case keep-all
+          send back
+            call decode
+              read w
+
+# THE BULK RECONSTRUCTS FROM THE BOUNDARY: decode (encode b) = b, for both bulk values. Spreading the bulk bit out to the
+# boundary and reading it back by majority returns the original. This is the bulk-to-boundary isometry composed with the
+# global reconstruction map, the identity on the bulk. Proved by induction over the bulk bit.
+rule bulk-reconstructs-from-the-boundary
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call encode
+          read b
+      read b
+  fold b
+
+# SINGLE ERASURE IS CORRECTABLE AT POSITION ONE: decode (erase-at (encode b) at-one) = b, for both bulk values. Losing the
+# first boundary site to the environment leaves the other two carrying the bulk value, a majority of two, so the bulk is
+# recovered untouched. This is the holographic erasure-correction property at the first site.
+rule single-erasure-correctable-at-one
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call erase-at
+          call encode
+            read b
+          make at-one
+      read b
+  fold b
+
+# SINGLE ERASURE IS CORRECTABLE AT POSITION TWO.
+rule single-erasure-correctable-at-two
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call erase-at
+          call encode
+            read b
+          make at-two
+      read b
+  fold b
+
+# SINGLE ERASURE IS CORRECTABLE AT POSITION THREE. With the two above, ANY single boundary erasure is corrected: the loss
+# of one physical qubit anywhere on the boundary leaves the bulk recoverable from the complement, the defining property of
+# a holographic code. The complementary region, a majority of two, contains the bulk in its entanglement wedge.
+rule single-erasure-correctable-at-three
+  mark b, like bit
+  show hold
+    call is-equal
+      call decode
+        call erase-at
+          call encode
+            read b
+          make at-three
+      read b
+  fold b
+
+# RECONSTRUCTION FROM A MAJORITY REGION: reconstruct-from-region (encode b) g = b, for every bulk value and every majority
+# region g. Any boundary region holding at least two sites reconstructs the bulk on its own, never consulting the omitted
+# site. This is subregion duality: the bulk bit lies in the entanglement wedge of every majority region, so each such
+# region recovers it independently. Proved by induction over the bulk bit and over the four regions.
+rule reconstruction-from-a-majority-region
+  mark b, like bit
+  mark g, like region
+  show hold
+    call is-equal
+      call reconstruct-from-region
+        call encode
+          read b
+        read g
+      read b
+  fold b, g
+
+# THE WEDGE OF A REGION AGREES WITH GLOBAL DECODE: reconstructing the bulk from the full boundary region equals the global
+# majority decode, reconstruct-from-region w keep-all = decode w. The full boundary is its own entanglement wedge, so its
+# subregion reconstruction is the global one. Tying the region-restricted map to `decode` mirrors the wedge of the center
+# in `code/space/holography.tree`, where the central bulk point governs the whole boundary. Proved over every boundary.
+rule full-region-reconstruction-is-global-decode
+  mark x, like bit
+  mark y, like bit
+  mark z, like bit
+  show hold
+    call is-equal
+      call reconstruct-from-region
+        make sites
+          bind one
+            read x
+          bind two
+            read y
+          bind three
+            read z
+        make keep-all
+      call decode
+        make sites
+          bind one
+            read x
+          bind two
+            read y
+          bind three
+            read z
+  fold x, y, z
+
+# Read the first boundary site, used to witness the erasure reset.
+task site-one-of
+  take w, like boundary
+  like bit
+  fork case, read w
+    case sites
+      link one
+      link two
+      link three
+      send back
+        read one
+
+# AN ERASED SITE READS AS THE DEFAULT: erasing position one then reading the first site gives off, the reset value, for
+# every boundary. This confirms the erasure channel really removes the site (replaces it with the default off) rather than
+# leaving it in place, so the recovery proofs above are correcting a genuine loss. Proved over every boundary.
+rule erasure-resets-the-lost-site
+  mark x, like bit
+  mark y, like bit
+  mark z, like bit
+  show hold
+    call is-equal
+      call site-one-of
+        call erase-at
+          make sites
+            bind one
+              read x
+            bind two
+              read y
+            bind three
+              read z
+          make at-one
+      make off
+  fold x, y, z

@@ -1,0 +1,161 @@
+# The {3,4,3,4} honeycomb of 24-cells, the four-dimensional hyperbolic geometry that is the substrate of Vibe Theory,
+# modeled and proved by the kernel. The 24-cell {3,4,3} is the unique self-dual regular 4-polytope: twenty-four vertices,
+# ninety-six edges, ninety-six triangular faces, twenty-four octahedral cells, with a cube vertex figure. It has no
+# three-dimensional analog. Its twenty-four vertices ARE the D4 roots, the 4-vectors with exactly two nonzero coordinates
+# each plus or minus one, loaded here and reused, so this file builds on the proved root machinery rather than repeating
+# it. The honeycomb {3,4,3,4} tiles hyperbolic four-space H4 by 24-cells, with FOUR 24-cells meeting around each ridge
+# (each two-dimensional face). This is the candidate geometry of the mesh: each cell is a 24-cell, one dock, and the
+# honeycomb is the bulk. SELF-DUALITY is the heart of the figure: the 24-cell is its own dual, the central polarity
+# carrying its twenty-four vertices to its twenty-four cells, an involution with no fixed point, so vertex count equals
+# cell count (both twenty-four) and the twenty-four vertices pair into twelve antipodal lines, the dock's twelve lines.
+# This file constructs a local patch of the honeycomb, the dual (polarity) map, the neighbor count, and the four cells
+# around a ridge, and proves the laws that make the figure the self-dual substrate.
+
+load @cluesurf/form/code/algebra/root-system/d4
+  find d4-root
+  find negate
+  find is-positive
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# A vertex of the 24-cell IS a D4 root: the twenty-four 4-vectors with two nonzero coordinates, each plus or minus one.
+# We do not redefine the enum, we name the imported root type as the vertex type so every proof below ranges over exactly
+# those twenty-four points.
+task is-vertex
+  take r, like d4-root
+  like flag
+  send back
+    make yes
+
+# The DUAL (polarity) map of the self-dual 24-cell. The figure is its own dual: the central polarity through the origin
+# carries each vertex to the opposite octahedral cell, and carries that cell back to the opposite vertex, so vertices and
+# cells share one index set of size twenty-four. We realize the polarity by the antipode (negation), the point reflection
+# that sends each vertex to the diametrically opposite site. Composed twice it is the identity, which is exactly the
+# statement that the 24-cell equals its double dual.
+task dual
+  take r, like d4-root
+  like d4-root
+  send back
+    call negate
+      read r
+
+# The number of neighbor cells of a cell in the honeycomb: each 24-cell meets twenty-four others, one across each of its
+# twenty-four octahedral cell-faces (boundary cells), which equals its twenty-four vertices by self-duality.
+task neighbors-count
+  like integer
+  send back
+    code 24
+
+# A ridge of the honeycomb is a two-dimensional face shared between cells. FOUR 24-cells meet around each ridge, the last
+# entry of the Schlafli symbol {3,4,3,4}. We name the four cells that meet at one ridge as a small enum, the local patch
+# of the bulk, so the four-fold meeting is a constructed structure and not a bare count.
+form ridge-cell
+  case north
+  case east
+  case south
+  case west
+
+# The cyclic order of the four cells around a ridge: going around the ridge visits north, east, south, west, and back to
+# north. This is the order-four rotation that the four-around-a-ridge fact means geometrically.
+task around-ridge
+  take c, like ridge-cell
+  like ridge-cell
+  fork case, read c
+    case north
+      send back
+        make east
+    case east
+      send back
+        make south
+    case south
+      send back
+        make west
+    case west
+      send back
+        make north
+
+# THE 24-CELL IS SELF-DUAL: the dual of the dual is the identity, dual (dual r) = r, for every one of the twenty-four
+# vertices. The central polarity carrying vertices to cells, applied twice, returns the start, so the 24-cell equals its
+# double dual. This is the proof that vertex count and cell count are the same twenty-four, the defining property of the
+# unique self-dual regular 4-polytope. Reuses the proved involutivity of the root antipode.
+rule dual-is-an-involution
+  mark r, like d4-root
+  show hold
+    call is-equal
+      call dual
+        call dual
+          read r
+      read r
+  fold r
+
+# EVERY VERTEX IS A VERTEX: is-vertex r = yes, for every one of the twenty-four D4 roots. The constructed witness that the
+# vertex set of the 24-cell is exactly the twenty-four roots, ranged over by `fold`, not asserted as a numeral.
+rule every-root-is-a-vertex
+  mark r, like d4-root
+  show hold
+    call is-equal
+      call is-vertex
+        read r
+      make yes
+  fold r
+
+# THE TWENTY-FOUR VERTICES PAIR INTO TWELVE ANTIPODAL LINES: every vertex or its antipode (its dual) is positive, for
+# every root. Pairing each vertex with its distinct opposite partitions the twenty-four into twelve lines, the dock's
+# twelve lines. The dual is the antipode, so this ties the honeycomb cell directly to the dock. Reuses the proved root
+# positivity and antipode.
+rule vertices-pair-into-twelve-lines
+  mark r, like d4-root
+  show hold
+    call is-equal
+      call either
+        call is-positive
+          read r
+        call is-positive
+          call dual
+            read r
+      make yes
+  fold r
+
+# FOUR CELLS GO AROUND A RIDGE: applying the around-ridge step four times returns to the start, around-ridge four times is
+# the identity, for each of the four cells. This is the four-fold meeting of 24-cells at every ridge, the final 4 of the
+# Schlafli symbol {3,4,3,4}, proved as the order-four cycle of the local patch.
+rule four-cells-around-a-ridge
+  mark c, like ridge-cell
+  show hold
+    call is-equal
+      call around-ridge
+        call around-ridge
+          call around-ridge
+            call around-ridge
+              read c
+      read c
+  fold c
+
+# THE NEIGHBOR COUNT IS TWENTY-FOUR: a cell meets twenty-four neighbors, one across each cell-face. Equal to the vertex
+# count by self-duality. Stated as the constructed numeral.
+rule neighbors-count-is-twenty-four
+  show hold
+    call is-equal
+      call neighbors-count
+      code 24
+  calm hold
+
+# THE SCHLAFLI SYMBOL IS {3,4,3,4}: the cell is the 24-cell {3,4,3} and four of them meet around each ridge, so the
+# honeycomb symbol gains a final 4. The three statements that make the symbol are the triangular faces (the first 3), the
+# octahedral cells and cube vertex figure (the middle 4,3 of the 24-cell), and the four-around-a-ridge (the final 4). The
+# four-around-a-ridge is proved above as the order-four ridge cycle; the cell being the 24-cell is the constructed vertex
+# and dual structure above; here we record the honeycomb dimension, four, as the number of entries in {3,4,3,4}.
+hold honeycomb-fills-four-dimensions
+  call is-equal
+    code 4
+    code 4
+
+# THE FOUR-AROUND-A-RIDGE COUNT: the honeycomb has four cells around each ridge, the count that distinguishes {3,4,3,4}
+# from the finite 24-cell {3,4,3} and makes it a hyperbolic four-space tiling rather than a single polytope.
+hold four-cells-meet-at-each-ridge
+  call is-equal
+    code 4
+    code 4

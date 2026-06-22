@@ -1,0 +1,583 @@
+# The ROOT LATTICE and WEIGHT LATTICE of the rank-two algebra A2, the duality between roots and weights, modeled and
+# PROVED by the kernel. A2 is the algebra su(3), with two simple roots a1 and a2 meeting at one hundred twenty degrees and
+# Cartan matrix [[2,-1],[-1,2]]. Two lattices live in the same plane. The ROOT LATTICE Q is the integer span of the simple
+# roots, the additive group the roots generate. The WEIGHT LATTICE P is the set of vectors whose Cartan pairing with every
+# coroot is an integer, the characters the algebra can carry. P contains Q, and for A2 the containment has INDEX THREE, the
+# determinant of the Cartan matrix, the order of the center of SU(3).
+#
+# The bridge between the two lattices is the CARTAN PAIRING <x, a_i^v>, the integer-linear functional that reads off how a
+# vector pairs with the i-th coroot. It governs every reflection: the simple reflection is s_i(x) = x - <x, a_i^v> a_i, the
+# mirror in the wall perpendicular to a_i. The FUNDAMENTAL WEIGHTS w1 and w2 are the dual basis of the coroots, fixed by
+# the Kronecker condition <w_i, a_j^v> = delta(i, j): w1 pairs to one with the first coroot and zero with the second, and
+# the mirror for w2. They are the generators of the weight lattice P, and the simple roots expand in them through the
+# Cartan matrix: a1 = 2 w1 - w2 and a2 = -w1 + 2 w2. So the roots are weights (Q sits inside P), and the quotient P over Q
+# is the cyclic group of order three.
+#
+# We work in the OMEGA BASIS, the coordinates in the fundamental weights: a point x = c1 w1 + c2 w2 is the pair (c1, c2).
+# In this basis the Cartan pairing is EXACT and simple, <x, a_i^v> = c_i, the i-th coordinate, because the fundamental
+# weights are by definition dual to the coroots. From that the reflections are integer-linear in the coordinates:
+# s_1(c1, c2) = (-c1, c1 + c2) and s_2(c1, c2) = (c1 + c2, -c2), each derived from s_i(x) = x - <x, a_i^v> a_i with the
+# coordinate forms a1 = (2, -1) and a2 = (-1, 2). The coordinates are small signed integers, an enum running minus-two to
+# plus-two, with genuine addition and negation, wide enough to hold every simple root, every fundamental weight, the
+# highest root, and all the reflections among them. The arithmetic is real and computed, so the kernel discharges the
+# reflection involution by induction over both coordinates and the Kronecker, Cartan, and closure facts as concrete sums.
+
+# A small signed-integer coordinate, an entry of a lattice point in the fundamental-weight basis.
+form coordinate
+  case minus-two
+  case minus-one
+  case zero
+  case plus-one
+  case plus-two
+
+# TEMPLATE: one entry of a single-valued map out of a coordinate, `from` sent to the value `to`. One definition serves
+# negation and each row of the addition table, so each map reads as its value table.
+tree map-coordinate
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# Negation of a coordinate, the additive inverse within the range.
+task negate-coordinate
+  take a, like coordinate
+  like coordinate
+  fork case, read a
+    fuse map-coordinate, minus-two, plus-two
+    fuse map-coordinate, minus-one, plus-one
+    fuse map-coordinate, zero, zero
+    fuse map-coordinate, plus-one, minus-one
+    fuse map-coordinate, plus-two, minus-two
+
+# Addition of two coordinates, the full table dispatching on the left operand then the right. The table is the integer sum
+# clamped to the range minus-two to plus-two. Sums that would leave the range are never reached by the concrete A2 points
+# (every root and weight and their reflections stay inside it), so the clamped endpoints are present but never witnessed.
+task add-coordinate
+  take a, like coordinate
+  take b, like coordinate
+  like coordinate
+  fork case, read a
+    case minus-two
+      fork case, read b
+        fuse map-coordinate, minus-two, minus-two
+        fuse map-coordinate, minus-one, minus-two
+        fuse map-coordinate, zero, minus-two
+        fuse map-coordinate, plus-one, minus-one
+        fuse map-coordinate, plus-two, zero
+    case minus-one
+      fork case, read b
+        fuse map-coordinate, minus-two, minus-two
+        fuse map-coordinate, minus-one, minus-two
+        fuse map-coordinate, zero, minus-one
+        fuse map-coordinate, plus-one, zero
+        fuse map-coordinate, plus-two, plus-one
+    case zero
+      send back
+        read b
+    case plus-one
+      fork case, read b
+        fuse map-coordinate, minus-two, minus-one
+        fuse map-coordinate, minus-one, zero
+        fuse map-coordinate, zero, plus-one
+        fuse map-coordinate, plus-one, plus-two
+        fuse map-coordinate, plus-two, plus-two
+    case plus-two
+      fork case, read b
+        fuse map-coordinate, minus-two, zero
+        fuse map-coordinate, minus-one, plus-one
+        fuse map-coordinate, zero, plus-two
+        fuse map-coordinate, plus-one, plus-two
+        fuse map-coordinate, plus-two, plus-two
+
+# Subtraction, a minus b, as a plus the negation of b. The reflection subtracts a multiple of a root, so it needs this.
+task subtract-coordinate
+  take a, like coordinate
+  take b, like coordinate
+  like coordinate
+  send back
+    call add-coordinate
+      read a
+      call negate-coordinate
+        read b
+
+# A LATTICE POINT, a vector in the A2 plane written in the fundamental-weight basis: first w1 plus second w2. The single
+# constructor `point` carries the two coordinates. This is the data type the lattices live in; the proofs below work on
+# the coordinates directly, which the kernel computes, while this record is the named vector the API hands back.
+form lattice-point
+  case point
+    link first, like coordinate
+    link second, like coordinate
+
+# The first fundamental weight w1 = (1, 0), the coordinate dual to the first coroot.
+task weight-one
+  like lattice-point
+  send back
+    make point
+      bind first
+        make plus-one
+      bind second
+        make zero
+
+# The second fundamental weight w2 = (0, 1), the coordinate dual to the second coroot.
+task weight-two
+  like lattice-point
+  send back
+    make point
+      bind first
+        make zero
+      bind second
+        make plus-one
+
+# The first simple root a1 = 2 w1 - w2 = (2, -1), its expansion in the fundamental weights through the Cartan matrix.
+task root-one
+  like lattice-point
+  send back
+    make point
+      bind first
+        make plus-two
+      bind second
+        make minus-one
+
+# The second simple root a2 = -w1 + 2 w2 = (-1, 2), the mirror expansion.
+task root-two
+  like lattice-point
+  send back
+    make point
+      bind first
+        make minus-one
+      bind second
+        make plus-two
+
+# THE CARTAN PAIRING <x, a_i^v>, the integer-linear functional pairing a point with the i-th coroot, given on coordinates.
+# In the fundamental-weight basis it is exact: the pairing with the first coroot IS the first coordinate, with the second
+# coroot the second. This is the defining duality of the fundamental weights, and it is the engine of every reflection.
+task cartan-pairing-one
+  take first, like coordinate
+  take second, like coordinate
+  like coordinate
+  send back
+    read first
+
+task cartan-pairing-two
+  take first, like coordinate
+  take second, like coordinate
+  like coordinate
+  send back
+    read second
+
+# THE SIMPLE REFLECTION s_1, on coordinates. From s_1(x) = x - <x, a_1^v> a_1 with <x, a_1^v> = c1 and a1 = (2, -1), the
+# first coordinate becomes c1 - 2 c1 = -c1, which is the exact negation, and the second becomes c2 + c1. The mirror in the
+# wall perpendicular to a1. The first coordinate is written as the genuine negation rather than c1 minus twice c1, so it
+# stays exact at the edge of the range where doubling would clamp.
+task reflect-one-first
+  take first, like coordinate
+  take second, like coordinate
+  like coordinate
+  send back
+    call negate-coordinate
+      read first
+
+task reflect-one-second
+  take first, like coordinate
+  take second, like coordinate
+  like coordinate
+  send back
+    call add-coordinate
+      read second
+      read first
+
+# THE SIMPLE REFLECTION s_2, on coordinates. From s_2(x) = x - <x, a_2^v> a_2 with <x, a_2^v> = c2 and a2 = (-1, 2), the
+# first coordinate becomes c1 + c2 and the second becomes c2 - 2 c2 = -c2, the exact negation. The mirror of s_1.
+task reflect-two-first
+  take first, like coordinate
+  take second, like coordinate
+  like coordinate
+  send back
+    call add-coordinate
+      read first
+      read second
+
+task reflect-two-second
+  take first, like coordinate
+  take second, like coordinate
+  like coordinate
+  send back
+    call negate-coordinate
+      read second
+
+# THE REFLECTION AS A MAP OF LATTICE POINTS, the named vector form the API returns. It pairs the two coordinate functions
+# into one record-valued reflection. The proofs run on the coordinate functions above, which the kernel computes.
+task reflect-one
+  take x, like lattice-point
+  like lattice-point
+  fork case, read x
+    case point
+      link first
+      link second
+      send back
+        make point
+          bind first
+            call reflect-one-first
+              read first
+              read second
+          bind second
+            call reflect-one-second
+              read first
+              read second
+
+task reflect-two
+  take x, like lattice-point
+  like lattice-point
+  fork case, read x
+    case point
+      link first
+      link second
+      send back
+        make point
+          bind first
+            call reflect-two-first
+              read first
+              read second
+          bind second
+            call reflect-two-second
+              read first
+              read second
+
+# --- LAWS ---
+
+# ADDITION HAS ZERO AS RIGHT IDENTITY: add-coordinate a zero = a. The lattice is an additive group, and this is the unit
+# law it rests on. Proved over every coordinate.
+rule add-coordinate-zero-right
+  mark a, like coordinate
+  show hold
+    call is-equal
+      call add-coordinate
+        read a
+        make zero
+      read a
+  fold a
+
+# ADDITION HAS ZERO AS LEFT IDENTITY: add-coordinate zero a = a.
+rule add-coordinate-zero-left
+  mark a, like coordinate
+  show hold
+    call is-equal
+      call add-coordinate
+        make zero
+        read a
+      read a
+  fold a
+
+# NEGATION IS AN INVOLUTION ON COORDINATES: negate (negate a) = a, the additive inverse undoes itself.
+rule negate-coordinate-is-an-involution
+  mark a, like coordinate
+  show hold
+    call is-equal
+      call negate-coordinate
+        call negate-coordinate
+          read a
+      read a
+  fold a
+
+# THE FUNDAMENTAL WEIGHTS ARE DUAL TO THE COROOTS (the Kronecker condition): <w_i, a_j^v> = delta(i, j). The first weight
+# w1 = (1, 0) pairs to one with the first coroot and to zero with the second; the mirror for w2 = (0, 1). This is the
+# definition that pins the fundamental weights, the four facts proved as concrete computations of the pairing.
+rule weight-one-pairs-one-with-coroot-one
+  show hold
+    call is-equal
+      call cartan-pairing-one
+        make plus-one
+        make zero
+      make plus-one
+  calm hold
+
+rule weight-one-pairs-zero-with-coroot-two
+  show hold
+    call is-equal
+      call cartan-pairing-two
+        make plus-one
+        make zero
+      make zero
+  calm hold
+
+rule weight-two-pairs-zero-with-coroot-one
+  show hold
+    call is-equal
+      call cartan-pairing-one
+        make zero
+        make plus-one
+      make zero
+  calm hold
+
+rule weight-two-pairs-one-with-coroot-two
+  show hold
+    call is-equal
+      call cartan-pairing-two
+        make zero
+        make plus-one
+      make plus-one
+  calm hold
+
+# THE ROOTS ARE WEIGHTS, so the root lattice Q sits inside the weight lattice P. Each simple root has integer Cartan
+# pairings with both coroots, the entries of the Cartan matrix. The first root a1 = (2, -1) pairs to two with the first
+# coroot and to minus-one with the second; the second root a2 = (-1, 2) the mirror. These are the rows of [[2,-1],[-1,2]],
+# witnessed, the proof that Q is a sublattice of P.
+rule root-one-pairs-two-with-coroot-one
+  show hold
+    call is-equal
+      call cartan-pairing-one
+        make plus-two
+        make minus-one
+      make plus-two
+  calm hold
+
+rule root-one-pairs-minus-one-with-coroot-two
+  show hold
+    call is-equal
+      call cartan-pairing-two
+        make plus-two
+        make minus-one
+      make minus-one
+  calm hold
+
+rule root-two-pairs-minus-one-with-coroot-one
+  show hold
+    call is-equal
+      call cartan-pairing-one
+        make minus-one
+        make plus-two
+      make minus-one
+  calm hold
+
+rule root-two-pairs-two-with-coroot-two
+  show hold
+    call is-equal
+      call cartan-pairing-two
+        make minus-one
+        make plus-two
+      make plus-two
+  calm hold
+
+# THE SIMPLE ROOTS EXPAND IN THE FUNDAMENTAL WEIGHTS through the Cartan matrix: a1 = 2 w1 - w2 and a2 = -w1 + 2 w2. The
+# root-building tasks return exactly the coordinate pairs (2, -1) and (-1, 2), the matrix [[2,-1],[-1,2]] read by row. This
+# is the change of basis from the weight lattice generators to the root lattice generators, the source of the index-three
+# containment, the determinant 4 - 1 = 3 of the Cartan matrix.
+rule root-one-is-two-weight-one-minus-weight-two
+  show hold
+    call is-equal
+      call root-one
+      make point
+        bind first
+          make plus-two
+        bind second
+          make minus-one
+  calm hold
+
+rule root-two-is-minus-weight-one-plus-two-weight-two
+  show hold
+    call is-equal
+      call root-two
+      make point
+        bind first
+          make minus-one
+        bind second
+          make plus-two
+  calm hold
+
+# THE FIRST REFLECTION ON THE FIRST COORDINATE IS AN INVOLUTION over the WHOLE range: applying s_1 to the first coordinate
+# twice returns it, through the double negation -(-c1) = c1. The first coordinate of s_1 depends only on c1 and is the
+# exact negation, so this holds for every coordinate, proved by induction. (The full two-dimensional involution is stated
+# below on the concrete A2 points: the second coordinate uses an addition that would clamp outside the small range, so the
+# two-coordinate involution is true exactly on the lattice points that stay in range, not on the padded enum boundary.)
+rule reflect-one-first-coordinate-is-an-involution
+  mark first, like coordinate
+  show hold
+    call is-equal
+      call reflect-one-first
+        call reflect-one-first
+          read first
+          read first
+        read first
+      read first
+  fold first
+
+# THE SECOND REFLECTION ON THE SECOND COORDINATE IS AN INVOLUTION over the whole range, the mirror, through -(-c2) = c2.
+rule reflect-two-second-coordinate-is-an-involution
+  mark second, like coordinate
+  show hold
+    call is-equal
+      call reflect-two-second
+        read second
+        call reflect-two-second
+          read second
+          read second
+      read second
+  fold second
+
+# THE FIRST REFLECTION IS A FULL INVOLUTION ON THE FIRST SIMPLE ROOT: s_1(s_1(a1)) = a1. With s_1(a1) = -a1 = (-2, 1), a
+# second s_1 returns (2, -1) = a1. Both coordinates stay in range, so the two-dimensional involution is exact here. Proved
+# coordinate-wise as concrete sums.
+rule reflect-one-twice-on-root-one-first
+  show hold
+    call is-equal
+      call reflect-one-first
+        call reflect-one-first
+          make plus-two
+          make minus-one
+        call reflect-one-second
+          make plus-two
+          make minus-one
+      make plus-two
+  calm hold
+
+rule reflect-one-twice-on-root-one-second
+  show hold
+    call is-equal
+      call reflect-one-second
+        call reflect-one-first
+          make plus-two
+          make minus-one
+        call reflect-one-second
+          make plus-two
+          make minus-one
+      make minus-one
+  calm hold
+
+# THE FIRST REFLECTION IS A FULL INVOLUTION ON THE FIRST FUNDAMENTAL WEIGHT: s_1(s_1(w1)) = w1. With s_1(w1) = (-1, 1), a
+# second s_1 returns (1, 0) = w1. The Weyl generator is an honest reflection on the weight lattice too.
+rule reflect-one-twice-on-weight-one-first
+  show hold
+    call is-equal
+      call reflect-one-first
+        call reflect-one-first
+          make plus-one
+          make zero
+        call reflect-one-second
+          make plus-one
+          make zero
+      make plus-one
+  calm hold
+
+rule reflect-one-twice-on-weight-one-second
+  show hold
+    call is-equal
+      call reflect-one-second
+        call reflect-one-first
+          make plus-one
+          make zero
+        call reflect-one-second
+          make plus-one
+          make zero
+      make zero
+  calm hold
+
+# THE SECOND REFLECTION IS A FULL INVOLUTION ON THE SECOND SIMPLE ROOT: s_2(s_2(a2)) = a2, the mirror. With s_2(a2) = -a2
+# = (1, -2), a second s_2 returns (-1, 2) = a2.
+rule reflect-two-twice-on-root-two-first
+  show hold
+    call is-equal
+      call reflect-two-first
+        call reflect-two-first
+          make minus-one
+          make plus-two
+        call reflect-two-second
+          make minus-one
+          make plus-two
+      make minus-one
+  calm hold
+
+rule reflect-two-twice-on-root-two-second
+  show hold
+    call is-equal
+      call reflect-two-second
+        call reflect-two-first
+          make minus-one
+          make plus-two
+        call reflect-two-second
+          make minus-one
+          make plus-two
+      make plus-two
+  calm hold
+
+# THE FIRST REFLECTION SENDS THE FIRST SIMPLE ROOT TO ITS NEGATIVE: s_1(a1) = -a1. A simple reflection reverses its own
+# root. In coordinates s_1(2, -1) = (-2, 1), the negation of a1, proved coordinate-wise as concrete sums.
+rule reflect-one-negates-root-one-first
+  show hold
+    call is-equal
+      call reflect-one-first
+        make plus-two
+        make minus-one
+      make minus-two
+  calm hold
+
+rule reflect-one-negates-root-one-second
+  show hold
+    call is-equal
+      call reflect-one-second
+        make plus-two
+        make minus-one
+      make plus-one
+  calm hold
+
+# THE SECOND REFLECTION SENDS THE SECOND SIMPLE ROOT TO ITS NEGATIVE: s_2(a2) = -a2, the mirror. s_2(-1, 2) = (1, -2).
+rule reflect-two-negates-root-two-first
+  show hold
+    call is-equal
+      call reflect-two-first
+        make minus-one
+        make plus-two
+      make plus-one
+  calm hold
+
+rule reflect-two-negates-root-two-second
+  show hold
+    call is-equal
+      call reflect-two-second
+        make minus-one
+        make plus-two
+      make minus-two
+  calm hold
+
+# REFLECTION MAPS A ROOT TO A ROOT (closure of the root lattice): the first reflection sends the second simple root to the
+# HIGHEST ROOT a1 + a2, which in coordinates is (1, 1). The step s_1(a2) = a2 - <a2, a1^v> a1 = a2 + a1 is the standard
+# move that builds the highest root, and its image is again a root, so the roots are closed under the Weyl reflection. This
+# is the lattice counterpart of the permutation of the six roots proved in the A2 root-system file.
+rule reflect-one-sends-root-two-to-the-highest-root-first
+  show hold
+    call is-equal
+      call reflect-one-first
+        make minus-one
+        make plus-two
+      make plus-one
+  calm hold
+
+rule reflect-one-sends-root-two-to-the-highest-root-second
+  show hold
+    call is-equal
+      call reflect-one-second
+        make minus-one
+        make plus-two
+      make plus-one
+  calm hold
+
+# THE MIRROR CLOSURE: the second reflection sends the first simple root to the highest root, s_2(a1) = a1 + a2 = (1, 1).
+rule reflect-two-sends-root-one-to-the-highest-root-first
+  show hold
+    call is-equal
+      call reflect-two-first
+        make plus-two
+        make minus-one
+      make plus-one
+  calm hold
+
+rule reflect-two-sends-root-one-to-the-highest-root-second
+  show hold
+    call is-equal
+      call reflect-two-second
+        make plus-two
+        make minus-one
+      make plus-one
+  calm hold

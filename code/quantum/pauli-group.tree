@@ -1,0 +1,225 @@
+# The single-qubit Pauli group, the foundation of stabilizer quantum error correction, modeled by the kernel. The three
+# Pauli operators are the bit flip (X), the phase flip (Z), and their product the bit-and-phase flip (Y), together with
+# the identity. With the four phases (the fourth roots of unity one, i, minus one, minus i) they form a group of sixteen
+# elements. This file CONSTRUCTS the operators and phases, COMPUTES their product, and PROVES the defining facts: every
+# Pauli squares to the identity, the cyclic relation X Y = i Z, and the ANTICOMMUTATION X Y = minus Y X that is the heart
+# of the uncertainty between complementary measurements and the reason stabilizer codes detect errors without disturbing
+# the encoded state.
+
+# The four Pauli operators (up to phase): the identity, the bit flip, the bit-and-phase flip, and the phase flip.
+form pauli
+  case identity
+  case bit-flip
+  case both-flip
+  case phase-flip
+
+# The four phases, the fourth roots of unity one, i, minus one, minus i. They are the cyclic group of order four.
+form phase
+  case pos-one
+  case pos-i
+  case neg-one
+  case neg-i
+
+# A group element: a phase times a Pauli operator. The Pauli product of two operators generally carries a phase, so the
+# product lands here.
+form element
+  case scaled
+    link turn, like phase
+    link flip, like pauli
+
+# TEMPLATE: one row of the phase product table, the cyclic group of order four. For a fixed first phase, give the result
+# against each of one, i, minus one, minus i.
+tree phase-row
+  take row
+  take at-one
+  take at-i
+  take at-neg-one
+  take at-neg-i
+
+  hook fuse
+    case {row}
+      fork case, read b
+        case pos-one
+          send back
+            make {at-one}
+        case pos-i
+          send back
+            make {at-i}
+        case neg-one
+          send back
+            make {at-neg-one}
+        case neg-i
+          send back
+            make {at-neg-i}
+
+# Multiply two phases: the fourth roots of unity under multiplication, equivalently addition of quarter turns. One is the
+# identity, i times i is minus one, and i to the fourth is one.
+task phase-multiply
+  take a, like phase
+  take b, like phase
+  like phase
+  fork case, read a
+    fuse phase-row, pos-one, pos-one, pos-i, neg-one, neg-i
+    fuse phase-row, pos-i, pos-i, neg-one, neg-i, pos-one
+    fuse phase-row, neg-one, neg-one, neg-i, pos-one, pos-i
+    fuse phase-row, neg-i, neg-i, pos-one, pos-i, neg-one
+
+# TEMPLATE: one row of the Pauli product table. For a fixed first operator, give the resulting phase and operator against
+# each of identity, bit-flip, both-flip, phase-flip. Each product is a phase times an operator, so the row carries four
+# phase-operator pairs.
+tree pauli-row
+  take row
+  take id-turn
+  take id-flip
+  take bit-turn
+  take bit-flip-out
+  take both-turn
+  take both-flip-out
+  take phase-turn
+  take phase-flip-out
+
+  hook fuse
+    case {row}
+      fork case, read b
+        case identity
+          send back
+            make scaled
+              bind turn
+                make {id-turn}
+              bind flip
+                make {id-flip}
+        case bit-flip
+          send back
+            make scaled
+              bind turn
+                make {bit-turn}
+              bind flip
+                make {bit-flip-out}
+        case both-flip
+          send back
+            make scaled
+              bind turn
+                make {both-turn}
+              bind flip
+                make {both-flip-out}
+        case phase-flip
+          send back
+            make scaled
+              bind turn
+                make {phase-turn}
+              bind flip
+                make {phase-flip-out}
+
+# The Pauli product, the actual multiplication table. The identity is neutral, each operator squares to the identity, and
+# two distinct flips multiply to the third with a phase of plus i one way and minus i the other. The whole table reads as
+# four rows, the cyclic structure X Y = i Z, Y Z = i X, Z X = i Y plain in the off-diagonal entries.
+task pauli-multiply
+  take a, like pauli
+  take b, like pauli
+  like element
+  fork case, read a
+    fuse pauli-row, identity, pos-one, identity, pos-one, bit-flip, pos-one, both-flip, pos-one, phase-flip
+    fuse pauli-row, bit-flip, pos-one, bit-flip, pos-one, identity, pos-i, phase-flip, neg-i, both-flip
+    fuse pauli-row, both-flip, pos-one, both-flip, neg-i, phase-flip, pos-one, identity, pos-i, bit-flip
+    fuse pauli-row, phase-flip, pos-one, phase-flip, pos-i, both-flip, neg-i, bit-flip, pos-one, identity
+
+# Multiply a phase by minus one, flipping its sign. Anticommutation says X Y and Y X differ by exactly this.
+task negate-phase
+  take p, like phase
+  like phase
+  send back
+    call phase-multiply
+      read p
+      make neg-one
+
+# Multiply a phase by i, a quarter turn. Used to show the phase has order four.
+task multiply-by-i
+  take p, like phase
+  like phase
+  send back
+    call phase-multiply
+      read p
+      make pos-i
+
+# Extract the phase of an element, to state anticommutation in terms of the other product's phase.
+task extract-phase
+  take e, like element
+  like phase
+  fork case, read e
+    case scaled
+      link turn
+      link flip
+      send back
+        read turn
+
+# EVERY PAULI SQUARES TO THE IDENTITY: pauli-multiply p p = the identity with phase one, for every operator. This is the
+# involution property X squared = Y squared = Z squared = identity, proved over all four operators.
+rule every-pauli-squares-to-identity
+  mark p, like pauli
+  show hold
+    call is-equal
+      call pauli-multiply
+        read p
+        read p
+      make scaled
+        bind turn
+          make pos-one
+        bind flip
+          make identity
+  fold p
+
+# I TIMES I IS MINUS ONE: the defining relation of the imaginary phase, proved by computation.
+rule i-squared-is-negative-one
+  show hold
+    call is-equal
+      call phase-multiply
+        make pos-i
+        make pos-i
+      make neg-one
+  calm hold
+
+# THE PHASE HAS ORDER FOUR: i to the fourth power is one. The chain starts at i and multiplies by i three more times.
+rule i-to-the-fourth-is-one
+  show hold
+    call is-equal
+      make pos-i
+        link multiply-by-i
+        link multiply-by-i
+        link multiply-by-i
+      make pos-one
+  calm hold
+
+# THE CYCLIC RELATION X Y = i Z: the bit flip times the bit-and-phase flip is the phase flip with a phase of plus i. One
+# of the three cyclic structure relations of the Pauli operators, proved by computation.
+rule bit-times-both-is-i-phase
+  show hold
+    call is-equal
+      call pauli-multiply
+        make bit-flip
+        make both-flip
+      make scaled
+        bind turn
+          make pos-i
+        bind flip
+          make phase-flip
+  calm hold
+
+# ANTICOMMUTATION X Y = minus Y X: the bit flip and the bit-and-phase flip ANTICOMMUTE. Both products are the same
+# operator (the phase flip), but with opposite phases, plus i against minus i, and minus i is exactly minus one times plus
+# i. This anticommutation is what lets a stabilizer measurement detect an error while leaving the encoded state untouched.
+rule bit-and-both-anticommute
+  show hold
+    call is-equal
+      call pauli-multiply
+        make bit-flip
+        make both-flip
+      make scaled
+        bind turn
+          call pauli-multiply
+            make both-flip
+            make bit-flip
+            link extract-phase
+            link negate-phase
+        bind flip
+          make phase-flip
+  calm hold

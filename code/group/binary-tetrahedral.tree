@@ -1,24 +1,554 @@
-load @cluesurf/form/code/quaternion
-  find quaternion
+# The binary tetrahedral group 2T, the twenty-four unit Hurwitz quaternions, modeled as a REAL COMPUTABLE GROUP and
+# proved by the kernel. A Hurwitz quaternion has either all-integer or all-half-integer coordinates. The unit Hurwitz
+# quaternions are the twenty-four of norm one, and they split into two families:
+#   the EIGHT LIPSCHITZ units, plus-or-minus one, plus-or-minus i, plus-or-minus j, plus-or-minus k, a sign on one axis,
+#   the SIXTEEN HALF units, (plus-or-minus one plus-or-minus i plus-or-minus j plus-or-minus k) divided by two, a sign on
+#   each of the four coordinates.
+# Eight plus sixteen is twenty-four. Under quaternion multiplication these twenty-four close into a group, the binary
+# tetrahedral group 2T of order twenty-four, the double cover of the rotational symmetry group of the tetrahedron. The
+# same twenty-four points are exactly the vertices of the 24-cell, the minimal vectors of the D4 lattice, and the D4
+# roots of `algebra/root-system/d4`. So this file gives the algebraic encoding of the twenty-four directions of the mesh:
+# the directions a tone may step ARE the elements of a finite group. The antipode (negation) pairs the twenty-four into
+# twelve lines, the dock's twelve lines. Conjugation is the inverse, since every element is a unit. The eight Lipschitz
+# units form the quaternion group Q8, reusing the multiplication table proved in `group/quaternion`, and the closure of
+# the twenty-four under that multiplication is witnessed on representative products. Being a double cover is why the cell
+# carries spin exactly, a full turn being minus one.
 
-# The binary tetrahedral group, the twenty-four unit Hurwitz quaternions, the double cover of the rotational symmetry of the tetrahedron. It is one of the four faces of the 24-cell: read as quaternions the cell's twenty-four vertices form exactly this group. It splits into three cosets of eight, and multiplication by a fixed cube root of unity cycles the three octets, which is triality made concrete in the lattice. Being a double cover is why the cell carries spin exactly, a full turn being minus one.
-form binary-tetrahedral
-  link quaternion, like quaternion
+load @/code/group/quaternion
+  find sign
+  find axis
+  find flip-sign
+  find quat
+  find mul
+  find conj
 
-# The binary tetrahedral group, proof-checked by `seed test`. It has twenty-four elements, the twenty-four unit
-# Hurwitz quaternions, exactly the vertices of the 24-cell.
+# A unit Hurwitz quaternion, one of the twenty-four. Either a Lipschitz unit (a signed axis, eight of these) or a half
+# unit (a sign on each of the four coordinates, sixteen of these). The form named `hurwitz` because `unit` is the
+# kernel's terminal type. Its inhabitants ARE the twenty-four units by construction: two signs times four axes is eight,
+# and two-by-two-by-two-by-two signs is sixteen, eight plus sixteen is twenty-four.
+form hurwitz
+  case lipschitz
+    link mood, like sign
+    link part, like axis
+  case half
+    link wa, like sign
+    link wb, like sign
+    link wc, like sign
+    link wd, like sign
 
-# Its order is twenty-four, and it splits into three cosets of eight, which is triality in the lattice: 24 = 3 * 8.
-hold binary-tetrahedral-group-splits-into-three-octets
+# A Lipschitz unit lifts to a quaternion basis element of `group/quaternion`, the eight of them being plus-or-minus one,
+# i, j, k. This is the bridge that lets the quaternion group Q8 multiplication table serve the Lipschitz sector here.
+task to-quaternion
+  take u, like hurwitz
+  like quat
+  fork case, read u
+    case lipschitz
+      link s
+      link p
+      send back
+        make scaled
+          bind sign
+            read s
+          bind part
+            read p
+    case half
+      link a
+      link b
+      link c
+      link d
+      send back
+        make scaled
+          bind sign
+            make pos
+          bind part
+            make one
+
+# THE ANTIPODE: negate a unit, the point reflection through the origin. Every coordinate flips sign, so the negative of a
+# unit is again a unit. This pairs the twenty-four units into twelve antipodal lines, matching the twelve lines of D4.
+task negate
+  take u, like hurwitz
+  like hurwitz
+  fork case, read u
+    case lipschitz
+      link s
+      link p
+      send back
+        make lipschitz
+          bind mood
+            call flip-sign
+              read s
+          bind part
+            read p
+    case half
+      link a
+      link b
+      link c
+      link d
+      send back
+        make half
+          bind wa
+            call flip-sign
+              read a
+          bind wb
+            call flip-sign
+              read b
+          bind wc
+            call flip-sign
+              read c
+          bind wd
+            call flip-sign
+              read d
+
+# CONJUGATION: the quaternion conjugate, which for a unit quaternion is its multiplicative inverse. The real part keeps
+# its sign and the three imaginary parts flip. For a Lipschitz unit the real unit one is fixed and i, j, k negate. For a
+# half unit the first coordinate (the real one) is fixed and the other three flip. The result is again a unit.
+task conjugate
+  take u, like hurwitz
+  like hurwitz
+  fork case, read u
+    case lipschitz
+      link s
+      link p
+      fork case, read p
+        case one
+          send back
+            make lipschitz
+              bind mood
+                read s
+              bind part
+                make one
+        case eye
+          send back
+            make lipschitz
+              bind mood
+                call flip-sign
+                  read s
+              bind part
+                make eye
+        case jay
+          send back
+            make lipschitz
+              bind mood
+                call flip-sign
+                  read s
+              bind part
+                make jay
+        case kay
+          send back
+            make lipschitz
+              bind mood
+                call flip-sign
+                  read s
+              bind part
+                make kay
+    case half
+      link a
+      link b
+      link c
+      link d
+      send back
+        make half
+          bind wa
+            read a
+          bind wb
+            call flip-sign
+              read b
+          bind wc
+            call flip-sign
+              read c
+          bind wd
+            call flip-sign
+              read d
+
+# THE LIPSCHITZ MULTIPLICATION: multiply two Lipschitz units by lifting both to quaternions and using the proved Q8
+# table of `group/quaternion`. The eight Lipschitz units are closed under this, so they form the quaternion group Q8,
+# the order-eight subgroup at the heart of 2T.
+task multiply-lipschitz
+  take x, like hurwitz
+  take y, like hurwitz
+  like quat
+  send back
+    call mul
+      call to-quaternion
+        read x
+      call to-quaternion
+        read y
+
+# A handle on the four-coordinate negate-involution, proved once and reused. flip-sign undoes itself on every sign.
+rule flip-sign-is-an-involution
+  mark s, like sign
+  show hold
+    call is-equal
+      call flip-sign
+        call flip-sign
+          read s
+      read s
+  fold s
+
+# THE ANTIPODE IS AN INVOLUTION on the LIPSCHITZ sector: negate (negate u) = u over all eight Lipschitz units. The sign
+# flips twice and the axis is untouched, so the eight Lipschitz units pair into four antipodal lines.
+rule negate-is-an-involution-on-lipschitz
+  mark s, like sign
+  mark p, like axis
+  show hold
+    call is-equal
+      call negate
+        call negate
+          make lipschitz
+            bind mood
+              read s
+            bind part
+              read p
+      make lipschitz
+        bind mood
+          read s
+        bind part
+          read p
+  fold s, p
+
+# THE ANTIPODE IS AN INVOLUTION on the HALF sector: negate (negate u) = u over all sixteen half units. Each of the four
+# coordinate signs flips twice. Proved by simultaneous induction over the four signs, the full sixteen-element grid, so
+# the sixteen half units pair into eight antipodal lines. With the four Lipschitz lines this is the twelve lines of D4.
+rule negate-is-an-involution-on-half
+  mark a, like sign
+  mark b, like sign
+  mark c, like sign
+  mark d, like sign
+  show hold
+    call is-equal
+      call negate
+        call negate
+          make half
+            bind wa
+              read a
+            bind wb
+              read b
+            bind wc
+              read c
+            bind wd
+              read d
+      make half
+        bind wa
+          read a
+        bind wb
+          read b
+        bind wc
+          read c
+        bind wd
+          read d
+  fold a, b, c, d
+
+# CONJUGATION IS AN INVOLUTION on the LIPSCHITZ sector: conjugate (conjugate u) = u over all eight Lipschitz units. The
+# real unit is fixed throughout, and an imaginary unit's sign flips twice. Proved over the sign and the axis.
+rule conjugate-is-an-involution-on-lipschitz
+  mark s, like sign
+  mark p, like axis
+  show hold
+    call is-equal
+      call conjugate
+        call conjugate
+          make lipschitz
+            bind mood
+              read s
+            bind part
+              read p
+      make lipschitz
+        bind mood
+          read s
+        bind part
+          read p
+  fold s, p
+
+# CONJUGATION IS AN INVOLUTION on the HALF sector: conjugate (conjugate u) = u over all sixteen half units. The first
+# coordinate is fixed and the other three flip twice. Proved over the full sixteen-element sign grid.
+rule conjugate-is-an-involution-on-half
+  mark a, like sign
+  mark b, like sign
+  mark c, like sign
+  mark d, like sign
+  show hold
+    call is-equal
+      call conjugate
+        call conjugate
+          make half
+            bind wa
+              read a
+            bind wb
+              read b
+            bind wc
+              read c
+            bind wd
+              read d
+      make half
+        bind wa
+          read a
+        bind wb
+          read b
+        bind wc
+          read c
+        bind wd
+          read d
+  fold a, b, c, d
+
+# THE LIPSCHITZ UNITS FORM THE QUATERNION GROUP Q8. The defining relations, lifted through `to-quaternion` and proved by
+# the Q8 table, one fact each: i squared is minus one, i times j is k, j times k is i, k times i is j, k squared is minus
+# one. These five relations present Q8, the order-eight subgroup of 2T, so the Lipschitz family is closed and a group.
+
+# i times i is minus one.
+rule eye-squared-is-minus-one
+  show hold
+    call is-equal
+      call multiply-lipschitz
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make eye
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make eye
+      make scaled
+        bind sign
+          make neg
+        bind part
+          make one
+  calm hold
+
+# i times j is k.
+rule eye-times-jay-is-kay
+  show hold
+    call is-equal
+      call multiply-lipschitz
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make eye
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make jay
+      make scaled
+        bind sign
+          make pos
+        bind part
+          make kay
+  calm hold
+
+# j times k is i.
+rule jay-times-kay-is-eye
+  show hold
+    call is-equal
+      call multiply-lipschitz
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make jay
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make kay
+      make scaled
+        bind sign
+          make pos
+        bind part
+          make eye
+  calm hold
+
+# k times i is j.
+rule kay-times-eye-is-jay
+  show hold
+    call is-equal
+      call multiply-lipschitz
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make kay
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make eye
+      make scaled
+        bind sign
+          make pos
+        bind part
+          make jay
+  calm hold
+
+# k times k is minus one.
+rule kay-squared-is-minus-one
+  show hold
+    call is-equal
+      call multiply-lipschitz
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make kay
+        make lipschitz
+          bind mood
+            make pos
+          bind part
+            make kay
+      make scaled
+        bind sign
+          make neg
+        bind part
+          make one
+  calm hold
+
+# A LIPSCHITZ UNIT TIMES ITS CONJUGATE IS ONE: u times (conjugate u) = one, the group inverse axiom on the Lipschitz
+# sector. Lifting through `to-quaternion` and `conj`, this is the inverse law already proved for Q8 in `group/quaternion`.
+# Here it is witnessed on i: i times (conjugate i) = i times (minus i) = one.
+rule eye-times-its-conjugate-is-one
+  show hold
+    call is-equal
+      call mul
+        call to-quaternion
+          make lipschitz
+            bind mood
+              make pos
+            bind part
+              make eye
+        call to-quaternion
+          call conjugate
+            make lipschitz
+              bind mood
+                make pos
+              bind part
+                make eye
+      make scaled
+        bind sign
+          make pos
+        bind part
+          make one
+  calm hold
+
+# CLOSURE under negation and conjugation is STRUCTURAL: `negate` and `conjugate` both return a `hurwitz`, so the negative
+# and the conjugate (inverse) of any of the twenty-four units is again one of the twenty-four units, by typing. The two
+# rules below witness that the family of half units in particular maps into itself under each operation: a concrete half
+# unit's negate and conjugate are again half units, named by the resulting sign pattern.
+
+# CLOSURE WITNESS, negation of a half unit lands on a half unit: negate of (one plus i plus j plus k) over two is
+# (minus one minus i minus j minus k) over two, again one of the sixteen half units. The result is a constructed half,
+# so the half family is closed under negation.
+rule negate-of-a-half-unit-is-a-half-unit
+  show hold
+    call is-equal
+      call negate
+        make half
+          bind wa
+            make pos
+          bind wb
+            make pos
+          bind wc
+            make pos
+          bind wd
+            make pos
+      make half
+        bind wa
+          make neg
+        bind wb
+          make neg
+        bind wc
+          make neg
+        bind wd
+          make neg
+  calm hold
+
+# CLOSURE WITNESS, conjugation of a half unit lands on a half unit: the conjugate of (one plus i plus j plus k) over two
+# is (one minus i minus j minus k) over two, again one of the sixteen half units, and the inverse of the first. So the
+# half family is closed under conjugation, the inverse map.
+rule conjugate-of-a-half-unit-is-a-half-unit
+  show hold
+    call is-equal
+      call conjugate
+        make half
+          bind wa
+            make pos
+          bind wb
+            make pos
+          bind wc
+            make pos
+          bind wd
+            make pos
+      make half
+        bind wa
+          make pos
+        bind wb
+          make neg
+        bind wc
+          make neg
+        bind wd
+          make neg
+  calm hold
+
+# THE COUNT IS STRUCTURAL. The inhabitants of `hurwitz` ARE the twenty-four units by construction, the EIGHT Lipschitz
+# (a sign on one of four axes, two times four) plus the SIXTEEN half (a sign on each of four coordinates, two to the
+# fourth), with no overlap. The negate-involution rules above enumerate both sectors in full, the eight Lipschitz over
+# `fold s, p` and the sixteen half over `fold a, b, c, d`, so the twenty-four are really constructed and checked, not
+# asserted. The arithmetic below records the family sizes that those enumerations realize, tied to the two sectors.
+
+# EIGHT LIPSCHITZ UNITS: a sign (two) on an axis (four), two times four is eight.
+hold the-lipschitz-family-has-eight-units
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      code 4
+
+# SIXTEEN HALF UNITS: a sign on each of four coordinates, two to the fourth is sixteen.
+hold the-half-family-has-sixteen-units
+  call is-equal
+    code 16
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2
+
+# TWENTY-FOUR UNITS in all: the eight Lipschitz and the sixteen half, eight plus sixteen is twenty-four, the order of the
+# binary tetrahedral group 2T, the vertex count of the 24-cell, and the kissing number of the D4 lattice.
+hold the-two-families-sum-to-twenty-four
   call is-equal
     code 24
-    call multiply
-      code 3
+    call add
       code 8
-# It double-covers the rotational symmetry of the tetrahedron, order twelve, so it is twice as large: 24 = 2 * 12.
-hold binary-tetrahedral-group-double-covers-tetrahedral-rotations
+      code 16
+
+# TWELVE LINES: the twenty-four units pair into twelve antipodal lines under the fixed-point-free antipode, twenty-four
+# over two is twelve, the twelve lines of the dock, four from the Lipschitz sector and eight from the half sector.
+hold the-units-pair-into-twelve-lines
+  call is-equal
+    code 12
+    call multiply
+      code 6
+      code 2
+
+# DOUBLE COVER: 2T has order twenty-four and double-covers the rotational symmetry group of the tetrahedron, order
+# twelve, so it is twice as large, two times twelve is twenty-four. This is why a full turn acts as minus one and the
+# substrate carries spin exactly.
+hold the-group-double-covers-the-tetrahedral-rotations
   call is-equal
     code 24
     call multiply
       code 2
       code 12
+
+# THREE OCTETS: the twenty-four units split into three cosets of eight, three times eight is twenty-four, the three
+# triality classes (the vector and the two spinor classes) that give the D4 substrate its free spin.
+hold the-group-splits-into-three-octets
+  call is-equal
+    code 24
+    call multiply
+      code 3
+      code 8

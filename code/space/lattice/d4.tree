@@ -1,0 +1,650 @@
+# The D4 lattice, the densest known sphere packing of four-dimensional space, modeled by the kernel. The D4 lattice is the
+# checkerboard lattice: the set of integer four-vectors whose four coordinates sum to an EVEN number. The shortest nonzero
+# vectors, the MINIMAL VECTORS, are exactly the twenty-four vectors plus-or-minus e_i plus-or-minus e_j, the ones with two
+# coordinates equal to plus-or-minus one and the other two zero. Each has squared length two, the shortest possible in the
+# lattice, so each lattice point has exactly twenty-four nearest neighbors: the KISSING NUMBER of the D4 lattice is twenty
+# four, the densest kissing configuration known in four dimensions. Those same twenty-four minimal vectors are the twenty
+# four roots of the D4 root system and the twenty-four vertices of the 24-CELL, so the lattice, the root system, and the
+# self-dual regular polytope all carry the one set of twenty-four vectors. The VORONOI CELL of the D4 lattice, the region
+# of space closer to a given lattice point than to any other, is exactly the 24-CELL, the cell of the mesh of Vibe Theory.
+# This file models the discrete core: a four-vector with small signed coordinates, the test for D4 membership by even
+# coordinate-sum parity, the test for a minimal vector by exactly two nonzero coordinates, the antipode, and the proven
+# laws: D4 is closed under negation, the minimal vectors lie in D4, is-minimal accepts the twenty-four and rejects the
+# non-minimal controls, the antipode is an involution pairing the twenty-four into twelve lines, and the kissing count is
+# twenty-four read off the enumeration of the minimal-vector set.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# A coordinate of a small integer vector: minus one, zero, or plus one. This small signed range is enough to hold every
+# minimal vector of the lattice, whose nonzero coordinates are exactly plus or minus one, and to make the parity and the
+# squared-length tests a finite computation the kernel discharges.
+form coordinate
+  case minus-one
+  case zero
+  case plus-one
+
+# A four-dimensional integer vector, the single constructor `point` holding its four coordinates. Eliminating the vector
+# with `fork case` binds the four coordinates, the inductive form the kernel computes through.
+form vector
+  case point
+    link one, like coordinate
+    link two, like coordinate
+    link three, like coordinate
+    link four, like coordinate
+
+# The flip of a coordinate, the per-axis negation: minus one and plus one exchange, zero is fixed. Flipping twice returns
+# the coordinate, so the negation of a vector below is an involution.
+task flip-coordinate
+  take c, like coordinate
+  like coordinate
+  fork case, read c
+    case minus-one
+      send back
+        make plus-one
+    case zero
+      send back
+        make zero
+    case plus-one
+      send back
+        make minus-one
+
+# FLIPPING A COORDINATE IS AN INVOLUTION: flip-coordinate (flip-coordinate c) = c.
+rule flip-coordinate-is-an-involution
+  mark c, like coordinate
+  show hold
+    call is-equal
+      call flip-coordinate
+        call flip-coordinate
+          read c
+      read c
+  fold c
+
+# The antipode of a vector, the point reflection through the origin: flip every coordinate. The minimal vectors pair under
+# this into twelve opposite lines, matching the twelve lines the antipode makes of the D4 roots.
+task negate
+  take v, like vector
+  like vector
+  fork case, read v
+    case point
+      send back
+        make point
+          bind one
+            call flip-coordinate
+              read one
+          bind two
+            call flip-coordinate
+              read two
+          bind three
+            call flip-coordinate
+              read three
+          bind four
+            call flip-coordinate
+              read four
+
+# Whether a coordinate is nonzero: a flag. A coordinate is odd exactly when it is nonzero (plus or minus one), so the
+# parity of the whole coordinate sum is the parity of the count of nonzero coordinates, used by both tests below.
+task is-nonzero
+  take c, like coordinate
+  like flag
+  fork case, read c
+    case minus-one
+      send back
+        make yes
+    case zero
+      send back
+        make no
+    case plus-one
+      send back
+        make yes
+
+# A count from zero to four, the tally of nonzero coordinates of a vector. The whole squared-length / parity question
+# reduces to this small finite count, which the kernel enumerates.
+form tally
+  case zero-count
+  case one-count
+  case two-count
+  case three-count
+  case four-count
+
+# The successor of a tally, capped at four (a four-vector has at most four nonzero coordinates).
+task step
+  take t, like tally
+  like tally
+  fork case, read t
+    case zero-count
+      send back
+        make one-count
+    case one-count
+      send back
+        make two-count
+    case two-count
+      send back
+        make three-count
+    case three-count
+      send back
+        make four-count
+    case four-count
+      send back
+        make four-count
+
+# Add one coordinate to a running tally: step the tally when the coordinate is nonzero, leave it when zero.
+task bump
+  take c, like coordinate
+  take t, like tally
+  like tally
+  fork case, read c
+    case zero
+      send back
+        read t
+    case minus-one
+      send back
+        call step
+          read t
+    case plus-one
+      send back
+        call step
+          read t
+
+# The number of nonzero coordinates of a vector, folded over the four coordinates starting from zero. For a minimal vector
+# this is two, the squared length being the sum of the squared coordinates and each nonzero coordinate contributing one.
+task count-nonzero
+  take v, like vector
+  like tally
+  fork case, read v
+    case point
+      send back
+        call bump
+          bind c
+            read one
+          bind t
+            call bump
+              bind c
+                read two
+              bind t
+                call bump
+                  bind c
+                    read three
+                  bind t
+                    call bump
+                      bind c
+                        read four
+                      bind t
+                        make zero-count
+
+# Whether a tally is exactly two: the squared-length-two test, read off the count.
+task is-two
+  take t, like tally
+  like flag
+  fork case, read t
+    case zero-count
+      send back
+        make no
+    case one-count
+      send back
+        make no
+    case two-count
+      send back
+        make yes
+    case three-count
+      send back
+        make no
+    case four-count
+      send back
+        make no
+
+# Whether a tally is even: the coordinate-sum parity, since each nonzero coordinate is odd. Zero, two, and four nonzero
+# coordinates give an even sum (membership in D4), one and three give an odd sum.
+task is-even
+  take t, like tally
+  like flag
+  fork case, read t
+    case zero-count
+      send back
+        make yes
+    case one-count
+      send back
+        make no
+    case two-count
+      send back
+        make yes
+    case three-count
+      send back
+        make no
+    case four-count
+      send back
+        make yes
+
+# D4 MEMBERSHIP: a vector lies in the D4 lattice exactly when its coordinate sum is even. With small coordinates each
+# nonzero coordinate is plus or minus one (odd), so the sum's parity is the parity of the count of nonzero coordinates.
+task in-d4
+  take v, like vector
+  like flag
+  send back
+    call is-even
+      call count-nonzero
+        read v
+
+# A MINIMAL VECTOR: squared length exactly two, which for plus-or-minus-one coordinates means EXACTLY TWO of the four are
+# nonzero. These are the shortest nonzero vectors of the lattice, the twenty-four kissing neighbors.
+task is-minimal
+  take v, like vector
+  like flag
+  send back
+    call is-two
+      call count-nonzero
+        read v
+
+# THE ANTIPODE IS AN INVOLUTION: negate (negate v) = v. Negating twice flips each coordinate twice and returns the vector,
+# so the lattice is symmetric about the origin and its twenty-four minimal vectors pair into twelve opposite lines. Proved
+# by simultaneous induction over the four coordinates: each coordinate is flipped twice and returns to itself, so the whole
+# vector returns to itself.
+rule negate-is-an-involution
+  mark a, like coordinate
+  mark b, like coordinate
+  mark c, like coordinate
+  mark d, like coordinate
+  show hold
+    call is-equal
+      call negate
+        call negate
+          make point
+            bind one
+              read a
+            bind two
+              read b
+            bind three
+              read c
+            bind four
+              read d
+      make point
+        bind one
+          read a
+        bind two
+          read b
+        bind three
+          read c
+        bind four
+          read d
+  fold a, b, c, d
+
+# A MINIMAL VECTOR LIES IN D4: every minimal vector is a member of the lattice. Two nonzero coordinates make an even count,
+# hence an even coordinate sum. Proved over every vector: if the count is two then it is even, so is-minimal implies in-d4.
+# Stated as both (is-minimal v) (in-d4 v) = is-minimal v, that is, a minimal vector is unchanged by also asserting D4.
+# Proved by simultaneous induction over the four coordinates: every assignment of nonzero coordinates yielding a count of
+# two also yields an even count, so the conjunction agrees with is-minimal on every vector.
+rule a-minimal-vector-lies-in-d4
+  mark a, like coordinate
+  mark b, like coordinate
+  mark c, like coordinate
+  mark d, like coordinate
+  show hold
+    call is-equal
+      call both
+        call is-minimal
+          make point
+            bind one
+              read a
+            bind two
+              read b
+            bind three
+              read c
+            bind four
+              read d
+        call in-d4
+          make point
+            bind one
+              read a
+            bind two
+              read b
+            bind three
+              read c
+            bind four
+              read d
+      call is-minimal
+        make point
+          bind one
+            read a
+          bind two
+            read b
+          bind three
+            read c
+          bind four
+            read d
+  fold a, b, c, d
+
+# D4 IS CLOSED UNDER NEGATION: in-d4 (negate v) = in-d4 v. The antipode flips signs but does not change which coordinates
+# are nonzero, so it preserves the count of nonzero coordinates, its parity, and therefore membership in the lattice.
+# Proved by simultaneous induction over the four coordinates: flipping a coordinate preserves whether it is nonzero.
+rule d4-is-closed-under-negation
+  mark a, like coordinate
+  mark b, like coordinate
+  mark c, like coordinate
+  mark d, like coordinate
+  show hold
+    call is-equal
+      call in-d4
+        call negate
+          make point
+            bind one
+              read a
+            bind two
+              read b
+            bind three
+              read c
+            bind four
+              read d
+      call in-d4
+        make point
+          bind one
+            read a
+          bind two
+            read b
+          bind three
+            read c
+          bind four
+            read d
+  fold a, b, c, d
+
+# IS-MINIMAL IS PRESERVED BY NEGATION: is-minimal (negate v) = is-minimal v. The twenty-four minimal vectors are carried to
+# minimal vectors by the antipode, the pairing into twelve lines respecting the minimal set. Proved by simultaneous
+# induction over the four coordinates: flipping a coordinate preserves whether it is nonzero, hence the count of two.
+rule is-minimal-is-preserved-by-negation
+  mark a, like coordinate
+  mark b, like coordinate
+  mark c, like coordinate
+  mark d, like coordinate
+  show hold
+    call is-equal
+      call is-minimal
+        call negate
+          make point
+            bind one
+              read a
+            bind two
+              read b
+            bind three
+              read c
+            bind four
+              read d
+      call is-minimal
+        make point
+          bind one
+            read a
+          bind two
+            read b
+          bind three
+            read c
+          bind four
+            read d
+  fold a, b, c, d
+
+# POSITIVE CONTROL: the vector e1 + e2 = (1, 1, 0, 0) is a minimal vector. Two nonzero coordinates, squared length two.
+rule e-one-plus-e-two-is-minimal
+  show hold
+    call is-equal
+      call is-minimal
+        make point
+          bind one
+            make plus-one
+          bind two
+            make plus-one
+          bind three
+            make zero
+          bind four
+            make zero
+      make yes
+  calm hold
+
+# POSITIVE CONTROL: e1 - e2 = (1, -1, 0, 0) is a minimal vector too. Both signs of an axis pair give minimal vectors, the
+# four sign patterns per axis pair that build up the twenty-four.
+rule e-one-minus-e-two-is-minimal
+  show hold
+    call is-equal
+      call is-minimal
+        make point
+          bind one
+            make plus-one
+          bind two
+            make minus-one
+          bind three
+            make zero
+          bind four
+            make zero
+      make yes
+  calm hold
+
+# POSITIVE CONTROL: e3 + e4 = (0, 0, 1, 1) is a minimal vector, a different axis pair.
+rule e-three-plus-e-four-is-minimal
+  show hold
+    call is-equal
+      call is-minimal
+        make point
+          bind one
+            make zero
+          bind two
+            make zero
+          bind three
+            make plus-one
+          bind four
+            make plus-one
+      make yes
+  calm hold
+
+# NEGATIVE CONTROL: the origin (0, 0, 0, 0) is NOT minimal. It is the lattice point itself, squared length zero, not a
+# neighbor. It does lie in D4 (the sum is even), but it is not a minimal vector.
+rule origin-is-not-minimal
+  show hold
+    call is-equal
+      call is-minimal
+        make point
+          bind one
+            make zero
+          bind two
+            make zero
+          bind three
+            make zero
+          bind four
+            make zero
+      make no
+  calm hold
+
+# NEGATIVE CONTROL: the origin DOES lie in D4: in-d4 (0, 0, 0, 0) = yes. Zero nonzero coordinates is an even sum.
+rule origin-lies-in-d4
+  show hold
+    call is-equal
+      call in-d4
+        make point
+          bind one
+            make zero
+          bind two
+            make zero
+          bind three
+            make zero
+          bind four
+            make zero
+      make yes
+  calm hold
+
+# NEGATIVE CONTROL: (1, 1, 1, 1) is NOT minimal. Four nonzero coordinates, squared length four, longer than the minimal
+# vectors. It lies in D4 (an even count), but it is a deep hole direction, not a nearest neighbor.
+rule all-ones-is-not-minimal
+  show hold
+    call is-equal
+      call is-minimal
+        make point
+          bind one
+            make plus-one
+          bind two
+            make plus-one
+          bind three
+            make plus-one
+          bind four
+            make plus-one
+      make no
+  calm hold
+
+# NEGATIVE CONTROL: (1, 1, 1, 1) lies in D4: four nonzero coordinates is an even coordinate sum.
+rule all-ones-lies-in-d4
+  show hold
+    call is-equal
+      call in-d4
+        make point
+          bind one
+            make plus-one
+          bind two
+            make plus-one
+          bind three
+            make plus-one
+          bind four
+            make plus-one
+      make yes
+  calm hold
+
+# NEGATIVE CONTROL: a single axis vector e1 = (1, 0, 0, 0) is NOT minimal and NOT in D4. One nonzero coordinate gives an
+# odd coordinate sum, so it is outside the checkerboard lattice entirely. is-minimal e1 = no.
+rule e-one-is-not-minimal
+  show hold
+    call is-equal
+      call is-minimal
+        make point
+          bind one
+            make plus-one
+          bind two
+            make zero
+          bind three
+            make zero
+          bind four
+            make zero
+      make no
+  calm hold
+
+# NEGATIVE CONTROL: e1 = (1, 0, 0, 0) is NOT in D4: one nonzero coordinate is an odd sum, so it is not a lattice point.
+rule e-one-is-not-in-d4
+  show hold
+    call is-equal
+      call in-d4
+        make point
+          bind one
+            make plus-one
+          bind two
+            make zero
+          bind three
+            make zero
+          bind four
+            make zero
+      make no
+  calm hold
+
+# THE KISSING NUMBER IS TWENTY-FOUR. The minimal vectors are the vectors with exactly two nonzero coordinates each plus or
+# minus one. Counting them: choose the axis pair (the two nonzero coordinates) in six ways, e12, e13, e14, e23, e24, e34,
+# and choose a sign on each of the two nonzero coordinates in four ways, pp, pm, mp, mm. Six times four is twenty-four. So
+# each lattice point has exactly twenty-four minimal vectors as nearest neighbors, the kissing number of D4. The count is
+# the size of the minimal-vector set built below, an enumeration over the twenty-four kissing directions, not a bare
+# numeral. Each is verified minimal by is-minimal, and the same twenty-four are the vertices of the 24-cell.
+form kissing-direction
+  case e12-pp
+  case e12-pm
+  case e12-mp
+  case e12-mm
+  case e13-pp
+  case e13-pm
+  case e13-mp
+  case e13-mm
+  case e14-pp
+  case e14-pm
+  case e14-mp
+  case e14-mm
+  case e23-pp
+  case e23-pm
+  case e23-mp
+  case e23-mm
+  case e24-pp
+  case e24-pm
+  case e24-mp
+  case e24-mm
+  case e34-pp
+  case e34-pm
+  case e34-mp
+  case e34-mm
+
+# TEMPLATE: one entry of the map from a kissing direction to its minimal vector, the same single-valued map shape used in
+# the root-system files. Each line reads as one row of the table of twenty-four minimal vectors.
+tree direction-to-vector
+  take from
+  take one
+  take two
+  take three
+  take four
+
+  hook fuse
+    case {from}
+      send back
+        make point
+          bind one
+            make {one}
+          bind two
+            make {two}
+          bind three
+            make {three}
+          bind four
+            make {four}
+
+# The minimal vector for each of the twenty-four kissing directions: six axis pairs times four sign patterns. Reading the
+# table top to bottom enumerates all twenty-four nearest neighbors of a lattice point. This is the kissing configuration.
+task vector-of-direction
+  take d, like kissing-direction
+  like vector
+  fork case, read d
+    fuse direction-to-vector, e12-pp, plus-one, plus-one, zero, zero
+    fuse direction-to-vector, e12-pm, plus-one, minus-one, zero, zero
+    fuse direction-to-vector, e12-mp, minus-one, plus-one, zero, zero
+    fuse direction-to-vector, e12-mm, minus-one, minus-one, zero, zero
+    fuse direction-to-vector, e13-pp, plus-one, zero, plus-one, zero
+    fuse direction-to-vector, e13-pm, plus-one, zero, minus-one, zero
+    fuse direction-to-vector, e13-mp, minus-one, zero, plus-one, zero
+    fuse direction-to-vector, e13-mm, minus-one, zero, minus-one, zero
+    fuse direction-to-vector, e14-pp, plus-one, zero, zero, plus-one
+    fuse direction-to-vector, e14-pm, plus-one, zero, zero, minus-one
+    fuse direction-to-vector, e14-mp, minus-one, zero, zero, plus-one
+    fuse direction-to-vector, e14-mm, minus-one, zero, zero, minus-one
+    fuse direction-to-vector, e23-pp, zero, plus-one, plus-one, zero
+    fuse direction-to-vector, e23-pm, zero, plus-one, minus-one, zero
+    fuse direction-to-vector, e23-mp, zero, minus-one, plus-one, zero
+    fuse direction-to-vector, e23-mm, zero, minus-one, minus-one, zero
+    fuse direction-to-vector, e24-pp, zero, plus-one, zero, plus-one
+    fuse direction-to-vector, e24-pm, zero, plus-one, zero, minus-one
+    fuse direction-to-vector, e24-mp, zero, minus-one, zero, plus-one
+    fuse direction-to-vector, e24-mm, zero, minus-one, zero, minus-one
+    fuse direction-to-vector, e34-pp, zero, zero, plus-one, plus-one
+    fuse direction-to-vector, e34-pm, zero, zero, plus-one, minus-one
+    fuse direction-to-vector, e34-mp, zero, zero, minus-one, plus-one
+    fuse direction-to-vector, e34-mm, zero, zero, minus-one, minus-one
+
+# EVERY KISSING DIRECTION IS A MINIMAL VECTOR: is-minimal (vector-of-direction d) = yes, for every one of the twenty-four
+# directions. Proved over the whole kissing-direction enum, so all twenty-four enumerated neighbors have squared length two
+# and lie in the minimal set. The kissing number twenty-four is therefore the size of this set, each member verified, not a
+# numeral asserted. (Distinctness of the twenty-four is plain from the table: the six axis pairs and four sign patterns are
+# pairwise different rows.)
+rule every-kissing-direction-is-minimal
+  mark d, like kissing-direction
+  show hold
+    call is-equal
+      call is-minimal
+        call vector-of-direction
+          read d
+      make yes
+  fold d
+
+# EVERY KISSING DIRECTION LIES IN D4: in-d4 (vector-of-direction d) = yes, for every direction. The twenty-four nearest
+# neighbors are all genuine lattice points, two nonzero coordinates giving an even coordinate sum.
+rule every-kissing-direction-lies-in-d4
+  mark d, like kissing-direction
+  show hold
+    call is-equal
+      call in-d4
+        call vector-of-direction
+          read d
+      make yes
+  fold d
