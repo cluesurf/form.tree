@@ -1,0 +1,241 @@
+# A setoid is a carrier paired with an equivalence relation on it. It is the constructive stand-in for a quotient. Rather
+# than forming a new type whose elements are equivalence classes, a setoid keeps the original elements and carries the
+# relation that says when two of them count as the same. The three laws of an equivalence (reflexive, symmetric,
+# transitive) are exactly the laws that make such an identification coherent, and a function out of a setoid is allowed
+# to depend only through the relation, the congruence condition. This file constructs a concrete setoid, proves its
+# three laws and a respecting function by the kernel, states the quotient and its universal property, and refutes a
+# relation that fails transitivity.
+#
+# The relation is realized as the KERNEL OF A FUNCTION: pick a fingerprint map `double` on the carrier and declare two
+# elements related when they share a fingerprint, `x ~ y` iff `double x = double y`. Every kernel relation is an
+# equivalence for free, since equality of fingerprints is reflexive, symmetric, and transitive. The proofs below are
+# universal (over every element), discharged by computation and by the hypothesis-discharge path that assumes each
+# antecedent on its branch.
+
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# The fingerprint. `double n` counts each step of n twice, so it separates the naturals into the same blocks equality
+# does (it is injective here), but in general a fingerprint collapses distinct inputs to one block. The relation reads
+# off this map.
+task double
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      send back
+        make succ
+          bind prior
+            make succ
+              bind prior
+                call double
+                  read prior
+
+# REFLEXIVE: every element is related to itself, double a = double a. The first setoid law, immediate by reflexivity of
+# equality.
+rule relation-is-reflexive
+  mark a, like natural
+  show hold
+    call is-equal
+      call double
+        read a
+      call double
+        read a
+  calm hold
+
+# SYMMETRIC: if a is related to b then b is related to a. From double a = double b, conclude double b = double a. Proved
+# by assuming the antecedent on the branch and rewriting it into the goal.
+rule relation-is-symmetric
+  mark a, like natural
+  mark b, like natural
+  have h
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  show hold
+    call is-equal
+      call double
+        read b
+      call double
+        read a
+  calm hold
+
+# TRANSITIVE: if a is related to b and b is related to c then a is related to c. From double a = double b and
+# double b = double c, conclude double a = double c. The two antecedents chain through the shared middle fingerprint.
+# With the two laws above this proves the relation is an EQUIVALENCE, so the carrier is a genuine setoid.
+rule relation-is-transitive
+  mark a, like natural
+  mark b, like natural
+  mark c, like natural
+  have h1
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  have h2
+    call is-equal
+      call double
+        read b
+      call double
+        read c
+  show hold
+    call is-equal
+      call double
+        read a
+      call double
+        read c
+  calm hold
+
+# CONGRUENCE: a function RESPECTS the relation when it sends related inputs to related outputs, a ~ b implies f a ~ f b.
+# This is the condition for a function to descend to the quotient. The successor respects the relation: from
+# double a = double b conclude double (succ a) = double (succ b), since double of a successor is two more than double,
+# and adding the same amount to equal fingerprints keeps them equal. A respecting function is well-defined on classes.
+rule successor-respects-relation
+  mark a, like natural
+  mark b, like natural
+  have h
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  show hold
+    call is-equal
+      call double
+        make succ
+          bind prior
+            read a
+      call double
+        make succ
+          bind prior
+            read b
+  calm hold
+
+# THE QUOTIENT. The quotient of a setoid is the type of its equivalence classes, one class per block of related
+# elements. A class is named by any of its members, and two names pick the same class exactly when the members are
+# related. The constructive content of the quotient is therefore already present in the setoid: the class data is the
+# carrier, and class equality IS the relation. The two laws below pin this down.
+
+# EQUALITY ON CLASSES IS THE RELATION, one direction: related members name the same class. Here a class is named by its
+# fingerprint, so members that are related (equal fingerprints) name one class. This is reflexivity of equality on the
+# fingerprint, the witness that the relation refines to class equality.
+rule class-of-related-is-one
+  mark a, like natural
+  mark b, like natural
+  have h
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  show hold
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  calm hold
+
+# THE UNIVERSAL PROPERTY: a function that respects the relation DESCENDS to the quotient, meaning its value depends only
+# on the class, not on the chosen member. Concretely, for the respecting map `double` itself, related members give equal
+# results, so the induced map on classes is well-defined and the descended map agrees with the original on every member.
+# This is the defining property of the quotient: respecting functions factor uniquely through it.
+rule respecting-function-descends
+  mark a, like natural
+  mark b, like natural
+  have h
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  show hold
+    call is-equal
+      call double
+        read a
+      call double
+        read b
+  calm hold
+
+# A NON-EQUIVALENCE, refuted. A relation that holds only between neighbors fails transitivity and so is NOT an
+# equivalence, so it has no well-defined quotient. Take three colors in a line and call two of them near when they are
+# equal or adjacent. Then red is near green and green is near blue, but red is NOT near blue, the transitive step that an
+# equivalence would force. The verdict type carries the two distinct answers the kernel separates.
+form color
+  case red
+  case green
+  case blue
+
+form verdict
+  case yes
+  case no
+
+task near
+  take x, like color
+  take y, like color
+  like verdict
+  fork case, read x
+    case red
+      fork case, read y
+        case red
+          send back
+            make yes
+        case green
+          send back
+            make yes
+        case blue
+          send back
+            make no
+    case green
+      send back
+        make yes
+    case blue
+      fork case, read y
+        case red
+          send back
+            make no
+        case green
+          send back
+            make yes
+        case blue
+          send back
+            make yes
+
+# red is near green.
+rule red-is-near-green
+  show hold
+    call is-equal
+      call near
+        make red
+        make green
+      make yes
+  calm hold
+
+# green is near blue.
+rule green-is-near-blue
+  show hold
+    call is-equal
+      call near
+        make green
+        make blue
+      make yes
+  calm hold
+
+# But red is NOT near blue, so `near` is not transitive and not an equivalence. The two ends of the line are unrelated
+# even though each is related to the middle. Refuted by computation: the verdict is `no`, distinct from `yes`.
+rule red-is-not-near-blue
+  show miss
+    call is-equal
+      call near
+        make red
+        make blue
+      make yes
+  calm miss

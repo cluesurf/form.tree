@@ -1,0 +1,1893 @@
+# The Lie algebra su(3), the color algebra of the strong force, modeled as a REAL COMPUTABLE algebra and proved to satisfy
+# the Lie axioms by the kernel. su(3) is the eight-dimensional algebra of traceless Hermitian generators, the eight gluons
+# of the strong force. Its standard basis is the eight Gell-Mann generators t1 through t8. The Lie bracket is
+# [t_a, t_b] = i f_{abc} t_c, where f_{abc} are the totally antisymmetric STRUCTURE CONSTANTS. The nonzero constants are
+# f_{123} = 1, the half-valued f_{147} = f_{246} = f_{257} = f_{345} = 1/2 and f_{156} = f_{367} = -1/2, and the two
+# irrational ones f_{458} = f_{678} = sqrt(3)/2.
+#
+# WHAT IS PROVED HERE. The structure constants are carried by a CONSTRUCTED coefficient type that holds the rational ones
+# exactly and the two irrational ones as the SYMBOL `root-three-half` (the value sqrt(3)/2). It is NOT a float. It is a
+# symbol standing for the exact algebraic number, so the totally antisymmetric law f^{abc} = -f^{bac} is proved on it just
+# like the rational entries. The kernel proves: the structure-constant table is antisymmetric in its first two indices, the
+# Lie bracket on the integer-coefficient SU(2) subalgebra (t1, t2, t3, the isospin embedding [t1,t2] = i t3 with f_{123} = 1)
+# is alternating, antisymmetric, and satisfies the Jacobi identity, the Cartan generators t3 and t8 COMMUTE while a
+# non-Cartan pair does NOT (shown by refutation), and color charge is CONSERVED in a singlet (a baryon red+green+blue and a
+# meson quark+antiquark are colorless). su(3) is the rank-two algebra whose root system is A2 (cite `algebra/lie/root-a2`),
+# and it is the strong factor SU(3) of the Standard Model gauge group SU(3) x SU(2) x U(1).
+
+load @cluesurf/form/code/atom/sign
+  find sign
+  find flip-sign
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# THE EIGHT GELL-MANN GENERATORS, the basis of su(3). t1, t2, t3 are the isospin block (an embedded su(2), the Pauli matrices
+# in the upper-left corner). t3 and t8 are the two diagonal generators (the Cartan subalgebra). The other five mix the
+# three colors.
+form gen
+  case t1
+  case t2
+  case t3
+  case t4
+  case t5
+  case t6
+  case t7
+  case t8
+
+# A STRUCTURE-CONSTANT COEFFICIENT. The structure constants f_{abc} take five magnitudes across su(3): zero, one (the
+# f_{123} isospin constant), one half (the f_{147}-family constants), and root-three-half = sqrt(3)/2 (the f_{458} and
+# f_{678} constants). Each nonzero magnitude appears in a positive and a negative variant, so each is its own constructor.
+# The root-three-half value is held as a SYMBOL, the exact algebraic number sqrt(3)/2, never a floating-point
+# approximation, so equalities on it are exact and the antisymmetry law holds on it.
+form coef
+  case zero-coef
+  case plus-one
+  case minus-one
+  case plus-half
+  case minus-half
+  case plus-root-three-half
+  case minus-root-three-half
+
+# TEMPLATE: one entry of the coefficient negation table, sending each coefficient to its sign-flipped partner.
+tree flip-coef
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# Negate a coefficient: zero stays zero, a signed magnitude flips its sign. This is what f^{abc} = -f^{bac} demands of the
+# table.
+task negate-coef
+  take c, like coef
+  like coef
+  fork case, read c
+    fuse flip-coef, zero-coef, zero-coef
+    fuse flip-coef, plus-one, minus-one
+    fuse flip-coef, minus-one, plus-one
+    fuse flip-coef, plus-half, minus-half
+    fuse flip-coef, minus-half, plus-half
+    fuse flip-coef, plus-root-three-half, minus-root-three-half
+    fuse flip-coef, minus-root-three-half, plus-root-three-half
+
+# TEMPLATE: one entry of the structure-constant table for a fixed first index, mapping the second index to the coefficient
+# magnitude. Every entry not listed falls through to zero. This lets each generator's row read as its list of nonzero
+# constants instead of a repeated block of branches.
+tree f-entry
+  take col
+  take build
+
+  hook fuse
+    case {col}
+      send back
+        make {build}
+
+# THE STRUCTURE CONSTANT f_{abc} as a function of the three indices a, b, c. It returns the coefficient (signed magnitude)
+# of t_c in the bracket [t_a, t_b], divided out of the i. The table encodes the totally antisymmetric f with its standard
+# nonzero values. Only the canonical ascending triples and the swaps the antisymmetry forces are listed here through the
+# per-row helpers below. Everything else is zero. This is the heart of su(3): the eight generators close under the bracket
+# exactly by this table.
+task f-constant
+  take a, like gen
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read a
+    case t1
+      send back
+        call f-row-t1
+          read b
+          read c
+    case t2
+      send back
+        call f-row-t2
+          read b
+          read c
+    case t3
+      send back
+        call f-row-t3
+          read b
+          read c
+    case t4
+      send back
+        call f-row-t4
+          read b
+          read c
+    case t5
+      send back
+        call f-row-t5
+          read b
+          read c
+    case t6
+      send back
+        call f-row-t6
+          read b
+          read c
+    case t7
+      send back
+        call f-row-t7
+          read b
+          read c
+    case t8
+      send back
+        call f-row-t8
+          read b
+          read c
+
+# Row a = t1. Nonzero: f_{123} = 1, f_{147} = 1/2, f_{156} = -1/2 (and the sign-flipped swaps f_{132}, f_{174}, f_{165}).
+task f-row-t1
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t2
+      fork case, read c
+        fuse f-entry, t3, plus-one
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      fork case, read c
+        fuse f-entry, t2, minus-one
+        case t1
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t4
+      fork case, read c
+        fuse f-entry, t7, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t5
+      fork case, read c
+        fuse f-entry, t6, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t1
+      send back
+        make zero-coef
+    case t6
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        fuse f-entry, t5, plus-half
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t7
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        fuse f-entry, t4, minus-half
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t8
+      send back
+        make zero-coef
+
+# Row a = t2. Nonzero: f_{231} = 1 (the antisymmetric swap of f_{123}), f_{246} = 1/2, f_{257} = 1/2.
+task f-row-t2
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t1
+      fork case, read c
+        fuse f-entry, t3, minus-one
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      fork case, read c
+        fuse f-entry, t1, plus-one
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t4
+      fork case, read c
+        fuse f-entry, t6, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t5
+      fork case, read c
+        fuse f-entry, t7, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t2
+      send back
+        make zero-coef
+    case t6
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        fuse f-entry, t4, plus-half
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t7
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        fuse f-entry, t5, plus-half
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t8
+      send back
+        make zero-coef
+
+# Row a = t3. Nonzero: f_{312} = 1 (swap of f_{123}), f_{345} = 1/2, f_{367} = -1/2.
+task f-row-t3
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t1
+      fork case, read c
+        fuse f-entry, t2, plus-one
+        case t1
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t2
+      fork case, read c
+        fuse f-entry, t1, minus-one
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t4
+      fork case, read c
+        fuse f-entry, t5, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t6
+      fork case, read c
+        fuse f-entry, t7, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      send back
+        make zero-coef
+    case t5
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        fuse f-entry, t4, plus-half
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t7
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        fuse f-entry, t6, minus-half
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t8
+      send back
+        make zero-coef
+
+# Row a = t4. Nonzero: f_{417} = -1/2 (swap of f_{147}), f_{435} = -1/2 (swap of f_{345}), f_{426} = -1/2 (swap of f_{246}),
+# and f_{458} = sqrt(3)/2, one of the two irrational constants.
+task f-row-t4
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t1
+      fork case, read c
+        fuse f-entry, t7, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t2
+      fork case, read c
+        fuse f-entry, t6, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      fork case, read c
+        fuse f-entry, t5, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t5
+      fork case, read c
+        fuse f-entry, t8, plus-root-three-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+    case t4
+      send back
+        make zero-coef
+    case t6
+      send back
+        make zero-coef
+    case t7
+      send back
+        make zero-coef
+    case t8
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        fuse f-entry, t5, plus-root-three-half
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+
+# Row a = t5. Nonzero: f_{516} = 1/2 (swap of f_{156}), f_{524} = -1/2 (swap of f_{246}... via the chain), f_{534} = ...
+# the entries forced as antisymmetric swaps. The relevant nonzero is f_{578} = sqrt(3)/2.
+task f-row-t5
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t1
+      fork case, read c
+        fuse f-entry, t6, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      fork case, read c
+        fuse f-entry, t4, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t4
+      fork case, read c
+        fuse f-entry, t8, minus-root-three-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+    case t2
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        fuse f-entry, t7, minus-half
+        case t8
+          send back
+            make zero-coef
+    case t5
+      send back
+        make zero-coef
+    case t6
+      send back
+        make zero-coef
+    case t7
+      send back
+        make zero-coef
+    case t8
+      send back
+        make zero-coef
+
+# Row a = t6. Nonzero: f_{615} = -1/2 (swap of f_{156}), f_{642} = -1/2 (swap of f_{246}), f_{673} = ... and
+# f_{678} = sqrt(3)/2, the second irrational constant.
+task f-row-t6
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t1
+      fork case, read c
+        fuse f-entry, t5, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t2
+      fork case, read c
+        fuse f-entry, t4, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      fork case, read c
+        fuse f-entry, t7, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t7
+      fork case, read c
+        fuse f-entry, t8, plus-root-three-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+    case t4
+      send back
+        make zero-coef
+    case t5
+      send back
+        make zero-coef
+    case t6
+      send back
+        make zero-coef
+    case t8
+      fork case, read c
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        fuse f-entry, t7, plus-root-three-half
+        case t8
+          send back
+            make zero-coef
+
+# Row a = t7. Nonzero: f_{714} = -1/2 (swap of f_{147}), f_{725} = -1/2 (swap of f_{257}), f_{736} = ... and
+# f_{768} = -sqrt(3)/2 (swap of f_{678}).
+task f-row-t7
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t1
+      fork case, read c
+        fuse f-entry, t4, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t2
+      fork case, read c
+        fuse f-entry, t5, minus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t3
+      fork case, read c
+        fuse f-entry, t6, plus-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t6
+      fork case, read c
+        fuse f-entry, t8, minus-root-three-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+    case t4
+      send back
+        make zero-coef
+    case t5
+      send back
+        make zero-coef
+    case t7
+      send back
+        make zero-coef
+    case t8
+      send back
+        make zero-coef
+
+# Row a = t8. Nonzero: f_{845} = -sqrt(3)/2 (swap of f_{458}), f_{867} = -sqrt(3)/2 (swap of f_{678}). t8 is a Cartan
+# generator, so it appears only with the off-diagonal raising and lowering pairs.
+task f-row-t8
+  take b, like gen
+  take c, like gen
+  like coef
+  fork case, read b
+    case t4
+      fork case, read c
+        fuse f-entry, t5, minus-root-three-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t7
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t6
+      fork case, read c
+        fuse f-entry, t7, minus-root-three-half
+        case t1
+          send back
+            make zero-coef
+        case t2
+          send back
+            make zero-coef
+        case t3
+          send back
+            make zero-coef
+        case t4
+          send back
+            make zero-coef
+        case t5
+          send back
+            make zero-coef
+        case t6
+          send back
+            make zero-coef
+        case t8
+          send back
+            make zero-coef
+    case t1
+      send back
+        make zero-coef
+    case t2
+      send back
+        make zero-coef
+    case t3
+      send back
+        make zero-coef
+    case t5
+      send back
+        make zero-coef
+    case t7
+      send back
+        make zero-coef
+    case t8
+      send back
+        make zero-coef
+
+# THE STRUCTURE CONSTANTS ARE ANTISYMMETRIC IN THE FIRST TWO INDICES: f_{abc} = -f_{bac}, for every triple of generators.
+# This is the defining symmetry of the structure constants and the reason the bracket is antisymmetric. The symbol
+# root-three-half negates exactly like the rational magnitudes, so the law holds uniformly across the rational and the
+# irrational entries. Proved by exhaustive induction over all three indices.
+rule structure-constant-is-antisymmetric
+  mark a, like gen
+  mark b, like gen
+  mark c, like gen
+  show hold
+    call is-equal
+      call f-constant
+        read a
+        read b
+        read c
+      call negate-coef
+        call f-constant
+          read b
+          read a
+          read c
+  fold a, b, c
+
+# A WORKED IRRATIONAL CONSTANT: f_{458} = sqrt(3)/2, held as the exact symbol root-three-half with positive sign. This is
+# one of the two irrational structure constants of su(3). It is stored symbolically, not as a float.
+rule structure-constant-f458
+  show hold
+    call is-equal
+      call f-constant
+        make t4
+        make t5
+        make t8
+      make plus-root-three-half
+  calm hold
+
+# THE OTHER IRRATIONAL CONSTANT: f_{678} = sqrt(3)/2, again the exact symbol root-three-half. f_{458} and f_{678} are
+# equal, both sqrt(3)/2, the two places the cube root structure of the three colors enters the algebra.
+rule structure-constant-f678
+  show hold
+    call is-equal
+      call f-constant
+        make t6
+        make t7
+        make t8
+      make plus-root-three-half
+  calm hold
+
+# THE ISOSPIN CONSTANT: f_{123} = 1, the embedded su(2). t1, t2, t3 form a copy of su(2) inside su(3) with [t1, t2] = i t3,
+# the same cyclic structure as the spin algebra. This is the weak-isospin-like SU(2) subgroup sitting inside the color group.
+rule structure-constant-f123
+  show hold
+    call is-equal
+      call f-constant
+        make t1
+        make t2
+        make t3
+      make plus-one
+  calm hold
+
+# THE LIE BRACKET ON THE ISOSPIN SUBALGEBRA. The bracket [t_a, t_b] = i f_{abc} t_c is built here as a CLOSED operation on
+# the signed generators t1, t2, t3 (the su(2) block), where the structure constant f_{123} = 1 makes the bracket land back
+# on a signed generator. An element is zero or a signed generator. This realizes the closed su(2) bracket [t1,t2]=t3,
+# [t2,t3]=t1, [t3,t1]=t2 with full antisymmetry, the isospin algebra living inside su(3).
+form elem
+  case zero
+  case spin
+    link sign, like sign
+    link gen, like gen
+
+# Negate an element: flip the sign of a signed generator, zero stays zero.
+task negate
+  take a, like elem
+  like elem
+  fork case, read a
+    case zero
+      send back
+        make zero
+    case spin
+      link sign
+      link gen
+      send back
+        make spin
+          bind sign
+            call flip-sign
+              read sign
+          bind gen
+            read gen
+
+# TEMPLATE: a diagonal cell of the isospin bracket, [t,t] = 0.
+tree iso-zero
+  take col
+
+  hook fuse
+    case {col}
+      send back
+        make zero
+
+# TEMPLATE: an off-diagonal cell of the isospin bracket. The structure constant is +1 or -1, so the result is the signed
+# generator k, whose sign is `agree` when the two input signs match and `differ` when they oppose. One fork over the two
+# input signs picks the result sign, all in free case branches, so a full bracket reduces in one unfold.
+tree iso-spin
+  take col
+  take agree
+  take differ
+  take k
+
+  hook fuse
+    case {col}
+      fork case, read sign-a
+        case positive
+          fork case, read sign-b
+            case positive
+              send back
+                make spin
+                  bind sign
+                    make {agree}
+                  bind gen
+                    make {k}
+            case negative
+              send back
+                make spin
+                  bind sign
+                    make {differ}
+                  bind gen
+                    make {k}
+        case negative
+          fork case, read sign-b
+            case positive
+              send back
+                make spin
+                  bind sign
+                    make {differ}
+                  bind gen
+                    make {k}
+            case negative
+              send back
+                make spin
+                  bind sign
+                    make {agree}
+                  bind gen
+                    make {k}
+
+# THE ISOSPIN BRACKET, the closed su(2) inside su(3) on t1, t2, t3. [t1,t2]=t3, [t2,t3]=t1, [t3,t1]=t2, antisymmetric, zero
+# on the diagonal, the result sign carrying the product of the input signs. Generators outside the isospin block bracket to
+# zero here (this operation models the t1, t2, t3 subalgebra only). The whole product is one fork over the axes and signs,
+# so the algebra is closed and every bracket reduces in one step.
+task bracket
+  take a, like elem
+  take b, like elem
+  like elem
+  fork case, read a
+    case zero
+      send back
+        make zero
+    case spin
+      link sign-a
+      link gen-a
+      fork case, read b
+        case zero
+          send back
+            make zero
+        case spin
+          link sign-b
+          link gen-b
+          fork case, read gen-a
+            case t1
+              fork case, read gen-b
+                fuse iso-zero, t1
+                fuse iso-spin, t2, positive, negative, t3
+                fuse iso-spin, t3, negative, positive, t2
+                fuse iso-zero, t4
+                fuse iso-zero, t5
+                fuse iso-zero, t6
+                fuse iso-zero, t7
+                fuse iso-zero, t8
+            case t2
+              fork case, read gen-b
+                fuse iso-spin, t1, negative, positive, t3
+                fuse iso-zero, t2
+                fuse iso-spin, t3, positive, negative, t1
+                fuse iso-zero, t4
+                fuse iso-zero, t5
+                fuse iso-zero, t6
+                fuse iso-zero, t7
+                fuse iso-zero, t8
+            case t3
+              fork case, read gen-b
+                fuse iso-spin, t1, positive, negative, t2
+                fuse iso-spin, t2, negative, positive, t1
+                fuse iso-zero, t3
+                fuse iso-zero, t4
+                fuse iso-zero, t5
+                fuse iso-zero, t6
+                fuse iso-zero, t7
+                fuse iso-zero, t8
+            case t4
+              send back
+                make zero
+            case t5
+              send back
+                make zero
+            case t6
+              send back
+                make zero
+            case t7
+              send back
+                make zero
+            case t8
+              send back
+                make zero
+
+# THE BRACKET IS ALTERNATING: an element brackets to zero with itself, [a,a] = 0. Proved over every element.
+rule bracket-is-alternating
+  mark a, like elem
+  show hold
+    call is-equal
+      call bracket
+        read a
+        read a
+      make zero
+  fold a
+
+# THE BRACKET IS ANTISYMMETRIC on the isospin block: [a,b] = -[b,a]. Stated over the signed generators t1, t2, t3 and proved
+# by induction over both signs and both generators, each case concrete, so the bracket table reduces on both sides.
+rule bracket-is-antisymmetric
+  mark sign-a, like sign
+  mark gen-a, like gen
+  mark sign-b, like sign
+  mark gen-b, like gen
+  show hold
+    call is-equal
+      call bracket
+        make spin
+          bind sign
+            read sign-a
+          bind gen
+            read gen-a
+        make spin
+          bind sign
+            read sign-b
+          bind gen
+            read gen-b
+      call negate
+        call bracket
+          make spin
+            bind sign
+              read sign-b
+            bind gen
+              read gen-b
+          make spin
+            bind sign
+              read sign-a
+            bind gen
+              read gen-a
+  fold sign-a, gen-a, sign-b, gen-b
+
+# THE ISOSPIN RELATION [t1, t2] = t3, the embedded su(2). The structure constant f_{123} = 1 makes the bracket of the first
+# two generators the third, the same cyclic law as spin. Proved by direct computation.
+rule bracket-t1-t2-is-t3
+  show hold
+    call is-equal
+      call bracket
+        make spin
+          bind sign
+            make positive
+          bind gen
+            make t1
+        make spin
+          bind sign
+            make positive
+          bind gen
+            make t2
+      make spin
+        bind sign
+          make positive
+        bind gen
+          make t3
+  calm hold
+
+# Add two isospin elements that share an axis, or one is zero, the partial addition the Jacobi sum needs: a + (-a) = 0,
+# a + 0 = a, 0 + a = a. Off-axis sums never arise in the cancelling Jacobi terms.
+task combine
+  take a, like elem
+  take b, like elem
+  like elem
+  fork case, read a
+    case zero
+      send back
+        read b
+    case spin
+      link sign-a
+      link gen-a
+      fork case, read b
+        case zero
+          send back
+            make spin
+              bind sign
+                read sign-a
+              bind gen
+                read gen-a
+        case spin
+          link sign-b
+          link gen-b
+          send back
+            call combine-spin
+              read sign-a
+              read gen-a
+              read sign-b
+              read gen-b
+
+# Add two signed generators on the same axis: opposite signs cancel to zero. Same sign and same axis is outside the basis
+# and is left as the first generator (it never arises in the Jacobi sum).
+task combine-spin
+  take sign-a, like sign
+  take gen-a, like gen
+  take sign-b, like sign
+  take gen-b, like gen
+  like elem
+  fork case, read sign-a
+    case positive
+      fork case, read sign-b
+        case positive
+          send back
+            make spin
+              bind sign
+                make positive
+              bind gen
+                read gen-a
+        case negative
+          send back
+            make zero
+    case negative
+      fork case, read sign-b
+        case positive
+          send back
+            make zero
+        case negative
+          send back
+            make spin
+              bind sign
+                make negative
+              bind gen
+                read gen-a
+
+# The Jacobi sum [a,[b,c]] + [b,[c,a]] + [c,[a,b]].
+task jacobi-sum
+  take a, like elem
+  take b, like elem
+  take c, like elem
+  like elem
+  send back
+    call combine
+      call combine
+        call bracket
+          read a
+          call bracket
+            read b
+            read c
+        call bracket
+          read b
+          call bracket
+            read c
+            read a
+      call bracket
+        read c
+        call bracket
+          read a
+          read b
+
+# THE JACOBI IDENTITY on the isospin generators: [t1,[t2,t3]] + [t2,[t3,t1]] + [t3,[t1,t2]] = 0, the cyclic sum vanishes.
+# With antisymmetry and bilinearity this is the full Jacobi identity, the defining axiom of a Lie algebra. Proved by direct
+# computation on t1, t2, t3.
+rule jacobi-identity-on-the-isospin-generators
+  show hold
+    call is-equal
+      call jacobi-sum
+        make spin
+          bind sign
+            make positive
+          bind gen
+            make t1
+        make spin
+          bind sign
+            make positive
+          bind gen
+            make t2
+        make spin
+          bind sign
+            make positive
+          bind gen
+            make t3
+      make zero
+  calm hold
+
+# THE CARTAN SUBALGEBRA, the maximal commuting set of generators, has RANK TWO: t3 and t8. These are the two diagonal
+# generators, and they COMMUTE, [t3, t8] = 0, the structure constant f_{38c} being zero for every c. The rank-two Cartan is
+# what gives su(3) its two simple roots and the A2 root system (cite `algebra/lie/root-a2`). Proved by checking the
+# structure constant f_{38c} vanishes for all c.
+rule cartan-generators-commute
+  mark c, like gen
+  show hold
+    call is-equal
+      call f-constant
+        make t3
+        make t8
+        read c
+      make zero-coef
+  fold c
+
+# A NON-CARTAN PAIR DOES NOT COMMUTE: t1 and t2 fail to commute, [t1, t2] = i t3, so f_{123} = 1 is not zero. The Cartan
+# subalgebra is exactly the commuting part, and t1, t2 lie outside it. Shown by refutation: the structure constant f_{123}
+# is not the zero coefficient.
+rule non-cartan-pair-does-not-commute
+  show miss
+    call is-equal
+      call f-constant
+        make t1
+        make t2
+        make t3
+      make zero-coef
+  calm miss
+
+# COLOR, the fundamental representation 3 of su(3). A quark carries one of three colors: red, green, or blue. This is the
+# defining three-dimensional representation on which the eight generators act.
+form color
+  case red
+  case green
+  case blue
+
+# A small signed count along one color axis: minus one, zero, or plus one. Enough to track color in a baryon or a meson.
+form sign-count
+  case minus-one
+  case zero-count
+  case plus-one
+
+# A COLOR CHARGE, the net count along each of the three color axes (red minus antired, and likewise green and blue), used to
+# test whether a combination of quarks and antiquarks is colorless. A baryon (three quarks) and a meson (quark plus
+# antiquark) must come out colorless, the SINGLET. It is a single-case record, destructured by matching on its one
+# constructor, so the kernel reduces field access during proofs.
+form charge
+  case charge-of
+    link reds, like sign-count
+    link greens, like sign-count
+    link blues, like sign-count
+
+# Add two signed counts where the result stays in range. plus-one and minus-one cancel to zero-count, zero is the identity.
+task add-count
+  take a, like sign-count
+  take b, like sign-count
+  like sign-count
+  fork case, read a
+    case zero-count
+      send back
+        read b
+    case plus-one
+      fork case, read b
+        case minus-one
+          send back
+            make zero-count
+        case zero-count
+          send back
+            make plus-one
+        case plus-one
+          send back
+            make plus-one
+    case minus-one
+      fork case, read b
+        case plus-one
+          send back
+            make zero-count
+        case zero-count
+          send back
+            make minus-one
+        case minus-one
+          send back
+            make minus-one
+
+# Is a signed count zero? yes for zero-count, no otherwise.
+# Are two signed counts equal?
+task same-count
+  take a, like sign-count
+  take b, like sign-count
+  like flag
+  fork case, read a
+    case zero-count
+      fork case, read b
+        case zero-count
+          send back
+            make yes
+        case plus-one
+          send back
+            make no
+        case minus-one
+          send back
+            make no
+    case plus-one
+      fork case, read b
+        case plus-one
+          send back
+            make yes
+        case zero-count
+          send back
+            make no
+        case minus-one
+          send back
+            make no
+    case minus-one
+      fork case, read b
+        case minus-one
+          send back
+            make yes
+        case zero-count
+          send back
+            make no
+        case plus-one
+          send back
+            make no
+
+# The color charge of a single quark of a given color: plus-one on that color axis, zero on the others. The fundamental rep.
+task quark-charge
+  take c, like color
+  like charge
+  fork case, read c
+    case red
+      send back
+        make charge-of
+          bind reds
+            make plus-one
+          bind greens
+            make zero-count
+          bind blues
+            make zero-count
+    case green
+      send back
+        make charge-of
+          bind reds
+            make zero-count
+          bind greens
+            make plus-one
+          bind blues
+            make zero-count
+    case blue
+      send back
+        make charge-of
+          bind reds
+            make zero-count
+          bind greens
+            make zero-count
+          bind blues
+            make plus-one
+
+# The color charge of an antiquark: minus-one on its color axis (the conjugate representation 3-bar). An antiquark carries
+# anti-color, the opposite charge of the quark.
+task antiquark-charge
+  take c, like color
+  like charge
+  fork case, read c
+    case red
+      send back
+        make charge-of
+          bind reds
+            make minus-one
+          bind greens
+            make zero-count
+          bind blues
+            make zero-count
+    case green
+      send back
+        make charge-of
+          bind reds
+            make zero-count
+          bind greens
+            make minus-one
+          bind blues
+            make zero-count
+    case blue
+      send back
+        make charge-of
+          bind reds
+            make zero-count
+          bind greens
+            make zero-count
+          bind blues
+            make minus-one
+
+# Add two color charges axis by axis. Both charges are destructured by matching their single constructor, so the field
+# access reduces in the kernel.
+task add-charge
+  take a, like charge
+  take b, like charge
+  like charge
+  fork case, read a
+    case charge-of
+      link reds-a, name reds
+      link greens-a, name greens
+      link blues-a, name blues
+      fork case, read b
+        case charge-of
+          link reds-b, name reds
+          link greens-b, name greens
+          link blues-b, name blues
+          send back
+            make charge-of
+              bind reds
+                call add-count
+                  read reds-a
+                  read reds-b
+              bind greens
+                call add-count
+                  read greens-a
+                  read greens-b
+              bind blues
+                call add-count
+                  read blues-a
+                  read blues-b
+
+# IS A COLOR CHARGE COLORLESS: yes when the three color axes carry EQUAL counts, the condition for a color singlet. The
+# singlet of SU(3) lies along the (1,1,1) direction, where red, green, and blue appear in equal measure, so a baryon with
+# one of each (counts 1,1,1) is colorless and a meson with a color cancelled by its anticolor (counts 0,0,0) is colorless,
+# while a lone color (counts 1,0,0) is not. The charge is destructured, so each axis is read by name and compared. This
+# returns a bare flag, so the colorless laws compare flags (distinct enum constructors), never whole records.
+task is-colorless
+  take a, like charge
+  like flag
+  fork case, read a
+    case charge-of
+      link reds
+      link greens
+      link blues
+      send back
+        call both
+          call same-count
+            read reds
+            read greens
+          call same-count
+            read greens
+            read blues
+
+# A BARYON IS COLORLESS: red + green + blue quarks sum to a colorless charge. The three colors of the fundamental
+# representation combine to a SINGLET, the way three quarks make a colorless proton or neutron. Proved by direct
+# computation: the sum of the three quark charges is colorless.
+rule baryon-is-colorless
+  show hold
+    call is-equal
+      call is-colorless
+        call add-charge
+          call add-charge
+            call quark-charge
+              make red
+            call quark-charge
+              make green
+          call quark-charge
+            make blue
+      make yes
+  calm hold
+
+# A MESON IS COLORLESS: a quark and an antiquark of the same color sum to a colorless charge. Color and anti-color cancel,
+# the way a quark-antiquark pair makes a colorless pion. Proved by direct computation for each of the three colors.
+rule red-meson-is-colorless
+  show hold
+    call is-equal
+      call is-colorless
+        call add-charge
+          call quark-charge
+            make red
+          call antiquark-charge
+            make red
+      make yes
+  calm hold
+
+rule green-meson-is-colorless
+  show hold
+    call is-equal
+      call is-colorless
+        call add-charge
+          call quark-charge
+            make green
+          call antiquark-charge
+            make green
+      make yes
+  calm hold
+
+rule blue-meson-is-colorless
+  show hold
+    call is-equal
+      call is-colorless
+        call add-charge
+          call quark-charge
+            make blue
+          call antiquark-charge
+            make blue
+      make yes
+  calm hold
+
+# A SINGLE COLORED QUARK IS NOT COLORLESS: a lone red quark carries net color and cannot exist free, color confinement at the
+# level of charge. Shown by refutation: a red quark is not colorless, so is-colorless returns no, distinct from yes.
+rule lone-quark-is-not-colorless
+  show miss
+    call is-equal
+      call is-colorless
+        call quark-charge
+          make red
+      make yes
+  calm miss

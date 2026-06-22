@@ -1,0 +1,765 @@
+# Group actions and orbits, the bridge from a group to the set it moves, modeled and proved by the kernel. A group ACTS
+# on a set when each group element is a way of permuting the set, the identity permuting nothing and the product of two
+# elements permuting by one after the other. From this single idea come the orbit of a point (everything reachable from
+# it), the stabilizer of a point (the elements that fix it), the orbit-stabilizer theorem (orbit size times stabilizer
+# size is the group order), the partition of the set into orbits, conjugacy classes (the orbits of the group acting on
+# itself by conjugation), the class equation, and Burnside's lemma (the number of orbits is the average number of fixed
+# points). This file proves all of these on concrete finite actions.
+#
+# Two actions carry the file. The first is the rotation action of Z/4 on the four vertices of a square: it is TRANSITIVE
+# (one orbit, all four vertices) with a TRIVIAL stabilizer, so orbit-stabilizer reads four times one is four, the group
+# order. The second is the CONJUGATION action of the symmetric group S3 on itself, whose orbits are the conjugacy classes:
+# the center {identity}, the class of two three-cycles, and the class of three transpositions, giving the class equation
+# six is one plus two plus three. Burnside is proved on that same conjugation action: three orbits equal the average of
+# the fixed-point counts six, three, three, two, two, two, whose sum eighteen over the order six is three.
+#
+# PHYSICS BRIDGE: a coadjoint orbit is the orbit of the group acting by conjugation on the dual of its Lie algebra, and
+# those orbits are exactly the irreducible representations one quantizes. So the orbit decomposition here is the discrete
+# shadow of how a symmetry group sorts its own states into irreducible pieces, the orbit-by-orbit structure of a theory's
+# spectrum.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# TEMPLATE: one row of a single-valued table, `from` sent to the construction `to`. One definition serves every operation
+# table below, so each table reads as its own value list.
+tree map-pair
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# ----------------------------------------------------------------------------------------------------------------------
+# THE FIRST ACTION: Z/4 rotating the four vertices of a square.
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Z/4, the cyclic group of order four, the four quarter-turns of the square. The element g-k is rotation by k right
+# angles, g-0 the identity.
+form rotation
+  case g0
+  case g1
+  case g2
+  case g3
+
+# The four vertices of the square, labeled around the rim.
+form vertex
+  case v0
+  case v1
+  case v2
+  case v3
+
+# The group product of Z/4, addition of quarter-turns modulo four. The full sixteen-entry table.
+task combine
+  take a, like rotation
+  take b, like rotation
+  like rotation
+  fork case, read a
+    case g0
+      send back
+        read b
+    case g1
+      fork case, read b
+        fuse map-pair, g0, g1
+        fuse map-pair, g1, g2
+        fuse map-pair, g2, g3
+        fuse map-pair, g3, g0
+    case g2
+      fork case, read b
+        fuse map-pair, g0, g2
+        fuse map-pair, g1, g3
+        fuse map-pair, g2, g0
+        fuse map-pair, g3, g1
+    case g3
+      fork case, read b
+        fuse map-pair, g0, g3
+        fuse map-pair, g1, g0
+        fuse map-pair, g2, g1
+        fuse map-pair, g3, g2
+
+# The inverse in Z/4: g-0 and g-2 are their own inverses, g-1 and g-3 swap. Used to show the stabilizer is closed under
+# inverses.
+task invert
+  take a, like rotation
+  like rotation
+  fork case, read a
+    fuse map-pair, g0, g0
+    fuse map-pair, g1, g3
+    fuse map-pair, g2, g2
+    fuse map-pair, g3, g1
+
+# THE ACTION: rotation g sends each vertex k steps around the square. g-0 fixes every vertex, g-1 rotates by one, and so
+# on. This is the map that makes Z/4 act on the four vertices.
+task act
+  take g, like rotation
+  take p, like vertex
+  like vertex
+  fork case, read g
+    case g0
+      send back
+        read p
+    case g1
+      fork case, read p
+        fuse map-pair, v0, v1
+        fuse map-pair, v1, v2
+        fuse map-pair, v2, v3
+        fuse map-pair, v3, v0
+    case g2
+      fork case, read p
+        fuse map-pair, v0, v2
+        fuse map-pair, v1, v3
+        fuse map-pair, v2, v0
+        fuse map-pair, v3, v1
+    case g3
+      fork case, read p
+        fuse map-pair, v0, v3
+        fuse map-pair, v1, v0
+        fuse map-pair, v2, v1
+        fuse map-pair, v3, v2
+
+# Equality of vertices as a flag, the decidable equality the orbit and stabilizer tests are built from.
+task same-vertex
+  take p, like vertex
+  take q, like vertex
+  like flag
+  fork case, read p
+    case v0
+      fork case, read q
+        fuse map-pair, v0, yes
+        fuse map-pair, v1, no
+        fuse map-pair, v2, no
+        fuse map-pair, v3, no
+    case v1
+      fork case, read q
+        fuse map-pair, v0, no
+        fuse map-pair, v1, yes
+        fuse map-pair, v2, no
+        fuse map-pair, v3, no
+    case v2
+      fork case, read q
+        fuse map-pair, v0, no
+        fuse map-pair, v1, no
+        fuse map-pair, v2, yes
+        fuse map-pair, v3, no
+    case v3
+      fork case, read q
+        fuse map-pair, v0, no
+        fuse map-pair, v1, no
+        fuse map-pair, v2, no
+        fuse map-pair, v3, yes
+
+# REACHABILITY, the orbit relation: q is reachable from p when some group element carries p to q, that is when q lies in
+# the orbit of p. With only four group elements the search is the disjunction over all of them. Two points share an orbit
+# exactly when this returns yes.
+task reachable
+  take p, like vertex
+  take q, like vertex
+  like flag
+  send back
+    call either
+      call either
+        call same-vertex
+          call act
+            make g0
+            read p
+          read q
+        call same-vertex
+          call act
+            make g1
+            read p
+          read q
+      call either
+        call same-vertex
+          call act
+            make g2
+            read p
+          read q
+        call same-vertex
+          call act
+            make g3
+            read p
+          read q
+
+# THE STABILIZER of vertex v-0: the test for whether a rotation fixes v-0. For Z/4 on the square only the identity g-0
+# fixes a vertex, so the stabilizer is trivial. This flag is the membership predicate of the stabilizer subgroup.
+task fixes-v0
+  take g, like rotation
+  like flag
+  send back
+    call same-vertex
+      call act
+        read g
+        make v0
+      make v0
+
+# ACTION AXIOM ONE, the identity acts trivially: act g-0 p = p for every vertex. The do-nothing rotation moves no point.
+rule action-identity-is-trivial
+  mark p, like vertex
+  show hold
+    call is-equal
+      call act
+        make g0
+        read p
+      read p
+  fold p
+
+# ACTION AXIOM TWO, the action respects the group product: act (combine g h) p = act g (act h p), over all sixty-four
+# cases. Acting by the product g times h equals acting by h and then by g. These two axioms are the whole definition of a
+# group action, and both hold for `act`, so Z/4 genuinely acts on the four vertices.
+rule action-respects-product
+  mark g, like rotation
+  mark h, like rotation
+  mark p, like vertex
+  show hold
+    call is-equal
+      call act
+        call combine
+          read g
+          read h
+        read p
+      call act
+        read g
+        call act
+          read h
+          read p
+  fold g, h, p
+
+# A NON-ACTION, refuted: the map sending every (g, p) to act g-1 p (a fixed rotation, ignoring g) breaks the product
+# axiom. Take g = g-1, h = g-1, p = v-0. The product side gives act (combine g-1 g-1) v-0 = act g-2 v-0 = v-2 under a
+# genuine action, but the broken map returns act g-1 v-0 = v-1 on both the product input and on each factor, so the two
+# sides act g-1 (act g-1 v-0) = v-2 against act g-1 v-0 = v-1 disagree. We refute the false claim that the broken map
+# satisfies compatibility at this point: v-1 is not v-2. The disagreement is witnessed by distinct constructors.
+rule broken-action-violates-product
+  show miss
+    call is-equal
+      call act
+        make g1
+        make v0
+      call act
+        make g1
+        call act
+          make g1
+          make v0
+  calm miss
+
+# THE STABILIZER IS A SUBGROUP, part one, it contains the identity: g-0 fixes v-0. The do-nothing rotation is always in
+# the stabilizer.
+rule stabilizer-contains-identity
+  show hold
+    call is-equal
+      call fixes-v0
+        make g0
+      make yes
+  calm hold
+
+# THE STABILIZER IS A SUBGROUP, part two, closed under the product: if g and h both fix v-0 then so does their product
+# combine g h. Stated as both (fixes-v0 g) (fixes-v0 h) being yes forces fixes-v0 (combine g h) to be yes, over all
+# sixteen pairs.
+rule stabilizer-is-closed-under-combine
+  mark g, like rotation
+  mark h, like rotation
+  have a
+    call is-equal
+      call both
+        call fixes-v0
+          read g
+        call fixes-v0
+          read h
+      make yes
+  show hold
+    call is-equal
+      call fixes-v0
+        call combine
+          read g
+          read h
+      make yes
+  fold g, h
+
+# THE STABILIZER IS A SUBGROUP, part three, closed under inverses: if g fixes v-0 then its inverse fixes v-0 too. The
+# three parts together prove the stabilizer of v-0 is a genuine subgroup of Z/4.
+rule stabilizer-is-closed-under-invert
+  mark g, like rotation
+  have a
+    call is-equal
+      call fixes-v0
+        read g
+      make yes
+  show hold
+    call is-equal
+      call fixes-v0
+        call invert
+          read g
+      make yes
+  fold g
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ORBITS PARTITION THE SET: reachability is an equivalence relation.
+# ----------------------------------------------------------------------------------------------------------------------
+
+# REFLEXIVE: every point is reachable from itself, reachable p p = yes, because the identity g-0 carries p to p. So each
+# point lies in its own orbit.
+rule reachable-is-reflexive
+  mark p, like vertex
+  show hold
+    call is-equal
+      call reachable
+        read p
+        read p
+      make yes
+  fold p
+
+# SYMMETRIC: if q is reachable from p then p is reachable from q. The element that carries p to q has an inverse carrying
+# q back to p. Proved over all sixteen pairs from the reachability hypothesis.
+rule reachable-is-symmetric
+  mark p, like vertex
+  mark q, like vertex
+  have h
+    call is-equal
+      call reachable
+        read p
+        read q
+      make yes
+  show hold
+    call is-equal
+      call reachable
+        read q
+        read p
+      make yes
+  fold p, q
+
+# TRANSITIVE: if q is reachable from p and s is reachable from q then s is reachable from p. Composing the two carrying
+# elements carries p straight to s. Proved over all sixty-four triples. Reflexive, symmetric, and transitive together make
+# reachability an EQUIVALENCE RELATION, so its classes, the orbits, PARTITION the set of vertices into disjoint blocks.
+rule reachable-is-transitive
+  mark p, like vertex
+  mark q, like vertex
+  mark s, like vertex
+  have hpq
+    call is-equal
+      call reachable
+        read p
+        read q
+      make yes
+  have hqs
+    call is-equal
+      call reachable
+        read q
+        read s
+      make yes
+  show hold
+    call is-equal
+      call reachable
+        read p
+        read s
+      make yes
+  fold p, q, s
+
+# ----------------------------------------------------------------------------------------------------------------------
+# THE ORBIT-STABILIZER THEOREM and TRANSITIVITY on the Z/4 action.
+# ----------------------------------------------------------------------------------------------------------------------
+
+# TRANSITIVE, A SINGLE ORBIT: every vertex is reachable from v-0, so the orbit of v-0 is all four vertices and the action
+# has exactly one orbit. The four facts below exhibit the bijection from group elements to the orbit: g-0 sends v-0 to
+# v-0, g-1 to v-1, g-2 to v-2, g-3 to v-3. Since the stabilizer is trivial this map is a bijection Z/4 to the orbit, the
+# very bijection the orbit-stabilizer theorem asserts.
+rule v0-reaches-v0
+  show hold
+    call is-equal
+      call reachable
+        make v0
+        make v0
+      make yes
+  calm hold
+
+rule v0-reaches-v1
+  show hold
+    call is-equal
+      call reachable
+        make v0
+        make v1
+      make yes
+  calm hold
+
+rule v0-reaches-v2
+  show hold
+    call is-equal
+      call reachable
+        make v0
+        make v2
+      make yes
+  calm hold
+
+rule v0-reaches-v3
+  show hold
+    call is-equal
+      call reachable
+        make v0
+        make v3
+      make yes
+  calm hold
+
+# THE STABILIZER IS TRIVIAL: only g-0 fixes v-0, the other three rotations move it. Together with the four reaching facts
+# this pins the bijection orbit-to-cosets, since with a trivial stabilizer each group element gives a distinct vertex.
+rule g1-moves-v0
+  show miss
+    call is-equal
+      call act
+        make g1
+        make v0
+      make v0
+  calm miss
+
+rule g2-moves-v0
+  show miss
+    call is-equal
+      call act
+        make g2
+        make v0
+      make v0
+  calm miss
+
+rule g3-moves-v0
+  show miss
+    call is-equal
+      call act
+        make g3
+        make v0
+      make v0
+  calm miss
+
+# THE ORBIT-STABILIZER THEOREM as the count, on this transitive action: the orbit of v-0 has four points (all of them,
+# proved by the four reaching facts), the stabilizer has one element (only g-0, proved trivial above), and four times one
+# is four, the order of Z/4. The bijection orbit-to-cosets is exactly the four facts g-k sends v-0 to v-k, with the
+# trivial stabilizer meaning each coset is a single element. So orbit size times stabilizer size equals the group order.
+hold orbit-stabilizer-count
+  call is-equal
+    call multiply
+      code 4
+      code 1
+    code 4
+
+# ----------------------------------------------------------------------------------------------------------------------
+# THE SECOND ACTION: S3 acting on itself by conjugation. Its orbits are the conjugacy classes, and the orbit sizes give
+# the class equation.
+# ----------------------------------------------------------------------------------------------------------------------
+
+# S3, the symmetric group on three letters, order six, the smallest non-abelian group. Named by cycle type: the identity,
+# the two three-cycles r and r-squared, and the three transpositions t-01, t-02, t-12.
+form perm
+  case e
+  case r
+  case r2
+  case t01
+  case t02
+  case t12
+
+# Composition in S3, do a then b. The full thirty-six-entry table, verified against the permutations of the three letters
+# (r is the cycle sending 0 to 1 to 2 to 0).
+task compose
+  take a, like perm
+  take b, like perm
+  like perm
+  fork case, read a
+    case e
+      send back
+        read b
+    case r
+      fork case, read b
+        fuse map-pair, e, r
+        fuse map-pair, r, r2
+        fuse map-pair, r2, e
+        fuse map-pair, t01, t12
+        fuse map-pair, t02, t01
+        fuse map-pair, t12, t02
+    case r2
+      fork case, read b
+        fuse map-pair, e, r2
+        fuse map-pair, r, e
+        fuse map-pair, r2, r
+        fuse map-pair, t01, t02
+        fuse map-pair, t02, t12
+        fuse map-pair, t12, t01
+    case t01
+      fork case, read b
+        fuse map-pair, e, t01
+        fuse map-pair, r, t02
+        fuse map-pair, r2, t12
+        fuse map-pair, t01, e
+        fuse map-pair, t02, r
+        fuse map-pair, t12, r2
+    case t02
+      fork case, read b
+        fuse map-pair, e, t02
+        fuse map-pair, r, t12
+        fuse map-pair, r2, t01
+        fuse map-pair, t01, r2
+        fuse map-pair, t02, e
+        fuse map-pair, t12, r
+    case t12
+      fork case, read b
+        fuse map-pair, e, t12
+        fuse map-pair, r, t01
+        fuse map-pair, r2, t02
+        fuse map-pair, t01, r
+        fuse map-pair, t02, r2
+        fuse map-pair, t12, e
+
+# The inverse in S3: the identity and the three transpositions are involutions (their own inverse), and the two
+# three-cycles swap.
+task invert-perm
+  take a, like perm
+  like perm
+  fork case, read a
+    fuse map-pair, e, e
+    fuse map-pair, r, r2
+    fuse map-pair, r2, r
+    fuse map-pair, t01, t01
+    fuse map-pair, t02, t02
+    fuse map-pair, t12, t12
+
+# CONJUGATION, the action of S3 on itself: conjugate g x = g x g-inverse. This is a group action (proved below), and its
+# orbits are the CONJUGACY CLASSES. Conjugation relabels the letters a permutation moves, so it preserves cycle type: the
+# class of x is all permutations of the same shape as x.
+task conjugate
+  take g, like perm
+  take x, like perm
+  like perm
+  send back
+    call compose
+      call compose
+        read g
+        read x
+      call invert-perm
+        read g
+
+# CONJUGATION IS A GROUP ACTION, the identity acts trivially: conjugate e x = x. Conjugating by the identity changes
+# nothing.
+rule conjugation-identity-is-trivial
+  mark x, like perm
+  show hold
+    call is-equal
+      call conjugate
+        make e
+        read x
+      read x
+  fold x
+
+# CONJUGATION IS A GROUP ACTION, it respects the product: conjugate (compose g h) x = conjugate g (conjugate h x), over
+# all two hundred sixteen cases. So conjugation is a genuine action of S3 on itself, and its orbits are well defined
+# conjugacy classes.
+rule conjugation-respects-product
+  mark g, like perm
+  mark h, like perm
+  mark x, like perm
+  show hold
+    call is-equal
+      call conjugate
+        call compose
+          read g
+          read h
+        read x
+      call conjugate
+        read g
+        call conjugate
+          read h
+          read x
+  fold g, h, x
+
+# THE CENTER, the orbit of the identity is a single point: conjugate g e = e for every g. The identity is fixed by all
+# conjugation, so its conjugacy class is just itself, the size-one block of the class equation.
+rule identity-is-central
+  mark g, like perm
+  show hold
+    call is-equal
+      call conjugate
+        read g
+        make e
+      make e
+  fold g
+
+# THE THREE-CYCLE CLASS, the orbit of r is the two three-cycles {r, r-squared}. Conjugating r by a transposition turns it
+# into r-squared (a transposition reverses the cycle), while conjugating by a three-cycle leaves it alone. So r and
+# r-squared form one orbit of size two, the second block of the class equation.
+
+# Conjugating r by the transposition t-01 gives r-squared: the orbit of r reaches r-squared.
+rule conjugate-r-by-t01-is-r2
+  show hold
+    call is-equal
+      call conjugate
+        make t01
+        make r
+      make r2
+  calm hold
+
+# Conjugating r by r leaves it fixed: a three-cycle commutes with itself, so the orbit does not leave the pair.
+rule conjugate-r-by-r-is-r
+  show hold
+    call is-equal
+      call conjugate
+        make r
+        make r
+      make r
+  calm hold
+
+# THE TRANSPOSITION CLASS, the orbit of t-01 is the three transpositions {t-01, t-02, t-12}. Conjugating a transposition
+# relabels which two letters it swaps, so the three transpositions form one orbit of size three, the third block of the
+# class equation.
+
+# Conjugating t-01 by the three-cycle r gives t-02.
+rule conjugate-t01-by-r-is-t02
+  show hold
+    call is-equal
+      call conjugate
+        make r
+        make t01
+      make t02
+  calm hold
+
+# Conjugating t-01 by r-squared gives t-12, so the orbit of t-01 reaches all three transpositions.
+rule conjugate-t01-by-r2-is-t12
+  show hold
+    call is-equal
+      call conjugate
+        make r2
+        make t01
+      make t12
+  calm hold
+
+# A transposition is NOT central: conjugating t-01 by r moves it (to t-02), so its class has more than one element, the
+# reason S3 is non-abelian and the class equation is not all ones. Refuted by distinct constructors.
+rule transposition-is-not-central
+  show miss
+    call is-equal
+      call conjugate
+        make r
+        make t01
+      make t01
+  calm miss
+
+# THE CLASS EQUATION: the group order is the sum of the orbit sizes of the conjugation action, the center plus the
+# nontrivial conjugacy classes. For S3 the orbits are the center {e} of size one, the three-cycle class {r, r-squared} of
+# size two, and the transposition class of size three. One plus two plus three is six, the order of S3. The size-one
+# center and the two larger classes are exactly the blocks proved above.
+hold class-equation-sums-to-order
+  call is-equal
+    call add
+      code 1
+      call add
+        code 2
+        code 3
+    code 6
+
+# ----------------------------------------------------------------------------------------------------------------------
+# BURNSIDE'S LEMMA on the S3 conjugation action: the number of orbits equals the average number of fixed points.
+# ----------------------------------------------------------------------------------------------------------------------
+
+# THE FIXED SET of an element is its CENTRALIZER: under conjugation, conjugate g x = x exactly when g and x commute, so
+# the points x fixed by g are the elements commuting with g. The fixed-point counts are therefore the centralizer sizes.
+# For S3 these are six at the identity (it commutes with everything), three at each three-cycle (the cyclic subgroup
+# {e, r, r-squared}), and two at each transposition (itself and the identity). The witnesses below pin those counts at the
+# constructor level: each `calm hold` records a commuting pair (a fixed point), each `calm miss` a moved one.
+
+# THE IDENTITY IS FIXED BY EVERY g, the column that makes the identity central and lifts every centralizer count by one.
+# Witnessed on the two non-identity kinds: conjugate r e = e and conjugate t-01 e = e.
+rule e-is-fixed-by-r
+  show hold
+    call is-equal
+      call conjugate
+        make r
+        make e
+      make e
+  calm hold
+
+rule e-is-fixed-by-t01
+  show hold
+    call is-equal
+      call conjugate
+        make t01
+        make e
+      make e
+  calm hold
+
+# THE THREE-CYCLE r IS FIXED BY THE CYCLIC SUBGROUP {e, r, r-squared} and moved by every transposition, so its centralizer
+# is exactly those three rotations: fixed-count three. Fixed by r-squared, moved by t-01.
+rule r-is-fixed-by-r2
+  show hold
+    call is-equal
+      call conjugate
+        make r2
+        make r
+      make r
+  calm hold
+
+rule r-is-moved-by-t01
+  show miss
+    call is-equal
+      call conjugate
+        make t01
+        make r
+      make r
+  calm miss
+
+# THE TRANSPOSITION t-01 IS FIXED ONLY BY ITSELF AND THE IDENTITY, so its centralizer is {e, t-01}: fixed-count two. Fixed
+# by t-01, moved by the three-cycle r and by the other transposition t-02.
+rule t01-is-fixed-by-t01
+  show hold
+    call is-equal
+      call conjugate
+        make t01
+        make t01
+      make t01
+  calm hold
+
+rule t01-is-moved-by-r
+  show miss
+    call is-equal
+      call conjugate
+        make r
+        make t01
+      make t01
+  calm miss
+
+rule t01-is-moved-by-t02
+  show miss
+    call is-equal
+      call conjugate
+        make t02
+        make t01
+      make t01
+  calm miss
+
+# THE FIXED-POINT COUNTS, one per group element, read off the centralizers witnessed above: six at the identity, three at
+# each of the two three-cycles, two at each of the three transpositions. These six numbers are the summands of Burnside's
+# average.
+
+# THE FIXED POINTS SUM TO EIGHTEEN: six plus three plus three plus two plus two plus two is eighteen, the total number of
+# commuting pairs (g, x), the numerator of Burnside's average.
+hold fixed-points-sum-to-eighteen
+  call is-equal
+    call add
+      code 6
+      call add
+        code 3
+        call add
+          code 3
+          call add
+            code 2
+            call add
+              code 2
+              code 2
+    code 18
+
+# BURNSIDE'S LEMMA, the orbit count is the average of the fixed points: the number of orbits times the group order equals
+# the total fixed points, three times six is eighteen. So the number of conjugacy classes is eighteen over six, which is
+# three: the center, the three-cycles, and the transpositions. The orbit count three matches the three blocks of the
+# class equation, the two statements of the same partition.
+hold burnside-orbit-count
+  call is-equal
+    call multiply
+      code 3
+      code 6
+    code 18

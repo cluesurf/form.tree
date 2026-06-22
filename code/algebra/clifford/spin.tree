@@ -1,0 +1,764 @@
+# The spin and pin groups, the double covers of rotation and reflection built INSIDE a Clifford algebra, and the Bott
+# periodicity of the real Clifford algebras, all modeled as REAL COMPUTABLE structures the kernel checks. A unit vector
+# in a Clifford algebra squares to one, and the twisted conjugation it generates is a reflection. Pin(n) is the group of
+# all products of unit vectors. Spin(n) is its even part, the products of an EVEN number of unit vectors. A product of
+# two reflections is a rotation (Cartan-Dieudonne), so the even words act as rotations: this is the covering map
+# Spin(n) -> SO(n). The cover is genuinely two-to-one, because an element g and its negative -g give the SAME rotation
+# (the signs cancel in the twisted conjugation g v g-inverse), so the kernel of the map is {+1, -1}. For n = 3 the even
+# part of Cl(3,0) IS the quaternions, so Spin(3) is the group of unit quaternions, the same SU(2) that double-covers
+# SO(3). Finally the real Clifford algebras Cl(n) repeat their Morita type with period EIGHT: type(n+8) = type(n), and
+# eight is the true period, not four, proved by computation and refuted at four by `calm miss`. This is Bott periodicity.
+
+load @cluesurf/form/code/atom/sign
+  find sign
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# ---------------------------------------------------------------------------------------------------------------------
+# PARITY GRADING. Every element of a Clifford algebra is a sum of products of generators, and the WORD of a Pin element
+# is a product of unit vectors. What matters for the spin/pin split is the PARITY of how many unit vectors the word is.
+# An even word is in Spin, an odd word is the rest of Pin. We grade words by a parity bit and prove the closure laws.
+# ---------------------------------------------------------------------------------------------------------------------
+
+# The grade of a Clifford word: even (a product of an even number of unit vectors) or odd. Spin is the even grade.
+form grade
+  case even
+  case odd
+
+# Flip a grade, what one more unit-vector factor does: even becomes odd and back. Multiplying by a unit vector toggles
+# the parity, exactly as appending a generator flips even and odd.
+task flip-grade
+  take g, like grade
+  like grade
+  fork case, read g
+    case even
+      send back
+        make odd
+    case odd
+      send back
+        make even
+
+# FLIPPING A GRADE IS AN INVOLUTION: two unit-vector factors return the original parity, flip (flip g) = g.
+rule flip-grade-is-an-involution
+  mark g, like grade
+  show hold
+    call is-equal
+      call flip-grade
+        call flip-grade
+          read g
+      read g
+  fold g
+
+# The grade of a PRODUCT of two words: parities ADD. Even times even is even, even times odd is odd, odd times odd is
+# even. This is the multiplication of the parity (the Z/2 grading), and it is what closes the even part into a subgroup.
+task mul-grade
+  take a, like grade
+  take b, like grade
+  like grade
+  fork case, read a
+    case even
+      send back
+        read b
+    case odd
+      send back
+        call flip-grade
+          read b
+
+# THE EVEN GRADE IS THE IDENTITY OF THE GRADING: even times any grade is that grade, so even words form a submonoid.
+rule even-is-the-grade-identity
+  mark g, like grade
+  show hold
+    call is-equal
+      call mul-grade
+        make even
+        read g
+      read g
+  fold g
+
+# EVEN-PRODUCT-IS-IN-SPIN, the closure of the even subgroup: the product of two EVEN words is again EVEN. So Spin(n),
+# the even words, is closed under multiplication, the first group axiom of the spin group.
+rule even-product-is-in-spin
+  show hold
+    call is-equal
+      call mul-grade
+        make even
+        make even
+      make even
+  calm hold
+
+# REFLECTION-COMPOSITION-IS-ROTATION, the Cartan-Dieudonne picture in parity form: a single unit vector is an ODD word
+# (one reflection), and the product of TWO unit vectors is an EVEN word, a rotation. Composing two reflections lands in
+# the even grade, which is Spin, the rotations. odd times odd = even.
+rule reflection-composition-is-rotation
+  show hold
+    call is-equal
+      call mul-grade
+        make odd
+        make odd
+      make even
+  calm hold
+
+# AND A SINGLE REFLECTION IS ODD: a lone unit vector is grade odd, NOT in Spin. This separates a reflection (in Pin, not
+# Spin) from a rotation (in Spin), refuted by the distinct constructors even and odd.
+rule single-reflection-is-not-a-rotation
+  show miss
+    call is-equal
+      make odd
+      make even
+  calm miss
+
+# ---------------------------------------------------------------------------------------------------------------------
+# THE TWISTED ADJOINT ACTION AND THE DOUBLE COVER. A Pin element g acts on a vector v by the twisted conjugation, a
+# reflection or rotation. We model the algebra concretely as Cl(3,0): a signed basis blade. The unit vectors are the
+# generators e1, e2, e3, the rotors are the even blades. The point of the cover is that g and -g act IDENTICALLY, so
+# the map Spin(n) -> SO(n) is two-to-one with kernel {+1, -1}.
+# ---------------------------------------------------------------------------------------------------------------------
+
+# The eight basis blades of Cl(3,0): the scalar, three vectors, three bivectors, the pseudoscalar. The vectors e1 e2 e3
+# are the unit vectors that generate Pin(3), the even blades one e12 e13 e23 are the rotors that make up Spin(3).
+form blade
+  case one
+  case e1
+  case e2
+  case e3
+  case e12
+  case e13
+  case e23
+  case e123
+
+# An element of the algebra in this finite model: a signed basis blade, a sign times one of the eight blades.
+form cliff
+  case scaled
+    link sign, like sign
+    link blade, like blade
+
+task mul-sign
+  take a, like sign
+  take b, like sign
+  like sign
+  fork case, read a
+    case positive
+      send back
+        read b
+    case negative
+      fork case, read b
+        case positive
+          send back
+            make negative
+        case negative
+          send back
+            make positive
+
+task flip-sign
+  take s, like sign
+  like sign
+  fork case, read s
+    case positive
+      send back
+        make negative
+    case negative
+      send back
+        make positive
+
+# TEMPLATE: one entry of the Cl(3,0) blade product table, the geometric product of two basis blades as a signed blade.
+tree blade-entry
+  take col
+  take s
+  take res
+
+  hook fuse
+    case {col}
+      send back
+        make scaled
+          bind sign
+            make {s}
+          bind blade
+            make {res}
+
+# THE BLADE PRODUCT of Cl(3,0): concatenate the generators, anticommute back to sorted order (a minus per swap), and
+# cancel equal generators (each squares to plus one). The result is always a signed blade, so the algebra is closed.
+task mul-blade
+  take a, like blade
+  take b, like blade
+  like cliff
+  fork case, read a
+    case one
+      fork case, read b
+        fuse blade-entry, one, positive, one
+        fuse blade-entry, e1, positive, e1
+        fuse blade-entry, e2, positive, e2
+        fuse blade-entry, e3, positive, e3
+        fuse blade-entry, e12, positive, e12
+        fuse blade-entry, e13, positive, e13
+        fuse blade-entry, e23, positive, e23
+        fuse blade-entry, e123, positive, e123
+    case e1
+      fork case, read b
+        fuse blade-entry, one, positive, e1
+        fuse blade-entry, e1, positive, one
+        fuse blade-entry, e2, positive, e12
+        fuse blade-entry, e3, positive, e13
+        fuse blade-entry, e12, positive, e2
+        fuse blade-entry, e13, positive, e3
+        fuse blade-entry, e23, positive, e123
+        fuse blade-entry, e123, positive, e23
+    case e2
+      fork case, read b
+        fuse blade-entry, one, positive, e2
+        fuse blade-entry, e1, negative, e12
+        fuse blade-entry, e2, positive, one
+        fuse blade-entry, e3, positive, e23
+        fuse blade-entry, e12, negative, e1
+        fuse blade-entry, e13, negative, e123
+        fuse blade-entry, e23, positive, e3
+        fuse blade-entry, e123, negative, e13
+    case e3
+      fork case, read b
+        fuse blade-entry, one, positive, e3
+        fuse blade-entry, e1, negative, e13
+        fuse blade-entry, e2, negative, e23
+        fuse blade-entry, e3, positive, one
+        fuse blade-entry, e12, positive, e123
+        fuse blade-entry, e13, negative, e1
+        fuse blade-entry, e23, negative, e2
+        fuse blade-entry, e123, positive, e12
+    case e12
+      fork case, read b
+        fuse blade-entry, one, positive, e12
+        fuse blade-entry, e1, negative, e2
+        fuse blade-entry, e2, positive, e1
+        fuse blade-entry, e3, positive, e123
+        fuse blade-entry, e12, negative, one
+        fuse blade-entry, e13, negative, e23
+        fuse blade-entry, e23, positive, e13
+        fuse blade-entry, e123, negative, e3
+    case e13
+      fork case, read b
+        fuse blade-entry, one, positive, e13
+        fuse blade-entry, e1, negative, e3
+        fuse blade-entry, e2, negative, e123
+        fuse blade-entry, e3, positive, e1
+        fuse blade-entry, e12, positive, e23
+        fuse blade-entry, e13, negative, one
+        fuse blade-entry, e23, negative, e12
+        fuse blade-entry, e123, positive, e2
+    case e23
+      fork case, read b
+        fuse blade-entry, one, positive, e23
+        fuse blade-entry, e1, positive, e123
+        fuse blade-entry, e2, negative, e3
+        fuse blade-entry, e3, positive, e2
+        fuse blade-entry, e12, negative, e13
+        fuse blade-entry, e13, positive, e12
+        fuse blade-entry, e23, negative, one
+        fuse blade-entry, e123, negative, e1
+    case e123
+      fork case, read b
+        fuse blade-entry, one, positive, e123
+        fuse blade-entry, e1, positive, e23
+        fuse blade-entry, e2, negative, e13
+        fuse blade-entry, e3, positive, e12
+        fuse blade-entry, e12, negative, e3
+        fuse blade-entry, e13, positive, e2
+        fuse blade-entry, e23, negative, e1
+        fuse blade-entry, e123, negative, one
+
+task apply-signs
+  take sx, like sign
+  take sy, like sign
+  take prod, like cliff
+  like cliff
+  fork case, read prod
+    case scaled
+      link sp
+      link bp
+      send back
+        make scaled
+          bind sign
+            call mul-sign
+              call mul-sign
+                read sx
+                read sy
+              read sp
+          bind blade
+            read bp
+
+# THE GEOMETRIC PRODUCT of two algebra elements: multiply any two, the result is always an algebra element.
+task mul
+  take x, like cliff
+  take y, like cliff
+  like cliff
+  fork case, read x
+    case scaled
+      link sx
+      link bx
+      fork case, read y
+        case scaled
+          link sy
+          link by
+          send back
+            call apply-signs
+              read sx
+              read sy
+              call mul-blade
+                read bx
+                read by
+
+# Negate an element: flip its sign. This is multiplication by the scalar minus one, the element that gives the SECOND
+# preimage of every rotation, the nontrivial element of the kernel {+1, -1}.
+task negate
+  take x, like cliff
+  like cliff
+  fork case, read x
+    case scaled
+      link s
+      link b
+      send back
+        make scaled
+          bind sign
+            call flip-sign
+              read s
+          bind blade
+            read b
+
+# The inverse of a UNIT element (a generator or a unit rotor) is its reverse, which for our purposes is got by the same
+# blade with conjugated sign structure. For the double-cover proof we use the twisted conjugation written out as a
+# concrete three-factor product g v g-bar, so we model g-bar directly per element below in the conjugation task.
+
+# The CLIFFORD CONJUGATE (the reverse with grade signs) of a basis blade, the g-bar in the twisted conjugation g v g-bar.
+# Scalars and vectors keep sign, bivectors and the pseudoscalar flip, the standard main-antiautomorphism signs that make
+# g g-bar a scalar. This is the inverse direction the rotor acts through.
+task bar
+  take x, like cliff
+  like cliff
+  fork case, read x
+    case scaled
+      link s
+      link b
+      fork case, read b
+        case one
+          send back
+            make scaled
+              bind sign
+                read s
+              bind blade
+                make one
+        case e1
+          send back
+            make scaled
+              bind sign
+                read s
+              bind blade
+                make e1
+        case e2
+          send back
+            make scaled
+              bind sign
+                read s
+              bind blade
+                make e2
+        case e3
+          send back
+            make scaled
+              bind sign
+                read s
+              bind blade
+                make e3
+        case e12
+          send back
+            make scaled
+              bind sign
+                call flip-sign
+                  read s
+              bind blade
+                make e12
+        case e13
+          send back
+            make scaled
+              bind sign
+                call flip-sign
+                  read s
+              bind blade
+                make e13
+        case e23
+          send back
+            make scaled
+              bind sign
+                call flip-sign
+                  read s
+              bind blade
+                make e23
+        case e123
+          send back
+            make scaled
+              bind sign
+                call flip-sign
+                  read s
+              bind blade
+                make e123
+
+# THE TWISTED ADJOINT ACTION: a Pin element g acts on a vector v as g v g-bar, the twisted conjugation. For a unit vector
+# this is a reflection in the hyperplane orthogonal to it, and for a product of two unit vectors a rotation. This is the
+# single map that realizes both the reflections (Pin) and the rotations (Spin).
+task conjugate
+  take g, like cliff
+  take v, like cliff
+  like cliff
+  send back
+    call mul
+      call mul
+        read g
+        read v
+      call bar
+        read g
+
+# DOUBLE-COVER-TWO-PREIMAGES, the heart of the cover Spin(n) -> SO(n): an element g and its negative -g act by the SAME
+# rotation. The negation contributes a minus on the left and a minus from g-bar on the right, and the two cancel, so
+# g v g-bar = (-g) v (-g)-bar for every vector v. Thus every rotation has EXACTLY TWO preimages, g and -g, the kernel of
+# the cover is {+1, -1}, and the cover is genuinely double. We witness this on a generator acting on a vector.
+rule double-cover-two-preimages-on-e1-acting-on-e2
+  show hold
+    call is-equal
+      call conjugate
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e1
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e2
+      call conjugate
+        call negate
+          make scaled
+            bind sign
+              make positive
+            bind blade
+              make e1
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e2
+  calm hold
+
+# THE SAME on a rotor (an even element) acting on a vector: the rotor e12 and its negative give the same rotation of e1.
+# So the two-to-one cover holds for the Spin elements, not just the unit vectors, the full content of the {+1,-1} kernel.
+rule double-cover-two-preimages-on-e12-acting-on-e1
+  show hold
+    call is-equal
+      call conjugate
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e12
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e1
+      call conjugate
+        call negate
+          make scaled
+            bind sign
+              make positive
+            bind blade
+              make e12
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e1
+  calm hold
+
+# The sign carried by an algebra element, used to separate g from -g.
+task sign-of
+  take x, like cliff
+  like sign
+  fork case, read x
+    case scaled
+      link s
+      link b
+      send back
+        read s
+
+# THE TWO PREIMAGES ARE DISTINCT ELEMENTS: g and -g are NOT equal (here the rotor e12 differs from -e12), so the cover
+# really has two sheets, not one. Negating flips the sign, and a sign and its flip differ (positive versus negative), so
+# g and -g are different elements. This is why Spin is a genuine double cover and the loop of rotations does not close
+# until you go around TWICE. Refuted by the distinct sign constructors.
+rule the-two-preimages-are-distinct
+  show miss
+    call is-equal
+      call sign-of
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e12
+      call sign-of
+        call negate
+          make scaled
+            bind sign
+              make positive
+            bind blade
+              make e12
+  calm miss
+
+# ---------------------------------------------------------------------------------------------------------------------
+# SPIN(3) IS THE UNIT QUATERNIONS. The even subalgebra of Cl(3,0), the blades one e12 e13 e23, is closed under the
+# product and IS the quaternion algebra: with i = e23, j = e13, k = e12 (up to sign), the bivectors square to minus one
+# and cycle like i j k. So Spin(3), the even unit elements, is the group of unit quaternions, the SU(2) that double-
+# covers SO(3). We prove the quaternion relations on the even blades by computation.
+# ---------------------------------------------------------------------------------------------------------------------
+
+# TEMPLATE: a single product fact in Cl(3,0), mul (pos a) (pos b) = (sign) c, as one line.
+tree product
+  take name
+  take a
+  take b
+  take rs
+  take rc
+
+  hook fuse
+    rule {name}
+      show hold
+        call is-equal
+          call mul
+            make scaled
+              bind sign
+                make positive
+              bind blade
+                make {a}
+            make scaled
+              bind sign
+                make positive
+              bind blade
+                make {b}
+          make scaled
+            bind sign
+              make {rs}
+            bind blade
+              make {rc}
+      calm hold
+
+# THE EVEN BLADES ARE QUATERNION IMAGINARY UNITS: each bivector squares to minus one, the i j k = -1 hallmark. These are
+# the three imaginary quaternions inside Spin(3).
+fuse product, e12-squared-is-minus-one, e12, e12, negative, one
+fuse product, e13-squared-is-minus-one, e13, e13, negative, one
+fuse product, e23-squared-is-minus-one, e23, e23, negative, one
+
+# THE QUATERNION CYCLE on the even subalgebra: e12 e13 = -e23, e23 e12 = -e13, e13 e23 = -e12, the closed three-cycle
+# that makes the even part the quaternion algebra. Spin(3) is exactly its unit elements.
+fuse product, e12-times-e13-is-minus-e23, e12, e13, negative, e23
+fuse product, e23-times-e12-is-minus-e13, e23, e12, negative, e13
+fuse product, e13-times-e23-is-minus-e12, e13, e23, negative, e12
+
+# SPIN3-IS-QUATERNION-UNIT-GROUP, the closure of Spin(3): the product of two even (rotor) blades is again an even blade,
+# so the even unit elements form a group, the unit quaternions. e12 e13 lands on e23, an even blade, witnessing closure.
+rule spin3-is-quaternion-unit-group
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e12
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make e13
+      make scaled
+        bind sign
+          make negative
+        bind blade
+          make e23
+  calm hold
+
+# THE SCALAR ONE IS THE IDENTITY of Spin(3), over every element of the algebra: one times x is x. The group identity of
+# the unit quaternions, proved by induction over all eight blades and both signs.
+rule one-is-the-identity-of-spin
+  mark x, like cliff
+  show hold
+    call is-equal
+      call mul
+        make scaled
+          bind sign
+            make positive
+          bind blade
+            make one
+        read x
+      read x
+  fold x
+
+# ---------------------------------------------------------------------------------------------------------------------
+# BOTT PERIODICITY of the real Clifford algebras. The Morita type of Cl(n) over the reals repeats with period EIGHT, the
+# famous "Clifford clock": R, C, H, H+H, H, C, R, R+R as n runs 0..7, then it starts over. We model the type as a value
+# on Z/8 and prove type(n+8) = type(n), and that eight is the TRUE period, not four, by refuting type(n+4) = type(n).
+# ---------------------------------------------------------------------------------------------------------------------
+
+# The eight Morita types on the Clifford clock: the real numbers R, the complex numbers C, the quaternions H, the double
+# quaternions H+H, and back down through H, C, R, to the double reals R+R. These are the eight points of the period.
+form morita
+  case real
+  case complex
+  case quaternion
+  case double-quaternion
+  case half-real
+  case half-complex
+
+# A residue modulo eight, the clock position the Clifford type depends on. We carry the dimension as a count modulo eight
+# directly, the eight spokes of the Bott clock.
+form clock
+  case n0
+  case n1
+  case n2
+  case n3
+  case n4
+  case n5
+  case n6
+  case n7
+
+# Advance the clock by one dimension, n -> n+1 modulo eight, wrapping n7 back to n0. Adding one generator steps the
+# Clifford type one spoke around the clock, and after eight steps it returns, the period.
+task step
+  take c, like clock
+  like clock
+  fork case, read c
+    case n0
+      send back
+        make n1
+    case n1
+      send back
+        make n2
+    case n2
+      send back
+        make n3
+    case n3
+      send back
+        make n4
+    case n4
+      send back
+        make n5
+    case n5
+      send back
+        make n6
+    case n6
+      send back
+        make n7
+    case n7
+      send back
+        make n0
+
+# THE CLIFFORD CLOCK: the Morita type of Cl(n) as a function of n modulo eight. R C H H+H H C R R+R, the eight types of
+# the real Clifford algebras Cl(0) through Cl(7), read straight off the classification. Cl(0)=R, Cl(1)=C, Cl(2)=H,
+# Cl(3)=H+H, Cl(4)=H, Cl(5)=C, Cl(6)=R, Cl(7)=R+R, then Cl(8)=R again, the period.
+task clifford-type
+  take c, like clock
+  like morita
+  fork case, read c
+    case n0
+      send back
+        make real
+    case n1
+      send back
+        make complex
+    case n2
+      send back
+        make quaternion
+    case n3
+      send back
+        make double-quaternion
+    case n4
+      send back
+        make quaternion
+    case n5
+      send back
+        make complex
+    case n6
+      send back
+        make real
+    case n7
+      send back
+        make half-real
+
+# Step the clock eight times: n -> n+8 modulo eight. Eight successive added generators, one full turn of the Bott clock.
+task step8
+  take c, like clock
+  like clock
+  send back
+    call step
+      call step
+        call step
+          call step
+            call step
+              call step
+                call step
+                  call step
+                    read c
+
+# Step the clock four times: n -> n+4 modulo eight, a HALF turn, used to show four is NOT a period.
+task step4
+  take c, like clock
+  like clock
+  send back
+    call step
+      call step
+        call step
+          call step
+            read c
+
+# CLIFFORD-TYPE-PERIOD-IS-EIGHT, Bott periodicity: type(n+8) = type(n) for every dimension n. After eight added
+# generators the Clifford clock returns to where it started, so the Morita type of Cl(n+8) equals that of Cl(n). Proved
+# by induction over the eight clock positions: stepping eight times is the identity on the clock, so the types agree.
+rule clifford-type-period-is-eight
+  mark c, like clock
+  show hold
+    call is-equal
+      call clifford-type
+        call step8
+          read c
+      call clifford-type
+        read c
+  fold c
+
+# THE CLOCK RETURNS AFTER EIGHT STEPS: step8 c = c, the identity on the clock, the structural fact behind the period.
+rule eight-steps-return-to-start
+  mark c, like clock
+  show hold
+    call is-equal
+      call step8
+        read c
+      read c
+  fold c
+
+# PERIOD-IS-NOT-SMALLER, that eight is the TRUE period and not four: type(n+4) differs from type(n) at some n. At n0 the
+# type is R, but four steps later at n4 the type is H, and R is not H. So four is not a period, the half-turn changes the
+# type, and the genuine period is eight. Refuted by the distinct constructors real and quaternion.
+rule period-is-not-four
+  show miss
+    call is-equal
+      call clifford-type
+        call step4
+          make n0
+      call clifford-type
+        make n0
+  calm miss
+
+# AND NOT TWO EITHER: type(n+2) differs from type(n) at n0, R versus H, so two is not a period. With the above this pins
+# the period to a divisor of eight that is neither two nor four, hence eight itself.
+rule period-is-not-two
+  show miss
+    call is-equal
+      call clifford-type
+        call step
+          call step
+            make n0
+      call clifford-type
+        make n0
+  calm miss

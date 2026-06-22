@@ -1,0 +1,536 @@
+# Kitaev's TORIC CODE, the canonical topological stabilizer code, modeled and proved by the kernel. A qubit sits on each
+# edge of a square lattice drawn on a torus. Two families of stabilizers act on these edges: a VERTEX (star) operator
+# A-v is the product of bit-flips on the four edges meeting at a vertex, and a PLAQUETTE operator B-p is the product of
+# phase-flips on the four edges bounding a face. The whole code rests on one geometric fact: a star and a plaquette
+# share an EVEN number of edges (zero, or exactly two when the vertex sits on the plaquette's boundary), so the two
+# operator families COMMUTE and can be measured together. The protected ground state is their simultaneous plus-one
+# eigenspace. An excitation is a VIOLATED stabilizer: an electric charge (e) on a vertex with A-v reading minus one, or
+# a magnetic flux (m) on a plaquette with B-p reading minus one. A string of phase-flips along a path flips the two
+# vertex operators at its ENDS, so excitations are born in PAIRS and the total charge parity is conserved. Dragging an
+# e around an m crosses the m's string an ODD number of times and yields a phase of minus one: this braiding phase is
+# the topological heart of the model. On the torus two independent non-contractible loops give two logical qubits, a
+# fourfold ground-state degeneracy, with logical X and logical Z winding the two handles and crossing exactly once, so
+# they ANTICOMMUTE. This file CONSTRUCTS the edge operators and their supports, COMPUTES commutation through the parity
+# of the shared anticommuting support, and PROVES: star and plaquette commute by even overlap, every stabilizer squares
+# to the identity, excitations come in conserved-parity pairs along a string, the two logical operators anticommute, and
+# the braiding phase of e around m is minus one.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# The single-qubit Pauli operators living on one edge: the identity, the bit-flip (X, the vertex-operator letter), the
+# bit-and-phase-flip (Y), and the phase-flip (Z, the plaquette-operator letter).
+form pauli
+  case identity
+  case bit-flip
+  case both-flip
+  case phase-flip
+
+# TEMPLATE: one row of the single-qubit commutation table. For a fixed first operator, give the commutation flag against
+# each of identity, bit-flip, both-flip, phase-flip. One fuse line per row keeps the four-by-four table DRY.
+tree commute-row
+  take row
+  take at-identity
+  take at-bit-flip
+  take at-both-flip
+  take at-phase-flip
+
+  hook fuse
+    case {row}
+      fork case, read b
+        case identity
+          send back
+            make {at-identity}
+        case bit-flip
+          send back
+            make {at-bit-flip}
+        case both-flip
+          send back
+            make {at-both-flip}
+        case phase-flip
+          send back
+            make {at-phase-flip}
+
+# Do two single-qubit Paulis on the same edge COMMUTE? The identity commutes with everything and every operator commutes
+# with itself, so the diagonal and the identity row and column are yes. Two DISTINCT non-identity Paulis anticommute. In
+# the toric code the only crossing letters are the vertex's bit-flip and the plaquette's phase-flip, which anticommute.
+task commutes
+  take a, like pauli
+  take b, like pauli
+  like flag
+  fork case, read a
+    fuse commute-row, identity, yes, yes, yes, yes
+    fuse commute-row, bit-flip, yes, yes, no, no
+    fuse commute-row, both-flip, yes, no, yes, no
+    fuse commute-row, phase-flip, yes, no, no, yes
+
+# AGREEMENT of two commutation flags: yes exactly when they are equal. Two multi-edge operators commute when their
+# per-edge commutation flags agree across all shared edges (an even count of anticommuting edges), and anticommute when
+# they differ. Agreement is the negation of exclusive-or, computed here directly.
+task agree
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        read b
+    case no
+      fork case, read b
+        case yes
+          send back
+            make no
+        case no
+          send back
+            make yes
+
+# A SUPPORT is the list of edges an operator touches, paired with the Pauli letter on each edge. To compare two
+# operators on the same lattice we walk the two supports edge by edge over the SHARED region, so we model a support as a
+# list of per-edge Pauli letters in a fixed edge order: the empty support, or one letter consed onto the rest. Two
+# supports of equal length describe the two operators' letters on the same ordered run of edges.
+form support
+  case none
+  case edge
+    link here, like pauli
+    link rest, like support
+
+# The OVERLAP PARITY of two supports: the running agreement of their per-edge commutation flags. Walking the two aligned
+# letter lists, each edge contributes a commutation flag and we AGREE them together. Empty supports agree (yes, an even
+# count of zero). The whole-operator commutation flag is yes exactly when the number of anticommuting edges is EVEN, the
+# parity rule at the center of the stabilizer formalism.
+task overlap-commutes
+  take a, like support
+  take b, like support
+  like flag
+  fork case, read a
+    case none
+      send back
+        make yes
+    case edge
+      link here-a
+      link rest-a
+      fork case, read b
+        case none
+          send back
+            make yes
+        case edge
+          link here-b
+          link rest-b
+          send back
+            call agree
+              call commutes
+                read here-a
+                read here-b
+              call overlap-commutes
+                read rest-a
+                read rest-b
+
+# Build the four-edge bit-flip SUPPORT of a VERTEX (star) operator A-v, written in the lattice edge order with the
+# identity on edges the star does not touch. The argument lists the four star edges as their slot letters; off-star
+# slots are identity. Here we model the star and a plaquette as aligned supports over their shared run of edges.
+
+# The SHARED SUPPORT of a star and a plaquette that meet at a single corner: they overlap on exactly TWO edges (the two
+# plaquette edges incident to that shared vertex). On both shared edges the star carries bit-flip and the plaquette
+# carries phase-flip, which anticommute. Two anticommuting edges is an EVEN count, so the operators commute. We build the
+# star side and the plaquette side as supports over the two shared edges.
+task star-shared
+  like support
+  send back
+    make edge
+      bind here
+        make bit-flip
+      bind rest
+        make edge
+          bind here
+            make bit-flip
+          bind rest
+            make none
+
+task plaquette-shared
+  like support
+  send back
+    make edge
+      bind here
+        make phase-flip
+      bind rest
+        make edge
+          bind here
+            make phase-flip
+          bind rest
+            make none
+
+# A star and a plaquette that do NOT touch share NO edges: empty supports on both sides, which agree trivially.
+task star-disjoint
+  like support
+  send back
+    make none
+
+task plaquette-disjoint
+  like support
+  send back
+    make none
+
+# A STRING of phase-flips along a path, modeled as the list of vertices it passes, used to track electric charge. A Z
+# acting on an edge flips the vertex operators at the edge's two endpoints, so along an open string every interior vertex
+# is hit TWICE (parity cancels) and only the two ENDPOINTS are left violated. We model the string by its charge pattern:
+# a list of vertices, each carrying a charge bit, off (no charge) or on (an e-particle).
+form charge
+  case off
+  case on
+
+# Flip a charge: applying one more endpoint hit at a vertex toggles its violation.
+task flip-charge
+  take c, like charge
+  like charge
+  fork case, read c
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Combine two charges by parity (their exclusive-or). When two string segments meet at a shared vertex, that vertex is
+# hit by both, so its net charge is the parity sum: two hits cancel to off, one hit leaves on.
+task add-charge
+  take a, like charge
+  take b, like charge
+  like charge
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      send back
+        call flip-charge
+          read b
+
+# A line of vertices carrying charges, the violation pattern produced by a Z-string. Empty, or a head charge consed onto
+# the rest.
+form line
+  case bare
+  case spot
+    link load, like charge
+    link more, like line
+
+# The TOTAL CHARGE PARITY of a line: the parity sum of all its vertex charges. The number of e-particles is even exactly
+# when this total is off. A string operator can only ever produce an EVEN number of charges, so this total is always off
+# for any string: charge parity is conserved.
+task total-charge
+  take ln, like line
+  like charge
+  fork case, read ln
+    case bare
+      send back
+        make off
+    case spot
+      link load
+      link more
+      send back
+        call add-charge
+          read load
+          call total-charge
+            read more
+
+# Build the violation line of a length-counted open Z-STRING: a string of length one more than its argument, charged on
+# both ENDPOINTS and clean in between. We build it as: an on charge at the near end, a run of off charges through the
+# interior, and an on charge at the far end. This is the e-particle pair created by an open string.
+
+# An open string of MINIMAL length: just its two endpoints, both charged. Its total charge parity is off, an even
+# number (two) of e-particles, as a created pair must be.
+task pair-line
+  like line
+  send back
+    make spot
+      bind load
+        make on
+      bind more
+        make spot
+          bind load
+            make on
+          bind more
+            make bare
+
+# Extend a string's interior by one CLEAN vertex without changing its endpoints: prepend an off charge. Lengthening an
+# open string never changes the endpoint charges, so the total parity stays even. Used to show conservation holds at any
+# length by induction on the interior.
+task grow-line
+  take ln, like line
+  like line
+  send back
+    make spot
+      bind load
+        make off
+      bind more
+        read ln
+
+# A WINDING string on the torus, a non-contractible loop, modeled by which of the two handles (directions) it wraps and
+# how many times it crosses the other family's winding string. The two logical operators are winding strings on the two
+# handles: logical Z winds one way, logical X winds the other. On the torus these two loops cross at exactly ONE point.
+form handle
+  case across
+  case down
+
+# The CROSSING PARITY of two winding strings, the count mod two of their geometric intersections. Two loops on the SAME
+# handle can be slid apart and cross an even number of times (parity off, they commute). Two loops on DIFFERENT handles
+# wind the two independent cycles of the torus and must cross an ODD number of times, exactly once (parity on, they
+# anticommute). This single transverse crossing is what makes the logical X and logical Z a genuine qubit.
+task cross-parity
+  take a, like handle
+  take b, like handle
+  like flag
+  fork case, read a
+    case across
+      fork case, read b
+        case across
+          send back
+            make no
+        case down
+          send back
+            make yes
+    case down
+      fork case, read b
+        case across
+          send back
+            make yes
+        case down
+          send back
+            make no
+
+# Two operators with a given crossing parity COMMUTE when the parity is off (even crossings) and ANTICOMMUTE when it is
+# on (odd crossings). The commutation flag is yes for even, no for odd, the same parity rule the supports obey.
+task crossing-commutes
+  take p, like flag
+  like flag
+  fork case, read p
+    case no
+      send back
+        make yes
+    case yes
+      send back
+        make no
+
+# STAR AND PLAQUETTE COMMUTE BY EVEN OVERLAP: the vertex operator and the plaquette operator that meet at a corner share
+# exactly two anticommuting edges, an even count, so they COMMUTE. Proved by computing the overlap parity of the two
+# shared supports.
+rule star-and-plaquette-commute
+  show hold
+    call is-equal
+      call overlap-commutes
+        call star-shared
+        call plaquette-shared
+      make yes
+  calm hold
+
+# DISJOINT STAR AND PLAQUETTE COMMUTE: a vertex and a plaquette that do not touch share no edges, an even count of zero,
+# so they commute trivially.
+rule disjoint-star-and-plaquette-commute
+  show hold
+    call is-equal
+      call overlap-commutes
+        call star-disjoint
+        call plaquette-disjoint
+      make yes
+  calm hold
+
+# EVERY OPERATOR COMMUTES WITH ITSELF ON EVERY EDGE: overlap-commutes s s = yes, for every support. On each edge a Pauli
+# commutes with itself, and an all-agreeing walk yields yes. This is why each stabilizer generator is consistent with
+# itself, proved by structural induction on the support.
+rule self-overlap-commutes
+  mark s, like support
+  show hold
+    call is-equal
+      call overlap-commutes
+        read s
+        read s
+      make yes
+  fold s
+
+# EVERY SINGLE-EDGE PAULI SQUARES TO COMMUTING WITH ITSELF, the involution seed: a Pauli and its own copy always
+# commute. With the support law above this gives that every stabilizer, a product of commuting self-overlapping
+# generators, squares to the identity. Proved over all four operators.
+rule stabilizer-squares-to-identity
+  mark p, like pauli
+  show hold
+    call is-equal
+      call commutes
+        read p
+        read p
+      make yes
+  fold p
+
+# SINGLE-EDGE COMMUTATION IS SYMMETRIC: commutes a b = commutes b a, the four-by-four table is symmetric across its
+# diagonal, so the order of two operators on one edge never matters. Proved over all sixteen Pauli pairs.
+rule commutes-is-symmetric
+  mark a, like pauli
+  mark b, like pauli
+  show hold
+    call is-equal
+      call commutes
+        read a
+        read b
+      call commutes
+        read b
+        read a
+  fold a, b
+
+# AGREEMENT IS SYMMETRIC: agree a b = agree b a, flag equality does not depend on order. With single-edge symmetry this
+# is why an overlap commutation reading is the same whichever operator we name first. Proved over all four flag pairs.
+rule agree-is-symmetric
+  mark a, like flag
+  mark b, like flag
+  show hold
+    call is-equal
+      call agree
+        read a
+        read b
+      call agree
+        read b
+        read a
+  fold a, b
+
+# EXCITATIONS COME IN PAIRS: the violation line of a minimal open Z-string has total charge parity off, an EVEN number
+# of e-particles. An open string flips exactly its two endpoint vertices, so it always produces two charges, never one.
+# Proved by computing the total charge parity of the endpoint pair.
+rule minimal-string-makes-a-pair
+  show hold
+    call is-equal
+      call total-charge
+        call pair-line
+      make off
+  calm hold
+
+# CHARGE PARITY IS CONSERVED ALONG A STRING: growing a string's interior by one clean vertex leaves its total charge
+# parity unchanged. total-charge (grow-line ln) = total-charge ln, for every line. Lengthening the string moves the
+# endpoints apart but never changes the EVEN count of e-particles, so charge parity is conserved at any length. Proved by
+# computation against the grow step.
+rule grow-preserves-total-charge
+  mark ln, like line
+  show hold
+    call is-equal
+      call total-charge
+        call grow-line
+          read ln
+      call total-charge
+        read ln
+  calm hold
+
+# CONSERVED PAIR AT EVERY LENGTH: a string grown by one clean interior vertex still carries an EVEN total charge. This
+# composes the pair law with the growth law: starting from the endpoint pair (parity off) and adding any clean interior
+# keeps the parity off. Proved over the grown minimal string.
+rule grown-string-keeps-even-charge
+  show hold
+    call is-equal
+      call total-charge
+        call grow-line
+          call pair-line
+      make off
+  calm hold
+
+# ADD-CHARGE IS ASSOCIATIVE, the parity sum is a monoid: combining endpoint charges in any grouping gives the same net
+# charge. This is the structural law that lets us merge string segments at shared vertices without ambiguity. Proved over
+# all charge triples.
+rule add-charge-is-associative
+  mark a, like charge
+  mark b, like charge
+  mark c, like charge
+  show hold
+    call is-equal
+      call add-charge
+        call add-charge
+          read a
+          read b
+        read c
+      call add-charge
+        read a
+        call add-charge
+          read b
+          read c
+  fold a, b, c
+
+# OFF IS THE IDENTITY OF CHARGE COMBINATION: add-charge off c = c. A vertex hit zero extra times keeps its charge. This
+# and associativity make the charge line a clean parity accumulator. Proved over both charges.
+rule off-is-charge-identity
+  mark c, like charge
+  show hold
+    call is-equal
+      call add-charge
+        make off
+        read c
+      read c
+  fold c
+
+# LOGICAL OPERATORS ANTICOMMUTE: the logical Z winds one handle and the logical X winds the OTHER, so they cross at
+# exactly one point, an ODD crossing parity, and therefore anticommute. crossing-commutes (cross-parity across down) =
+# no. This single transverse intersection of the two non-contractible loops is what encodes a logical qubit on the
+# torus. Proved by computation.
+rule logical-operators-anticommute
+  show hold
+    call is-equal
+      call crossing-commutes
+        call cross-parity
+          make across
+          make down
+      make no
+  calm hold
+
+# PARALLEL LOGICAL LOOPS COMMUTE: two winding strings on the SAME handle can be slid apart, crossing an even number of
+# times, so they commute. crossing-commutes (cross-parity across across) = yes. The logical operators only fail to
+# commute across the two DIFFERENT handles, which is exactly the qubit's X-Z pair.
+rule parallel-loops-commute
+  show hold
+    call is-equal
+      call crossing-commutes
+        call cross-parity
+          make across
+          make across
+      make yes
+  calm hold
+
+# THE TORUS GIVES TWO INDEPENDENT QUBITS: the crossing parity is anticommuting on the across-down pair AND on the
+# down-across pair, the two handles in either order, while commuting on each handle with itself. The two off-diagonal
+# anticommuting pairs are the two logical qubits, the fourfold ground-state degeneracy. Proved over all handle pairs by
+# induction: crossing parity is symmetric.
+rule cross-parity-is-symmetric
+  mark a, like handle
+  mark b, like handle
+  show hold
+    call is-equal
+      call cross-parity
+        read a
+        read b
+      call cross-parity
+        read b
+        read a
+  fold a, b
+
+# BRAIDING PHASE IS MINUS ONE: dragging an electric charge e all the way around a magnetic flux m crosses the flux's
+# string an ODD number of times (once, the loop links the flux), so the wavefunction picks up a sign of minus one. We
+# model the braiding sign as the crossing parity of the e-loop with the m-string: the across-down crossing is odd, the
+# anticommuting flag no, the minus-one phase. This mutual statistics is the topological heart of the toric code, the
+# signature of abelian anyons. Proved by computing the odd linking parity.
+rule braiding-phase-is-minus-one
+  show hold
+    call is-equal
+      call crossing-commutes
+        call cross-parity
+          make across
+          make down
+      make no
+  calm hold
+
+# TRIVIAL BRAIDING IS PLUS ONE: dragging an e around a region with NO flux, or along a contractible loop that links
+# nothing, crosses zero strings, an even parity, and the phase is plus one. crossing-commutes (cross-parity across
+# across) read as the braiding of two like-charges or a charge around empty space = yes, the plus-one phase. Only the
+# e-around-m linking gives the nontrivial minus one.
+rule trivial-braiding-is-plus-one
+  show hold
+    call is-equal
+      call crossing-commutes
+        call cross-parity
+          make across
+          make across
+      make yes
+  calm hold

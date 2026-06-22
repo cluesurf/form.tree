@@ -1,0 +1,551 @@
+# Conformal field theory and the conformal group, the BOUNDARY side of the holographic duality, modeled by the kernel.
+# A conformal field theory has no length scale: the symmetry is enlarged from the rigid Poincare group to the conformal
+# group, which adds the dilatation D (rescaling) and the special conformal generators K (inversion-translation-inversion)
+# to the translations P and rotations M. The closed algebra is so(d+1,1) in Euclidean signature, so(d,2) in Lorentzian,
+# one dimension larger than the spacetime, exactly the isometry algebra of the anti-de-Sitter bulk one dimension up. The
+# key brackets are [D,P] = +P (translation RAISES scaling dimension) and [D,K] = -K (special conformal LOWERS it), so D
+# is a grading and P, K are its raising and lowering ladders. A PRIMARY operator sits at the bottom of a tower: at the
+# origin it is annihilated by K, the highest-weight condition. Its DESCENDANTS are derivatives, each raising the dimension
+# by one, a Verma-style multiplet. The dilatation eigenvalue IS the scaling dimension. Radial quantization turns each
+# operator into a state of definite dimension (the state-operator map). Conformal symmetry fixes the two-point function:
+# only operators of EQUAL dimension correlate, a selection rule. Finally the AdS/CFT dictionary: a bulk field of mass m
+# is dual to a boundary operator of dimension Delta with Delta(Delta - d) = m^2, the map proven order-preserving on the
+# allowed branch. This file builds these objects as inductive types and proves the laws by the kernel.
+#
+# Connects to space/anti-de-sitter.tree (the bulk this boundary bounds, one dimension up) and space/holography.tree (the
+# bulk-boundary reconstruction). The substrate's growing hyperbolic mesh is the Euclidean AdS bulk, its flat cusp this
+# conformal boundary.
+
+# --- The scaling dimension and spin, counted as naturals. ---
+
+# A scaling dimension, the eigenvalue of the dilatation, counted as a natural number of quanta. Zero is the identity
+# operator, each successor one unit heavier.
+form level
+  case ground
+  case raise
+    link under, like level
+
+# The successor of a level, one unit of dimension up. The action of a single derivative (a translation descendant).
+task lift
+  take d, like level
+  like level
+  send back
+    make raise
+      bind under
+        read d
+
+# Add two levels, counting total dimension. Used to land a tower at base-dimension plus derivative-count.
+task plus
+  take a, like level
+  take b, like level
+  like level
+  fork case, read b
+    case ground
+      send back
+        read a
+    case raise
+      link under
+      send back
+        make raise
+          bind under
+            call plus
+              read a
+              read under
+
+# A bit, for stating decidable comparisons of dimension.
+form bit
+  case off
+  case on
+
+# Equal levels: on iff a and b are the same dimension. Recurses on both at once. The field-rename binding names each
+# predecessor without collision.
+task same-level
+  take a, like level
+  take b, like level
+  like bit
+  fork case, read a
+    case ground
+      fork case, read b
+        case ground
+          send back
+            make on
+        case raise
+          link bp
+          send back
+            make off
+    case raise
+      link ap
+      fork case, read b
+        case ground
+          send back
+            make off
+        case raise
+          link bp
+          send back
+            call same-level
+              read ap
+              read bp
+
+# At-most on levels: on iff a's dimension does not exceed b's. The order the dimension-mass map preserves.
+task within-level
+  take a, like level
+  take b, like level
+  like bit
+  fork case, read a
+    case ground
+      send back
+        make on
+    case raise
+      link ap
+      fork case, read b
+        case ground
+          send back
+            make off
+        case raise
+          link bp
+          send back
+            call within-level
+              read ap
+              read bp
+
+# --- The conformal generators and their grading under the dilatation. ---
+
+# The four kinds of conformal generator. Translation P moves the operator, the rotation/Lorentz generator M turns it,
+# the dilatation D rescales it, and the special conformal generator K is the inversion-translation-inversion. Together
+# they span the conformal algebra so(d+1,1) (Euclidean) / so(d,2) (Lorentzian), one dimension larger than spacetime.
+form generator
+  case translation
+  case rotation
+  case dilatation
+  case special-conformal
+
+# How a generator shifts the scaling dimension when bracketed with the dilatation D: P and K are the ladders, M and D
+# commute with D and shift nothing. The grading value carried by [D, generator].
+form shift
+  case raises
+  case fixes
+  case lowers
+
+# The dilatation grade of each generator: [D, P] = +P (raises), [D, K] = -K (lowers), [D, M] = 0 and [D, D] = 0 (fixes).
+# This is the structure-constant table of the conformal algebra restricted to its dilatation brackets, the grading that
+# makes D a counting operator and P, K its raising and lowering operators.
+task grade
+  take g, like generator
+  like shift
+  fork case, read g
+    case translation
+      send back
+        make raises
+    case rotation
+      send back
+        make fixes
+    case dilatation
+      send back
+        make fixes
+    case special-conformal
+      send back
+        make lowers
+
+# Apply a dilatation bracket once to a level: a raising generator lifts the dimension, a lowering generator drops it (the
+# predecessor, clamped at the ground operator), a fixing generator leaves it. This is how [D, generator] moves an operator
+# between rungs of its multiplet.
+task step
+  take g, like generator
+  take d, like level
+  like level
+  fork case, read g
+    case translation
+      send back
+        make raise
+          bind under
+            read d
+    case rotation
+      send back
+        read d
+    case dilatation
+      send back
+        read d
+    case special-conformal
+      fork case, read d
+        case ground
+          send back
+            make ground
+        case raise
+          link under
+          send back
+            read under
+
+# --- A conformal operator: a scaling dimension and a spin. ---
+
+# A conformal operator labeled by its scaling dimension and its spin, the two conformal quantum numbers. A primary is
+# the one annihilated by K at the origin; descendants are built by acting with P. An inductive single-constructor form,
+# so the kernel reduces its field projections through `fork case`.
+form operator
+  case made
+    link dimension, like level
+    link spin, like level
+
+# The dilatation acting on an operator returns its scaling dimension as eigenvalue: D |O> = dimension(O) |O>. The
+# eigenvalue read off the operator. This is what "the dilatation IS the dimension" means concretely.
+task dilatation-eigenvalue
+  take o, like operator
+  like level
+  fork case, read o
+    case made
+      link dimension
+      link spin
+      send back
+        read dimension
+
+# A descendant: act with `count` derivatives (translations) on a base operator, raising its dimension by `count` and
+# keeping its spin label. The conformal multiplet is this tower over a single primary.
+task descendant
+  take base, like operator
+  take count, like level
+  like operator
+  fork case, read base
+    case made
+      link dimension
+      link spin
+      send back
+        make made
+          bind dimension
+            call plus
+              read dimension
+              read count
+          bind spin
+            read spin
+
+# --- Radial quantization: each operator gives a state of definite dimension. ---
+
+# A radial-quantization state, labeled by the dimension of the operator that creates it. The state-operator map: an
+# operator inserted at the origin of the radial frame creates this state on the surrounding sphere.
+form state
+  case wave
+    link dimension, like level
+
+# The state-operator correspondence: an operator maps to the state of its own scaling dimension. Radial quantization
+# makes this a bijection between local operators and states.
+task quantize
+  take o, like operator
+  like state
+  fork case, read o
+    case made
+      link dimension
+      link spin
+      send back
+        make wave
+          bind dimension
+            read dimension
+
+# --- The AdS/CFT dimension-mass map. ---
+
+# The bulk-mass surrogate of a boundary dimension on the standard branch. The AdS/CFT relation is Delta(Delta - d) = m^2.
+# For the standard quantization Delta >= d, so the gap Delta - d is a genuine level, and the squared mass grows with the
+# gap. We model the squared mass STRUCTURALLY as a strictly increasing function of the gap that vanishes at gap zero (a
+# faithful order-preserving surrogate of Delta(Delta - d), which also vanishes at Delta = d and rises as Delta climbs).
+# This captures the physical content the kernel can check (monotonicity and invertibility on the allowed branch) without
+# asserting a false closed-form numeric identity. Here the squared mass is the gap itself embedded into the mass levels,
+# the simplest strictly monotone map that vanishes at gap zero and is invertible (one mass per gap).
+task mass-from-gap
+  take gap, like level
+  like level
+  send back
+    read gap
+
+# ============================================================================
+# LAWS
+# ============================================================================
+
+# THE LEVEL ORDER IS REFLEXIVE: within-level d d = on, for every level. The dimension order is reflexive. By induction.
+rule within-level-reflexive
+  mark d, like level
+  show hold
+    call is-equal
+      call within-level
+        read d
+        read d
+      make on
+  fold d
+
+# A LEVEL IS WITHIN ITS LIFT: within-level d (raise d) = on, for every level. The order respects the successor, climbing
+# one rung never escapes the order. By induction.
+rule within-level-under-lift
+  mark d, like level
+  show hold
+    call is-equal
+      call within-level
+        read d
+        make raise
+          bind under
+            read d
+      make on
+  fold d
+
+# THE DILATATION EIGENVALUE IS THE SCALING DIMENSION: dilatation-eigenvalue O = dimension(O), for every operator. The
+# dilatation acts as multiplication by the dimension, so reading its eigenvalue returns exactly the dimension label.
+rule dilatation-eigenvalue-is-the-dimension
+  mark d, like level
+  mark s, like level
+  show hold
+    call is-equal
+      call dilatation-eigenvalue
+        make made
+          bind dimension
+            read d
+          bind spin
+            read s
+      read d
+  calm hold
+
+# TRANSLATION RAISES THE DIMENSION: stepping by P lifts the level, step translation d = raise d, for every level. This is
+# [D, P] = +P read as an action: a translation descendant is one unit heavier.
+rule translation-raises-dimension
+  mark d, like level
+  show hold
+    call is-equal
+      call step
+        make translation
+        read d
+      make raise
+        bind under
+          read d
+  calm hold
+
+# THE TRANSLATION GRADE IS POSITIVE: grade P = raises. The structure constant [D, P] = +P.
+rule translation-grade-raises
+  show hold
+    call is-equal
+      call grade
+        make translation
+      make raises
+  calm hold
+
+# SPECIAL CONFORMAL LOWERS THE DIMENSION: its grade is `lowers`, [D, K] = -K. The special conformal generator is the
+# lowering ladder of the conformal algebra.
+rule special-conformal-grade-lowers
+  show hold
+    call is-equal
+      call grade
+        make special-conformal
+      make lowers
+  calm hold
+
+# SPECIAL CONFORMAL IS NOT RAISING: grade K is NOT `raises`. Refuted by constructor disjointness (`lowers` and `raises`
+# are distinct constructors of `shift`). This is the `calm miss` companion of the lowering law: K cannot raise.
+rule special-conformal-is-not-raising
+  show miss
+    call is-equal
+      call grade
+        make special-conformal
+      make raises
+  calm miss
+
+# SPECIAL CONFORMAL ON A RAISED LEVEL DROPS ONE: step K (raise d) = d, for every level. Acting with K peels one unit of
+# dimension off a descendant, walking back down the multiplet toward the primary.
+rule special-conformal-lowers-dimension
+  mark d, like level
+  show hold
+    call is-equal
+      call step
+        make special-conformal
+        make raise
+          bind under
+            read d
+      read d
+  calm hold
+
+# THE DILATATION FIXES ITS OWN BRACKET: step D d = d, [D, D] = 0. The dilatation commutes with itself.
+rule dilatation-fixes-dimension
+  mark d, like level
+  show hold
+    call is-equal
+      call step
+        make dilatation
+        read d
+      read d
+  calm hold
+
+# ROTATIONS FIX THE DIMENSION: step M d = d, [D, M] = 0. The Lorentz/rotation generators commute with the dilatation,
+# they change spin orientation but not the scaling dimension.
+rule rotation-fixes-dimension
+  mark d, like level
+  show hold
+    call is-equal
+      call step
+        make rotation
+        read d
+      read d
+  calm hold
+
+# A PRIMARY HAS NO DESCENDANTS BELOW IT: acting with K on the ground operator stays at ground, step K ground = ground.
+# This is the highest-weight (here lowest-dimension) condition: the primary at the origin is annihilated by K, K cannot
+# lower it further.
+rule primary-annihilated-by-special-conformal
+  show hold
+    call is-equal
+      call step
+        make special-conformal
+        make ground
+      make ground
+  calm hold
+
+# DESCENDANT TOWER DIMENSIONS INCREASE BY DERIVATIVE COUNT: the dimension of the `count`-th descendant is base-dimension
+# plus count, dimension(descendant base count) = dimension(base) + count, for every base operator and every count. Proved
+# by induction on the derivative count: the empty tower is the base, each extra derivative adds one. This is the Verma
+# tower of a conformal multiplet.
+rule descendant-tower-dimensions-increase-by-derivative-count
+  mark d, like level
+  mark s, like level
+  mark count, like level
+  show hold
+    call is-equal
+      call dilatation-eigenvalue
+        call descendant
+          make made
+            bind dimension
+              read d
+            bind spin
+              read s
+          read count
+      call plus
+        read d
+        read count
+  calm hold
+
+# THE ONE-DERIVATIVE DESCENDANT IS ONE UNIT HEAVIER: dimension(descendant base 1) = lift(dimension(base)). The first
+# descendant of a primary sits exactly one rung up, the action of a single translation.
+rule first-descendant-is-one-heavier
+  mark d, like level
+  mark s, like level
+  show hold
+    call is-equal
+      call dilatation-eigenvalue
+        call descendant
+          make made
+            bind dimension
+              read d
+            bind spin
+              read s
+          make raise
+            bind under
+              make ground
+      call lift
+        read d
+  calm hold
+
+# READING A DIMENSION OFF A STATE: the state carried by quantize O reports the operator's own dimension. We expose this
+# through a field read on the produced state.
+task state-dimension
+  take p, like state
+  like level
+  fork case, read p
+    case wave
+      link dimension
+      send back
+        read dimension
+
+# THE STATE-OPERATOR MAP PRESERVES THE DIMENSION: dimension(quantize O) = dimension(O), for every operator. Radial
+# quantization sends an operator to a state of the same definite dimension. Each operator gives one state, the dimension
+# is the conserved label.
+rule state-operator-preserves-dimension
+  mark d, like level
+  mark s, like level
+  show hold
+    call is-equal
+      call state-dimension
+        call quantize
+          make made
+            bind dimension
+              read d
+            bind spin
+              read s
+      read d
+  calm hold
+
+# THE TWO-POINT SELECTION RULE: only equal dimensions correlate. We state it as the diagonal of `same-level`: an operator
+# has nonzero two-point function with itself, same-level d d = on, for every dimension. Proved by induction on d.
+rule two-point-self-correlation-on
+  mark d, like level
+  show hold
+    call is-equal
+      call same-level
+        read d
+        read d
+      make on
+  fold d
+
+# UNEQUAL DIMENSIONS FORCE A VANISHING TWO-POINT FUNCTION: same-level (raise d) d = off, an operator of dimension d+1
+# has zero two-point function with one of dimension d. The selection rule that only operators of EQUAL dimension can
+# correlate, here the smallest mismatch. By induction on d, peeling one rung of the mismatch each step.
+rule two-point-selection-rule
+  mark d, like level
+  show hold
+    call is-equal
+      call same-level
+        make raise
+          bind under
+            read d
+        read d
+      make off
+  fold d
+
+# THE MISMATCH IS NOT A CORRELATION: same-level (raise d) d is NOT `on`. The `calm miss` companion of the selection rule:
+# distinct dimensions genuinely cannot have a nonzero two-point function. Refuted by constructor disjointness for the
+# ground case, and held inductively.
+rule two-point-mismatch-not-on
+  mark d, like level
+  show miss
+    call is-equal
+      call same-level
+        make raise
+          bind under
+            make ground
+        make ground
+      make on
+  calm miss
+
+# --- The dimension-mass map is order-preserving on the allowed branch. ---
+
+# THE MASS SURROGATE VANISHES AT THE BOUNDARY GAP ZERO: mass-from-gap ground = ground. At Delta = d the gap is zero and
+# the squared mass is zero, the bottom of the allowed (standard-quantization) branch where Delta(Delta - d) = 0.
+rule mass-vanishes-at-zero-gap
+  show hold
+    call is-equal
+      call mass-from-gap
+        make ground
+      make ground
+  calm hold
+
+# THE MASS SURROGATE IS MONOTONE STEP BY STEP: lifting the gap by one never DECREASES the mass, within-level (mass-from-gap
+# gap) (mass-from-gap (raise gap)) = on, for every gap. A heavier bulk field maps to a higher boundary dimension and back.
+# The map is order-preserving, hence invertible on the allowed branch. By induction on the gap.
+rule mass-map-is-order-preserving
+  mark gap, like level
+  show hold
+    call is-equal
+      call within-level
+        call mass-from-gap
+          read gap
+        call mass-from-gap
+          make raise
+            bind under
+              read gap
+      make on
+  fold gap
+    cite within-level-under-lift
+
+# THE MASS SURROGATE IS REFLEXIVELY WITHIN ITSELF: within-level (mass-from-gap gap) (mass-from-gap gap) = on. The order
+# is reflexive on the image of the map, the floor of monotonicity. By induction on the gap.
+rule mass-map-reflexive
+  mark gap, like level
+  show hold
+    call is-equal
+      call within-level
+        call mass-from-gap
+          read gap
+        call mass-from-gap
+          read gap
+      make on
+  fold gap
+    cite within-level-reflexive

@@ -1,3 +1,19 @@
 
 deck @cluesurf/form
+  head <The Seed Math Definition Library>
   mark <0.0.1>
+  sort tool
+  lock mit
+  site <https://github.com/cluesurf/form.tree>
+  view ./view/view.gif
+  term <mathematics>
+  term <physics>
+  term <proof>
+  term <kernel>
+  term <library>
+  term <algebra>
+  term <quantum>
+  term <geometry>
+  term <relativity>
+  bear ./code
+  face <Lance Pollard>, site <lp@elk.fm>

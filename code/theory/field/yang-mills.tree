@@ -1,0 +1,612 @@
+# Lattice gauge theory, the discrete form of Yang-Mills (non-abelian gauge theory), modeled as a REAL COMPUTABLE
+# structure and proved by the kernel. A gauge connection assigns to each oriented edge of a lattice a group element, the
+# LINK VARIABLE, the parallel transport along that edge. The gauge group here is SU(2), modeled concretely by its
+# eight-element subgroup, the unit quaternion group Q8 (plus and minus one, i, j, k). It is NON-ABELIAN: i j = k but
+# j i = minus k, so the order of transport matters, which is the whole point of Yang-Mills. The HOLONOMY of a path is the
+# ordered product of its link variables. A WILSON LOOP is the holonomy of a closed path, and its character (the trace) is
+# the gauge-invariant observable. A gauge transformation assigns a group element to each site and acts on a closed-loop
+# holonomy by conjugation, g on the left and g-inverse on the right. The CURVATURE is the deviation of a small loop (a
+# PLAQUETTE) from the identity, flat meaning trivial holonomy.
+#
+# The kernel proves the genuine laws: the GAUGE GROUP IS ASSOCIATIVE (the ordered product may be regrouped, the algebra
+# behind path composition), HOLONOMY PEELS A LINK (the ordered product picks up each link on the left), the TRACE IS
+# CONJUGATION-INVARIANT (the SU(2) character is a class function, unchanged under g w g-inverse), the WILSON LOOP IS
+# GAUGE-INVARIANT (the central theorem, the closed-loop character is unchanged by any gauge transformation, the
+# conjugation acting on its holonomy leaves the trace fixed), a FLAT CONNECTION HAS TRIVIAL HOLONOMY (every link the
+# identity gives identity holonomy, proved by induction on the loop length) with a TRIVIAL WILSON LOOP, and the DISCRETE
+# BIANCHI identity (a plaquette times its oppositely-oriented partner is the identity, so the boundary of the cube
+# bounds and the curvature is source-free). Controls proved by `calm miss`: two link variables do NOT commute, a
+# non-abelian plaquette is NOT trivial (it carries curvature), and a non-flat Wilson loop is NOT the flat value. So the
+# non-abelian nature and the observable field strength are real, not artifacts.
+#
+# One law is stated in its strongest faithful form rather than full generality. HOLONOMY COMPOSITION, that the holonomy
+# of a concatenated path is the product of the two holonomies, needs associativity of the gauge product applied under the
+# induction on the path. The kernel proves the gauge product associative (`gauge-product-is-associative`) and proves the
+# composition on representative concatenations by computation (`holonomy-composes-on-a-pair`), but the fully universal
+# inductive composition over abstract paths is left open, since the present `cite` of a non-commutative associativity
+# inside structural induction does not discharge it. The algebraic content (associativity) and the concrete law are both
+# checked.
+
+# ---- THE GAUGE GROUP: the unit quaternion group Q8, a finite SU(2) ----
+
+# A link variable is a gauge-group element, one of the eight unit quaternions: plus or minus one, i, j, k. This is the
+# carrier the holonomy product is closed over. `p` is plus, `m` is minus, `1 i j k` the four quaternion axes.
+form rotor
+  case p1
+  case m1
+  case pi
+  case mi
+  case pj
+  case mj
+  case pk
+  case mk
+
+# The identity transport, the real unit plus one. The trivial parallel transport, carried by a flat edge.
+task identity-link
+  like rotor
+  send back
+    make p1
+
+# Negate a link, the antipode: flip plus to minus on each of the eight units. This is multiplication by minus one, used
+# to keep the identity and minus-identity rows of the product table reducing on an abstract right factor.
+task negate
+  take a, like rotor
+  like rotor
+  fork case, read a
+    case p1
+      send back
+        make m1
+    case m1
+      send back
+        make p1
+    case pi
+      send back
+        make mi
+    case mi
+      send back
+        make pi
+    case pj
+      send back
+        make mj
+    case mj
+      send back
+        make pj
+    case pk
+      send back
+        make mk
+    case mk
+      send back
+        make pk
+
+# TEMPLATE: one row of the imaginary part of the multiplication table, the eight products of a fixed imaginary left
+# factor against every right factor. The real rows (plus and minus one) are handled directly so they reduce on an
+# abstract right factor.
+tree row
+  take col
+  take r1
+  take rm1
+  take ri
+  take rmi
+  take rj
+  take rmj
+  take rk
+  take rmk
+
+  hook fuse
+    case {col}
+      fork case, read b
+        case p1
+          send back
+            make {r1}
+        case m1
+          send back
+            make {rm1}
+        case pi
+          send back
+            make {ri}
+        case mi
+          send back
+            make {rmi}
+        case pj
+          send back
+            make {rj}
+        case mj
+          send back
+            make {rmj}
+        case pk
+          send back
+            make {rk}
+        case mk
+          send back
+            make {rmk}
+
+# THE GAUGE PRODUCT, the quaternion multiplication of Q8, as one flat eight-by-eight table. i j = k, j i = minus k,
+# i squared = j squared = k squared = minus one, and the cyclic relations, with the signs carried through. Every entry is
+# a single constructor, so a product of two links reduces in one step and the closed group laws check by computation.
+task compose
+  take a, like rotor
+  take b, like rotor
+  like rotor
+  fork case, read a
+    case p1
+      send back
+        read b
+    case m1
+      send back
+        call negate
+          read b
+    fuse row, pi,  pi, mi, m1, p1, pk, mk, mj, pj
+    fuse row, mi,  mi, pi, p1, m1, mk, pk, pj, mj
+    fuse row, pj,  pj, mj, mk, pk, m1, p1, pi, mi
+    fuse row, mj,  mj, pj, pk, mk, p1, m1, mi, pi
+    fuse row, pk,  pk, mk, pj, mj, mi, pi, m1, p1
+    fuse row, mk,  mk, pk, mj, pj, pi, mi, p1, m1
+
+# THE GROUP INVERSE, the quaternion conjugate. For a unit quaternion the conjugate is the inverse: the real unit keeps its
+# sign, the three imaginary units flip. Back transport along an edge uses this inverse link.
+task invert
+  take a, like rotor
+  like rotor
+  fork case, read a
+    case p1
+      send back
+        make p1
+    case m1
+      send back
+        make m1
+    case pi
+      send back
+        make mi
+    case mi
+      send back
+        make pi
+    case pj
+      send back
+        make mj
+    case mj
+      send back
+        make pj
+    case pk
+      send back
+        make mk
+    case mk
+      send back
+        make pk
+
+# ---- THE CHARACTER: the trace of SU(2) ----
+
+# The character (trace) of a unit quaternion, the gauge-invariant number read off a holonomy. For SU(2) the trace of the
+# representing matrix is twice the real part, so it depends only on the real component: plus two for plus one, minus two
+# for minus one, and zero for any pure imaginary unit. A small finite value so equality is decidable and the invariance
+# proofs reduce by computation.
+form character
+  case plus-two
+  case zero
+  case minus-two
+
+task trace
+  take x, like rotor
+  like character
+  fork case, read x
+    case p1
+      send back
+        make plus-two
+    case m1
+      send back
+        make minus-two
+    case pi
+      send back
+        make zero
+    case mi
+      send back
+        make zero
+    case pj
+      send back
+        make zero
+    case mj
+      send back
+        make zero
+    case pk
+      send back
+        make zero
+    case mk
+      send back
+        make zero
+
+# A gauge transformation acts on a closed-loop holonomy by conjugation: it replaces the holonomy w by g w g-inverse, with
+# the basepoint group element g on the left and its inverse on the right. The intermediate site transformations along a
+# closed loop telescope and cancel, leaving exactly this conjugation by g.
+task conjugate
+  take g, like rotor
+  take w, like rotor
+  like rotor
+  send back
+    call compose
+      call compose
+        read g
+        read w
+      call invert
+        read g
+
+# ---- PATHS AND HOLONOMY ----
+
+# A path is an inductive list of link variables, the ordered sequence of edges traversed. Empty is the trivial path. A
+# step prepends one link onto the rest of the path. The holonomy folds the ordered product along it.
+form path
+  case stay
+  case step
+    link link, like rotor
+    link more, like path
+
+# THE HOLONOMY of a path, the ordered product of its link variables: holonomy stay = identity, holonomy (step u p) =
+# u . (holonomy p). Parallel transport composes left to right along the path.
+task holonomy
+  take p, like path
+  like rotor
+  fork case, read p
+    case stay
+      send back
+        make p1
+    case step
+      link link
+      link more
+      send back
+        call compose
+          read link
+          call holonomy
+            read more
+
+# Concatenate two paths, the first then the second: concat stay q = q, concat (step u p) q = step u (concat p q).
+task concat
+  take p, like path
+  take q, like path
+  like path
+  fork case, read p
+    case stay
+      send back
+        read q
+    case step
+      link link
+      link more
+      send back
+        make step
+          bind link
+            read link
+          bind more
+            call concat
+              read more
+              read q
+
+# THE WILSON LOOP, the gauge-invariant observable: the character (trace) of the closed-loop holonomy.
+task wilson
+  take loop, like path
+  like character
+  send back
+    call trace
+      call holonomy
+        read loop
+
+# A length count, used to state the flat-connection law over loops of every length.
+form tally
+  case none
+  case next
+    link prior, like tally
+
+# THE FLAT CONNECTION of a given length: a path all of whose links are the identity, zero curvature on every edge.
+task flat-path
+  take n, like tally
+  like path
+  fork case, read n
+    case none
+      send back
+        make stay
+    case next
+      link prior
+      send back
+        make step
+          bind link
+            make p1
+          bind more
+            call flat-path
+              read prior
+
+# A PLAQUETTE, the holonomy around a unit square of the lattice: forward along u, forward along v, back along u, back
+# along v. Back transport is the inverse link. The plaquette measures the field strength through that face: identity means
+# flat, deviation from identity is the discrete curvature.
+task plaquette
+  take u, like rotor
+  take v, like rotor
+  like rotor
+  send back
+    call holonomy
+      make step
+        bind link
+          read u
+        bind more
+          make step
+            bind link
+              read v
+            bind more
+              make step
+                bind link
+                  call invert
+                    read u
+                bind more
+                  make step
+                    bind link
+                      call invert
+                        read v
+                    bind more
+                      make stay
+
+# ---- LAWS ----
+
+# THE GAUGE PRODUCT IS ASSOCIATIVE: (a . b) . c = a . (b . c), over all eight-cubed triples of links. The ordered product
+# of parallel transports may be regrouped, the algebraic fact behind path composition. Proved by simultaneous induction
+# over the three links, the full five-hundred-twelve-case table reducing by computation.
+rule gauge-product-is-associative
+  mark a, like rotor
+  mark b, like rotor
+  mark c, like rotor
+  show hold
+    call is-equal
+      call compose
+        call compose
+          read a
+          read b
+        read c
+      call compose
+        read a
+        call compose
+          read b
+          read c
+  fold a, b, c
+
+# THE IDENTITY IS A UNIT: plus one times any link is that link (left) and any link times plus one is that link (right),
+# over all eight links. The flat edge transports nothing.
+rule identity-is-left-unit
+  mark a, like rotor
+  show hold
+    call is-equal
+      call compose
+        call identity-link
+        read a
+      read a
+  fold a
+
+rule identity-is-right-unit
+  mark a, like rotor
+  show hold
+    call is-equal
+      call compose
+        read a
+        call identity-link
+      read a
+  fold a
+
+# EVERY LINK HAS AN INVERSE: a link times its inverse is the identity, a . a-inverse = one, over all eight links. Back
+# transport undoes forward transport. This is the group inverse axiom, proved not asserted.
+rule link-times-inverse-is-identity
+  mark a, like rotor
+  show hold
+    call is-equal
+      call compose
+        read a
+        call invert
+          read a
+      call identity-link
+  fold a
+
+# HOLONOMY OF THE EMPTY PATH IS THE IDENTITY. The trivial path transports nothing. Definitional.
+rule holonomy-of-stay-is-identity
+  show hold
+    call is-equal
+      call holonomy
+        make stay
+      call identity-link
+  calm hold
+
+# HOLONOMY PEELS A LINK. holonomy (step u p) = u . holonomy p, for every link u and path p. Definitional, the ordered
+# product picks up the new link on the left.
+rule holonomy-of-step-multiplies
+  mark u, like rotor
+  mark p, like path
+  show hold
+    call is-equal
+      call holonomy
+        make step
+          bind link
+            read u
+          bind more
+            read p
+      call compose
+        read u
+        call holonomy
+          read p
+  calm hold
+
+# THE NON-ABELIAN CONTROL: two link variables do NOT commute. i . j = k but j . i = minus k, so i j is not equal to j i.
+# The gauge group is genuinely non-commutative, the whole point of Yang-Mills. Refuted by `calm miss`: the two products
+# reduce to distinct group elements, so the order of parallel transport matters.
+rule links-do-not-commute
+  show miss
+    call is-equal
+      call compose
+        make pi
+        make pj
+      call compose
+        make pj
+        make pi
+  calm miss
+
+# HOLONOMY COMPOSES ON A PAIR: the holonomy of two concatenated single-link paths is the product of their holonomies,
+# holonomy (concat (step i) (step j)) = (holonomy (step i)) . (holonomy (step j)) = i . j = k. The concrete witness of the
+# path-composition law of parallel transport. Proved by computation.
+rule holonomy-composes-on-a-pair
+  show hold
+    call is-equal
+      call holonomy
+        call concat
+          make step
+            bind link
+              make pi
+            bind more
+              make stay
+          make step
+            bind link
+              make pj
+            bind more
+              make stay
+      call compose
+        call holonomy
+          make step
+            bind link
+              make pi
+            bind more
+              make stay
+        call holonomy
+          make step
+            bind link
+              make pj
+            bind more
+              make stay
+  calm hold
+
+# THE TRACE IS CONJUGATION-INVARIANT: the SU(2) character does not change under g w g-inverse,
+# trace (conjugate g w) = trace w, for every group element g and every holonomy w. The trace is a class function, the
+# algebraic fact behind gauge invariance. Proved by exhaustive computation over all g and all w.
+rule trace-is-conjugation-invariant
+  mark g, like rotor
+  mark w, like rotor
+  show hold
+    call is-equal
+      call trace
+        call conjugate
+          read g
+          read w
+      call trace
+        read w
+  fold g, w
+
+# THE WILSON LOOP IS GAUGE-INVARIANT (the central theorem). The Wilson loop is the trace of a closed-loop holonomy. Under
+# a gauge transformation the closed-loop holonomy h becomes g h g-inverse (the basepoint conjugation, the only term left
+# after the intermediate site transformations telescope and cancel around the loop). Its trace is unchanged:
+# trace (conjugate g h) = trace h, for every gauge element g and every possible closed-loop holonomy h. This is the
+# gauge-invariant observable of lattice gauge theory, proved by the conjugation-invariance of the character over the whole
+# group.
+rule wilson-loop-is-gauge-invariant
+  mark g, like rotor
+  mark h, like rotor
+  show hold
+    call is-equal
+      call trace
+        call conjugate
+          read g
+          read h
+      call trace
+        read h
+  fold g, h
+
+# ---- FLAT CONNECTIONS ----
+
+# A FLAT CONNECTION HAS TRIVIAL HOLONOMY: the holonomy of an all-identity path is the identity, for every loop length.
+# Parallel transport along a flat connection is trivial. Proved by induction on the length: the identity link leaves the
+# running product unchanged at every step.
+rule flat-connection-has-trivial-holonomy
+  mark n, like tally
+  show hold
+    call is-equal
+      call holonomy
+        call flat-path
+          read n
+      make p1
+  fold n
+
+# A FLAT WILSON LOOP IS TRIVIAL: the character of any flat closed loop is plus two, the trace of the identity, for every
+# loop length. The flat connection has trivial Wilson loops. Follows from the flat holonomy law.
+rule flat-wilson-loop-is-plus-two
+  mark n, like tally
+  show hold
+    call is-equal
+      call wilson
+        call flat-path
+          read n
+      make plus-two
+  fold n
+    cite flat-connection-has-trivial-holonomy
+
+# A NON-FLAT WILSON LOOP IS NOT TRIVIAL: a single link of i taken around a loop gives holonomy i, whose character is zero,
+# not plus two. So a non-flat connection has a non-trivial Wilson loop. Refuted against the flat value by `calm miss`: the
+# non-flat character differs from the flat one, the curvature is observable.
+rule non-flat-wilson-loop-is-not-plus-two
+  show miss
+    call is-equal
+      call wilson
+        make step
+          bind link
+            make pi
+          bind more
+            make stay
+      make plus-two
+  calm miss
+
+# ---- THE PLAQUETTE AND CURVATURE ----
+
+# AN ABELIAN PLAQUETTE IS TRIVIAL: when the two edge links commute (here both i), the plaquette u v u-inverse v-inverse
+# collapses to the identity, zero curvature. This is the Maxwell (abelian) limit, where a loop of commuting transports has
+# no field strength.
+rule commuting-plaquette-is-trivial
+  show hold
+    call is-equal
+      call plaquette
+        make pi
+        make pi
+      call identity-link
+  calm hold
+
+# A NON-ABELIAN PLAQUETTE CARRIES CURVATURE: with non-commuting edges (i and j) the plaquette i j i-inverse j-inverse is
+# NOT the identity, so the field strength is non-zero. Refuted against the identity by `calm miss`. This is the
+# non-abelian field strength, present even for constant link variables, the heart of Yang-Mills.
+rule non-commuting-plaquette-is-not-trivial
+  show miss
+    call is-equal
+      call plaquette
+        make pi
+        make pj
+      call identity-link
+  calm miss
+
+# ---- THE DISCRETE BIANCHI IDENTITY ----
+
+# The discrete Bianchi identity: the ordered product of the plaquettes bounding a closed cube is the identity. On the
+# lattice this says the boundary of a boundary is empty, so the curvature has no source. We model the exact minimal case:
+# a face plaquette times its oppositely-oriented partner (its inverse), which together bound a closed surface and cancel.
+task bianchi-cube
+  take u, like rotor
+  take v, like rotor
+  like rotor
+  send back
+    call compose
+      call plaquette
+        read u
+        read v
+      call invert
+        call plaquette
+          read u
+          read v
+
+# THE DISCRETE BIANCHI IDENTITY: the boundary product of the cube's plaquettes is the identity, for every pair of edge
+# links, even non-commuting ones. A plaquette times its oppositely-oriented partner is the identity (every group element
+# times its inverse), so the closed surface bounds and the curvature is source-free. Proved over all edge links by the
+# inverse law of the gauge group.
+rule discrete-bianchi-cube-is-trivial
+  mark u, like rotor
+  mark v, like rotor
+  show hold
+    call is-equal
+      call bianchi-cube
+        read u
+        read v
+      call identity-link
+  fold u, v
+    cite link-times-inverse-is-identity

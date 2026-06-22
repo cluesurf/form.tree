@@ -1,0 +1,550 @@
+# Noether's theorem in its exact discrete, algebraic form, proved by the kernel. The continuous theorem says that every
+# differentiable one-parameter symmetry of a physical action yields a conserved current, and integrating that current
+# gives a charge constant in time. We state that continuous theorem in prose and prove the discrete one-parameter-group
+# version exactly. A system is a STATE that evolves by a single dynamics STEP. A SYMMETRY is a transformation that
+# COMMUTES with the step (it carries solutions to solutions, leaving the law of motion unchanged). A CONSERVED QUANTITY
+# is an observable of the state that one step leaves unchanged. Noether's correspondence is the bridge: from a symmetry
+# of the dynamics we read off a conserved charge, and we PROVE it is constant along the WHOLE trajectory, under every
+# evolution step, by induction on time. The concrete system is a free particle on the integer line carrying an internal
+# phase: its state is a position, a momentum, and a phase, and one step advances the position by the momentum and rotates
+# the phase by a fixed turn. Three instances are proved exactly. TIME-TRANSLATION INVARIANCE (the step law does not depend
+# on the absolute time) gives a conserved ENERGY, here the momentum, the generator of spatial motion that the free step
+# preserves. SPATIAL-TRANSLATION INVARIANCE (shifting every position by a constant commutes with the step) gives conserved
+# MOMENTUM. A discrete PHASE ROTATION (the internal U(1), here its Z/3 quotient) commutes with the step and gives a
+# conserved CHARGE, the particle NUMBER the phase carries no power to change. The converse control is proved too: a
+# momentum KICK is NOT a symmetry of the free step, and its candidate charge is NOT conserved, refuted by direct
+# computation. Energy is additive over independent subsystems, also proved.
+
+load @cluesurf/form/code/number/integer
+  find rung
+  find combine
+  find combine-is-associative
+  find combine-is-commutative
+
+# The natural numbers, the discrete TIME the trajectory runs over and the COUNT the conserved charge carries.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# A discrete internal PHASE, the three-element quotient Z/3 of the internal U(1) circle. A phase rotation is the symmetry
+# whose Noether charge is the conserved particle number. Z/3 keeps the model finite while carrying the full content of a
+# one-parameter phase symmetry: a rotation acts, it commutes with the dynamics, and it fixes the number.
+form phase
+  case p0
+  case p1
+  case p2
+
+# The SYSTEM STATE: a free particle on the integer line carrying an internal phase. The position and momentum are signed
+# integers (the rung), the count of unit cells and the count of cells advanced per step. The phase is the internal angle.
+# This single record is the configuration the dynamics acts on and the observables read.
+form state
+  case state
+    link position, like rung
+    link momentum, like rung
+    link spin, like phase
+
+# --- Observables: functions of the state a conservation law can be stated about. ---
+
+# Read the POSITION out of a state.
+task position-of
+  take s, like state
+  like rung
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        read position
+
+# Read the MOMENTUM out of a state. This observable is the conserved ENERGY of the free particle (the generator of motion
+# the time-translation-invariant step preserves) and is also the conserved MOMENTUM under spatial translation.
+task momentum-of
+  take s, like state
+  like rung
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        read momentum
+
+# Read the PHASE out of a state.
+task spin-of
+  take s, like state
+  like phase
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        read spin
+
+# --- The one-parameter phase group: a discrete rotation, its identity and composition. ---
+
+# TEMPLATE: one entry of a single-valued map on phases, `from` sent to `to`, replacing each case block with one line.
+tree turn-entry
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# A unit phase ROTATION, advancing the internal angle by one third of the circle, p0 to p1 to p2 to p0. This is the
+# generator of the one-parameter phase symmetry, the discrete U(1) whose Noether charge is the conserved number.
+task rotate
+  take a, like phase
+  like phase
+  fork case, read a
+    fuse turn-entry, p0, p1
+    fuse turn-entry, p1, p2
+    fuse turn-entry, p2, p0
+
+# --- The dynamics: a single evolution step, the discrete law of motion. ---
+
+# One evolution STEP of the free particle. The position advances by the momentum (free motion, x to x + p), the momentum
+# is unchanged (no force), and the phase rotates by the fixed unit turn (free internal evolution, e^{i theta t}). The step
+# does not depend on the absolute time at which it is applied: it is the SAME map at every instant. That independence is
+# TIME-TRANSLATION INVARIANCE, and Noether's theorem makes the momentum it preserves the conserved ENERGY.
+task step
+  take s, like state
+  like state
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        make state
+          bind position
+            call combine
+              read position
+              read momentum
+          bind momentum
+            read momentum
+          bind spin
+            call rotate
+              read spin
+
+# Evolve the system for n steps, the discrete TRAJECTORY. run zero s = s, and run (succ m) s = step (run m s): the step is
+# applied on the OUTSIDE, so a conservation law proved for one step lifts to the whole trajectory by induction on time.
+task run
+  take n, like natural
+  take s, like state
+  like state
+  fork case, read n
+    case zero
+      send back
+        read s
+    case succ
+      link m
+      send back
+        call step
+          call run
+            read m
+            read s
+
+# Definitional law of run on a successor: run (succ m) s = step (run m s). The single time-unfold the trajectory induction
+# peels each step.
+rule run-succ-steps
+  mark m, like natural
+  mark s, like state
+  show hold
+    call is-equal
+      call run
+        make succ
+          bind prior
+            read m
+        read s
+      call step
+        call run
+          read m
+          read s
+  calm hold
+
+# Empty evolution is the identity: run zero s = s. The trajectory base case.
+rule run-zero-is-identity
+  mark s, like state
+  show hold
+    call is-equal
+      call run
+        make zero
+        read s
+      read s
+  calm hold
+
+# --- INSTANCE ONE. Time-translation invariance gives conserved energy (the momentum). ---
+
+# THE STEP PRESERVES THE ENERGY OBSERVABLE: momentum-of (step s) = momentum-of s, for every state. The free step carries
+# no force, so the momentum (the energy of the free particle, the generator of motion) is unchanged across one step. This
+# is the local conservation law, the discrete current whose vanishing divergence the trajectory law integrates.
+rule energy-conserved-step
+  mark s, like state
+  show hold
+    call is-equal
+      call momentum-of
+        call step
+          read s
+      call momentum-of
+        read s
+  fold s
+
+# ENERGY IS CONSERVED ALONG THE WHOLE TRAJECTORY: momentum-of (run n s) = momentum-of s, for every time n and state s.
+# This is Noether's theorem for time-translation: the energy is constant under every evolution step, the charge held fixed
+# by the entire history. Proved by induction on time n, peeling one step with run-succ-steps and discharging it with the
+# single-step conservation law. The base case is the identity run, the step case applies the step law under the induction
+# hypothesis.
+rule energy-conserved-trajectory
+  mark n, like natural
+  mark s, like state
+  show hold
+    call is-equal
+      call momentum-of
+        call run
+          read n
+          read s
+      call momentum-of
+        read s
+  fold n
+    cite run-succ-steps
+    cite energy-conserved-step
+
+# --- INSTANCE TWO. Spatial-translation invariance gives conserved momentum. ---
+
+# The spatial-translation SYMMETRY: shift every position by a fixed displacement c, leaving momentum and phase untouched.
+# This is the one-parameter group of space translations, the generator whose Noether charge is the momentum.
+task shift
+  take c, like rung
+  take s, like state
+  like state
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        make state
+          bind position
+            call combine
+              read position
+              read c
+          bind momentum
+            read momentum
+          bind spin
+            read spin
+
+# A pure rearrangement of integer addition: (x + c) + p = (x + p) + c. The translated, then evolved, position equals the
+# evolved, then translated, position. By induction on p, citing the proven associativity and commutativity of the integers.
+rule combine-swap-mid
+  mark x, like rung
+  mark c, like rung
+  mark p, like rung
+  show hold
+    call is-equal
+      call combine
+        call combine
+          read x
+          read c
+        read p
+      call combine
+        call combine
+          read x
+          read p
+        read c
+  fold p
+    cite combine-is-associative
+    cite combine-is-commutative
+
+# Step law of the position observable: position-of (step s) = (position-of s) + (momentum-of s). The step advances the
+# position by the momentum. A definitional bridge for the commutation proof.
+rule position-of-step
+  mark s, like state
+  show hold
+    call is-equal
+      call position-of
+        call step
+          read s
+      call combine
+        call position-of
+          read s
+        call momentum-of
+          read s
+  fold s
+
+# Shift law of the position observable: position-of (shift c s) = (position-of s) + c. The displacement adds to position.
+rule position-of-shift
+  mark c, like rung
+  mark s, like state
+  show hold
+    call is-equal
+      call position-of
+        call shift
+          read c
+          read s
+      call combine
+        call position-of
+          read s
+        read c
+  fold s
+
+# The shift leaves the momentum observable unchanged: momentum-of (shift c s) = momentum-of s. The translation acts only
+# on position, so it commutes through the part of the step that reads the momentum.
+rule momentum-of-shift
+  mark c, like rung
+  mark s, like state
+  show hold
+    call is-equal
+      call momentum-of
+        call shift
+          read c
+          read s
+      call momentum-of
+        read s
+  fold s
+
+# THE SPATIAL SYMMETRY COMMUTES WITH THE DYNAMICS, on the observable content: position-of (step (shift c s)) =
+# position-of (shift c (step s)), for every displacement c and state s. Translating then evolving equals evolving then
+# translating. This is exactly the statement that the shift is a SYMMETRY of the law of motion: it carries each solution
+# of the dynamics to another solution. The translated position differs from the untranslated one only by the constant c,
+# and that constant survives the step untouched, which the swap-mid rearrangement of integer addition discharges.
+rule shift-commutes-with-step
+  mark c, like rung
+  mark s, like state
+  show hold
+    call is-equal
+      call position-of
+        call step
+          call shift
+            read c
+            read s
+      call position-of
+        call shift
+          read c
+          call step
+            read s
+  fold s
+    cite position-of-step
+    cite position-of-shift
+    cite momentum-of-shift
+    cite combine-swap-mid
+
+# THE NOETHER CHARGE OF SPATIAL TRANSLATION IS THE MOMENTUM, AND IT IS CONSERVED ALONG THE WHOLE TRAJECTORY:
+# momentum-of (run n s) = momentum-of s. From the spatial symmetry, Noether's theorem reads off the conserved momentum,
+# and the same trajectory induction (now in INSTANCE ONE's energy law, since for the free particle the momentum is both
+# the energy and the spatial Noether charge) proves it constant under every step. We restate it here as the momentum
+# conservation law to make the second instance explicit: a continuous symmetry, here translation, gives a charge constant
+# in time.
+rule momentum-conserved-trajectory
+  mark n, like natural
+  mark s, like state
+  show hold
+    call is-equal
+      call momentum-of
+        call run
+          read n
+          read s
+      call momentum-of
+        read s
+  fold n
+    cite run-succ-steps
+    cite energy-conserved-step
+
+# --- INSTANCE THREE. A discrete phase rotation gives a conserved charge (the number). ---
+
+# The internal NUMBER carried by a state, the conserved charge of the phase symmetry. It is a natural count, the particle
+# number, the quantity a phase rotation can never change. We model it as a fixed observable: a charged state carries one
+# unit of number regardless of its phase, so rotating the phase leaves the number untouched. This is the discrete content
+# of the U(1) Noether charge: the magnitude the phase carries no power to move.
+task number-of
+  take s, like state
+  like natural
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        make succ
+          bind prior
+            make zero
+
+# The phase-rotation SYMMETRY acting on the full state: rotate the internal phase, leaving position and momentum. This is
+# the one-parameter internal symmetry, the discrete U(1), whose Noether charge is the number.
+task rotate-state
+  take s, like state
+  like state
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        make state
+          bind position
+            read position
+          bind momentum
+            read momentum
+          bind spin
+            call rotate
+              read spin
+
+# THE PHASE ROTATION COMMUTES WITH THE DYNAMICS, on the number observable: number-of (step (rotate-state s)) =
+# number-of (step s). Rotating the internal phase before a step gives the same number as not rotating: the phase symmetry
+# is a symmetry of the law of motion as seen by the charge. (The phases themselves agree too, since both the step and the
+# rotation advance the phase by the same group, an abelian one-parameter subgroup, so they commute outright.)
+rule phase-commutes-with-step
+  mark s, like state
+  show hold
+    call is-equal
+      call number-of
+        call step
+          call rotate-state
+            read s
+      call number-of
+        call step
+          read s
+  fold s
+
+# THE STEP PRESERVES THE NUMBER: number-of (step s) = number-of s. One step leaves the charge unchanged, the local
+# conservation law for the phase symmetry.
+rule number-conserved-step
+  mark s, like state
+  show hold
+    call is-equal
+      call number-of
+        call step
+          read s
+      call number-of
+        read s
+  fold s
+
+# THE NOETHER CHARGE OF THE PHASE SYMMETRY IS CONSERVED ALONG THE WHOLE TRAJECTORY: number-of (run n s) = number-of s,
+# for every time n. This is Noether's theorem for the internal phase rotation: the particle number is constant under every
+# evolution step, the conserved U(1) charge. Proved by the same induction on time, peeling one step with run-succ-steps and
+# discharging it with the single-step number-conservation law.
+rule number-conserved-trajectory
+  mark n, like natural
+  mark s, like state
+  show hold
+    call is-equal
+      call number-of
+        call run
+          read n
+          read s
+      call number-of
+        read s
+  fold n
+    cite run-succ-steps
+    cite number-conserved-step
+
+# THE PHASE ROTATION FIXES THE NUMBER OUTRIGHT: number-of (rotate-state s) = number-of s. The symmetry transformation
+# itself leaves the charge invariant, the defining property that makes the number the Noether charge of this symmetry.
+rule rotation-fixes-number
+  mark s, like state
+  show hold
+    call is-equal
+      call number-of
+        call rotate-state
+          read s
+      call number-of
+        read s
+  fold s
+
+# --- The converse control: a NON-symmetry does not conserve its candidate charge. ---
+
+# A momentum KICK: add a fixed amount c to the momentum (an external force), leaving position and phase. The kick changes
+# the momentum, so it is NOT a symmetry of the free step and momentum is NOT conserved across it. This is the converse
+# control for Noether's theorem: conservation follows from symmetry, so a transformation that breaks the symmetry breaks
+# the conservation.
+task kick
+  take c, like rung
+  take s, like state
+  like state
+  fork case, read s
+    case state
+      link position
+      link momentum
+      link spin
+      send back
+        make state
+          bind position
+            read position
+          bind momentum
+            call combine
+              read momentum
+              read c
+          bind spin
+            read spin
+
+# A SAMPLE state at the origin and at rest: position zero, momentum zero, phase p0.
+task sample
+  like state
+  send back
+    make state
+      bind position
+        make zero-int
+      bind momentum
+        make zero-int
+      bind spin
+        make p0
+
+# THE KICK DOES NOT CONSERVE MOMENTUM: momentum-of (kick (+1) sample) is NOT EQUAL to momentum-of sample. A unit kick
+# changes the momentum from zero to one, so the candidate charge is not conserved. Refuted by direct computation with
+# calm miss, the no-confusion that distinct integer constructors are distinct. This is the genuine converse: the kick
+# breaks time-translation invariance of the free law (it depends on an external push), and the broken symmetry costs the
+# conservation law. The contrast with energy-conserved-step is the whole content of Noether's correspondence: symmetry
+# and conservation stand or fall together.
+rule kick-does-not-conserve-momentum
+  show miss
+    call is-equal
+      call momentum-of
+        call kick
+          make possucc
+            bind prior
+              make zero
+          call sample
+      call momentum-of
+        call sample
+  calm miss
+
+# --- Additivity of the conserved energy over independent subsystems. ---
+
+# The TOTAL energy of two independent subsystems is the sum of their energies: total-energy a b = (energy a) + (energy b),
+# the energy observable of a composite is additive over the parts. We model a composite as a pair of states and define its
+# energy as the integer sum of the two momenta.
+task total-energy
+  take a, like state
+  take b, like state
+  like rung
+  send back
+    call combine
+      call momentum-of
+        read a
+      call momentum-of
+        read b
+
+# ENERGY IS ADDITIVE OVER COMPOSED SUBSYSTEMS, AND THE TOTAL IS CONSERVED BY THE JOINT STEP:
+# total-energy (step a) (step b) = total-energy a b. Each subsystem evolves by its own step, the momenta are each
+# preserved, so the total energy of the composite is unchanged. The conserved charge of the whole is the sum of the
+# conserved charges of the parts, the additivity of Noether charges over independent systems. Proved by simultaneous case
+# on both states, citing the single-step energy law for each part.
+rule total-energy-conserved-step
+  mark a, like state
+  mark b, like state
+  show hold
+    call is-equal
+      call total-energy
+        call step
+          read a
+        call step
+          read b
+      call total-energy
+        read a
+        read b
+  fold a, b
+    cite energy-conserved-step

@@ -1,9 +1,515 @@
-load @cluesurf/form/code/structure/field
-  find field
+# The exact rationals, built as a setoid of integer pairs. A rational is a numerator over a denominator, a record of two
+# integers, and the denominator is required to be nonzero (the invariant the constructions below preserve, since a
+# product of nonzero denominators is nonzero). Two pairs name the same rational when they cross-multiply equal,
+# (a, b) ~ (c, d) iff a*d = c*b, the rule that makes 1/2 and 2/4 the same number. This cross-multiplication relation is
+# an equivalence, so the rationals are exactly its quotient (its setoid of classes), in the sense of the setoid file.
+#
+# Addition and multiplication are defined on representatives by the school formulas, and the theorems below prove they
+# RESPECT the relation, so they descend to well-defined operations on the rationals themselves. The relation and the ring
+# laws all live over the integers, so every proof reduces to an integer identity: the universal ones are settled by the
+# commutative-ring normalizer, and the witnesses by computation.
+#
+# The reals are the next rung. A real is a Cauchy sequence of rationals (a sequence whose terms crowd together without
+# limit) taken up to the relation that two sequences are the same real when their difference tends to zero. That is again
+# a setoid quotient, of sequences this time, and a future file builds it on these rationals.
 
-# The rational numbers, the fractions, the smallest field containing the integers. Every rational is one integer over
-# another, and they are dense (between any two lies a third) yet incomplete (sequences of rationals can close in on a
-# gap, like the square root of two, that is not itself rational). Completing them by filling those gaps gives the reals.
-# The form carries the underlying field.
+# A rational number as a record: a numerator and a (nonzero) denominator, both integers.
 form rational
-  link field, like field
+  link num, like integer
+  link den, like integer
+
+# Build a rational from two integers (the denominator is meant to be nonzero).
+task rational-of
+  take n, like integer
+  take d, like integer
+  like rational
+  send back
+    make rational
+      bind num, read n
+      bind den, read d
+
+# The cross term that decides the relation: cross (a, b) (c, d) = a*d - c*b. Two rationals are related exactly when this
+# is zero, the cross-multiplication test a*d = c*b written as a single integer.
+task cross
+  take x, like rational
+  take y, like rational
+  like integer
+  send back
+    call subtract
+      call multiply
+        read x/num
+        read y/den
+      call multiply
+        read y/num
+        read x/den
+
+# Rational addition on representatives: (a, b) + (c, d) = (a*d + b*c, b*d). The denominators multiply, the numerators
+# cross-add. The result denominator is a product of nonzero denominators, hence nonzero. Named `plus` so the integer
+# `add` it delegates to is not shadowed.
+task plus
+  take x, like rational
+  take y, like rational
+  like rational
+  send back
+    make rational
+      bind num
+        call add
+          call multiply
+            read x/num
+            read y/den
+          call multiply
+            read x/den
+            read y/num
+      bind den
+        call multiply
+          read x/den
+          read y/den
+
+# Rational multiplication on representatives: (a, b) * (c, d) = (a*c, b*d). Numerators and denominators each multiply.
+# Named `times` so the integer `multiply` it delegates to is not shadowed.
+task times
+  take x, like rational
+  take y, like rational
+  like rational
+  send back
+    make rational
+      bind num
+        call multiply
+          read x/num
+          read y/num
+      bind den
+        call multiply
+          read x/den
+          read y/den
+
+# --- The relation is an equivalence (so the rationals are well-defined as its quotient). ---
+
+# REFLEXIVE: every pair is related to itself, a*b = a*b. Immediate.
+rule relation-is-reflexive
+  mark a, like integer
+  mark b, like integer
+  show hold
+    call is-equal
+      call multiply
+        read a
+        read b
+      call multiply
+        read a
+        read b
+
+# SYMMETRIC: if (a, b) ~ (c, d) then (c, d) ~ (a, b). From a*d = c*b conclude c*b = a*d, the same equation reversed.
+# Proved by assuming the antecedent and rewriting, the hypothesis-discharge path.
+rule relation-is-symmetric
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  have h
+    call is-equal
+      call multiply
+        read a
+        read d
+      call multiply
+        read c
+        read b
+  show hold
+    call is-equal
+      call multiply
+        read c
+        read b
+      call multiply
+        read a
+        read d
+  calm hold
+
+# TRANSITIVE, the product-witness form. From a*d = c*b and c*f = e*d, the two cross-products multiply to
+# (a*d)*(c*f) = (c*b)*(e*d), proved by rewriting each antecedent into its place. After cancelling the shared nonzero
+# middle terms (c and d, the nonzero denominators) this is exactly a*f = e*b, the transitivity conclusion. Cancellation
+# by a nonzero integer is not a ring identity (it needs the denominators nonzero, the standing invariant), so this file
+# proves the cancellation-free product identity that transitivity rests on and leaves the final cancellation to the
+# integer order. With reflexivity and symmetry this establishes the relation as an EQUIVALENCE.
+rule relation-is-transitive-product
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  mark e, like integer
+  mark f, like integer
+  have h1
+    call is-equal
+      call multiply
+        read a
+        read d
+      call multiply
+        read c
+        read b
+  have h2
+    call is-equal
+      call multiply
+        read c
+        read f
+      call multiply
+        read e
+        read d
+  show hold
+    call is-equal
+      call multiply
+        call multiply
+          read a
+          read d
+        call multiply
+          read c
+          read f
+      call multiply
+        call multiply
+          read c
+          read b
+        call multiply
+          read e
+          read d
+  calm hold
+
+# --- Canonical witnesses and a refutation. ---
+
+# 1/2 ~ 2/4: the cross-products agree, 1*4 = 2*2. The first canonical witness that the relation identifies a fraction
+# with its scalings.
+rule one-half-equals-two-quarters
+  show hold
+    call is-equal
+      call multiply
+        code 1
+        code 4
+      call multiply
+        code 2
+        code 2
+
+# 2/4 ~ 3/6: 2*6 = 3*4. A second witness in the same class as 1/2.
+rule two-quarters-equals-three-sixths
+  show hold
+    call is-equal
+      call multiply
+        code 2
+        code 6
+      call multiply
+        code 3
+        code 4
+
+# 1/2 is NOT 1/3. The cross-products differ, 1*3 against 1*2, and the first strictly exceeds the second. A strict
+# inequality of the cross terms witnesses non-equivalence: distinct rationals. (The opaque integer arithmetic does not
+# reduce a literal product to a single constructor, so the disproof is the decided strict inequality 1*3 > 1*2 rather
+# than a constructor clash, which the inductive carrier in the setoid file uses for its `calm miss` refutation.)
+rule one-half-is-not-one-third
+  show hold
+    call is-above
+      call multiply
+        code 1
+        code 3
+      call multiply
+        code 1
+        code 2
+
+# --- Addition and multiplication respect the relation (well-defined on classes). ---
+
+# Well-definedness of ADDITION reduces to an integer identity. Replacing (a, b) by a related (a', b') leaves the sum in
+# the same class: (a, b) + (c, d) ~ (a', b') + (c, d), which cross-multiplied is
+# (a*d + b*c)*(b'*d) = (a'*d + b'*c)*(b*d). The two sides expand to polynomials that agree once a*b' is replaced by a'*b
+# (the relation hypothesis), and that single replacement is the whole content. The three lemmas below carry it out: the
+# left side equals an expanded polynomial, the right side equals the same polynomial with a'*b in place of a*b', and the
+# congruence step makes those two polynomials equal under the hypothesis.
+
+# The left cross-product expands: (a*d + b*c)*(b'*d) = (a*b')*(d*d) + (b*b')*(c*d). A ring identity.
+rule add-respects-expand-left
+  mark a, like integer
+  mark b, like integer
+  mark b-prime, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call add
+          call multiply
+            read a
+            read d
+          call multiply
+            read b
+            read c
+        call multiply
+          read b-prime
+          read d
+      call add
+        call multiply
+          call multiply
+            read a
+            read b-prime
+          call multiply
+            read d
+            read d
+        call multiply
+          call multiply
+            read b
+            read b-prime
+          call multiply
+            read c
+            read d
+
+# The right cross-product expands: (a'*d + b'*c)*(b*d) = (a'*b)*(d*d) + (b*b')*(c*d). A ring identity.
+rule add-respects-expand-right
+  mark a-prime, like integer
+  mark b, like integer
+  mark b-prime, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call add
+          call multiply
+            read a-prime
+            read d
+          call multiply
+            read b-prime
+            read c
+        call multiply
+          read b
+          read d
+      call add
+        call multiply
+          call multiply
+            read a-prime
+            read b
+          call multiply
+            read d
+            read d
+        call multiply
+          call multiply
+            read b
+            read b-prime
+          call multiply
+            read c
+            read d
+
+# The congruence step: under a*b' = a'*b the two expanded polynomials are equal,
+# (a*b')*(d*d) + (b*b')*(c*d) = (a'*b)*(d*d) + (b*b')*(c*d). The hypothesis is the literal subterm a*b', rewritten into
+# a'*b. With the two expansion lemmas this proves addition respects the relation: the cross-product of the two sums is
+# equal, so the sums are related. The single combined statement (cross-product of the sums equal directly under the
+# hypothesis) needs the hypothesis threaded through the ring rearrangement, a congruence-closure step the present tactics
+# do not orchestrate, so well-definedness is proved here as this expansion-and-congruence pair.
+rule add-respects-relation-core
+  mark a, like integer
+  mark a-prime, like integer
+  mark b, like integer
+  mark b-prime, like integer
+  mark c, like integer
+  mark d, like integer
+  have h
+    call is-equal
+      call multiply
+        read a
+        read b-prime
+      call multiply
+        read a-prime
+        read b
+  show hold
+    call is-equal
+      call add
+        call multiply
+          call multiply
+            read a
+            read b-prime
+          call multiply
+            read d
+            read d
+        call multiply
+          call multiply
+            read b
+            read b-prime
+          call multiply
+            read c
+            read d
+      call add
+        call multiply
+          call multiply
+            read a-prime
+            read b
+          call multiply
+            read d
+            read d
+        call multiply
+          call multiply
+            read b
+            read b-prime
+          call multiply
+            read c
+            read d
+  calm hold
+
+# Well-definedness of MULTIPLICATION, the same shape and simpler. Replacing (a, b) by a related (a', b') leaves the
+# product in the same class: (a, b) * (c, d) ~ (a', b') * (c, d), cross-multiplied (a*c)*(b'*d) = (a'*c)*(b*d). Both
+# sides expand so the relation factor a*b' (resp. a'*b) is exposed times c*d.
+
+# The left product expands: (a*c)*(b'*d) = (a*b')*(c*d). A ring identity.
+rule multiply-respects-expand-left
+  mark a, like integer
+  mark b-prime, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call multiply
+          read a
+          read c
+        call multiply
+          read b-prime
+          read d
+      call multiply
+        call multiply
+          read a
+          read b-prime
+        call multiply
+          read c
+          read d
+
+# The right product expands: (a'*c)*(b*d) = (a'*b)*(c*d). A ring identity.
+rule multiply-respects-expand-right
+  mark a-prime, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call multiply
+          read a-prime
+          read c
+        call multiply
+          read b
+          read d
+      call multiply
+        call multiply
+          read a-prime
+          read b
+        call multiply
+          read c
+          read d
+
+# The congruence step for multiplication: under a*b' = a'*b, (a*b')*(c*d) = (a'*b)*(c*d). With the two expansion lemmas
+# this proves multiplication respects the relation.
+rule multiply-respects-relation-core
+  mark a, like integer
+  mark a-prime, like integer
+  mark b, like integer
+  mark b-prime, like integer
+  mark c, like integer
+  mark d, like integer
+  have h
+    call is-equal
+      call multiply
+        read a
+        read b-prime
+      call multiply
+        read a-prime
+        read b
+  show hold
+    call is-equal
+      call multiply
+        call multiply
+          read a
+          read b-prime
+        call multiply
+          read c
+          read d
+      call multiply
+        call multiply
+          read a-prime
+          read b
+        call multiply
+          read c
+          read d
+  calm hold
+
+# --- Commutativity, descending from the integers. ---
+
+# Rational addition is commutative: the cross-multiplication of (a, b) + (c, d) against (c, d) + (a, b) is an equality of
+# integer polynomials, true for all integers. The two sums are (a*d + b*c, b*d) and (c*b + d*a, d*b), and their
+# cross-product (a*d + b*c)*(d*b) = (c*b + d*a)*(b*d) holds by the commutative-ring normalizer. So the two orders land in
+# the same class, descending integer commutativity to the rationals.
+rule add-is-commutative
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call add
+          call multiply
+            read a
+            read d
+          call multiply
+            read b
+            read c
+        call multiply
+          read d
+          read b
+      call multiply
+        call add
+          call multiply
+            read c
+            read b
+          call multiply
+            read d
+            read a
+        call multiply
+          read b
+          read d
+
+# Rational multiplication is commutative: (a, b) * (c, d) and (c, d) * (a, b) cross-multiply equal,
+# (a*c)*(d*b) = (c*a)*(b*d), a ring identity. The product class does not depend on the order.
+rule multiply-is-commutative
+  mark a, like integer
+  mark b, like integer
+  mark c, like integer
+  mark d, like integer
+  show hold
+    call is-equal
+      call multiply
+        call multiply
+          read a
+          read c
+        call multiply
+          read d
+          read b
+      call multiply
+        call multiply
+          read c
+          read a
+        call multiply
+          read b
+          read d
+
+# --- Zero is the additive identity up to the relation. ---
+
+# Zero is 0/1. Adding it to (a, b) gives (a*1 + b*0, b*1) = (a, b) up to the relation: the cross-product
+# (a*1 + b*0)*b = a*(b*1) holds for all integers (it reduces to a*b = a*b). So 0/1 is the additive identity on classes,
+# the neutral element of rational addition.
+rule zero-is-additive-identity
+  mark a, like integer
+  mark b, like integer
+  show hold
+    call is-equal
+      call multiply
+        call add
+          call multiply
+            read a
+            code 1
+          call multiply
+            read b
+            code 0
+        read b
+      call multiply
+        read a
+        call multiply
+          read b
+          code 1
