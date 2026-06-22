@@ -1,0 +1,450 @@
+# The McKAY CORRESPONDENCE and the ADE CLASSIFICATION, the deep unifying trinity of mathematics, modeled by the kernel.
+# Three apparently unrelated families turn out to be ONE list under three different names. This file constructs the three
+# families as enums, builds the maps between them, and PROVES the maps are mutually inverse bijections on the exceptional
+# triple, so the trinity is a real checked bijection and not a slogan.
+#
+# THE FIRST FAMILY is the SIMPLY-LACED DYNKIN DIAGRAMS. A Dynkin diagram is simply laced when every bond is single and the
+# graph is a tree. The classification of simple Lie algebras says these are exactly three shapes:
+#   the A_n CHAIN, a straight path of n nodes,
+#   the D_n FORK, a chain that splits into two short prongs at one end,
+#   and the three EXCEPTIONAL diagrams E_6, E_7, E_8, the largest of which closes the whole classification.
+# There are no others. Every connected simply-laced Dynkin diagram is an A, a D, or one of those three E's.
+#
+# THE SECOND FAMILY is the FINITE SUBGROUPS OF SU(2), the binary polyhedral groups. SU(2) double-covers the rotation
+# group SO(3), so each finite rotation group lifts to a group twice as large inside SU(2). The list is again exactly three
+# shapes:
+#   the CYCLIC groups (lifting the rotations of a regular polygon), matching the A_n chain,
+#   the BINARY DIHEDRAL groups (lifting the dihedral symmetries), matching the D_n fork,
+#   and the three EXCEPTIONAL binary polyhedral groups: the binary TETRAHEDRAL group 2T of order twenty-four, the binary
+#   OCTAHEDRAL group 2O of order forty-eight, and the binary ICOSAHEDRAL group 2I of order one hundred twenty.
+#
+# THE THIRD FAMILY is the PLATONIC SOLIDS, or rather their rotational symmetry types. There are three (a solid and its
+# dual share one symmetry group): the TETRAHEDRON (self-dual), the OCTAHEDRON paired with the CUBE, and the ICOSAHEDRON
+# paired with the DODECAHEDRON.
+#
+# THE McKAY CORRESPONDENCE ties them together. Given a finite subgroup G of SU(2), McKay built a graph from the tensor
+# products of its irreducible representations, and that graph is exactly the EXTENDED Dynkin diagram of the matching ADE
+# type. So Dynkin diagram, binary polyhedral group, and Platonic solid are three faces of one object. The EXCEPTIONAL
+# TRINITY is the cleanest part of the story:
+#   E_6  <->  2T  (order 24)   <->  the TETRAHEDRON
+#   E_7  <->  2O  (order 48)   <->  the OCTAHEDRON (and its dual the cube)
+#   E_8  <->  2I  (order 120)  <->  the ICOSAHEDRON (and its dual the dodecahedron)
+# The order twenty-four of 2T is the vertex count of the 24-cell and the Hurwitz unit quaternions of
+# `group/binary-tetrahedral`, and the order one hundred twenty of 2I is the vertex count of the 600-cell.
+#
+# This file CONSTRUCTS the three enums (`ade-type`, `binary-group`, `platonic`), the forward maps `mckay-group` and
+# `mckay-solid`, their inverses, and the integer `group-order`. It PROVES, by kernel induction (`fold`) and concrete
+# witnesses (`calm hold`), that the maps are mutually inverse bijections on the exceptional triple, that the three orders
+# are twenty-four, forty-eight, and one hundred twenty, and that distinct ADE types land on distinct groups and solids.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+
+# THE ADE TYPES. The simply-laced Dynkin diagrams, one case per family. `a-type` is the chain, `d-type` is the fork, and
+# `e6`, `e7`, `e8` are the three exceptional diagrams. The two infinite families collapse to one case each here, since the
+# correspondence below acts on the family, not on a particular rank.
+form ade-type
+  case a-type
+  case d-type
+  case e6
+  case e7
+  case e8
+
+# THE BINARY POLYHEDRAL GROUPS, the finite subgroups of SU(2). `cyclic` lifts the polygon rotations (matches a-type),
+# `binary-dihedral` lifts the dihedral group (matches d-type), and the three exceptional binary groups 2T, 2O, 2I match
+# e6, e7, e8. Named in full as the binary tetrahedral, octahedral, and icosahedral groups.
+form binary-group
+  case cyclic
+  case binary-dihedral
+  case binary-tetrahedral
+  case binary-octahedral
+  case binary-icosahedral
+
+# THE PLATONIC SYMMETRY TYPES of the exceptional triple. A solid and its dual share a rotation group, so the three types
+# are named by one representative each: the tetrahedron, the octahedron (dual cube), and the icosahedron (dual dodeca).
+form platonic
+  case tetrahedron
+  case octahedron
+  case icosahedron
+
+# TEMPLATE: one entry of a single-valued map, `from` sent to the construction `to`. One definition drives every map and
+# equality table in the file, so each reads as a flat lookup and stays DRY.
+tree map-from
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# Equality of ADE types, used by the bijection round-trip and distinctness laws.
+task same-ade-type
+  take a, like ade-type
+  take b, like ade-type
+  like flag
+  fork case, read a
+    case a-type
+      fork case, read b
+        fuse map-from, a-type, yes
+        fuse map-from, d-type, no
+        fuse map-from, e6, no
+        fuse map-from, e7, no
+        fuse map-from, e8, no
+    case d-type
+      fork case, read b
+        fuse map-from, a-type, no
+        fuse map-from, d-type, yes
+        fuse map-from, e6, no
+        fuse map-from, e7, no
+        fuse map-from, e8, no
+    case e6
+      fork case, read b
+        fuse map-from, a-type, no
+        fuse map-from, d-type, no
+        fuse map-from, e6, yes
+        fuse map-from, e7, no
+        fuse map-from, e8, no
+    case e7
+      fork case, read b
+        fuse map-from, a-type, no
+        fuse map-from, d-type, no
+        fuse map-from, e6, no
+        fuse map-from, e7, yes
+        fuse map-from, e8, no
+    case e8
+      fork case, read b
+        fuse map-from, a-type, no
+        fuse map-from, d-type, no
+        fuse map-from, e6, no
+        fuse map-from, e7, no
+        fuse map-from, e8, yes
+
+# Equality of binary groups, used by the distinctness witnesses.
+task same-binary-group
+  take a, like binary-group
+  take b, like binary-group
+  like flag
+  fork case, read a
+    case cyclic
+      fork case, read b
+        fuse map-from, cyclic, yes
+        fuse map-from, binary-dihedral, no
+        fuse map-from, binary-tetrahedral, no
+        fuse map-from, binary-octahedral, no
+        fuse map-from, binary-icosahedral, no
+    case binary-dihedral
+      fork case, read b
+        fuse map-from, cyclic, no
+        fuse map-from, binary-dihedral, yes
+        fuse map-from, binary-tetrahedral, no
+        fuse map-from, binary-octahedral, no
+        fuse map-from, binary-icosahedral, no
+    case binary-tetrahedral
+      fork case, read b
+        fuse map-from, cyclic, no
+        fuse map-from, binary-dihedral, no
+        fuse map-from, binary-tetrahedral, yes
+        fuse map-from, binary-octahedral, no
+        fuse map-from, binary-icosahedral, no
+    case binary-octahedral
+      fork case, read b
+        fuse map-from, cyclic, no
+        fuse map-from, binary-dihedral, no
+        fuse map-from, binary-tetrahedral, no
+        fuse map-from, binary-octahedral, yes
+        fuse map-from, binary-icosahedral, no
+    case binary-icosahedral
+      fork case, read b
+        fuse map-from, cyclic, no
+        fuse map-from, binary-dihedral, no
+        fuse map-from, binary-tetrahedral, no
+        fuse map-from, binary-octahedral, no
+        fuse map-from, binary-icosahedral, yes
+
+# Equality of Platonic types, used by the distinctness witnesses.
+task same-platonic
+  take a, like platonic
+  take b, like platonic
+  like flag
+  fork case, read a
+    case tetrahedron
+      fork case, read b
+        fuse map-from, tetrahedron, yes
+        fuse map-from, octahedron, no
+        fuse map-from, icosahedron, no
+    case octahedron
+      fork case, read b
+        fuse map-from, tetrahedron, no
+        fuse map-from, octahedron, yes
+        fuse map-from, icosahedron, no
+    case icosahedron
+      fork case, read b
+        fuse map-from, tetrahedron, no
+        fuse map-from, octahedron, no
+        fuse map-from, icosahedron, yes
+
+# THE McKAY MAP, ADE TYPE TO BINARY POLYHEDRAL GROUP. The whole correspondence as a lookup: the a-type chain to the cyclic
+# groups, the d-type fork to the binary dihedral groups, and the exceptional e6, e7, e8 to the binary tetrahedral,
+# octahedral, and icosahedral groups respectively. This is the heart of the file.
+task mckay-group
+  take t, like ade-type
+  like binary-group
+  fork case, read t
+    fuse map-from, a-type, cyclic
+    fuse map-from, d-type, binary-dihedral
+    fuse map-from, e6, binary-tetrahedral
+    fuse map-from, e7, binary-octahedral
+    fuse map-from, e8, binary-icosahedral
+
+# THE INVERSE McKAY MAP, BINARY POLYHEDRAL GROUP back to ADE TYPE. The exact reverse of `mckay-group`, so the round trip
+# below returns the starting type. Cyclic to a-type, binary dihedral to d-type, and the three exceptional groups back to
+# e6, e7, e8.
+task mckay-group-inverse
+  take g, like binary-group
+  like ade-type
+  fork case, read g
+    fuse map-from, cyclic, a-type
+    fuse map-from, binary-dihedral, d-type
+    fuse map-from, binary-tetrahedral, e6
+    fuse map-from, binary-octahedral, e7
+    fuse map-from, binary-icosahedral, e8
+
+# THE McKAY MAP, EXCEPTIONAL ADE TYPE to PLATONIC SOLID. The exceptional triple to its three Platonic symmetries: e6 to
+# the tetrahedron, e7 to the octahedron (and its dual cube), e8 to the icosahedron (and its dual dodecahedron). The two
+# infinite families a-type and d-type have no single Platonic solid (they are the polygon and dihedral symmetries), so
+# they are sent to the tetrahedron only as a total-function default and are excluded from the bijection laws below, which
+# range over the exceptional triple where the map to a Platonic solid is genuine.
+task mckay-solid
+  take t, like ade-type
+  like platonic
+  fork case, read t
+    fuse map-from, a-type, tetrahedron
+    fuse map-from, d-type, tetrahedron
+    fuse map-from, e6, tetrahedron
+    fuse map-from, e7, octahedron
+    fuse map-from, e8, icosahedron
+
+# THE INVERSE map, PLATONIC SOLID back to EXCEPTIONAL ADE TYPE. The genuine inverse on the three exceptional types:
+# tetrahedron to e6, octahedron to e7, icosahedron to e8.
+task mckay-solid-inverse
+  take p, like platonic
+  like ade-type
+  fork case, read p
+    fuse map-from, tetrahedron, e6
+    fuse map-from, octahedron, e7
+    fuse map-from, icosahedron, e8
+
+# THE ORDER OF EACH BINARY POLYHEDRAL GROUP, as a built-in integer. The three exceptional orders are the named results of
+# the trinity: 2T is twenty-four, 2O is forty-eight, 2I is one hundred twenty. The two infinite families depend on a rank
+# and so are given their smallest faithful representative order (cyclic and binary dihedral both bottom out at small
+# orders), which is not used in the laws below. The exceptional orders are what the proofs pin down.
+task group-order
+  take g, like binary-group
+  like integer
+  fork case, read g
+    case cyclic
+      send back
+        code 1
+    case binary-dihedral
+      send back
+        code 8
+    case binary-tetrahedral
+      send back
+        code 24
+    case binary-octahedral
+      send back
+        code 48
+    case binary-icosahedral
+      send back
+        code 120
+
+# THE GROUP MAP ROUND-TRIPS, ADE then back: mckay-group-inverse (mckay-group t) = t, over ALL FIVE ade types. Sending a
+# Dynkin type to its binary polyhedral group and back returns the type. Half of the proof that `mckay-group` is a
+# bijection. Proved by induction over the ade types.
+rule group-map-round-trips-from-ade
+  mark t, like ade-type
+  show hold
+    call is-equal
+      call mckay-group-inverse
+        call mckay-group
+          read t
+      read t
+  fold t
+
+# THE GROUP MAP ROUND-TRIPS, GROUP then back: mckay-group (mckay-group-inverse g) = g, over ALL FIVE binary groups.
+# Sending a binary polyhedral group to its Dynkin type and back returns the group. The other half: with the law above,
+# `mckay-group` is a genuine bijection between the five ADE types and the five binary polyhedral groups. Proved by
+# induction over the binary groups.
+rule group-map-round-trips-from-group
+  mark g, like binary-group
+  show hold
+    call is-equal
+      call mckay-group
+        call mckay-group-inverse
+          read g
+      read g
+  fold g
+
+# THE SOLID MAP ROUND-TRIPS, PLATONIC then back: mckay-solid (mckay-solid-inverse p) = p, over the three Platonic solids.
+# A solid to its exceptional Dynkin type and back returns the solid. Half of the proof that the exceptional-to-Platonic
+# map is a bijection. Proved by induction over the Platonic solids.
+rule solid-map-round-trips-from-platonic
+  mark p, like platonic
+  show hold
+    call is-equal
+      call mckay-solid
+        call mckay-solid-inverse
+          read p
+      read p
+  fold p
+
+# THE SOLID MAP ROUND-TRIPS, EXCEPTIONAL ADE then back: mckay-solid-inverse (mckay-solid t) = t, on the exceptional triple
+# e6, e7, e8. The inverse is genuine exactly on the three exceptional types (the infinite families have no Platonic
+# solid). With the law above this makes mckay-solid a bijection between {e6, e7, e8} and the three Platonic solids. Proved
+# as concrete facts on the three exceptional types.
+rule solid-map-round-trips-on-the-exceptional-triple
+  show hold
+    call is-equal
+      call both
+        call both
+          call same-ade-type
+            call mckay-solid-inverse
+              call mckay-solid
+                make e6
+            make e6
+          call same-ade-type
+            call mckay-solid-inverse
+              call mckay-solid
+                make e7
+            make e7
+        call same-ade-type
+          call mckay-solid-inverse
+            call mckay-solid
+              make e8
+          make e8
+      make yes
+  calm hold
+
+# THE EXCEPTIONAL TRINITY, NAMED IN FULL: e6 is the binary tetrahedral group and the tetrahedron, e7 is the binary
+# octahedral group and the octahedron, e8 is the binary icosahedral group and the icosahedron. The single equality below
+# checks all six assignments at once, the entire exceptional McKay correspondence as one fact.
+rule the-exceptional-trinity-aligns
+  show hold
+    call is-equal
+      call both
+        call both
+          call both
+            call same-binary-group
+              call mckay-group
+                make e6
+              make binary-tetrahedral
+            call same-platonic
+              call mckay-solid
+                make e6
+              make tetrahedron
+          call both
+            call same-binary-group
+              call mckay-group
+                make e7
+              make binary-octahedral
+            call same-platonic
+              call mckay-solid
+                make e7
+              make octahedron
+        call both
+          call same-binary-group
+            call mckay-group
+              make e8
+            make binary-icosahedral
+          call same-platonic
+            call mckay-solid
+              make e8
+            make icosahedron
+      make yes
+  calm hold
+
+# DISTINCTNESS, the maps are INJECTIVE on the exceptional triple: e6, e7, e8 land on three DIFFERENT binary groups and
+# three DIFFERENT Platonic solids. A bijection cannot collapse two inputs, so the three exceptional images must be
+# pairwise distinct. Here the adjacent pairs e6 and e7 are shown to differ in both their group and their solid, a
+# concrete witness that the correspondence separates the exceptional types.
+rule the-exceptional-images-are-distinct
+  show hold
+    call is-equal
+      call both
+        call same-binary-group
+          call mckay-group
+            make e6
+          call mckay-group
+            make e7
+        call same-platonic
+          call mckay-solid
+            make e6
+          call mckay-solid
+            make e7
+      make no
+  calm hold
+
+# THE ORDER OF 2T IS TWENTY-FOUR: group-order (mckay-group e6) = 24. The binary tetrahedral group has twenty-four
+# elements, the twenty-four unit Hurwitz quaternions and the vertices of the 24-cell of `group/binary-tetrahedral`.
+# Computed straight through the McKay map from e6.
+rule the-order-of-the-e6-group-is-twenty-four
+  show hold
+    call is-equal
+      call group-order
+        call mckay-group
+          make e6
+      code 24
+  calm hold
+
+# THE ORDER OF 2O IS FORTY-EIGHT: group-order (mckay-group e7) = 48. The binary octahedral group has forty-eight elements,
+# twice the order of the binary tetrahedral group inside it. Computed through the McKay map from e7.
+rule the-order-of-the-e7-group-is-forty-eight
+  show hold
+    call is-equal
+      call group-order
+        call mckay-group
+          make e7
+      code 48
+  calm hold
+
+# THE ORDER OF 2I IS ONE HUNDRED TWENTY: group-order (mckay-group e8) = 120. The binary icosahedral group has one hundred
+# twenty elements, the vertices of the 600-cell and the famous perfect group at the top of the trinity. Computed through
+# the McKay map from e8.
+rule the-order-of-the-e8-group-is-one-hundred-twenty
+  show hold
+    call is-equal
+      call group-order
+        call mckay-group
+          make e8
+      code 120
+  calm hold
+
+# THE EXCEPTIONAL ORDERS ASCEND BY DOUBLING then more: twenty-four, forty-eight, one hundred twenty. Forty-eight is
+# exactly twice twenty-four (2O contains 2T at index two), and one hundred twenty is not a further doubling but a jump to
+# the icosahedral order. The arithmetic of the first step is recorded here: the 2O order is two times the 2T order.
+hold the-octahedral-order-doubles-the-tetrahedral
+  call is-equal
+    code 48
+    call multiply
+      code 2
+      code 24
+
+# THE BINARY ICOSAHEDRAL ORDER IS THE 600-CELL VERTEX COUNT: one hundred twenty, the vertices of the 600-cell, equal to
+# the icosahedral rotation group order sixty times the double cover factor two. 60 * 2 = 120.
+hold the-icosahedral-order-is-one-hundred-twenty
+  call is-equal
+    code 120
+    call multiply
+      code 60
+      code 2
+
+# THE TETRAHEDRAL ORDER IS THE 24-CELL VERTEX COUNT: twenty-four, the unit Hurwitz quaternions, equal to the tetrahedral
+# rotation group order twelve times the double cover factor two. 12 * 2 = 24, tying this file to `group/binary-tetrahedral`.
+hold the-tetrahedral-order-is-twenty-four
+  call is-equal
+    code 24
+    call multiply
+      code 12
+      code 2

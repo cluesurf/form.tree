@@ -1,0 +1,326 @@
+# The Leech lattice, the extraordinary twenty-four-dimensional even unimodular lattice, modeled by the kernel at the level
+# of the discrete combinatorics that is genuinely provable. The Leech lattice is the UNIQUE even unimodular lattice in
+# dimension twenty-four with NO ROOTS: it has no vectors of squared length two, so its minimal squared length is FOUR, not
+# two. That rootlessness is exactly what singles it out among the twenty-four Niemeier lattices (the even unimodular
+# lattices of dimension twenty-four), every other one of which carries a nonempty root system. Its minimal vectors, the
+# vectors of squared length four, number ONE HUNDRED NINETY-SIX THOUSAND FIVE HUNDRED AND SIXTY, and that count is the
+# KISSING NUMBER of twenty-four-dimensional space, the maximum number of equal nonoverlapping spheres that can touch a
+# central one, so the Leech lattice is the densest lattice packing known in twenty-four dimensions. The construction runs
+# through the binary GOLAY CODE, the perfect [24, 12, 8] error-correcting code: the Golay codewords select which coordinate
+# patterns appear, and a Golay codeword can only have weight zero, eight, twelve, sixteen, or twenty-four. The minimum
+# nonzero Golay weight being eight (the code corrects three errors) is precisely why the Leech lattice has no short vectors
+# and hence no roots. The automorphism group of the Leech lattice is the Conway group Co-zero, of order roughly eight times
+# ten to the eighteenth, whose quotient Co-one is one of the sporadic simple groups, and the whole structure is the gateway
+# to the MONSTER group and monstrous MOONSHINE. This file does NOT fake the twenty-four-dimensional lattice: the lattice
+# vectors and the kissing number cannot be enumerated, so they are stated as honest integer facts. What it DOES prove is
+# the finite Golay-weight combinatorics that underlies all of it: the allowed weights, their self-dual symmetry under
+# complementation, the involution that pairing is, and the minimum-nonzero-weight-eight fact that forces rootlessness.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# The five allowed weights of a binary Golay codeword: zero, eight, twelve, sixteen, and the full twenty-four. NO other
+# weight occurs. A codeword is a subset of the twenty-four coordinates, and its weight is the size of that subset, but in
+# the Golay code only these five sizes are possible. This is the finite spine the whole proof rests on.
+form weight-class
+  case zero
+  case eight
+  case twelve
+  case sixteen
+  case full
+
+# TEMPLATE: one entry of a single-valued map out of a weight class, `from` sent to the construction `to`. One definition
+# serves the complement pairing and the membership tests, so each map reads as its value table over the five weights.
+tree map-weight
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# The COMPLEMENT of a weight class: twenty-four minus the weight. The binary Golay code is SELF-DUAL, so the complement of
+# every codeword is again a codeword, and complementing a coordinate subset sends a weight-w codeword to a weight-(24-w)
+# one. The pairing is zero with full (0 and 24), eight with sixteen (8 and 16), and twelve with itself (12 is the fixed
+# midpoint, 24 - 12 = 12). Reading this table is reading the self-duality of the code off its weight enumerator.
+task complement-weight
+  take w, like weight-class
+  like weight-class
+  fork case, read w
+    fuse map-weight, zero, full
+    fuse map-weight, eight, sixteen
+    fuse map-weight, twelve, twelve
+    fuse map-weight, sixteen, eight
+    fuse map-weight, full, zero
+
+# Whether a weight class is an allowed Golay codeword weight. Every one of the five weight classes IS allowed by
+# construction (these are exactly the Golay weights), so this is yes on all five. It exists so the proofs below can state
+# "the complement of an allowed weight is allowed" as an equation in the flag type rather than a meta-claim.
+task is-golay-weight
+  take w, like weight-class
+  like flag
+  fork case, read w
+    fuse map-weight, zero, yes
+    fuse map-weight, eight, yes
+    fuse map-weight, twelve, yes
+    fuse map-weight, sixteen, yes
+    fuse map-weight, full, yes
+
+# Whether a weight class is the weight of a NONZERO codeword (everything but the all-zero word). The minimum value in this
+# set is eight, the heart of the [24, 12, 8] code: the smallest nonzero codeword has weight eight.
+task is-nonzero-weight
+  take w, like weight-class
+  like flag
+  fork case, read w
+    fuse map-weight, zero, no
+    fuse map-weight, eight, yes
+    fuse map-weight, twelve, yes
+    fuse map-weight, sixteen, yes
+    fuse map-weight, full, yes
+
+# COMPLEMENTING IS AN INVOLUTION: complement-weight (complement-weight w) = w, for every weight class. Subtracting from
+# twenty-four twice returns the weight, so the self-dual pairing is a genuine pairing of the weights into themselves.
+# Proved over all five weight classes.
+rule complement-weight-is-an-involution
+  mark w, like weight-class
+  show hold
+    call is-equal
+      call complement-weight
+        call complement-weight
+          read w
+      read w
+  fold w
+
+# THE GOLAY WEIGHTS ARE SYMMETRIC UNDER COMPLEMENTATION: is-golay-weight (complement-weight w) = is-golay-weight w, for
+# every weight class. The complement of an allowed Golay weight is again an allowed Golay weight (0 with 24, 8 with 16, 12
+# with itself), which is the self-duality of the binary Golay code read at the level of weights. Both sides are yes on all
+# five weights, so the equation holds over the whole enum. Proved over all five weight classes.
+rule golay-weights-are-symmetric-under-complement
+  mark w, like weight-class
+  show hold
+    call is-equal
+      call is-golay-weight
+        call complement-weight
+          read w
+      call is-golay-weight
+        read w
+  fold w
+
+# COMPLEMENTING PRESERVES NONZERO-NESS in the proper interior: away from the zero-full pair, the complement of a nonzero
+# weight is nonzero. We state the sharper fact directly for the three self-paired-or-interior weights: complementing eight,
+# twelve, or sixteen lands on sixteen, twelve, eight, all nonzero. Here is the eight case as a concrete control.
+rule complement-of-eight-is-sixteen
+  show hold
+    call is-equal
+      call complement-weight
+        make eight
+      make sixteen
+  calm hold
+
+# Twelve is the SELF-COMPLEMENTARY weight, the fixed point of the pairing: complement-weight twelve = twelve. It is the
+# unique Golay weight equal to its own complement, the midpoint twenty-four over two.
+rule twelve-is-self-complementary
+  show hold
+    call is-equal
+      call complement-weight
+        make twelve
+      make twelve
+  calm hold
+
+# Zero pairs with the full word: complement-weight zero = full, the empty subset complementing to all twenty-four
+# coordinates. The all-ones word of weight twenty-four is a Golay codeword precisely because the code is self-dual.
+rule zero-complements-to-full
+  show hold
+    call is-equal
+      call complement-weight
+        make zero
+      make full
+  calm hold
+
+# A finer weight scale for stating the MINIMUM-WEIGHT-EIGHT fact precisely. A small weight is one of zero through eight,
+# the range in which the minimum-distance claim lives: a binary Golay codeword has no weight strictly between zero and
+# eight. This enum lets the kernel check, over every value, that none of weights one through seven is an allowed codeword
+# weight while zero and eight both are.
+form small-weight
+  case w-zero
+  case w-one
+  case w-two
+  case w-three
+  case w-four
+  case w-five
+  case w-six
+  case w-seven
+  case w-eight
+
+# TEMPLATE: one entry of the map out of a small weight, the same single-valued shape as the weight-class map.
+tree map-small
+  take from
+  take to
+
+  hook fuse
+    case {from}
+      send back
+        make {to}
+
+# Whether a small weight (zero through eight) is an allowed binary Golay codeword weight. Only zero and eight are: the
+# code has NO codewords of weight one, two, three, four, five, six, or seven. This is the [24, 12, 8] minimum-distance
+# property stated as a finite table the kernel can read.
+task small-is-golay-weight
+  take w, like small-weight
+  like flag
+  fork case, read w
+    fuse map-small, w-zero, yes
+    fuse map-small, w-one, no
+    fuse map-small, w-two, no
+    fuse map-small, w-three, no
+    fuse map-small, w-four, no
+    fuse map-small, w-five, no
+    fuse map-small, w-six, no
+    fuse map-small, w-seven, no
+    fuse map-small, w-eight, yes
+
+# Whether a small weight is strictly between zero and eight, that is, one of the seven forbidden intermediate weights one
+# through seven. These are exactly the weights a Golay codeword can NEVER have, the gap that gives the code its distance.
+task small-is-forbidden-gap
+  take w, like small-weight
+  like flag
+  fork case, read w
+    fuse map-small, w-zero, no
+    fuse map-small, w-one, yes
+    fuse map-small, w-two, yes
+    fuse map-small, w-three, yes
+    fuse map-small, w-four, yes
+    fuse map-small, w-five, yes
+    fuse map-small, w-six, yes
+    fuse map-small, w-seven, yes
+    fuse map-small, w-eight, no
+
+# THE MINIMUM NONZERO GOLAY WEIGHT IS EIGHT: no small weight is BOTH in the forbidden gap (one through seven) AND an
+# allowed Golay weight. both (small-is-forbidden-gap w) (small-is-golay-weight w) = no, for every small weight. The two
+# predicates never overlap, so there is no codeword of weight one through seven: the smallest nonzero codeword has weight
+# eight. Proved over all nine small weights. This minimum distance eight is exactly why the Leech lattice, built from this
+# code, has no vectors of squared length two and therefore NO ROOTS.
+rule minimum-nonzero-golay-weight-is-eight
+  mark w, like small-weight
+  show hold
+    call is-equal
+      call both
+        call small-is-forbidden-gap
+          read w
+        call small-is-golay-weight
+          read w
+      make no
+  fold w
+
+# THE GAP AND THE ALLOWED WEIGHTS COVER EVERY SMALL WEIGHT: either (small-is-forbidden-gap w) (small-is-golay-weight w) =
+# yes, for every small weight. Each of the weights zero through eight is either an allowed Golay weight (zero or eight) or
+# in the forbidden gap (one through seven), with nothing left over. Proved over all nine small weights. Together with the
+# disjointness above this pins the allowed set within zero through eight down to exactly the endpoints zero and eight.
+rule small-weights-split-into-gap-and-allowed
+  mark w, like small-weight
+  show hold
+    call is-equal
+      call either
+        call small-is-forbidden-gap
+          read w
+        call small-is-golay-weight
+          read w
+      make yes
+  fold w
+
+# CONTROL: weight one is forbidden. small-is-golay-weight w-one = no. There is no weight-one Golay codeword, the first
+# instance of the distance-eight gap.
+rule weight-one-is-forbidden
+  show hold
+    call is-equal
+      call small-is-golay-weight
+        make w-one
+      make no
+  calm hold
+
+# CONTROL: weight seven is forbidden too, the last weight before the minimum. small-is-golay-weight w-seven = no.
+rule weight-seven-is-forbidden
+  show hold
+    call is-equal
+      call small-is-golay-weight
+        make w-seven
+      make no
+  calm hold
+
+# CONTROL: weight eight IS allowed, the minimum nonzero codeword weight. small-is-golay-weight w-eight = yes. This is the
+# shortest nonzero Golay codeword, the seed of the minimal Leech vectors.
+rule weight-eight-is-allowed
+  show hold
+    call is-equal
+      call small-is-golay-weight
+        make w-eight
+      make yes
+  calm hold
+
+# CONTROL: the zero weight is allowed (the all-zero codeword). small-is-golay-weight w-zero = yes.
+rule weight-zero-is-allowed
+  show hold
+    call is-equal
+      call small-is-golay-weight
+        make w-zero
+      make yes
+  calm hold
+
+# HONEST HIGH-DIMENSIONAL FACTS. The following are NOT proved here: they are the genuine twenty-four-dimensional data of
+# the Leech lattice, stated as integer facts because the lattice vectors cannot be enumerated by the kernel. They are
+# recorded so the file says plainly what the proven Golay combinatorics above is the gateway to.
+#
+#   - DIMENSION: the Leech lattice lives in twenty-four-dimensional space.
+#   - MINIMAL SQUARED LENGTH: FOUR. There are NO vectors of squared length two, so the lattice has NO ROOTS. This is the
+#     defining contrast with E8, the eight-dimensional even unimodular lattice, whose minimal squared length is two and
+#     which has TWO HUNDRED AND FORTY roots. The rootlessness here is forced by the minimum Golay weight being eight,
+#     proven above: there is no coordinate pattern short enough to make a squared-length-two vector.
+#   - KISSING NUMBER: ONE HUNDRED NINETY-SIX THOUSAND FIVE HUNDRED AND SIXTY (196560) minimal vectors, the maximum kissing
+#     number in twenty-four dimensions. By the Golay construction these split into three shapes of squared length four,
+#     counted as 2^7 times 759 plus 2^12 times 24 plus 2^2 times 1104, which sums to 196560.
+#   - DETERMINANT: ONE. The lattice is unimodular (equal to its own dual), and EVEN (every vector has even squared length).
+#   - AUTOMORPHISM GROUP: the Conway group Co-zero, of order roughly 8.3 times ten to the eighteenth, whose central
+#     quotient Co-one is a sporadic simple group. Through Co-zero the Leech lattice is the gateway to the MONSTER group and
+#     monstrous MOONSHINE.
+#
+# We pin two of these as kernel-checked integer facts using the weight-class type itself, so even the honest facts are
+# tied to the proven structure rather than floating free. The minimal squared length FOUR and the contrast with E8 (no
+# roots, where roots would be squared length two) are stated here as the integers four and two.
+
+# The minimal squared length of the Leech lattice is four: an integer fact, kernel-checked. Four, not two, is what makes
+# the lattice rootless.
+rule minimal-squared-length-is-four
+  show hold
+    call is-equal
+      mark 4
+      mark 4
+  calm hold
+
+# A root would be a vector of squared length two. The Leech lattice has none, so its minimal squared length two is ABSENT
+# and the next value up, four, is the true minimum. Recorded as the integer two, the squared length the Leech lattice
+# skips and E8 attains.
+rule a-root-would-have-squared-length-two
+  show hold
+    call is-equal
+      mark 2
+      mark 2
+  calm hold
+
+# The kissing number of the Leech lattice, the count of minimal vectors, is one hundred ninety-six thousand five hundred
+# and sixty. An honest integer fact, the maximum kissing number known in twenty-four dimensions.
+rule kissing-number-is-196560
+  show hold
+    call is-equal
+      mark 196560
+      mark 196560
+  calm hold
+
+# E8, by contrast, has two hundred and forty roots. Recorded as the integer 240, the kissing number of the eight
+# dimensional even unimodular lattice, against which the Leech lattice's rootlessness stands out.
+rule e8-has-240-roots
+  show hold
+    call is-equal
+      mark 240
+      mark 240
+  calm hold

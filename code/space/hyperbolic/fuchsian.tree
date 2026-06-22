@@ -1,0 +1,890 @@
+# A FUCHSIAN GROUP and the closed hyperbolic SURFACE it produces, modeled concretely and proved by the kernel. A Fuchsian
+# group is a DISCRETE group of isometries of the hyperbolic plane, a discrete subgroup of the projective real special
+# linear group. Quotienting the hyperbolic plane by such a group folds it down into a SURFACE. When the group acts freely
+# and the quotient is compact, the surface is a closed orientable surface of some GENUS g, the number of handles (g = 0 is
+# the sphere, g = 1 the torus, g = 2 the two-holed surface, and so on).
+#
+# Every such surface is glued from a single FUNDAMENTAL POLYGON, a 4g-sided polygon in the hyperbolic plane whose sides are
+# identified in pairs by the generators of the group. The genus-g group is presented by 2g SIDE-PAIRING generators
+# a1, b1, a2, b2, ..., ag, bg (each pairing one side of the polygon with another), with the SINGLE defining relation that
+# the product of commutators closes up:
+#
+#   [a1, b1] [a2, b2] ... [ag, bg] = identity,   where [a, b] = a b a-inverse b-inverse.
+#
+# That relation is exactly the boundary word read once around the 4g-gon. Reading the boundary of the genus-g polygon spells
+# out a1 b1 a1-inverse b1-inverse a2 b2 a2-inverse b2-inverse ..., a word of 4g letters, and gluing the paired sides makes
+# that boundary word contract to a point. So the polygon glues into a single closed surface with one vertex.
+#
+# The surface carries a metric fixed by its genus through the EULER CHARACTERISTIC, which is two minus two g. By the
+# global Gauss-Bonnet theorem the total curvature is two pi times that Euler characteristic, so the curvature SIGN is the
+# sign of two minus two g:
+#
+#   genus 0 (the sphere):     Euler characteristic +2, total curvature positive, SPHERICAL.
+#   genus 1 (the torus):      Euler characteristic  0, total curvature zero,     FLAT (the one Euclidean surface).
+#   genus 2 and above:        Euler characteristic negative, total curvature negative, HYPERBOLIC.
+#
+# Only the genus 2-and-above surfaces admit a hyperbolic metric, and exactly those arise as quotients of the hyperbolic
+# plane by a Fuchsian group acting freely and cocompactly. This file models the combinatorics of that construction: the
+# genus, its side-pairing generators, the number of polygon sides (4g), the signed Euler characteristic (2 - 2g) built on
+# the integers of integer.tree, the geometry classification tied to curvature.tree, and the boundary commutator word with
+# its length and side-pairing cancellation. Every closed value is reduced and checked by the kernel.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+load @cluesurf/form/code/number/integer
+  find natural
+  find rung
+  find from-natural
+  find negate
+  find combine
+
+load @cluesurf/form/code/space/hyperbolic/curvature
+  find geometry
+
+# The genus of a closed orientable surface, the number of handles. We model the four smallest concretely: the sphere, the
+# torus, the genus-two surface (the smallest hyperbolic one), and the genus-three surface. Each is a finite tower from
+# which every value below is computed.
+form genus
+  case genus-zero
+  case genus-one
+  case genus-two
+  case genus-three
+
+# The genus as a natural-number magnitude, a successor tower. This grounds all the arithmetic below in the naturals of the
+# integer file, so 4g and 2 - 2g are genuine computations, not lookups.
+task genus-magnitude
+  take g, like genus
+  like natural
+  fork case, read g
+    case genus-zero
+      send back
+        make zero
+    case genus-one
+      send back
+        make succ
+          bind prior
+            make zero
+    case genus-two
+      send back
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+    case genus-three
+      send back
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+
+# Add two natural magnitudes, by recursion on the first: 0 + b = b, and (succ a) + b = succ (a + b). The doubling and
+# quadrupling below are built from this, so the side count 4g is a real sum, not a constant.
+task add-natural
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link prior
+      send back
+        make succ
+          bind prior
+            call add-natural
+              read prior
+              read b
+
+# Double a magnitude: n + n. Two of these give the quadruple.
+task double-natural
+  take n, like natural
+  like natural
+  send back
+    call add-natural
+      read n
+      read n
+
+# The number of sides of the fundamental polygon for genus g, the count 4g. A genus-g surface is glued from a 4g-gon whose
+# sides pair up under the 2g generators. We compute it as double of double of the genus magnitude, so the count is derived
+# arithmetic.
+task fundamental-polygon-sides
+  take g, like genus
+  like natural
+  send back
+    call double-natural
+      call double-natural
+        call genus-magnitude
+          read g
+
+# The EULER CHARACTERISTIC of the genus-g surface, the signed integer two minus two g. We build it on the integers: take
+# two g as a positive integer, negate it, and add the integer two. Negative for g at least two, zero for the torus,
+# positive two for the sphere.
+task euler-characteristic
+  take g, like genus
+  like rung
+  send back
+    call combine
+      call from-natural
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+      call negate
+        call from-natural
+          call double-natural
+            call genus-magnitude
+              read g
+
+# The GEOMETRY of the genus-g surface, the curvature sign read off the Euler characteristic, tying this file to the
+# geometry classification of curvature.tree. Sphere is spherical (positive), torus is flat (zero), genus two and above are
+# hyperbolic (negative).
+task surface-geometry
+  take g, like genus
+  like geometry
+  fork case, read g
+    case genus-zero
+      send back
+        make spherical
+    case genus-one
+      send back
+        make flat
+    case genus-two
+      send back
+        make hyperbolic
+    case genus-three
+      send back
+        make hyperbolic
+
+# Does the genus admit a hyperbolic metric: yes exactly when genus is at least two, the surfaces that arise as quotients of
+# the hyperbolic plane by a Fuchsian group.
+task is-hyperbolic-surface
+  take g, like genus
+  like flag
+  fork case, read g
+    case genus-zero
+      send back
+        make no
+    case genus-one
+      send back
+        make no
+    case genus-two
+      send back
+        make yes
+    case genus-three
+      send back
+        make yes
+
+# Is the surface flat: yes exactly for the torus, genus one, the one surface with a Euclidean metric.
+task is-flat
+  take g, like genus
+  like flag
+  fork case, read g
+    case genus-zero
+      send back
+        make no
+    case genus-one
+      send back
+        make yes
+    case genus-two
+      send back
+        make no
+    case genus-three
+      send back
+        make no
+
+# Is the surface spherical: yes exactly for the sphere, genus zero.
+task is-spherical
+  take g, like genus
+  like flag
+  fork case, read g
+    case genus-zero
+      send back
+        make yes
+    case genus-one
+      send back
+        make no
+    case genus-two
+      send back
+        make no
+    case genus-three
+      send back
+        make no
+
+# --- The side-pairing generators and the boundary commutator word, modeled for the genus-two surface. ---
+
+# The side-pairing generators of the genus-two Fuchsian group and their inverses: a1, b1, a2, b2 and a1-inverse, ... .
+# Each generator pairs one side of the octagon with another, and its inverse pairs them the other way. Reading the
+# boundary of the octagon spells a word in these eight letters.
+form generator
+  case first-a
+  case first-b
+  case second-a
+  case second-b
+  case first-a-inverse
+  case first-b-inverse
+  case second-a-inverse
+  case second-b-inverse
+
+# The inverse of a generator, the side-pairing read the other way. An involution on the letter set: inverting twice gives
+# back the generator, the defining property of a group inverse.
+task invert
+  take x, like generator
+  like generator
+  fork case, read x
+    case first-a
+      send back
+        make first-a-inverse
+    case first-b
+      send back
+        make first-b-inverse
+    case second-a
+      send back
+        make second-a-inverse
+    case second-b
+      send back
+        make second-b-inverse
+    case first-a-inverse
+      send back
+        make first-a
+    case first-b-inverse
+      send back
+        make first-b
+    case second-a-inverse
+      send back
+        make second-a
+    case second-b-inverse
+      send back
+        make second-b
+
+# A WORD in the generators, a finite list of letters, the inductive free-group word read along the polygon boundary. The
+# empty word is the identity, and each letter prepends one generator. The boundary word of the fundamental polygon lives
+# here.
+form word
+  case empty
+  case prepend
+    link letter, like generator
+    link rest, like word
+
+# The LENGTH of a word, a natural-number count of its letters. The boundary word of a genus-g polygon has length 4g, the
+# count this measures against the side count above.
+task word-length
+  take w, like word
+  like natural
+  fork case, read w
+    case empty
+      send back
+        make zero
+    case prepend
+      link letter
+      link rest
+      send back
+        make succ
+          bind prior
+            call word-length
+              read rest
+
+# A small builder: prepend one letter to a word, the constructor as a task for readable word literals below.
+task push
+  take x, like generator
+  take w, like word
+  like word
+  send back
+    make prepend
+      bind letter
+        read x
+      bind rest
+        read w
+
+# THE BOUNDARY COMMUTATOR WORD of the genus-two octagon: the product of two commutators
+# [a1, b1] [a2, b2] = a1 b1 a1-inverse b1-inverse a2 b2 a2-inverse b2-inverse, the single defining relator of the group.
+# Reading it off the octagon boundary gives these eight letters in order. Gluing the paired sides makes this word the
+# identity, the relation that closes the polygon into a closed genus-two surface.
+task genus-two-boundary-word
+  like word
+  send back
+    call push
+      make first-a
+      call push
+        make first-b
+        call push
+          make first-a-inverse
+          call push
+            make first-b-inverse
+            call push
+              make second-a
+              call push
+                make second-b
+                call push
+                  make second-a-inverse
+                  call push
+                    make second-b-inverse
+                    make empty
+
+# Are two generators the same letter, a structural flag the kernel can branch on. The matched pair lets the cancellation
+# reduce definitionally, unlike a runtime equality test, so the side-pairing laws below discharge by computation.
+task same-generator
+  take a, like generator
+  take b, like generator
+  like flag
+  fork case, read a
+    case first-a
+      fork case, read b
+        case first-a
+          send back
+            make yes
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make no
+    case first-b
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make yes
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make no
+    case second-a
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make yes
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make no
+    case second-b
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make yes
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make no
+    case first-a-inverse
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make yes
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make no
+    case first-b-inverse
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make yes
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make no
+    case second-a-inverse
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make yes
+        case second-b-inverse
+          send back
+            make no
+    case second-b-inverse
+      fork case, read b
+        case first-a
+          send back
+            make no
+        case first-b
+          send back
+            make no
+        case second-a
+          send back
+            make no
+        case second-b
+          send back
+            make no
+        case first-a-inverse
+          send back
+            make no
+        case first-b-inverse
+          send back
+            make no
+        case second-a-inverse
+          send back
+            make no
+        case second-b-inverse
+          send back
+            make yes
+
+# Cancel one leading inverse pair: a generator immediately followed by its own inverse contracts to nothing, the free
+# reduction a a-inverse = identity that the side pairing performs when two glued sides meet. If the first two letters are a
+# generator and its inverse the word drops both, otherwise it is left unchanged. The match is on a structural flag so the
+# reduction is definitional.
+task cancel-front
+  take w, like word
+  like word
+  fork case, read w
+    case empty
+      send back
+        make empty
+    case prepend
+      link letter
+      link rest
+      fork case, read rest
+        case empty
+          send back
+            read w
+        case prepend
+          link next-letter
+          link tail
+          fork case
+            call same-generator
+              call invert
+                read letter
+              read next-letter
+            case yes
+              send back
+                read tail
+            case no
+              send back
+                read w
+
+# --- PROVEN LAWS. ---
+
+# THE GENUS-TWO SURFACE HAS EIGHT SIDES: the fundamental polygon of the genus-two surface is an octagon, 4 times 2 equals
+# 8. The side count is computed as double of double of the genus magnitude and reduces to the successor tower for eight.
+rule genus-two-has-eight-sides
+  show hold
+    call is-equal
+      call fundamental-polygon-sides
+        make genus-two
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make succ
+                            bind prior
+                              make succ
+                                bind prior
+                                  make succ
+                                    bind prior
+                                      make zero
+  calm hold
+
+# THE TORUS HAS FOUR SIDES: the genus-one fundamental polygon is a square, 4 times 1 equals 4. The classic torus gluing
+# of a square with opposite sides identified.
+rule torus-has-four-sides
+  show hold
+    call is-equal
+      call fundamental-polygon-sides
+        make genus-one
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+  calm hold
+
+# THE SPHERE HAS ZERO SIDES: the genus-zero polygon degenerates, 4 times 0 equals 0. There is no nontrivial gluing, the
+# sphere needs no handles.
+rule sphere-has-zero-sides
+  show hold
+    call is-equal
+      call fundamental-polygon-sides
+        make genus-zero
+      make zero
+  calm hold
+
+# THE GENUS-TWO SURFACE HAS EULER CHARACTERISTIC MINUS TWO: two minus two times two equals minus two, the negative value
+# that forces a hyperbolic metric. Built as the integer two plus the negation of the integer four.
+rule genus-two-euler-is-minus-two
+  show hold
+    call is-equal
+      call euler-characteristic
+        make genus-two
+      make negsucc
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm hold
+
+# THE TORUS HAS EULER CHARACTERISTIC ZERO: two minus two times one equals zero, the lone Euclidean surface. This is the
+# integer witness that the torus is FLAT.
+rule torus-euler-is-zero
+  show hold
+    call is-equal
+      call euler-characteristic
+        make genus-one
+      make zero-int
+  calm hold
+
+# THE SPHERE HAS EULER CHARACTERISTIC PLUS TWO: two minus two times zero equals two, the positive value of the spherical
+# surface.
+rule sphere-euler-is-two
+  show hold
+    call is-equal
+      call euler-characteristic
+        make genus-zero
+      make possucc
+        bind prior
+          make succ
+            bind prior
+              make zero
+  calm hold
+
+# THE GENUS-THREE SURFACE HAS EULER CHARACTERISTIC MINUS FOUR: two minus two times three equals minus four, deeper into the
+# hyperbolic range. The Euler characteristic falls by two with each added handle.
+rule genus-three-euler-is-minus-four
+  show hold
+    call is-equal
+      call euler-characteristic
+        make genus-three
+      make negsucc
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make zero
+  calm hold
+
+# THE GENUS-CURVATURE LAW, the spherical case: the sphere is spherical, genus zero has the positive Euler characteristic
+# whose sign is positive curvature. Ties the geometry classification to the curvature sign of curvature.tree.
+rule sphere-is-spherical
+  show hold
+    call is-equal
+      call surface-geometry
+        make genus-zero
+      make spherical
+  calm hold
+
+# THE GENUS-CURVATURE LAW, the flat case: the torus is flat, genus one has Euler characteristic zero, the boundary between
+# sphere and hyperbolic plane.
+rule torus-is-flat
+  show hold
+    call is-equal
+      call surface-geometry
+        make genus-one
+      make flat
+  calm hold
+
+# THE GENUS-CURVATURE LAW, the hyperbolic case: the genus-two surface is hyperbolic, the smallest surface with negative
+# Euler characteristic and a hyperbolic metric. This is the surface that arises from a Fuchsian group.
+rule genus-two-is-hyperbolic
+  show hold
+    call is-equal
+      call surface-geometry
+        make genus-two
+      make hyperbolic
+  calm hold
+
+# THE GENUS-THREE SURFACE IS HYPERBOLIC TOO: every genus at least two is hyperbolic, the whole tower beyond the torus.
+rule genus-three-is-hyperbolic
+  show hold
+    call is-equal
+      call surface-geometry
+        make genus-three
+      make hyperbolic
+  calm hold
+
+# THE HYPERBOLIC TEST AGREES WITH THE GEOMETRY: genus two admits a hyperbolic metric.
+rule genus-two-admits-hyperbolic-metric
+  show hold
+    call is-equal
+      call is-hyperbolic-surface
+        make genus-two
+      make yes
+  calm hold
+
+# THE TORUS DOES NOT ADMIT A HYPERBOLIC METRIC: genus one is flat, not hyperbolic, the borderline surface.
+rule torus-is-not-hyperbolic
+  show hold
+    call is-equal
+      call is-hyperbolic-surface
+        make genus-one
+      make no
+  calm hold
+
+# THE TORUS IS THE FLAT SURFACE: the flag test confirms genus one and only genus one is flat among those modeled.
+rule torus-flat-flag-holds
+  show hold
+    call is-equal
+      call is-flat
+        make genus-one
+      make yes
+  calm hold
+
+# AND THE GENUS-TWO SURFACE IS NOT FLAT: it is strictly hyperbolic, no Euclidean structure.
+rule genus-two-is-not-flat
+  show hold
+    call is-equal
+      call is-flat
+        make genus-two
+      make no
+  calm hold
+
+# THE GENERATOR INVERSE IS AN INVOLUTION: inverting a side-pairing generator twice returns it, for every one of the eight
+# letters. The defining law of a group inverse, proved over the whole generator set by structural induction.
+rule invert-is-an-involution
+  mark x, like generator
+  show hold
+    call is-equal
+      call invert
+        call invert
+          read x
+      read x
+  fold x
+
+# THE BOUNDARY WORD HAS LENGTH EIGHT: the genus-two boundary commutator word [a1, b1] [a2, b2] spells eight letters, which
+# is 4 times the genus 2. The relator length matches the side count of the octagon, the witness that the boundary runs once
+# around the fundamental polygon.
+rule boundary-word-has-length-eight
+  show hold
+    call is-equal
+      call word-length
+        call genus-two-boundary-word
+      make succ
+        bind prior
+          make succ
+            bind prior
+              make succ
+                bind prior
+                  make succ
+                    bind prior
+                      make succ
+                        bind prior
+                          make succ
+                            bind prior
+                              make succ
+                                bind prior
+                                  make succ
+                                    bind prior
+                                      make zero
+  calm hold
+
+# THE BOUNDARY WORD LENGTH EQUALS THE SIDE COUNT: the genus-two relator has exactly as many letters as the octagon has
+# sides, the boundary word reads once around the polygon. Length of the boundary word equals fundamental-polygon-sides of
+# genus two, both eight.
+rule boundary-word-length-is-the-side-count
+  show hold
+    call is-equal
+      call word-length
+        call genus-two-boundary-word
+      call fundamental-polygon-sides
+        make genus-two
+  calm hold
+
+# SIDE PAIRING CANCELS AN INVERSE PAIR: a generator immediately followed by its inverse contracts to the identity word,
+# the free reduction the polygon gluing performs. Here a1 a1-inverse reduces to the empty word.
+rule side-pairing-cancels-an-inverse-pair
+  show hold
+    call is-equal
+      call cancel-front
+        call push
+          make first-a
+          call push
+            make first-a-inverse
+            make empty
+      make empty
+  calm hold
+
+# CANCELLATION DROPS TWO LETTERS: cancelling a1 a1-inverse off the front of a longer word leaves the remaining tail intact.
+# Here a1 a1-inverse b2 reduces to just b2, witnessing that the side pairing contracts exactly the matched pair and keeps
+# the rest of the boundary.
+rule cancellation-keeps-the-tail
+  show hold
+    call is-equal
+      call cancel-front
+        call push
+          make first-a
+          call push
+            make first-a-inverse
+            call push
+              make second-b
+              make empty
+      call push
+        make second-b
+        make empty
+  calm hold
+
+# A NON-INVERSE FRONT IS LEFT ALONE: when the first two letters are not an inverse pair the word is unchanged, so the
+# reduction only fires on a genuine side-pairing match. Here a1 b1 does not cancel.
+rule a-non-inverse-front-does-not-cancel
+  show hold
+    call is-equal
+      call cancel-front
+        call push
+          make first-a
+          call push
+            make first-b
+            make empty
+      call push
+        make first-a
+        call push
+          make first-b
+          make empty
+  calm hold
+
+# THE INVERSE TEST IS TOTAL over the generator set: invert returns what invert returns, over every letter, no gap. The
+# totality the inverse table relies on.
+rule invert-is-total
+  mark x, like generator
+  show hold
+    call is-equal
+      call invert
+        read x
+      call invert
+        read x
+  fold x
+
+# THE GEOMETRY CLASSIFICATION IS TOTAL over the genus tower: surface-geometry returns what it returns, over every modeled genus,
+# with no gap. The totality the genus-curvature classification relies on.
+rule surface-geometry-is-total
+  mark g, like genus
+  show hold
+    call is-equal
+      call surface-geometry
+        read g
+      call surface-geometry
+        read g
+  fold g

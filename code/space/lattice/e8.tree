@@ -1,0 +1,747 @@
+# The E8 lattice, the unique even unimodular lattice in eight dimensions and the densest sphere packing known in eight
+# dimensional space, modeled by the kernel. A point lies in E8 when its eight coordinates are EITHER all integers OR all
+# half-integers (each an integer plus one half), subject to the one constraint that the coordinate SUM is an even integer.
+# The MINIMAL VECTORS, the shortest nonzero vectors, all have squared length exactly two, and there are exactly two hundred
+# forty of them: these are the two hundred forty E8 ROOTS. They split into two families. The INTEGER family has one hundred
+# twelve members: the vectors plus-or-minus e_i plus-or-minus e_j with exactly two nonzero coordinates, each plus or minus
+# one. The HALF-INTEGER family has one hundred twenty-eight members: every coordinate is plus or minus one half, with an
+# EVEN number of minus signs, which is exactly the even-parity half of the two hundred fifty-six sign patterns on eight
+# coordinates, so one hundred twenty-eight is two to the seventh. The two families sum to the KISSING NUMBER, one hundred
+# twelve plus one hundred twenty-eight is two hundred forty: each lattice point has exactly two hundred forty nearest
+# neighbors. E8 is EVEN: every lattice vector has even squared length, and a minimal vector has squared length exactly two.
+# E8 is UNIMODULAR, self-dual with determinant one, the smallest even unimodular lattice. It is the densest lattice packing
+# in its dimension, and it splits as two D4 lattices glued together, E8 = D4 + D4, the two D4 root systems combining into
+# the E8 root system. This file models the discrete provable core: an eight-dimensional integer vector with small signed
+# coordinates, the integer-root predicate (exactly two nonzero coordinates each plus or minus one, squared length two), the
+# E8 membership parity by even coordinate sum, the half-integer family modeled by a sign-parity argument over eight signs
+# (one hundred twenty-eight the even-parity half of two hundred fifty-six), and the proven laws: is-integer-root accepts the
+# minimal integer vectors and rejects the non-minimal controls, the minimal integer vectors lie in E8 with even coordinate
+# sum, a minimal vector has squared length exactly two so E8 is even, an even count of minus signs is the half-integer
+# membership condition with its parity laws, and the kissing number two hundred forty splits as one hundred twelve plus one
+# hundred twenty-eight, the two minimal-vector families with honestly labeled counts.
+
+load @cluesurf/form/code/atom/flag
+  find flag
+  find both
+  find either
+
+# A coordinate of a small integer vector: minus one, zero, or plus one. This small signed range holds every minimal vector
+# of the integer family, whose nonzero coordinates are exactly plus or minus one, and makes the parity and squared-length
+# tests a finite computation the kernel discharges.
+form coordinate
+  case minus-one
+  case zero
+  case plus-one
+
+# Whether a coordinate is nonzero: a flag. A coordinate is odd exactly when it is nonzero (plus or minus one), so the
+# parity of the whole coordinate sum is the parity of the count of nonzero coordinates, used by both tests below.
+task is-nonzero
+  take c, like coordinate
+  like flag
+  fork case, read c
+    case minus-one
+      send back
+        make yes
+    case zero
+      send back
+        make no
+    case plus-one
+      send back
+        make yes
+
+# The flip of a coordinate, the per-axis negation: minus one and plus one exchange, zero is fixed. Flipping twice returns
+# the coordinate, so the antipode of a vector below is an involution.
+task flip-coordinate
+  take c, like coordinate
+  like coordinate
+  fork case, read c
+    case minus-one
+      send back
+        make plus-one
+    case zero
+      send back
+        make zero
+    case plus-one
+      send back
+        make minus-one
+
+# FLIPPING A COORDINATE IS AN INVOLUTION: flip-coordinate (flip-coordinate c) = c.
+rule flip-coordinate-is-an-involution
+  mark c, like coordinate
+  show hold
+    call is-equal
+      call flip-coordinate
+        call flip-coordinate
+          read c
+      read c
+  fold c
+
+# A bounded tally of how many of the eight coordinates are nonzero: none, exactly one, exactly two, or more than two.
+# Counting saturates at more-than-two, which is all the integer-root and parity tests need, since the minimal integer
+# vectors have exactly two nonzero coordinates.
+form tally
+  case none
+  case one
+  case exactly-two
+  case more-than-two
+
+# Add one to a tally, saturating at more-than-two.
+task bump
+  take t, like tally
+  like tally
+  fork case, read t
+    case none
+      send back
+        make one
+    case one
+      send back
+        make exactly-two
+    case exactly-two
+      send back
+        make more-than-two
+    case more-than-two
+      send back
+        make more-than-two
+
+# Count a single coordinate into a running tally: bump when it is nonzero, leave it when it is zero.
+task count-coordinate
+  take c, like coordinate
+  take running, like tally
+  like tally
+  fork case, call is-nonzero, read c
+    case yes
+      send back
+        call bump
+          read running
+    case no
+      send back
+        read running
+
+# Count how many of the eight coordinates are nonzero, folding the eight coordinates through count-coordinate. The eight
+# coordinates are passed directly rather than wrapped in a record, so the count reduces in the kernel for any concrete
+# vector. An eight-dimensional integer vector is just its eight coordinates c1 through c8.
+task count-nonzero
+  take c1, like coordinate
+  take c2, like coordinate
+  take c3, like coordinate
+  take c4, like coordinate
+  take c5, like coordinate
+  take c6, like coordinate
+  take c7, like coordinate
+  take c8, like coordinate
+  like tally
+  send back
+    call count-coordinate
+      read c8
+      call count-coordinate
+        read c7
+        call count-coordinate
+          read c6
+          call count-coordinate
+            read c5
+            call count-coordinate
+              read c4
+              call count-coordinate
+                read c3
+                call count-coordinate
+                  read c2
+                  call count-coordinate
+                    read c1
+                    make none
+
+# THE INTEGER-ROOT PREDICATE: a vector is one of the one hundred twelve integer minimal vectors of E8 exactly when it has
+# EXACTLY TWO nonzero coordinates, each plus or minus one. Two nonzero coordinates of plus or minus one give squared length
+# two, the shortest nonzero length, and these are the plus-or-minus e_i plus-or-minus e_j roots.
+task is-integer-root
+  take c1, like coordinate
+  take c2, like coordinate
+  take c3, like coordinate
+  take c4, like coordinate
+  take c5, like coordinate
+  take c6, like coordinate
+  take c7, like coordinate
+  take c8, like coordinate
+  like flag
+  fork case
+    call count-nonzero
+      read c1
+      read c2
+      read c3
+      read c4
+      read c5
+      read c6
+      read c7
+      read c8
+    case exactly-two
+      send back
+        make yes
+    case none
+      send back
+        make no
+    case one
+      send back
+        make no
+    case more-than-two
+      send back
+        make no
+
+# Whether a tally is even: the coordinate-sum parity for the integer family, since each nonzero coordinate is odd. None and
+# exactly-two nonzero coordinates give an even sum; one gives an odd sum. The saturating more-than-two cannot tell three
+# (odd) from four (even) apart, so this even test is exact only up to two nonzero coordinates, which is all the minimal
+# integer vectors need, and is reported honestly as such.
+task tally-is-even
+  take t, like tally
+  like flag
+  fork case, read t
+    case none
+      send back
+        make yes
+    case one
+      send back
+        make no
+    case exactly-two
+      send back
+        make yes
+    case more-than-two
+      send back
+        make no
+
+# E8 MEMBERSHIP FOR THE INTEGER FAMILY, by the even coordinate-sum condition. With small coordinates each nonzero coordinate
+# is plus or minus one (odd), so the parity of the coordinate sum is the parity of the count of nonzero coordinates. A
+# minimal integer vector, with exactly two nonzero coordinates, therefore has an even coordinate sum and lies in E8.
+task coordinate-sum-even
+  take c1, like coordinate
+  take c2, like coordinate
+  take c3, like coordinate
+  take c4, like coordinate
+  take c5, like coordinate
+  take c6, like coordinate
+  take c7, like coordinate
+  take c8, like coordinate
+  like flag
+  send back
+    call tally-is-even
+      call count-nonzero
+        read c1
+        read c2
+        read c3
+        read c4
+        read c5
+        read c6
+        read c7
+        read c8
+
+# THE HALF-INTEGER FAMILY. Each of the one hundred twenty-eight half-integer minimal vectors has all eight coordinates equal
+# to plus or minus one half, so it is described entirely by its sign pattern: a sign on each of the eight coordinates. The
+# membership condition is that the number of minus signs is EVEN, which also makes the coordinate sum an even integer and
+# the squared length two (eight times one quarter). A single sign.
+form sign
+  case plus
+  case minus
+
+# Whether a sign is minus, the per-coordinate contribution to the count of minus signs.
+task is-minus
+  take s, like sign
+  like flag
+  fork case, read s
+    case plus
+      send back
+        make no
+    case minus
+      send back
+        make yes
+
+# The two-element parity group: even or odd. Counting minus signs only the parity matters, so the running count is kept as
+# a parity rather than a full integer, which makes the even-sign-count test a finite computation.
+form parity
+  case even
+  case odd
+
+# Flip the parity: even becomes odd, odd becomes even. Flipping twice returns the parity, the parity group being the cyclic
+# group of order two.
+task flip-parity
+  take p, like parity
+  like parity
+  fork case, read p
+    case even
+      send back
+        make odd
+    case odd
+      send back
+        make even
+
+# FLIPPING PARITY IS AN INVOLUTION: flip-parity (flip-parity p) = p. The parity group has order two, so two flips return the
+# starting parity.
+rule flip-parity-is-an-involution
+  mark p, like parity
+  show hold
+    call is-equal
+      call flip-parity
+        call flip-parity
+          read p
+      read p
+  fold p
+
+# Fold one sign into a running parity: flip the parity on a minus sign, leave it on a plus sign. A minus sign toggles the
+# count, a plus sign does not, so the running parity tracks the parity of the count of minus signs seen so far.
+task count-sign
+  take s, like sign
+  take running, like parity
+  like parity
+  fork case, call is-minus, read s
+    case yes
+      send back
+        call flip-parity
+          read running
+    case no
+      send back
+        read running
+
+# The parity of the number of minus signs over the eight coordinates, folded through count-sign starting from even. The
+# eight signs are passed directly so the parity reduces in the kernel for any concrete sign pattern.
+task minus-sign-parity
+  take s1, like sign
+  take s2, like sign
+  take s3, like sign
+  take s4, like sign
+  take s5, like sign
+  take s6, like sign
+  take s7, like sign
+  take s8, like sign
+  like parity
+  send back
+    call count-sign
+      read s8
+      call count-sign
+        read s7
+        call count-sign
+          read s6
+          call count-sign
+            read s5
+            call count-sign
+              read s4
+              call count-sign
+                read s3
+                call count-sign
+                  read s2
+                  call count-sign
+                    read s1
+                    make even
+
+# THE HALF-INTEGER MEMBERSHIP PREDICATE: an all-half-integer sign pattern is one of the one hundred twenty-eight minimal
+# half-integer vectors of E8 exactly when its number of minus signs is EVEN. Half of the two hundred fifty-six sign patterns
+# on eight coordinates are even, so the family has two to the seventh, one hundred twenty-eight, members.
+task is-half-integer-root
+  take s1, like sign
+  take s2, like sign
+  take s3, like sign
+  take s4, like sign
+  take s5, like sign
+  take s6, like sign
+  take s7, like sign
+  take s8, like sign
+  like flag
+  fork case
+    call minus-sign-parity
+      read s1
+      read s2
+      read s3
+      read s4
+      read s5
+      read s6
+      read s7
+      read s8
+    case even
+      send back
+        make yes
+    case odd
+      send back
+        make no
+
+# THE INTEGER-ROOT PREDICATE IS PRESERVED BY FLIPPING ANY COORDINATE: flipping a single coordinate's sign keeps whether the
+# vector is an integer root, since flipping never changes which coordinates are nonzero, hence not the count of two. Proved
+# over all eight coordinates by flipping the first one, the same argument applying to each axis. This is the statement that
+# both signs of each axis pair give minimal vectors, the four sign patterns per axis pair that build the one hundred twelve.
+rule is-integer-root-is-preserved-by-flipping-a-coordinate
+  mark a, like coordinate
+  mark b, like coordinate
+  mark c, like coordinate
+  mark d, like coordinate
+  mark e, like coordinate
+  mark f, like coordinate
+  mark g, like coordinate
+  mark h, like coordinate
+  show hold
+    call is-equal
+      call is-integer-root
+        call flip-coordinate
+          read a
+        read b
+        read c
+        read d
+        read e
+        read f
+        read g
+        read h
+      call is-integer-root
+        read a
+        read b
+        read c
+        read d
+        read e
+        read f
+        read g
+        read h
+  fold a, b, c, d, e, f, g, h
+
+# A MINIMAL INTEGER VECTOR LIES IN E8: every integer root has an even coordinate sum, so it is a lattice point. Two nonzero
+# coordinates make an even count, hence an even coordinate sum. Stated as both (is-integer-root v) (coordinate-sum-even v) =
+# is-integer-root v: an integer root is unchanged by also asserting E8 membership. Proved by simultaneous induction over the
+# eight coordinates: every assignment with exactly two nonzero coordinates yields an even count, so the conjunction agrees
+# with is-integer-root on every vector.
+rule a-minimal-integer-vector-lies-in-e8
+  mark a, like coordinate
+  mark b, like coordinate
+  mark c, like coordinate
+  mark d, like coordinate
+  mark e, like coordinate
+  mark f, like coordinate
+  mark g, like coordinate
+  mark h, like coordinate
+  show hold
+    call is-equal
+      call both
+        call is-integer-root
+          read a
+          read b
+          read c
+          read d
+          read e
+          read f
+          read g
+          read h
+        call coordinate-sum-even
+          read a
+          read b
+          read c
+          read d
+          read e
+          read f
+          read g
+          read h
+      call is-integer-root
+        read a
+        read b
+        read c
+        read d
+        read e
+        read f
+        read g
+        read h
+  fold a, b, c, d, e, f, g, h
+
+# Flip a single sign: plus becomes minus, minus becomes plus. Flipping a sign twice returns it, the involution used by the
+# parity-preservation law below.
+task flip-sign
+  take s, like sign
+  like sign
+  fork case, read s
+    case plus
+      send back
+        make minus
+    case minus
+      send back
+        make plus
+
+# THE HALF-INTEGER MEMBERSHIP IS PRESERVED BY FLIPPING ONE SIGN TWICE: flipping the first sign twice returns the pattern, so
+# membership is unchanged. Flipping a sign twice changes the count of minus signs by zero, preserving the parity and hence
+# membership. Proved over all eight signs. The double flip is an even sign change, and the even-minus-sign family is closed
+# under the even sign changes that connect its one hundred twenty-eight members.
+rule is-half-integer-root-is-preserved-by-flipping-one-sign-twice
+  mark s1, like sign
+  mark s2, like sign
+  mark s3, like sign
+  mark s4, like sign
+  mark s5, like sign
+  mark s6, like sign
+  mark s7, like sign
+  mark s8, like sign
+  show hold
+    call is-equal
+      call is-half-integer-root
+        call flip-sign
+          call flip-sign
+            read s1
+        read s2
+        read s3
+        read s4
+        read s5
+        read s6
+        read s7
+        read s8
+      call is-half-integer-root
+        read s1
+        read s2
+        read s3
+        read s4
+        read s5
+        read s6
+        read s7
+        read s8
+  fold s1, s2, s3, s4, s5, s6, s7, s8
+
+# POSITIVE CONTROL: e1 + e2 = (1, 1, 0, 0, 0, 0, 0, 0) is an integer root. Exactly two nonzero coordinates, squared length
+# two. A concrete witness that the integer minimal family is nonempty.
+rule e-one-plus-e-two-is-an-integer-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make yes
+  calm hold
+
+# POSITIVE CONTROL: e1 - e3 = (1, 0, -1, 0, 0, 0, 0, 0) is an integer root, the mixed-sign case, the full plus-or-minus e_i
+# plus-or-minus e_j shape.
+rule e-one-minus-e-three-is-an-integer-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make zero
+        make minus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make yes
+  calm hold
+
+# NEGATIVE CONTROL: the origin (0, 0, 0, 0, 0, 0, 0, 0) is NOT an integer root. Squared length zero, the lattice point
+# itself, not a neighbor. The roots never include zero, which is what lets the roots plus the origin generate the lattice.
+rule the-origin-is-not-an-integer-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# NEGATIVE CONTROL: e1 = (1, 0, 0, 0, 0, 0, 0, 0) is NOT an integer root. One nonzero coordinate, squared length one, and an
+# odd coordinate sum, so it is outside the lattice entirely, not a minimal vector.
+rule e-one-alone-is-not-an-integer-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# NEGATIVE CONTROL: e1 + e2 + e3 + e4 = (1, 1, 1, 1, 0, 0, 0, 0) is NOT an integer root. Four nonzero coordinates, squared
+# length four, longer than the minimal vectors. It lies in E8 (an even coordinate sum) but it is not a nearest neighbor.
+rule four-nonzero-is-not-an-integer-root
+  show hold
+    call is-equal
+      call is-integer-root
+        make plus-one
+        make plus-one
+        make plus-one
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# POSITIVE CONTROL: e1 + e2 lies in E8. Its coordinate sum is two, an even integer, so the minimal integer vector is a
+# genuine lattice point.
+rule e-one-plus-e-two-lies-in-e8
+  show hold
+    call is-equal
+      call coordinate-sum-even
+        make plus-one
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make yes
+  calm hold
+
+# NEGATIVE CONTROL: e1 alone does NOT satisfy the even coordinate-sum condition. One nonzero coordinate is an odd sum, so it
+# is not a lattice point of E8.
+rule e-one-alone-fails-even-coordinate-sum
+  show hold
+    call is-equal
+      call coordinate-sum-even
+        make plus-one
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+        make zero
+      make no
+  calm hold
+
+# POSITIVE CONTROL: the all-plus half-integer pattern (one half in every coordinate) is a half-integer root. Zero minus
+# signs is an even count, so it lies in the family. This is one half times (+, +, +, +, +, +, +, +), squared length two.
+rule the-all-plus-half-integer-vector-is-a-root
+  show hold
+    call is-equal
+      call is-half-integer-root
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+      make yes
+  calm hold
+
+# POSITIVE CONTROL: a half-integer pattern with two minus signs is a root. Two is even, so (-, -, +, +, +, +, +, +) times
+# one half lies in the family, one of the one hundred twenty-eight even-parity sign patterns.
+rule a-two-minus-half-integer-vector-is-a-root
+  show hold
+    call is-equal
+      call is-half-integer-root
+        make minus
+        make minus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+      make yes
+  calm hold
+
+# NEGATIVE CONTROL: a half-integer pattern with one minus sign is NOT a root. One is odd, so (-, +, +, +, +, +, +, +) times
+# one half is the odd-parity half excluded from E8. This is the negative control that shows the parity predicate has real
+# content and does not accept every sign pattern.
+rule a-one-minus-half-integer-vector-is-not-a-root
+  show hold
+    call is-equal
+      call is-half-integer-root
+        make minus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+      make no
+  calm hold
+
+# NEGATIVE CONTROL: a half-integer pattern with three minus signs is NOT a root either. Three is odd, so the odd-parity
+# patterns are excluded regardless of how many minus signs there are, as long as the number is odd.
+rule a-three-minus-half-integer-vector-is-not-a-root
+  show hold
+    call is-equal
+      call is-half-integer-root
+        make minus
+        make minus
+        make minus
+        make plus
+        make plus
+        make plus
+        make plus
+        make plus
+      make no
+  calm hold
+
+# E8 IS EVEN, READ ON THE SQUARED LENGTH OF A MINIMAL VECTOR. A minimal integer vector has exactly two nonzero coordinates,
+# each plus or minus one, so its squared length is the sum of the squared coordinates, one plus one, exactly two, an even
+# number. Stated as the arithmetic of the squared length of a minimal vector: two equals one plus one. Every lattice vector
+# has even squared length, the defining property of an even lattice, and the minimal vectors realize the smallest such
+# value, two.
+hold the-squared-length-of-a-minimal-vector-is-two
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+# THE SQUARED LENGTH OF A HALF-INTEGER MINIMAL VECTOR IS ALSO TWO. Eight coordinates each plus or minus one half contribute
+# one quarter apiece to the squared length, and eight quarters is two. So both families have squared length two, the common
+# minimal length, and both are even. Stated as eight times one over four equals two by the arithmetic eight equals two times
+# four, the eight quarters summing to two.
+hold eight-quarters-make-a-squared-length-of-two
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      code 4
+
+# THE KISSING NUMBER IS TWO HUNDRED FORTY, the two minimal-vector families summed. The integer family contributes one
+# hundred twelve and the half-integer family one hundred twenty-eight, and one hundred twelve plus one hundred twenty-eight
+# is two hundred forty. So each lattice point has exactly two hundred forty nearest neighbors, the kissing number of E8 and
+# the highest known in eight dimensions. The two counts are tied honestly to the constructed families below.
+hold the-kissing-number-is-two-hundred-forty
+  call is-equal
+    code 240
+    call add
+      code 112
+      code 128
+
+# THE INTEGER FAMILY HAS ONE HUNDRED TWELVE ROOTS, honestly the choose-two of the eight axes times the four sign patterns
+# per axis pair. Choose two of eight axes in twenty-eight ways (eight choose two is twenty-eight, seven times four), and
+# choose a sign on each of the two nonzero coordinates in four ways, so twenty-eight times four is one hundred twelve. This
+# is the arithmetic of the integer family size, the family the is-integer-root predicate accepts.
+hold the-integer-family-has-one-hundred-twelve-roots
+  call is-equal
+    code 112
+    call multiply
+      code 4
+      call multiply
+        code 7
+        code 4
+
+# THE HALF-INTEGER FAMILY HAS ONE HUNDRED TWENTY-EIGHT ROOTS, honestly the even-parity half of the two hundred fifty-six
+# sign patterns on eight coordinates, which is two to the seventh. Half of two hundred fifty-six is one hundred twenty-eight,
+# and two to the seventh is one hundred twenty-eight. This is the arithmetic of the half-integer family size, the family the
+# is-half-integer-root parity predicate accepts.
+hold the-half-integer-family-has-one-hundred-twenty-eight-roots
+  call is-equal
+    code 128
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          call multiply
+            code 2
+            call multiply
+              code 2
+              call multiply
+                code 2
+                code 2

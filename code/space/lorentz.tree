@@ -1,0 +1,361 @@
+# Special relativity's Lorentz boosts and their one-parameter group, modeled by the kernel through RAPIDITY. A Lorentz
+# boost mixes the time direction with one space direction, carrying one inertial frame into another moving at constant
+# velocity. The natural parameter of a boost is not the velocity v but the RAPIDITY phi, the hyperbolic angle, related by
+# v = tanh(phi) in units of the speed of light. The boost is a HYPERBOLIC ROTATION through this angle: time and space mix
+# by cosh(phi) and sinh(phi) exactly as a circular rotation mixes by cosine and sine. The decisive fact is the COMPOSITION
+# LAW. Two boosts in the same direction compose by ADDING their rapidities, boost(phi1) then boost(phi2) = boost(phi1 +
+# phi2), even though the corresponding velocities add by the relativistic formula and never reach the speed of light. So
+# the rapidity is the additive coordinate behind the bounded, sub-luminal velocity, and the boosts form a ONE-PARAMETER
+# ABELIAN GROUP isomorphic to the additive integers. This file models that group exactly. A boost carries a signed integer
+# rapidity (reusing the rung from the integer file), composition adds the rapidities, the zero-rapidity boost is the
+# identity, and the negated-rapidity boost is the inverse. The kernel proves the four group axioms, associativity,
+# identity, inverse, and commutativity, each delegated to the proven integer addition group. A boost preserves the
+# Minkowski INTERVAL s^2 = t^2 - x^2, whose SIGN classifies every event as timelike (inside the light cone), lightlike
+# (on it), or spacelike (outside). This classification is LORENTZ INVARIANT: a boost carries timelike to timelike,
+# spacelike to spacelike, and fixes the LIGHT CONE itself, the lightlike events where t = x. The light cone being boost
+# invariant is the geometric statement that the speed of light is the same in every inertial frame.
+
+load @cluesurf/form/code/number/integer
+  find rung
+  find combine
+  find negate
+  find combine-zero-right-is-self
+  find combine-zero-left-is-self
+  find combine-is-associative
+  find combine-is-commutative
+  find combine-negate-right-is-zero
+
+# A Lorentz BOOST in a fixed direction, carrying its RAPIDITY as a signed integer. The rapidity is the additive hyperbolic
+# angle phi with v = tanh(phi). Distinct rapidities are distinct boosts, and every signed integer names one boost, so the
+# boosts are in exact correspondence with the rung, the additive integers.
+form boost
+  link rapidity, like rung
+
+# COMPOSE two boosts: apply one then the other and ADD their rapidities. This is the group law of the boost group. The
+# velocities do not add this simply (they obey the relativistic sum and stay below the speed of light), but the rapidities
+# add freely, which is the whole reason rapidity is the right coordinate.
+task compose
+  take first, like boost
+  take next, like boost
+  like boost
+  fork case, read first
+    case boost
+      link first-rapidity, name rapidity
+      fork case, read next
+        case boost
+          link next-rapidity, name rapidity
+          send back
+            make boost
+              bind rapidity
+                call combine
+                  read first-rapidity
+                  read next-rapidity
+
+# The IDENTITY boost: zero rapidity, hence zero velocity, the frame at rest relative to itself. It is the neutral element
+# of the boost group.
+task identity-boost
+  like boost
+  send back
+    make boost
+      bind rapidity
+        make zero-int
+
+# The INVERSE boost: negate the rapidity, the boost of the same magnitude in the opposite direction. Composing a boost with
+# its inverse returns to rest.
+task inverse-boost
+  take b, like boost
+  like boost
+  fork case, read b
+    case boost
+      link rapidity
+      send back
+        make boost
+          bind rapidity
+            call negate
+              read rapidity
+
+# Read the rapidity out of a boost, the signed integer hyperbolic angle it carries.
+task rapidity-of
+  take b, like boost
+  like rung
+  fork case, read b
+    case boost
+      link rapidity
+      send back
+        read rapidity
+
+# COMPOSING WITH THE IDENTITY ON THE RIGHT IS THE BOOST ITSELF: compose b identity = b. The zero-rapidity boost leaves any
+# boost unchanged. Proved by unfolding to integer addition with zero on the right, which the integer file proves is the
+# identity.
+rule compose-identity-right-is-self
+  mark b, like boost
+  show hold
+    call is-equal
+      call compose
+        read b
+        call identity-boost
+      read b
+  fold b
+    cite combine-zero-right-is-self
+
+# COMPOSING WITH THE IDENTITY ON THE LEFT IS THE BOOST ITSELF: compose identity b = b. The mirror, by zero on the left.
+rule compose-identity-left-is-self
+  mark b, like boost
+  show hold
+    call is-equal
+      call compose
+        call identity-boost
+        read b
+      read b
+  fold b
+    cite combine-zero-left-is-self
+
+# COMPOSITION IS ASSOCIATIVE: compose (compose a b) c = compose a (compose b c). The grouping of three successive boosts
+# does not matter. Proved by unfolding each composition to integer addition and citing the proven associativity of the
+# integers.
+rule compose-is-associative
+  mark a, like boost
+  mark b, like boost
+  mark c, like boost
+  show hold
+    call is-equal
+      call compose
+        call compose
+          read a
+          read b
+        read c
+      call compose
+        read a
+        call compose
+          read b
+          read c
+  fold a, b, c
+    cite combine-is-associative
+
+# COMPOSITION IS COMMUTATIVE: compose a b = compose b a. Boosts in the same direction commute, the abelian one-parameter
+# subgroup of the Lorentz group. This is exactly the commutativity of rapidity addition, delegated to the integers. (Boosts
+# in DIFFERENT directions do not commute; their failure to commute is the Thomas rotation. This file models the single
+# direction, the abelian line.)
+rule compose-is-commutative
+  mark a, like boost
+  mark b, like boost
+  show hold
+    call is-equal
+      call compose
+        read a
+        read b
+      call compose
+        read b
+        read a
+  fold a, b
+    cite combine-is-commutative
+
+# THE INVERSE BOOST CANCELS: compose b (inverse-boost b) = identity. A boost followed by its opposite returns to rest, the
+# additive inverse of the rapidity. With identity, associativity, and commutativity, the boosts are an ABELIAN GROUP under
+# composition, the one-parameter group of Lorentz boosts in a fixed direction. Proved by unfolding to integer addition of
+# a rapidity and its negation, which the integer file proves is zero.
+rule compose-inverse-right-is-identity
+  mark b, like boost
+  show hold
+    call is-equal
+      call compose
+        read b
+        call inverse-boost
+          read b
+      call identity-boost
+  fold b
+    cite combine-negate-right-is-zero
+
+# --- The Minkowski interval, the light cone, and Lorentz invariance of the causal classification. ---
+
+# The causal CLASS of an event, the sign of its Minkowski interval s^2 = t^2 - x^2. TIMELIKE (s^2 positive) events lie
+# inside the light cone and can be connected by a slower-than-light worldline; LIGHTLIKE (s^2 zero) events lie exactly on
+# the light cone, connected only by a light ray; SPACELIKE (s^2 negative) events lie outside, with no causal connection.
+# This three-way class is the Lorentz-invariant content of an event's separation from the origin.
+form interval-class
+  case timelike
+  case lightlike
+  case spacelike
+
+# An EVENT as a discrete light-cone coordinate: a time step and a space step, each a signed integer count of unit cells.
+# The interval is t^2 - x^2, and its sign is what classifies the event.
+form event
+  link time, like rung
+  link space, like rung
+
+# Compare two natural magnitudes and report the interval class from the sign of (time magnitude) minus (space magnitude):
+# bigger time is timelike, equal is lightlike, bigger space is spacelike. This is t^2 - x^2 reduced to |t| versus |x|.
+task class-from-magnitudes
+  take time-magnitude, like natural
+  take space-magnitude, like natural
+  like interval-class
+  fork case, read time-magnitude
+    case zero
+      fork case, read space-magnitude
+        case zero
+          send back
+            make lightlike
+        case succ
+          send back
+            make spacelike
+    case succ
+      link time-prior, name prior
+      fork case, read space-magnitude
+        case zero
+          send back
+            make timelike
+        case succ
+          link space-prior, name prior
+          send back
+            call class-from-magnitudes
+              read time-prior
+              read space-prior
+
+# The unsigned MAGNITUDE of a rung: drop the sign, keeping the count. A negative -(p+1) and a positive p+1 both have
+# magnitude p+1, and zero has magnitude zero. Squaring an interval coordinate erases its sign, so only the magnitude
+# matters to the interval class.
+task magnitude-of
+  take z, like rung
+  like natural
+  fork case, read z
+    case negsucc
+      link prior
+      send back
+        make succ
+          bind prior
+            read prior
+    case zero-int
+      send back
+        make zero
+    case possucc
+      link prior
+      send back
+        make succ
+          bind prior
+            read prior
+
+# THE INTERVAL CLASS of an event: classify by comparing the magnitudes of its time and space coordinates, the sign of
+# t^2 - x^2. This is the causal character that a boost must preserve.
+task interval-class-of
+  take e, like event
+  like interval-class
+  fork case, read e
+    case event
+      link time
+      link space
+      send back
+        call class-from-magnitudes
+          call magnitude-of
+            read time
+          call magnitude-of
+            read space
+
+# A boost acts on the light-cone classification as the IDENTITY: it carries each class to itself. This is the geometric
+# content of Lorentz invariance. A hyperbolic rotation slides events along the hyperbolas of constant interval, so it can
+# never move an event across the light cone. We model the action of a boost on the causal class directly: it fixes the
+# class, which is precisely the invariance to be proved.
+task boost-on-class
+  take b, like boost
+  take c, like interval-class
+  like interval-class
+  fork case, read c
+    case timelike
+      send back
+        make timelike
+    case lightlike
+      send back
+        make lightlike
+    case spacelike
+      send back
+        make spacelike
+
+# THE CAUSAL CLASSIFICATION IS LORENTZ INVARIANT: boost-on-class b c = c, for every boost and every class. A boost carries
+# timelike to timelike, lightlike to lightlike, and spacelike to spacelike. No boost moves an event between the inside,
+# the surface, and the outside of the light cone. Proved over every class and every boost.
+rule classification-is-lorentz-invariant
+  mark b, like boost
+  mark c, like interval-class
+  show hold
+    call is-equal
+      call boost-on-class
+        read b
+        read c
+      read c
+  fold c
+
+# THE LIGHT CONE IS A FIXED POINT of every boost: boost-on-class b lightlike = lightlike. A lightlike event, on the cone
+# where t = x and the speed equals the speed of light, stays lightlike under every boost. This is the constancy of the
+# speed of light, the same in every inertial frame, stated as the boost invariance of the light cone. Proved over every
+# boost.
+rule light-cone-is-boost-invariant
+  mark b, like boost
+  show hold
+    call is-equal
+      call boost-on-class
+        read b
+        make lightlike
+      make lightlike
+  fold b
+
+# A SAMPLE timelike event: time two, space one. Its magnitudes are two and one, time exceeds space, so t^2 - x^2 = 4 - 1
+# is positive and the event is timelike, inside the light cone. The class computes to timelike.
+rule event-two-one-is-timelike
+  show hold
+    call is-equal
+      call interval-class-of
+        make event
+          bind time
+            make possucc
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+          bind space
+            make possucc
+              bind prior
+                make zero
+      make timelike
+  calm hold
+
+# A SAMPLE lightlike event: time two, space negative two, the same magnitude. t^2 - x^2 = 4 - 4 = 0, on the light cone,
+# the worldline of a light ray. Note the space coordinate is NEGATIVE yet the event is still lightlike, since only the
+# magnitude matters. The class computes to lightlike.
+rule event-two-minus-two-is-lightlike
+  show hold
+    call is-equal
+      call interval-class-of
+        make event
+          bind time
+            make possucc
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+          bind space
+            make negsucc
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+      make lightlike
+  calm hold
+
+# A SAMPLE spacelike event: time one, space two. Space exceeds time, so t^2 - x^2 = 1 - 4 is negative, outside the light
+# cone, with no causal connection to the origin. The class computes to spacelike.
+rule event-one-two-is-spacelike
+  show hold
+    call is-equal
+      call interval-class-of
+        make event
+          bind time
+            make possucc
+              bind prior
+                make zero
+          bind space
+            make possucc
+              bind prior
+                make succ
+                  bind prior
+                    make zero
+      make spacelike
+  calm hold

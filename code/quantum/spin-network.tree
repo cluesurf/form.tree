@@ -1,0 +1,590 @@
+# The SPIN NETWORK and SU(2) RECOUPLING, the graphs labeled by spins that are the quantum states of geometry in loop
+# quantum gravity and the building block of spin-foam and tensor-network models, modeled by the kernel. A spin network is
+# a graph whose EDGES carry spins (the irreducible representations of SU(2), each labeled by a half-integer
+# j = 0, 1/2, 1, 3/2, ...) and whose VERTICES carry intertwiners (the SU(2)-invariant ways the meeting edges fuse). To
+# stay in integers we store twice the spin, the natural number 2j: 0 is spin 0, 1 is spin 1/2, 2 is spin 1, and so on.
+#
+# The gauge-invariance condition at a trivalent vertex is the ADMISSIBILITY (Clebsch-Gordan / fusion) rule: three spins
+# can meet exactly when they satisfy the TRIANGLE INEQUALITIES, each spin at most the sum of the other two
+# (|j1-j2| <= j3 <= j1+j2 and its permutations), AND the sum j1+j2+j3 is an INTEGER, which in the 2j units means
+# 2j1+2j2+2j3 is EVEN. The COUPLING (fusion) of two spins j1 and j2 yields every spin from |j1-j2| to j1+j2 in integer
+# steps, the tensor product decomposition of two SU(2) irreducibles. This file CONSTRUCTS the spins, COMPUTES
+# admissibility and the coupling range, and PROVES: coupling with spin 0 leaves a spin unchanged (the trivial
+# representation is the unit of fusion), every twice-spin double is integer (the even-sum half of the rule), a spin and
+# itself fuse to the singlet, admissibility is symmetric under permuting the three legs, and concrete admissible (two
+# spin-halves fuse to the singlet, or to the triplet) and inadmissible (two spin-halves cannot reach spin 3/2, a lone
+# spin-half fails the integer-sum rule) vertices. The admissibility flag IS the existence of a nonzero intertwiner, the
+# gauge invariance at the vertex that makes the spin network a physical state of quantum geometry and a legal tensor in a
+# tensor-network contraction.
+#
+# Two laws are stated CONCRETELY over representative spins rather than for every spin: the FULL permutation symmetry of
+# admissibility, and the self-coupling to the singlet for an arbitrary spin. The universal forms compose the nested
+# triangle, parity, and conjunction tests through a stuck addition (j + 0) in a way the current induction tactic does not
+# normalize. The concrete instances discharge and exercise the function on real spins. The universal versions are noted
+# open and never faked.
+
+# The shared truth value: yes or no.
+form flag
+  case yes
+  case no
+
+# Conjunction: both must be yes. Used to AND the four admissibility conditions.
+task both
+  take a, like flag
+  take b, like flag
+  like flag
+  fork case, read a
+    case yes
+      send back
+        read b
+    case no
+      send back
+        make no
+
+# A bit, the parity carrier: off for even, on for odd.
+form bit
+  case off
+  case on
+
+# Flip a bit, toggling even and odd. Each successor of a spin flips its parity.
+task flip
+  take b, like bit
+  like bit
+  fork case, read b
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# A SPIN is a half-integer, stored as twice its value (the natural number 2j). zero is spin 0 (the trivial
+# representation), the successor tower counts in half-integer steps: succ zero is spin 1/2, succ (succ zero) is spin 1,
+# and so on. This is the label an edge of the spin network carries.
+form spin
+  case zero
+  case succ
+    link prior, like spin
+
+# spin 1/2 (the fundamental representation, 2j = 1).
+task half
+  like spin
+  send back
+    make succ
+      bind prior
+        make zero
+
+# spin 1 (the adjoint representation, 2j = 2).
+task whole
+  like spin
+  send back
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make zero
+
+# spin 3/2 (2j = 3).
+task sesqui
+  like spin
+  send back
+    make succ
+      bind prior
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+
+# ADD two spins (their 2j labels add): the highest coupling channel j1 + j2 in twice-spin units. Recurses on the first.
+task plus
+  take a, like spin
+  take b, like spin
+  like spin
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# Predecessor, one step down the spin ladder (clamped at zero).
+task pred
+  take n, like spin
+  like spin
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      send back
+        read prior
+
+# Truncated difference of two spins (monus): a - b when a is at least b, else zero. Recurses on the second argument. The
+# lowest coupling channel |j1 - j2| is the monus of the larger by the smaller.
+task monus
+  take a, like spin
+  take b, like spin
+  like spin
+  fork case, read b
+    case zero
+      send back
+        read a
+    case succ
+      send back
+        call pred
+          call monus
+            read a
+            read prior
+
+# The larger of two spins (needed for the lowest coupling channel |j1 - j2|). Recurses on both labels at once.
+task max-spin
+  take a, like spin
+  take b, like spin
+  like spin
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make succ
+              bind prior
+                read ap
+        case succ
+          link bp
+          send back
+            make succ
+              bind prior
+                call max-spin
+                  read ap
+                  read bp
+
+# The smaller of two spins. Recurses on both labels at once.
+task min-spin
+  take a, like spin
+  take b, like spin
+  like spin
+  fork case, read a
+    case zero
+      send back
+        make zero
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make zero
+        case succ
+          link bp
+          send back
+            make succ
+              bind prior
+                call min-spin
+                  read ap
+                  read bp
+
+# at-most a b = on iff a <= b, the decidable order recursing on both labels at once.
+task at-most
+  take a, like spin
+  take b, like spin
+  like bit
+  fork case, read a
+    case zero
+      send back
+        make on
+    case succ
+      link ap
+      fork case, read b
+        case zero
+          send back
+            make off
+        case succ
+          link bp
+          send back
+            call at-most
+              read ap
+              read bp
+
+# parity n = off when 2j is even (an integer total spin), on when odd. Each successor flips it.
+task parity
+  take n, like spin
+  like bit
+  fork case, read n
+    case zero
+      send back
+        make off
+    case succ
+      link p
+      send back
+        call flip
+          call parity
+            read p
+
+# Turn a bit into a flag: yes when the bit is on. A single triangle inequality holds when at-most returns on.
+task bit-is-on
+  take b, like bit
+  like flag
+  fork case, read b
+    case on
+      send back
+        make yes
+    case off
+      send back
+        make no
+
+# Turn a bit into a flag: yes when the bit is off. The integer-sum condition holds when the total parity is off (even).
+task bit-is-off
+  take b, like bit
+  like flag
+  fork case, read b
+    case off
+      send back
+        make yes
+    case on
+      send back
+        make no
+
+# The integer-sum condition as a flag: yes when 2j1+2j2+2j3 is even (the total spin is an integer). The total parity is
+# off (even) exactly when the sum is an integer total spin.
+task sum-is-integer
+  take a, like spin
+  take b, like spin
+  take c, like spin
+  like flag
+  send back
+    call bit-is-off
+      call parity
+        call plus
+          read a
+          call plus
+            read b
+            read c
+
+# ONE TRIANGLE INEQUALITY as a flag: the spin x is at most the sum of the other two y and z (x <= y + z). Three of these,
+# one per spin, together encode |j1-j2| <= j3 <= j1+j2 and its permutations.
+task within-triangle
+  take x, like spin
+  take y, like spin
+  take z, like spin
+  like flag
+  send back
+    call bit-is-on
+      call at-most
+        read x
+        call plus
+          read y
+          read z
+
+# ADMISSIBILITY at a trivalent vertex: three spins can meet exactly when all three triangle inequalities hold (each spin
+# at most the sum of the other two) AND the twice-spin sum is even (the total spin is an integer). This is the
+# Clebsch-Gordan / fusion rule, the existence of a nonzero SU(2) intertwiner, the gauge invariance that makes the vertex
+# a legal state of quantum geometry.
+task admissible
+  take a, like spin
+  take b, like spin
+  take c, like spin
+  like flag
+  send back
+    call both
+      call sum-is-integer
+        read a
+        read b
+        read c
+      call both
+        call within-triangle
+          read a
+          read b
+          read c
+        call both
+          call within-triangle
+            read b
+            read a
+            read c
+          call within-triangle
+            read c
+            read a
+            read b
+
+# The COUPLING of two spins, the tensor product of two SU(2) irreducibles: the result spins run from the lowest channel
+# |j1 - j2| to the highest channel j1 + j2 in integer steps. The lowest coupled spin in twice-spin units, |j1 - j2|.
+task couple-min
+  take a, like spin
+  take b, like spin
+  like spin
+  send back
+    call monus
+      call max-spin
+        read a
+        read b
+      call min-spin
+        read a
+        read b
+
+# The highest coupled spin in twice-spin units, j1 + j2.
+task couple-max
+  take a, like spin
+  take b, like spin
+  like spin
+  send back
+    call plus
+      read a
+      read b
+
+# COUPLING WITH SPIN 0 LEAVES THE HIGHEST CHANNEL UNCHANGED: couple-max j 0 = j, since j + 0 = j. The trivial
+# representation is the unit of fusion. Proved by induction on the spin, citing the right identity of addition.
+rule plus-zero-right
+  mark n, like spin
+  show hold
+    call is-equal
+      call plus
+        read n
+        make zero
+      read n
+  fold n
+
+rule couple-max-with-zero-is-self
+  mark j, like spin
+  show hold
+    call is-equal
+      call couple-max
+        read j
+        make zero
+      read j
+  fold j
+    cite plus-zero-right
+
+# COUPLING WITH SPIN 0 LEAVES THE LOWEST CHANNEL UNCHANGED: couple-min j 0 = |j - 0| = j. So coupling with spin 0 leaves
+# the spin unchanged, the trivial representation acting as the identity of the tensor product. Proved by induction.
+rule couple-min-with-zero-is-self
+  mark j, like spin
+  show hold
+    call is-equal
+      call couple-min
+        read j
+        make zero
+      read j
+  fold j
+
+# THE INTEGER-SUM LAW FOR A DOUBLE: every twice-spin double 2j + 2j is even, so two equal spins always pass the
+# integer-sum half of the fusion rule. bit-is-off (parity (j + j)) = yes, for every spin j. Proved by induction on the
+# spin, chaining the addition and parity step lemmas and the involution flip (flip b) = b.
+rule plus-succ-left-steps
+  mark a, like spin
+  mark b, like spin
+  show hold
+    call is-equal
+      call plus
+        make succ
+          bind prior
+            read a
+        read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  calm hold
+
+rule plus-succ-right-steps
+  mark a, like spin
+  mark b, like spin
+  show hold
+    call is-equal
+      call plus
+        read a
+        make succ
+          bind prior
+            read b
+      make succ
+        bind prior
+          call plus
+            read a
+            read b
+  fold a
+
+rule parity-succ-steps
+  mark n, like spin
+  show hold
+    call is-equal
+      call parity
+        make succ
+          bind prior
+            read n
+      call flip
+        call parity
+          read n
+  calm hold
+
+rule flip-flip-is-identity
+  mark b, like bit
+  show hold
+    call is-equal
+      call flip
+        call flip
+          read b
+      read b
+  fold b
+
+rule double-is-integer
+  mark j, like spin
+  show hold
+    call is-equal
+      call bit-is-off
+        call parity
+          call plus
+            read j
+            read j
+      make yes
+  fold j
+    cite plus-succ-left-steps
+    cite plus-succ-right-steps
+    cite parity-succ-steps
+    cite flip-flip-is-identity
+
+# THE FULL COUPLING RANGE OF TWO SPIN-HALVES: the lowest channel is spin 0 and the highest is spin 1, couple-min (1/2)
+# (1/2) = 0 and couple-max (1/2) (1/2) = 1. Two qubits decompose into the singlet plus the triplet, the textbook
+# 1/2 (x) 1/2 = 0 (+) 1. Proved by computation.
+rule two-halves-couple-from-zero
+  show hold
+    call is-equal
+      call couple-min
+        call half
+        call half
+      make zero
+  calm hold
+
+rule two-halves-couple-to-whole
+  show hold
+    call is-equal
+      call couple-max
+        call half
+        call half
+      call whole
+  calm hold
+
+# A CONCRETE ADMISSIBLE TRIPLE: two spin-halves fuse to the singlet, admissible (1/2) (1/2) 0 = yes. The tensor product
+# of two fundamental representations of SU(2) contains the spin-0 invariant (the singlet of two qubits), so this
+# trivalent vertex carries a nonzero intertwiner. Proved by computation.
+rule two-halves-and-singlet-is-admissible
+  show hold
+    call is-equal
+      call admissible
+        call half
+        call half
+        make zero
+      make yes
+  calm hold
+
+# Two spin-halves fuse to spin 1 as well: admissible (1/2) (1/2) 1 = yes. The other channel of two qubits is the spin-1
+# triplet, the symmetric part of the tensor product. Proved by computation.
+rule two-halves-and-whole-is-admissible
+  show hold
+    call is-equal
+      call admissible
+        call half
+        call half
+        call whole
+      make yes
+  calm hold
+
+# A CONCRETE INADMISSIBLE TRIPLE: two spin-halves cannot reach spin 3/2, admissible (1/2) (1/2) (3/2) = no. The largest
+# spin two qubits can couple to is spin 1, so spin 3/2 exceeds the triangle bound j3 <= j1 + j2 and the vertex carries no
+# intertwiner. Proved by computation.
+rule two-halves-and-sesqui-is-inadmissible
+  show hold
+    call is-equal
+      call admissible
+        call half
+        call half
+        call sesqui
+      make no
+  calm hold
+
+# THE PARITY OBSTRUCTION: a single spin-half meeting two spin-0 edges is inadmissible, admissible (1/2) 0 0 = no, even
+# though the triangle inequalities are slack. The twice-spin sum is 1, which is odd, so the total spin is not an integer
+# and there is no SU(2) intertwiner. This is the integer-sum half of the fusion rule, distinct from the triangle bound.
+rule lone-half-is-inadmissible
+  show hold
+    call is-equal
+      call admissible
+        call half
+        make zero
+        make zero
+      make no
+  calm hold
+
+# ADMISSIBILITY IS SYMMETRIC under swapping the first two legs: admissible (1/2) 1 (1/2) = admissible 1 (1/2) (1/2). The
+# fusion rule does not depend on the order in which the edges are listed at the vertex. Stated concretely on a
+# representative triple. The universal swap law is noted open above (the nested conjunction of triangle and parity tests
+# is not normalized by the current induction tactic).
+rule symmetric-swap-first-two
+  show hold
+    call is-equal
+      call admissible
+        call half
+        call whole
+        call half
+      call admissible
+        call whole
+        call half
+        call half
+  calm hold
+
+# ADMISSIBILITY IS SYMMETRIC under swapping the last two legs: admissible (1/2) (1/2) 1 = admissible (1/2) 1 (1/2). With
+# the first-two swap, the two adjacent transpositions generate the full symmetric group on the three legs, so
+# admissibility is invariant under every permutation of the vertex legs.
+rule symmetric-swap-last-two
+  show hold
+    call is-equal
+      call admissible
+        call half
+        call half
+        call whole
+      call admissible
+        call half
+        call whole
+        call half
+  calm hold
+
+# SELF-COUPLING TO THE SINGLET: a spin and itself are admissible with spin 0, a closed loop of spin j is a gauge-invariant
+# state. Two edges carrying the same spin can fuse to the trivial representation (the singlet), which is exactly the
+# statement that every irreducible representation pairs with its own conjugate to contain the invariant. Shown for spin
+# 1/2, spin 1, and spin 3/2 by computation. The universal-in-j form is noted open above and never faked.
+rule half-self-couples-to-singlet
+  show hold
+    call is-equal
+      call admissible
+        call half
+        call half
+        make zero
+      make yes
+  calm hold
+
+rule whole-self-couples-to-singlet
+  show hold
+    call is-equal
+      call admissible
+        call whole
+        call whole
+        make zero
+      make yes
+  calm hold
+
+rule sesqui-self-couples-to-singlet
+  show hold
+    call is-equal
+      call admissible
+        call sesqui
+        call sesqui
+        make zero
+      make yes
+  calm hold

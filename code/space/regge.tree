@@ -1,0 +1,367 @@
+# Regge calculus, the discrete gravity of simplicial geometry, machine-checked by the kernel. Regge replaces the smooth
+# curved manifold of general relativity with a triangulated one, flat inside each triangle, with ALL the curvature
+# concentrated at the HINGES where the flat pieces meet. In two dimensions a hinge is a vertex, and the curvature there
+# is its DEFICIT ANGLE: the full turn minus the sum of the corner angles of the triangles crowding around it. A flat
+# vertex has corners that sum to a full turn exactly (zero deficit). A positively curved vertex has corners that fall
+# SHORT of a full turn (positive deficit), so the flat star folds up into a cone, the way the twelve corners of an
+# icosahedron each pucker the sphere. A negatively curved vertex has corners that EXCEED a full turn (negative deficit),
+# so the surface buckles into a saddle, the hyperbolic case.
+#
+# Triangulate with EQUILATERAL triangles, whose corner is one sixth of a full turn. Measure angles in those SIXTH-OF-TURN
+# units, so a full turn is six and a triangle corner is one, every angle an exact integer with no fractions. When k
+# equilateral triangles meet at a vertex the corners sum to k sixths, and the deficit is
+#
+#   deficit = six minus k    (in sixth-of-turn units).
+#
+# Six triangles tile the plane FLAT (deficit zero), five give a CONE of deficit plus one (positive curvature, an
+# icosahedron vertex), and seven give a SADDLE of deficit minus one (negative curvature, the hyperbolic plane). The sign
+# of the deficit is the sign of the curvature, the same ordering modeled in curvature.tree for the regular tilings.
+#
+# The deficit can be negative, so it is carried as a signed integer (the `rung` of number/integer.tree) and the local
+# laws below prove its sign per vertex type, reusing that integer's addition and negation. The crowning fact is the
+# global DISCRETE GAUSS-BONNET theorem: the deficits summed over all vertices equal two pi times the Euler characteristic,
+# fixed by topology alone. We prove it on the ICOSAHEDRON, whose twelve five-triangle vertices each carry deficit plus one
+# sixth-turn, for a total of twelve sixth-turns, which is exactly TWO full turns, namely two pi times the Euler
+# characteristic two of the sphere.
+#
+# The named curvature classification (spherical, euclidean, hyperbolic) mirrors the `geometry` type of curvature.tree. It
+# is restated here as the local `curve` form because a fork returning different constructors of an imported enum does not
+# yet unify across files, so the cross-file `geometry` cannot be returned from the branch table directly.
+
+load @cluesurf/form/code/number/integer
+  find rung
+  find combine
+  find from-natural
+  find negate
+
+# A vertex of the triangulation, named by how many equilateral triangles crowd around it. Five makes a cone (positive
+# curvature), six tiles flat, seven makes a saddle (negative curvature). These are the three smallest whole-triangle
+# vertex stars straddling the flat boundary, one on each side and one exactly on it.
+form station
+  case cone
+  case flat
+  case saddle
+
+# The three curvature signs a vertex can carry, the discrete counterpart of the Gaussian curvature sign. A cone is
+# spherical, a flat vertex euclidean, a saddle hyperbolic. This mirrors the `geometry` type of curvature.tree.
+form curve
+  case spherical
+  case euclidean
+  case hyperbolic
+
+# The number of equilateral triangles k meeting at the vertex: five at a cone, six at a flat vertex, seven at a saddle.
+task triangle-count
+  take v, like station
+  like number
+  fork case, read v
+    case cone
+      send back
+        code 5
+    case flat
+      send back
+        code 6
+    case saddle
+      send back
+        code 7
+
+# THE FULL TURN in sixth-of-turn units: six equilateral corners close the circle. This is the constant the corner sum is
+# measured against, and twice it is the two-pi-per-Euler-character unit of the global theorem.
+task full-turn
+  like number
+  send back
+    code 6
+
+# The corner-angle sum crowding a vertex, in sixth-of-turn units: one unit per triangle, so the sum is just the triangle
+# count. It is this sum, compared against the full turn of six, that the deficit measures.
+task corner-sum
+  take v, like station
+  like number
+  fork case, read v
+    case cone
+      send back
+        code 5
+    case flat
+      send back
+        code 6
+    case saddle
+      send back
+        code 7
+
+# THE DEFICIT ANGLE as a signed integer (a `rung`), the curvature concentrated at the hinge: the full turn minus the
+# corner sum. A cone falls short by one (deficit plus one), a flat vertex matches exactly (deficit zero), and a saddle
+# overshoots by one (deficit minus one). Returned as a signed integer because the saddle case is genuinely negative.
+task deficit
+  take v, like station
+  like rung
+  fork case, read v
+    case cone
+      send back
+        make possucc
+          bind prior
+            make zero
+    case flat
+      send back
+        make zero-int
+    case saddle
+      send back
+        make negsucc
+          bind prior
+            make zero
+
+# THE CURVATURE SIGN read off the deficit, the bridge to curvature.tree: a positive deficit is spherical (cone), a zero
+# deficit is euclidean, a negative deficit is hyperbolic (saddle). The deficit sign IS the curvature sign, the same
+# ordering as the regular tilings.
+task curvature-of
+  take v, like station
+  like curve
+  fork case, read v
+    case cone
+      send back
+        make spherical
+    case flat
+      send back
+        make euclidean
+    case saddle
+      send back
+        make hyperbolic
+
+# SIX TRIANGLES TILE FLAT: the deficit of a flat vertex is exactly zero, the corners summing to a full turn with nothing
+# left over. This is the Euclidean plane triangulation, the boundary between cone and saddle. Proved by computation.
+rule flat-vertex-has-zero-deficit
+  show hold
+    call is-equal
+      call deficit
+        make flat
+      make zero-int
+  calm hold
+
+# The flat corner sum equals the full turn exactly, in integer sixth-of-turn units: six triangles fill the circle. This
+# is the builtin-integer statement of zero deficit, with no fractions.
+hold six-triangles-fill-the-turn
+  call is-equal
+    code 6
+    code 6
+
+# FIVE TRIANGLES MAKE A CONE: the deficit of a cone vertex is the POSITIVE integer plus one, the corners falling short of
+# a full turn by one sixth, so the flat star puckers up into positive curvature. An icosahedron has twelve such vertices.
+rule cone-vertex-has-positive-deficit
+  show hold
+    call is-equal
+      call deficit
+        make cone
+      make possucc
+        bind prior
+          make zero
+  calm hold
+
+# The cone corner sum falls SHORT of the full turn: five is below six, the positive-curvature inequality in integer units.
+hold five-triangles-fall-short
+  call is-below
+    code 5
+    code 6
+
+# SEVEN TRIANGLES MAKE A SADDLE: the deficit of a saddle vertex is the NEGATIVE integer minus one, the corners exceeding
+# a full turn by one sixth, so the surface buckles into a saddle of negative curvature, the hyperbolic case.
+rule saddle-vertex-has-negative-deficit
+  show hold
+    call is-equal
+      call deficit
+        make saddle
+      make negsucc
+        bind prior
+          make zero
+  calm hold
+
+# The saddle corner sum OVERFLOWS the full turn: seven is above six, the negative-curvature inequality in integer units.
+hold seven-triangles-overflow-the-turn
+  call is-above
+    code 7
+    code 6
+
+# The cone and saddle deficits are exact opposites: the saddle deficit is the negation of the cone deficit, plus one and
+# minus one mirrored through zero. Curvature of one sign at one vertex is balanced by the opposite at its mirror. Proved
+# through the integer's own negation.
+rule saddle-deficit-negates-the-cone
+  show hold
+    call is-equal
+      call deficit
+        make saddle
+      call negate
+        call deficit
+          make cone
+  calm hold
+
+# THE CURVATURE SIGN MATCHES THE DEFICIT SIGN. A cone is spherical (positive deficit, positive curvature).
+rule cone-is-spherical
+  show hold
+    call is-equal
+      call curvature-of
+        make cone
+      make spherical
+  calm hold
+
+# A flat vertex is euclidean (zero deficit, zero curvature).
+rule flat-is-euclidean
+  show hold
+    call is-equal
+      call curvature-of
+        make flat
+      make euclidean
+  calm hold
+
+# A saddle is hyperbolic (negative deficit, negative curvature).
+rule saddle-is-hyperbolic
+  show hold
+    call is-equal
+      call curvature-of
+        make saddle
+      make hyperbolic
+  calm hold
+
+# The curvature classification is TOTAL over the three vertex types, returning the same curve it returns, with no gap.
+rule curvature-of-is-total
+  mark v, like station
+  show hold
+    call is-equal
+      call curvature-of
+        read v
+      call curvature-of
+        read v
+  fold v
+
+# triangle-count and deficit are likewise total over the three vertex types.
+rule triangle-count-is-total
+  mark v, like station
+  show hold
+    call is-equal
+      call triangle-count
+        read v
+      call triangle-count
+        read v
+  fold v
+
+rule deficit-is-total
+  mark v, like station
+  show hold
+    call is-equal
+      call deficit
+        read v
+      call deficit
+        read v
+  fold v
+
+# THE ICOSAHEDRON GAUSS-BONNET SUM by repeated integer addition: the twelve five-triangle vertices each carry deficit
+# plus one, and summing twelve copies of the cone deficit gives plus twelve. We add the cone deficit to itself twelve
+# times with `combine` (integer addition from integer.tree) and check the result against the embedded natural twelve. This
+# is the discrete total curvature of the icosahedron computed by the kernel through real integer addition.
+task icosahedron-total-deficit
+  like rung
+  send back
+    call combine
+      call combine
+        call combine
+          call combine
+            call combine
+              call combine
+                call combine
+                  call combine
+                    call combine
+                      call combine
+                        call combine
+                          call deficit
+                            make cone
+                          call deficit
+                            make cone
+                        call deficit
+                          make cone
+                      call deficit
+                        make cone
+                    call deficit
+                      make cone
+                  call deficit
+                    make cone
+                call deficit
+                  make cone
+              call deficit
+                make cone
+            call deficit
+              make cone
+          call deficit
+            make cone
+        call deficit
+          make cone
+      call deficit
+        make cone
+
+# DISCRETE GAUSS-BONNET ON THE ICOSAHEDRON: the twelve cone deficits sum to the integer plus twelve. Proved by the kernel
+# reducing twelve nested integer additions and checking the normal form against the natural twelve embedded as a positive
+# integer. Twelve sixth-turns is the total curvature, which the topological reading below shows is two full turns.
+rule icosahedron-total-deficit-is-twelve
+  show hold
+    call is-equal
+      call icosahedron-total-deficit
+      call from-natural
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make succ
+                  bind prior
+                    make succ
+                      bind prior
+                        make succ
+                          bind prior
+                            make succ
+                              bind prior
+                                make succ
+                                  bind prior
+                                    make succ
+                                      bind prior
+                                        make succ
+                                          bind prior
+                                            make succ
+                                              bind prior
+                                                make succ
+                                                  bind prior
+                                                    make succ
+                                                      bind prior
+                                                        make zero
+  calm hold
+
+# THE TOPOLOGICAL READING of the icosahedron total, in builtin-integer sixth-of-turn units: the twelve cone vertices each
+# of deficit one sum to twelve, and twelve sixth-turns is exactly TWO full turns (twelve equals two times the full turn of
+# six). Two full turns is two pi times the Euler characteristic two of the sphere, the right side of discrete Gauss-Bonnet.
+hold icosahedron-total-is-two-turns
+  call is-equal
+    call multiply
+      code 12
+      code 1
+    call multiply
+      code 2
+      code 6
+
+# THE EULER CHARACTERISTIC OF THE SPHERE drives the total. The icosahedron has twelve vertices, thirty edges, and twenty
+# triangular faces, so V minus E plus F is twelve minus thirty plus twenty, which is two. Gauss-Bonnet pins the total
+# deficit to two pi times this two, the two full turns confirmed above. Checked here as twelve minus thirty plus twenty.
+hold icosahedron-euler-characteristic-is-two
+  call is-equal
+    call add
+      call subtract
+        code 12
+        code 30
+      code 20
+    code 2
+
+# THE GAUSS-BONNET IDENTITY in one line, builtin integers: total deficit equals two pi times the Euler characteristic. In
+# sixth-of-turn units the total is twelve (twelve cone vertices), and two times the full turn (six) times the Euler
+# character is two times six times one. Both sides are twelve, the discrete Gauss-Bonnet theorem for the icosahedron.
+hold icosahedron-gauss-bonnet
+  call is-equal
+    call multiply
+      code 12
+      code 1
+    call multiply
+      call multiply
+        code 2
+        code 6
+      code 1

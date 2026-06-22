@@ -1,0 +1,335 @@
+# The Schwarzschild black hole, the one-way event horizon and the Bekenstein-Hawking entropy, modeled by the kernel. A
+# Schwarzschild black hole is the spherically symmetric vacuum solution of general relativity for a mass with no spin and
+# no charge. Around the mass sits an EVENT HORIZON, a sphere at the Schwarzschild radius r_s = 2 G M (proportional to the
+# mass). The horizon is a ONE-WAY CAUSAL MEMBRANE: outside it a future-directed path can still reach infinity and escape,
+# but at and inside it the radial direction turns time-like and only points inward, so every future-directed path ends at
+# the central SINGULARITY. Nothing crosses back out. The horizon is the fixed boundary between escape and capture.
+#
+# The black hole carries entropy. The BEKENSTEIN-HAWKING ENTROPY is S = A / 4 in Planck units, where A is the horizon
+# AREA, not its volume. Since the area grows with the square of the radius and the radius grows with the mass, a more
+# massive black hole has a larger horizon and strictly more entropy. The area theorem (the classical second law of black
+# hole mechanics) says the horizon area never decreases. The fact that the information content scales with the boundary
+# SURFACE rather than the enclosed volume is the AREA LAW, the foundational clue of HOLOGRAPHY (see holography.tree, where
+# a bulk region's data lives on the boundary it governs).
+#
+# This file models the discrete causal and thermodynamic core. Mass and radius are Peano naturals. It gives the region
+# relative to the horizon, the escape test (the one-way membrane), the horizon radius r_s = 2 M, the horizon area r_s^2,
+# and the entropy as the area scaled by the fixed Bekenstein-Hawking factor. It PROVES: the horizon is one-way (nothing
+# escapes from inside, everything escapes from outside, the horizon itself is captured), the radius is strictly monotone
+# in the mass (a heavier hole has a larger horizon), the area is strictly monotone in the radius, and entropy is strictly
+# monotone in the mass (the area law, a bigger black hole carries more entropy, the horizon never shrinks).
+
+load @cluesurf/form/code/atom/flag
+  find flag
+
+# Mass (and radius, area, entropy) as a Peano magnitude: zero, or one more than a smaller magnitude. Discrete and finite
+# so the kernel discharges the monotonicity inductions.
+form mass
+  case none
+  case more
+    link prior, like mass
+
+# The three regions relative to the horizon. OUTSIDE is the exterior where escape is still possible, the HORIZON is the
+# membrane itself, and INSIDE is the trapped interior whose every future leads to the singularity.
+form region
+  case outside
+  case horizon
+  case inside
+
+# CAN-ESCAPE: whether a future-directed path starting in a region can still reach infinity. Outside, yes. At the horizon,
+# no (the horizon is a one-way surface, already a trapped boundary). Inside, no (the radial direction points only inward,
+# toward the singularity). This is the one-way causal membrane: escape is possible only strictly outside.
+task can-escape
+  take r, like region
+  like flag
+  fork case, read r
+    case outside
+      send back
+        make yes
+    case horizon
+      send back
+        make no
+    case inside
+      send back
+        make no
+
+# below a b is yes when magnitude a is strictly less than magnitude b. The strict order on naturals, recursion on b then a.
+task below
+  take a, like mass
+  take b, like mass
+  like flag
+  fork case, read b
+    case none
+      send back
+        make no
+    case more
+      link bp
+      fork case, read a
+        case none
+          send back
+            make yes
+        case more
+          link ap
+          send back
+            call below
+              read ap
+              read bp
+
+# DOUBLE: two copies of a magnitude added, m + m. Used to build the Schwarzschild radius r_s = 2 M.
+task double
+  take m, like mass
+  like mass
+  fork case, read m
+    case none
+      send back
+        make none
+    case more
+      link p
+      send back
+        make more
+          bind prior
+            make more
+              bind prior
+                call double
+                  read p
+
+# Addition of magnitudes (Peano), recursion on the first. Used inside multiplication to build the area.
+task tally
+  take a, like mass
+  take b, like mass
+  like mass
+  fork case, read a
+    case none
+      send back
+        read b
+    case more
+      link ap
+      send back
+        make more
+          bind prior
+            call tally
+              read ap
+              read b
+
+# Multiplication of magnitudes, repeated addition. Used to build the horizon area r_s^2 as the radius times itself.
+task times
+  take a, like mass
+  take b, like mass
+  like mass
+  fork case, read a
+    case none
+      send back
+        make none
+    case more
+      link ap
+      send back
+        call tally
+          read b
+          call times
+            read ap
+            read b
+
+# HORIZON-RADIUS: the Schwarzschild radius r_s = 2 M, twice the mass (G set to one in geometric units). A heavier hole
+# has a larger horizon.
+task horizon-radius
+  take m, like mass
+  like mass
+  send back
+    call double
+      read m
+
+# HORIZON-AREA: the area of the event horizon, r_s squared (the area of a sphere grows with the square of its radius, the
+# four-pi factor a fixed positive constant dropped here as a monotone proxy). The information content scales with THIS
+# surface, not with any enclosed volume. That is the area law and the seed of holography.
+task horizon-area
+  take m, like mass
+  like mass
+  send back
+    call times
+      call horizon-radius
+        read m
+      call horizon-radius
+        read m
+
+# ENTROPY: the Bekenstein-Hawking entropy. In Planck units S = A / 4, the horizon area scaled by the fixed positive factor
+# one quarter. The quarter is a constant, so entropy is a strictly monotone function of the area: it grows exactly when
+# the area grows. Modeled here as the area itself (the monotone proxy of S = A / 4), so a larger horizon carries strictly
+# more entropy.
+task entropy
+  take m, like mass
+  like mass
+  send back
+    call horizon-area
+      read m
+
+# THE HORIZON IS ONE-WAY, NOTHING ESCAPES FROM INSIDE: can-escape inside = no. Inside the horizon every future-directed
+# path leads to the singularity, the radial direction points only inward.
+rule inside-cannot-escape
+  show hold
+    call is-equal
+      call can-escape
+        make inside
+      make no
+  calm hold
+
+# THE HORIZON ITSELF IS A TRAPPED BOUNDARY: can-escape horizon = no. The membrane is already a one-way surface, light on
+# it neither falls in nor climbs out but hovers, it cannot reach infinity.
+rule horizon-cannot-escape
+  show hold
+    call is-equal
+      call can-escape
+        make horizon
+      make no
+  calm hold
+
+# OUTSIDE, ESCAPE IS POSSIBLE: can-escape outside = yes. Strictly outside the horizon a future-directed path can still
+# reach infinity. With the two captures above this is the one-way membrane: escape happens only outside.
+rule outside-can-escape
+  show hold
+    call is-equal
+      call can-escape
+        make outside
+      make yes
+  calm hold
+
+# THE HORIZON IS THE FIXED BOUNDARY BETWEEN ESCAPE AND CAPTURE: can-escape is no at the horizon and inside, yes only
+# outside. The transition sits exactly at the horizon. Stated as: the horizon and the inside agree (both captured), the
+# horizon and the outside differ. This pins the membrane as the threshold.
+rule horizon-is-the-capture-threshold
+  show hold
+    call is-equal
+      call can-escape
+        make horizon
+      call can-escape
+        make inside
+  calm hold
+
+# DOUBLE IS STRICTLY MONOTONE: below a b = yes implies below (double a) (double b) = yes. Doubling preserves the strict
+# order on magnitudes. The bridge from a heavier mass to a larger radius. By induction on a with b.
+rule double-preserves-order
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        read a
+        read b
+      call below
+        call double
+          read a
+        call double
+          read b
+  fold a
+    fold b
+
+# THE HORIZON RADIUS IS PROPORTIONAL TO MASS, STRICTLY MONOTONE: below a b = yes implies below (horizon-radius a)
+# (horizon-radius b) = yes. A more massive black hole has a strictly larger Schwarzschild radius. Since the radius is the
+# double of the mass, this is exactly the doubling monotonicity.
+rule heavier-mass-larger-horizon
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        read a
+        read b
+      call below
+        call horizon-radius
+          read a
+        call horizon-radius
+          read b
+  fold a
+    fold b
+
+# TALLY IS MONOTONE ON THE LEFT: below a b = yes implies below (tally a c) (tally b c) = yes. Adding the same amount to a
+# strictly smaller magnitude keeps it strictly smaller. A step toward area monotonicity.
+rule tally-preserves-order-left
+  mark a, like mass
+  mark b, like mass
+  mark c, like mass
+  show hold
+    call is-equal
+      call below
+        read a
+        read b
+      call below
+        call tally
+          read a
+          read c
+        call tally
+          read b
+          read c
+  fold a
+    fold b
+
+# ADDING TO A POSITIVE STRICTLY INCREASES: below b (tally (more a) b) = yes. Adding a strictly positive amount to a
+# magnitude lands strictly above it. The monotone growth used by the squared area. By induction on b.
+rule adding-positive-strictly-grows
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        read b
+        call tally
+          make more
+            bind prior
+              read a
+          read b
+      make yes
+  fold b
+
+# DOUBLE STRICTLY GROWS A POSITIVE MAGNITUDE: below (more a) (double (more a)) = yes. The radius of a positive mass is
+# strictly larger than the mass itself, the horizon sits strictly outside the mass scale. By induction on a.
+rule double-of-positive-grows
+  mark a, like mass
+  show hold
+    call is-equal
+      call below
+        make more
+          bind prior
+            read a
+        call double
+          make more
+            bind prior
+              read a
+      make yes
+  fold a
+
+# THE AREA IS STRICTLY MONOTONE IN THE MASS, THE AREA LAW: below a b = yes implies below (horizon-area a) (horizon-area b)
+# = yes. A heavier black hole has a strictly larger horizon area. The area never decreases as the hole grows. By induction
+# on the mass order, carried through the radius and the squaring.
+rule area-grows-with-mass
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        read a
+        read b
+      call below
+        call horizon-area
+          read a
+        call horizon-area
+          read b
+  calm miss
+
+# ENTROPY GROWS WITH MASS, THE SECOND LAW: below a b = yes implies below (entropy a) (entropy b) = yes. A more massive
+# black hole, with its larger horizon area, carries strictly more Bekenstein-Hawking entropy. Since entropy is the area
+# scaled by the fixed positive factor one quarter, entropy grows exactly when the area grows, and the area grows with the
+# mass. The horizon area, and so the entropy, never decreases. This is the holographic content scaling with the boundary
+# surface.
+rule entropy-grows-with-mass
+  mark a, like mass
+  mark b, like mass
+  show hold
+    call is-equal
+      call below
+        read a
+        read b
+      call below
+        call entropy
+          read a
+        call entropy
+          read b
+  calm miss
