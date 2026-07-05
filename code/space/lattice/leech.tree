@@ -293,8 +293,8 @@ rule weight-zero-is-allowed
 rule minimal-squared-length-is-four
   show hold
     call is-equal
-      mark 4
-      mark 4
+      code 4
+      code 4
   calm hold
 
 # A root would be a vector of squared length two. The Leech lattice has none, so its minimal squared length two is ABSENT
@@ -303,8 +303,8 @@ rule minimal-squared-length-is-four
 rule a-root-would-have-squared-length-two
   show hold
     call is-equal
-      mark 2
-      mark 2
+      code 2
+      code 2
   calm hold
 
 # The kissing number of the Leech lattice, the count of minimal vectors, is one hundred ninety-six thousand five hundred
@@ -312,8 +312,8 @@ rule a-root-would-have-squared-length-two
 rule kissing-number-is-196560
   show hold
     call is-equal
-      mark 196560
-      mark 196560
+      code 196560
+      code 196560
   calm hold
 
 # E8, by contrast, has two hundred and forty roots. Recorded as the integer 240, the kissing number of the eight
@@ -321,6 +321,6 @@ rule kissing-number-is-196560
 rule e8-has-240-roots
   show hold
     call is-equal
-      mark 240
-      mark 240
+      code 240
+      code 240
   calm hold

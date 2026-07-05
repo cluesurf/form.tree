@@ -1,0 +1,66 @@
+# The warp factor, the growth rate of the {3,4,3,4} bulk, pinned EXACTLY as a cubic surd. The cells of the honeycomb fall
+# into three CONE TYPES by back-degree (one, two, or three neighbours in the previous shell), and the cone-type transfer
+# matrix [[15,11,9],[4,4,3],[0,1,2]] has characteristic polynomial lambda^3 - 21 lambda^2 + 51 lambda - 23, whose largest
+# root 18.278707774... is the warp factor, degree THREE and irreducible (no rational root). The shell counts obey the
+# companion recurrence s(n) = 21 s(n-1) - 51 s(n-2) + 23 s(n-3), checked here on the measured counts by native integer
+# evaluation, so the growth rate is a determined algebraic number, not a fitted decimal. The transfer matrix is read from
+# a single build to shell four, so this is memory-optimal, no fifty-million-cell shell six enumeration is needed.
+
+# The characteristic-polynomial trace is 21, the diagonal sum 15 + 4 + 2 of the transfer matrix.
+hold warp-transfer-trace-is-twenty-one
+  call is-equal
+    code 21
+    call add
+      code 15
+      call add
+        code 4
+        code 2
+
+# Shell four satisfies the recurrence: 153192 = 21 * 8376 - 51 * 456 + 23 * 24.
+hold warp-recurrence-reproduces-shell-four
+  call is-equal
+    code 153192
+    call add
+      call subtract
+        call multiply
+          code 21
+          code 8376
+        call multiply
+          code 51
+          code 456
+      call multiply
+        code 23
+        code 24
+
+# Shell five satisfies the recurrence: 2800344 = 21 * 153192 - 51 * 8376 + 23 * 456. The exact check of the cubic, on a
+# shell count measured by a separate build, so the recurrence is not a fit but the true growth law.
+hold warp-recurrence-reproduces-shell-five
+  call is-equal
+    code 2800344
+    call add
+      call subtract
+        call multiply
+          code 21
+          code 153192
+        call multiply
+          code 51
+          code 8376
+      call multiply
+        code 23
+        code 456
+
+# The recurrence PREDICTS shell six with no enumeration: 51187080 = 21 * 2800344 - 51 * 153192 + 23 * 8376.
+hold warp-recurrence-predicts-shell-six
+  call is-equal
+    code 51187080
+    call add
+      call subtract
+        call multiply
+          code 21
+          code 2800344
+        call multiply
+          code 51
+          code 153192
+      call multiply
+        code 23
+        code 8376

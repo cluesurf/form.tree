@@ -63,7 +63,7 @@ task twin
   take rest, like figure
   like wave
   send back
-    wave true
+    true
 
 # mean: betweenness, true when site b lies between sites a and c.
 task mean
@@ -72,7 +72,7 @@ task mean
   take c, like site
   like wave
   send back
-    wave true
+    true
 
 # meet: incidence, true when a site lies on a line.
 task meet
@@ -80,7 +80,7 @@ task meet
   take here, like line
   like wave
   send back
-    wave true
+    true
 
 # ---- GROUP II, ORDER (betweenness) ----
 

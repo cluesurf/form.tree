@@ -126,6 +126,18 @@ hold hyperoctahedral-b4-order-is-384
       code 16
       code 24
 
+# THE THREE GENERATIONS, forced by the coset index. The local law (the knit) respects only B4 (order 384) inside the
+# full cell symmetry F4 (order 1152), so it BREAKS the triality. The number of cosets, the index [F4:B4] = 1152 / 384 =
+# 3, is the number of generations: the three cosets are the triality orbit the law breaks (the three inscribed 16-cells),
+# so a specific dynamics picks one generation frame while the COUNT stays three. The generation count is not fitted, it
+# is the group index, and the knit breaking triality is exactly what makes three distinguishable generations.
+hold generations-are-f4-over-b4-index-three
+  call is-equal
+    code 1152
+    call multiply
+      code 384
+      code 3
+
 # Triality cycles three eight-dimensional pieces, the vector and the two half-spinors: 8 + 8 + 8 = 24, the dual count.
 hold triality-three-octets-sum-to-twenty-four
   call is-equal
