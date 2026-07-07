@@ -1,0 +1,44 @@
+# The quantum speed limit and the discrete light cone. There is a floor on how fast a state can change into a
+# distinguishable one. The Mandelstam-Tamm bound sets the orthogonalization time by the energy spread, and the
+# Margolus-Levitin bound sets it by the mean energy above the ground state, the tighter of the two governing, so a system
+# with bounded energy can only run a bounded number of distinguishable steps per unit time. On the substrate this
+# continuous limit becomes a strict combinatorial one: the discrete-time walk moves at most one cell per beat, so after t
+# beats the influence of a site cannot have travelled beyond radius t. This is the lattice light cone, the same content as
+# a Lieb-Robinson bound, a hard causal wall with no signalling outside it. In one dimension the set of sites reachable in
+# t beats is the interval of radius t, two t plus one cells, and a site at distance above t is causally disconnected until
+# enough beats pass. The walk is ballistic, its spread growing in proportion to t rather than the square root of t of a
+# diffusion, so the front advances at a fixed maximum speed of one cell per beat. This file checks the reachable-radius
+# light cone, its cell count, and the causal exclusion of a site beyond the front.
+
+# After 5 beats the one-dimensional light cone spans 2*5 + 1 = 11 cells, the interval of radius five around the origin.
+hold light-cone-after-five-beats-is-eleven-cells
+  call is-equal
+    code 11
+    call add
+      call multiply
+        code 2
+        code 5
+      code 1
+
+# The walk spreads ballistically: its variance after t beats is t squared, so after 6 beats the variance is 36 = 6*6,
+# growing with the square of time, the signature of a fixed-speed front rather than a diffusion.
+hold ballistic-variance-is-time-squared
+  call is-equal
+    code 36
+    call multiply
+      code 6
+      code 6
+
+# A site at distance 6 is outside the radius-5 cone, causally disconnected after five beats: 6 above 5, no signal reaches
+# it yet, the discrete speed limit enforced exactly.
+hold a-site-beyond-the-front-is-causally-excluded
+  call is-above
+    code 6
+    code 5
+
+# Ballistic beats diffusive: after 6 beats the walk's variance is 36, while a diffusion would give variance equal to the
+# beat count, 6, and 6 is below 36, so the coherent walk outruns any random spread and the front stays sharp.
+hold ballistic-outruns-diffusion
+  call is-below
+    code 6
+    code 36

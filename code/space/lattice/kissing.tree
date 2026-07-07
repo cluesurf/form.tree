@@ -1,0 +1,69 @@
+# The kissing numbers, the count of spheres that can touch one central sphere in the record lattices. In four dimensions
+# the D4 lattice reaches twenty-four, the vertices of the twenty-four-cell. In eight dimensions the E8 lattice reaches two
+# hundred forty, and in twenty-four dimensions the Leech lattice reaches one hundred ninety-six thousand five hundred
+# sixty, each the proven maximum in its dimension. These are not isolated numbers: twenty-four is four times the D4 Coxeter
+# number six, two hundred forty is eight times the E8 Coxeter number thirty and splits as one hundred twelve plus one
+# hundred twenty-eight, and the Leech count is two hundred forty times eight hundred nineteen. The Leech minimal vectors
+# fall into three shapes and their counts sum exactly to the total: the vectors with two coordinates of size four give
+# eleven hundred four, the vectors built on the seven hundred fifty-nine Golay octads give ninety-seven thousand one
+# hundred fifty-two, and the vectors with one coordinate of size three give ninety-eight thousand three hundred four. This
+# file checks the three record kissing numbers and the Leech three-shape decomposition, tying the densest packings to the
+# Golay code and the Coxeter arithmetic.
+
+# D4 kissing is 4 * 6 = 24, the rank times the Coxeter number.
+hold d-four-kissing-is-twenty-four
+  call is-equal
+    code 24
+    call multiply
+      code 4
+      code 6
+
+# E8 kissing is 8 * 30 = 240.
+hold e-eight-kissing-is-two-hundred-forty
+  call is-equal
+    code 240
+    call multiply
+      code 8
+      code 30
+
+# The Leech kissing is 240 * 819 = 196560.
+hold leech-kissing-is-one-hundred-ninety-six-thousand-five-hundred-sixty
+  call is-equal
+    code 196560
+    call multiply
+      code 240
+      code 819
+
+# Leech shape one, two coordinates of size four: 4 * (24 choose 2) = 4 * 276 = 1104.
+hold leech-shape-of-two-fours-is-eleven-hundred-four
+  call is-equal
+    code 1104
+    call multiply
+      code 4
+      code 276
+
+# Leech shape two, built on the 759 Golay octads with signed coordinates of size two: 128 * 759 = 97152.
+hold leech-shape-on-octads-is-ninety-seven-thousand-one-hundred-fifty-two
+  call is-equal
+    code 97152
+    call multiply
+      code 128
+      code 759
+
+# Leech shape three, one coordinate of size three over the twenty-four Golay-fixed patterns: 4096 * 24 = 98304.
+hold leech-shape-of-one-three-is-ninety-eight-thousand-three-hundred-four
+  call is-equal
+    code 98304
+    call multiply
+      code 4096
+      code 24
+
+# The three shapes sum to the full kissing number: 1104 + 97152 + 98304 = 196560.
+hold leech-shapes-sum-to-the-kissing-number
+  call is-equal
+    code 196560
+    call add
+      code 1104
+      call add
+        code 97152
+        code 98304

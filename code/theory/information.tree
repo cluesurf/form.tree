@@ -1,0 +1,48 @@
+# Information and entropy, the count of distinctions a state can hold. The Shannon entropy of a source is the average
+# number of bits needed to name its outcome, and for n equally likely outcomes it is the logarithm base two of n, so a
+# fair coin holds one bit, a fair four-way choice two bits, a fair eight-way choice three bits. The von Neumann entropy is
+# the same measure for a quantum state, the Shannon entropy of its eigenvalues, zero for a pure state and maximal for a
+# fully mixed one. Mutual information measures shared uncertainty: the entropy of one part plus the entropy of the other
+# minus the entropy of the whole. For a Bell pair, each qubit alone is fully mixed with entropy one, while the pair
+# together is pure with entropy zero, so the mutual information is one plus one minus zero, two, the maximum for a single
+# qubit on each side. That value two is exactly the wormhole cross-section the holography files measure, twice the
+# entanglement entropy of one, and its being positive with a zero joint entropy is the strong subadditivity signature of
+# entanglement, the whole knowing less uncertainty than its parts. This file checks the equally-likely entropy, the Bell
+# mutual information, its relation to the entanglement entropy, and the subadditivity gap.
+
+# A fair eight-way source holds log base two of eight, three bits, because 2^3 = 8.
+hold entropy-of-eight-equally-likely-is-three-bits
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 2
+
+# The Bell-pair mutual information: each qubit alone has entropy one, the pair together has entropy zero, so the shared
+# information is 1 + 1 - 0 = 2, the maximum for one qubit each.
+hold bell-pair-mutual-information-is-two
+  call is-equal
+    code 2
+    call subtract
+      call add
+        code 1
+        code 1
+      code 0
+
+# The mutual information is twice the entanglement entropy: the entanglement entropy of the Bell pair is one, and 2 * 1 =
+# 2 equals the mutual information, so the cross-section is twice the entropy at the maximum.
+hold mutual-information-is-twice-the-entanglement-entropy
+  call is-equal
+    code 2
+    call multiply
+      code 2
+      code 1
+
+# Subadditivity: the joint entropy zero is below the sum of the parts' entropies two, 0 below 2, the entangled whole
+# holding less uncertainty than its parts separately, which is why the mutual information is positive.
+hold entanglement-makes-the-whole-less-uncertain-than-its-parts
+  call is-below
+    code 0
+    code 2

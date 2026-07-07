@@ -1,0 +1,51 @@
+# Continued fractions and the Farey structure of the rationals, the arithmetic of best approximation. Writing a number as
+# an integer plus one over an integer plus one over another peels off its nested self-similarity, and truncating gives the
+# convergents, the fractions that approximate it better than any with a smaller denominator. The golden ratio has the
+# simplest continued fraction of all, every layer a one, so it is approached the most slowly and is in that sense the most
+# irrational number, and its convergents are exactly the ratios of consecutive Fibonacci numbers. Two convergents in a row,
+# and more generally two Farey neighbors, satisfy the unimodular relation that the cross difference of their numerators and
+# denominators is one, which is why their Ford circles are tangent and why the mediant, formed by adding numerators and
+# adding denominators, lands cleanly between them in the Stern-Brocot tree. This file checks the unimodular relation for a
+# Farey pair, the mediant construction, and the Fibonacci-convergent unimodular identity that pins the golden ratio.
+
+# Farey neighbors one half and two thirds are unimodular: the cross difference 2*2 - 1*3 = 4 - 3 = 1, so their Ford
+# circles are tangent.
+hold farey-neighbors-are-unimodular
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 2
+        code 2
+      call multiply
+        code 1
+        code 3
+
+# The mediant of one half and one over one is two thirds: numerators add, 1 + 1 = 2, and denominators add, 2 + 1 = 3, the
+# Stern-Brocot child between the two parents.
+hold mediant-numerator-adds
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+hold mediant-denominator-adds
+  call is-equal
+    code 3
+    call add
+      code 2
+      code 1
+
+# Consecutive Fibonacci convergents of the golden ratio are unimodular: five thirds and eight fifths satisfy
+# 5*5 - 8*3 = 25 - 24 = 1, the Cassini identity, so each is the best rational approximation at its size.
+hold golden-convergents-are-unimodular
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 5
+        code 5
+      call multiply
+        code 8
+        code 3

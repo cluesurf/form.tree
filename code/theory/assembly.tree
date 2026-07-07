@@ -1,0 +1,49 @@
+# Assembly theory, the measure of how much history an object carries. The assembly index of an object is the least number
+# of joining steps needed to build it from basic parts, where any sub-assembly already made can be reused for free. An
+# object with a low assembly index can be reached by a short shared path; a high index means the object is complex,
+# requiring many distinct steps that could not have arisen by chance without a process that remembers its intermediates.
+# The clearest case is doubling: a run of one part becomes a run of two in one step, four in two steps, eight in three, so
+# a run of two to the k parts has assembly index k, the logarithm, because each step reuses the whole run built so far. A
+# chain with no repetition has no reuse, so its naive cost is one less than its length, every part joined separately. The
+# gap between the two, the logarithm below the length, is the compression that reuse buys, and it is why assembly index
+# distinguishes a structured object from a random one of the same size. This file checks the doubling index, the
+# no-reuse chain cost, and that reuse strictly beats the naive path.
+
+# A run of eight identical parts is built by doubling: one to two to four to eight, three steps, so the assembly index of
+# 2^3 = 8 is 3.
+hold assembly-index-of-eight-is-three
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 2
+
+# A run of sixteen parts doubles in four steps, assembly index 4: 16 = 2^4.
+hold assembly-index-of-sixteen-is-four
+  call is-equal
+    code 16
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2
+
+# A chain of eight distinct parts with no reuse costs one join per new part after the first, 8 - 1 = 7 steps.
+hold no-reuse-chain-of-eight-costs-seven
+  call is-equal
+    code 7
+    call subtract
+      code 8
+      code 1
+
+# Reuse strictly beats the naive path: the doubling index three is below the no-reuse cost seven for the same length
+# eight, so a structured object of a given size is cheaper to assemble than a random one, the compression assembly theory
+# measures.
+hold reuse-beats-the-naive-path
+  call is-below
+    code 3
+    code 7

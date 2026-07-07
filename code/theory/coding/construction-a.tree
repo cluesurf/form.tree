@@ -1,0 +1,73 @@
+# Construction A, the bridge from binary codes to lattices. Given a binary code, the Construction A lattice is every
+# integer vector whose reduction modulo two lies in the code. The code's minimum distance becomes the lattice's minimum
+# squared length, and the code's weight enumerator becomes the lattice's shell counts, so the best packings are read off
+# the best codes. The four-dimensional checkerboard lattice comes from the even-weight code on four bits, and the densest
+# eight-dimensional lattice comes from the extended Hamming code on eight bits, the [8,4,4] code. That extended Hamming
+# code has sixteen codewords with a clean weight profile: one word of weight zero, fourteen words of weight four, and one
+# word of weight eight, summing to sixteen. Its parent, the [7,4,3] Hamming code, is a PERFECT code: its sixteen codewords
+# each own a Hamming ball of radius one containing one center plus seven single-bit neighbors, eight points, and sixteen
+# times eight is one hundred twenty-eight, exactly the whole space of two to the seventh binary strings, so the balls tile
+# the space with no overlap and no gap. This file checks the perfect-packing identity and the extended-Hamming weight
+# enumerator, the code facts underneath the eight-dimensional lattice packing counted in the theta file.
+
+# The [7,4,3] Hamming code is perfect: 16 codewords times the 8-point radius-one ball tiles the full space, 16 * 8 = 128
+# = 2^7. The ball size is one center plus seven single-bit flips, 1 + 7 = 8.
+hold hamming-ball-is-eight
+  call is-equal
+    code 8
+    call add
+      code 1
+      code 7
+
+# The perfect sphere-packing identity: 16 * 8 = 128, and 128 is two to the seventh, the whole seven-bit space.
+hold hamming-code-perfectly-tiles-the-space
+  call is-equal
+    call multiply
+      code 16
+      code 8
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          call multiply
+            code 2
+            call multiply
+              code 2
+              call multiply
+                code 2
+                code 2
+
+# The extended Hamming [8,4,4] code has 2^4 = 16 codewords. Its weight enumerator is 1 word of weight 0, 14 of weight 4,
+# 1 of weight 8: 1 + 14 + 1 = 16.
+hold extended-hamming-weight-enumerator-sums-to-sixteen
+  call is-equal
+    code 16
+    call add
+      code 1
+      call add
+        code 14
+        code 1
+
+# The code has dimension four, so it holds 2^4 = 16 codewords: 16 = 2*2*2*2.
+hold extended-hamming-has-sixteen-codewords
+  call is-equal
+    code 16
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2
+
+# Construction A on the [8,4,4] code yields the eight-dimensional lattice whose kissing number is two hundred forty, the
+# same one hundred twelve plus one hundred twenty-eight split the theta file counts, so the code minimum distance four
+# lifts to the lattice minimum squared length two and the densest eight-dimensional packing.
+hold construction-a-kissing-splits-as-the-two-families
+  call is-equal
+    code 240
+    call add
+      code 112
+      code 128

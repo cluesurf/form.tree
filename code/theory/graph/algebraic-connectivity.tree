@@ -1,0 +1,56 @@
+# Algebraic connectivity and the graph Laplacian, the spectral measure of how integrated a network is. The Laplacian of a
+# graph is the degree matrix minus the adjacency matrix. It always has the eigenvalue zero, from the constant vector, and
+# the number of times zero appears is exactly the number of connected pieces, so a connected graph has a simple zero. The
+# second-smallest eigenvalue is the Fiedler value, the algebraic connectivity: it is positive precisely when the graph is
+# connected, and its size measures how hard the graph is to cut, the bottleneck of information flow. This is the quantity
+# an integration measure of a system reaches for, the spectral gap that says the whole is more than its separable parts.
+# The complete graph on n nodes is the extreme case: its Laplacian eigenvalues are zero once and n repeated n minus one
+# times, so its Fiedler value is n itself, maximal integration. The eigenvalues sum to the trace, which is the sum of the
+# degrees, twice the edge count. And the product of the nonzero eigenvalues over n counts the spanning trees, which for
+# the complete graph is Cayley's formula n to the n minus two. This file checks, on the complete graph of four nodes with
+# eigenvalues zero, four, four, four, the trace as the degree sum, the Fiedler value equal to n, and the spanning-tree
+# count sixteen equal to four squared.
+
+# The complete graph on four nodes has Laplacian eigenvalues 0, 4, 4, 4. Their sum is the trace, the degree sum: every
+# node has degree three, so the trace is 4 * 3 = 12, and 0 + 4 + 4 + 4 = 12.
+hold laplacian-trace-is-the-degree-sum
+  call is-equal
+    call add
+      code 0
+      call add
+        code 4
+        call add
+          code 4
+          code 4
+    call multiply
+      code 4
+      code 3
+
+# The eigenvalue n appears with multiplicity n minus one: the complete graph on four nodes carries the eigenvalue four
+# three times, and 3 = 4 - 1, so the Fiedler value four is the maximal algebraic connectivity, repeated across every
+# non-constant mode.
+hold complete-graph-eigenvalue-multiplicity
+  call is-equal
+    code 3
+    call subtract
+      code 4
+      code 1
+
+# The Fiedler value is strictly positive, the spectral certificate of connectedness: 0 below 4.
+hold connectedness-shows-as-a-positive-gap
+  call is-below
+    code 0
+    code 4
+
+# The spanning-tree count is the product of the nonzero eigenvalues divided by n: (4*4*4)/4 = 16. Written without
+# division: 16 * 4 = 4 * 4 * 4 = 64, the Matrix-Tree product, and 16 is Cayley's four to the two.
+hold spanning-tree-count-is-cayley
+  call is-equal
+    call multiply
+      code 16
+      code 4
+    call multiply
+      code 4
+      call multiply
+        code 4
+        code 4

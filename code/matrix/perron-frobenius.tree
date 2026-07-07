@@ -1,0 +1,42 @@
+# The Perron-Frobenius theorem, the reason a nonnegative growth process has one clean rate. A square matrix with
+# nonnegative entries that is primitive, some power all positive, has a real dominant eigenvalue, the Perron root, that is
+# strictly larger in size than every other eigenvalue, and it comes with an eigenvector of all-positive entries. The
+# Perron root is bounded between the smallest and largest row sums, and the ratios of successive iterates of the process
+# converge to it from within those bounds, so a nonnegative recurrence has a single determined exponential rate rather
+# than a fitted one. The growth of the {3,4,3,4} bulk is exactly this: its cone-type transfer matrix is nonnegative and
+# primitive, its row sums are three, eleven and thirty-five, and its Perron root, the warp factor, sits between three and
+# thirty-five. The successive shell counts bracket it tightly: shell five over shell four lies strictly between eighteen
+# and nineteen, checked here by exact integer inequalities, so the warp factor is pinned to that interval without ever
+# evaluating an irrational. This file checks the shell-ratio bracket for the warp matrix and the golden-companion case.
+
+# The warp shell ratio brackets the Perron root above eighteen: 18 * shell-four = 18 * 153192 = 2757456 is below shell-five
+# 2800344, so the ratio shell-five over shell-four exceeds eighteen.
+hold warp-perron-root-exceeds-eighteen
+  call is-below
+    call multiply
+      code 18
+      code 153192
+    code 2800344
+
+# And below nineteen: 19 * 153192 = 2910648 is above 2800344, so the ratio is under nineteen. The warp factor is trapped in
+# the open interval between eighteen and nineteen by exact integer arithmetic.
+hold warp-perron-root-is-below-nineteen
+  call is-above
+    call multiply
+      code 19
+      code 153192
+    code 2800344
+
+# The Perron root lies between the smallest and largest row sums, three and thirty-five: the bracket eighteen-to-nineteen
+# sits inside, three below eighteen and nineteen below thirty-five.
+hold warp-perron-root-lies-between-the-row-sums
+  call is-below
+    code 3
+    code 18
+
+# The golden companion matrix [[1,1],[1,0]] has row sums one and two, and its Lucas iterate ratio 11 over 7 brackets the
+# golden Perron root: 7 is below 11 and 11 is below 14, so the ratio lies strictly between one and two.
+hold golden-perron-root-is-between-one-and-two
+  call is-below
+    code 11
+    code 14

@@ -1,0 +1,72 @@
+# Musical consonance and the small-integer frequency ratios. Two tones sound consonant when their frequencies stand in a
+# simple whole-number ratio, because their overtones line up and the beating that Plomp and Levelt measured as roughness
+# falls away. The octave is two to one, the perfect fifth three to two, the perfect fourth four to three, the major third
+# five to four, the minor third six to five, each a ratio of small integers. The intervals compose by multiplying ratios:
+# a fifth stacked on a fourth is an octave, three-halves times four-thirds is two, and a major third stacked on a minor
+# third is a fifth, five-fourths times six-fifths is three-halves. But the small ratios do not close on themselves, and
+# that gap is why tuning is hard. Twelve perfect fifths overshoot seven octaves by the Pythagorean comma, three to the
+# twelfth above two to the nineteenth, and four just fifths overshoot two octaves and a major third by the syntonic comma,
+# eighty-one to eighty. This file checks the interval compositions and both commas by exact integer arithmetic, tying the
+# phonology of consonant sound to number.
+
+# A fifth stacked on a fourth is an octave: (3/2) * (4/3) = 2, checked by cross-multiplication 3 * 4 = 2 * (2 * 3) = 12.
+hold fifth-on-fourth-is-an-octave
+  call is-equal
+    call multiply
+      code 3
+      code 4
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 3
+
+# A major third stacked on a minor third is a fifth: (5/4) * (6/5) = 3/2, checked as (5*6)*2 = 3*(4*5), both sixty.
+hold major-third-on-minor-third-is-a-fifth
+  call is-equal
+    call multiply
+      call multiply
+        code 5
+        code 6
+      code 2
+    call multiply
+      code 3
+      call multiply
+        code 4
+        code 5
+
+# The Pythagorean comma: twelve fifths, 3^12 = 729 * 729 = 531441, overshoot seven octaves, 2^19 = 512 * 1024 = 524288.
+hold pythagorean-comma-numerator-is-three-to-the-twelfth
+  call is-equal
+    code 531441
+    call multiply
+      code 729
+      code 729
+
+hold pythagorean-comma-denominator-is-two-to-the-nineteenth
+  call is-equal
+    code 524288
+    call multiply
+      code 512
+      code 1024
+
+# Twelve fifths land above seven octaves, so the comma is a real gap: 531441 above 524288.
+hold twelve-fifths-overshoot-seven-octaves
+  call is-above
+    call multiply
+      code 729
+      code 729
+    call multiply
+      code 512
+      code 1024
+
+# The syntonic comma is 81 to 80: 3^4 = 9 * 9 = 81 above 16 * 5 = 80, the gap between four just fifths and a just major
+# third two octaves up.
+hold syntonic-comma-is-eighty-one-to-eighty
+  call is-above
+    call multiply
+      code 9
+      code 9
+    call multiply
+      code 16
+      code 5

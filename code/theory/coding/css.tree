@@ -1,0 +1,65 @@
+# CSS codes, the Calderbank-Shor-Steane construction that turns a pair of nested classical codes into a quantum code. A
+# classical code protects against bit flips only; a quantum code must protect against bit flips and phase flips at once,
+# and the CSS trick is to use one classical code for the bit-flip errors and its dual for the phase-flip errors, so a
+# single classical code that contains its own dual gives a quantum code for free. The Steane code is the CSS code built
+# from the [7,4,3] Hamming code: seven physical qubits, one logical qubit, distance three, correcting any single-qubit
+# error, written [[7,1,3]]. Its logical dimension is the Hamming dimension four minus the dual dimension three, one. The
+# number of stabilizer generators is the physical count minus the logical count, seven minus one, six, so there are two to
+# the sixth error syndromes, sixty-four, comfortably more than the twenty-two single-qubit errors it must distinguish, the
+# identity plus three Pauli errors on each of seven qubits. The five-qubit code [[5,1,3]] is the smallest that corrects a
+# single error and is PERFECT: its two to the fourth, sixteen, syndromes exactly equal the one identity plus three errors
+# on each of five qubits, sixteen, so the quantum Hamming bound is saturated with no waste. This file checks the Steane
+# dimension, its syndrome budget, and the perfect five-qubit saturation.
+
+# The Steane logical dimension: the containing Hamming code has dimension 4, its dual has dimension 3, and the CSS logical
+# count is the difference, 4 - 3 = 1, one protected qubit.
+hold steane-encodes-one-logical-qubit
+  call is-equal
+    code 1
+    call subtract
+      code 4
+      code 3
+
+# The Steane code has 7 - 1 = 6 stabilizer generators, giving 2^6 = 64 error syndromes.
+hold steane-has-sixty-four-syndromes
+  call is-equal
+    code 64
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          call multiply
+            code 2
+            call multiply
+              code 2
+              code 2
+
+# The single-qubit errors the distance-three code must name: the identity plus three Pauli errors on each of seven qubits,
+# 1 + 3*7 = 22, which fits inside the sixty-four syndromes, 22 below 64, so Steane is non-degenerate with room to spare.
+hold steane-errors-fit-in-the-syndromes
+  call is-below
+    call add
+      code 1
+      call multiply
+        code 3
+        code 7
+    code 64
+
+# The five-qubit perfect code saturates the quantum Hamming bound: 2^(5-1) = 16 syndromes exactly equal the 1 + 3*5 = 16
+# single-qubit error patterns, one identity plus three Paulis on each of five qubits, no syndrome wasted.
+hold five-qubit-code-is-perfect
+  call is-equal
+    call multiply
+      code 2
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2
+    call add
+      code 1
+      call multiply
+        code 3
+        code 5

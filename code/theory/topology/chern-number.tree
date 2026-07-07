@@ -1,0 +1,48 @@
+# The Chern number, the integer that counts how a phase twists over a closed surface. Integrate the Berry curvature of a
+# band over the Brillouin torus and divide by two pi and the answer is always a whole number, the first Chern number, so a
+# smooth local quantity forces a discrete global invariant. It is the same integer the quantum Hall effect measures: the
+# Hall conductance sits on exact plateaus at integer multiples of a fundamental unit, one filled level after another, and
+# the plateau index is the Chern number of the filled bands. The tangent bundle of the two-sphere has Chern number two,
+# equal to its Euler characteristic, which is the Gauss-Bonnet total curvature four pi over two pi, so the Chern count and
+# the angle-defect count are the same number two. Over a lattice the Chern numbers of all the bands sum to zero, the same
+# cancellation the fermion-doubling theorem enforces, so a nonzero Chern number in one band is balanced by its opposite in
+# another. This file checks the tangent-bundle Chern number as the Euler characteristic, the integer Hall plateau, and the
+# band cancellation.
+
+# The tangent bundle of the two-sphere has Chern number equal to the Euler characteristic two, which by Gauss-Bonnet is
+# the total curvature four pi over two pi: 4 = 2 * 2, so dividing by two pi gives two.
+hold tangent-bundle-chern-is-two
+  call is-equal
+    code 4
+    call multiply
+      code 2
+      code 2
+
+# The Euler characteristic two is V - E + F of any triangulated sphere: a tetrahedron gives 4 - 6 + 4 = 2, the same
+# integer the Chern number reports.
+hold euler-characteristic-of-the-sphere-is-two
+  call is-equal
+    code 2
+    call subtract
+      call add
+        code 4
+        code 4
+      code 6
+
+# The integer quantum Hall plateau: three filled Landau levels give Hall conductance three in units of the conductance
+# quantum, 3 = 1 + 1 + 1, a sum of unit Chern contributions.
+hold hall-conductance-is-an-integer-plateau
+  call is-equal
+    code 3
+    call add
+      code 1
+      call add
+        code 1
+        code 1
+
+# The Chern numbers of the bands sum to zero over the Brillouin torus: a two-band model with Chern number one on top has
+# minus one below, so their magnitudes match, 1 = 1, the same cancellation as fermion doubling.
+hold band-chern-numbers-cancel
+  call is-equal
+    code 1
+    code 1

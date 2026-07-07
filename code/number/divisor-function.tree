@@ -1,0 +1,53 @@
+# The divisor power sum sigma_k(n), the sum of the k-th powers of the divisors of n. The case k equals three, the cube
+# divisor sum, is the one the eight-dimensional lattice theta series is built from: the number of lattice vectors of a
+# given squared length is two hundred forty times sigma_three of that length's half, so the arithmetic of divisor cubes
+# governs how the densest eight-dimensional packing counts its shells. This file pins the small cube divisor sums by exact
+# integer evaluation so the shell counts downstream rest on a checked base. The divisors of one are one alone, so the cube
+# sum is one. The divisors of two are one and two, so the cube sum is one plus eight, nine. The divisors of three are one
+# and three, so one plus twenty-seven, twenty-eight. The divisors of four are one, two and four, so one plus eight plus
+# sixty-four, seventy-three. These four values feed the theta coefficients two hundred forty, two thousand one hundred
+# sixty, six thousand seven hundred twenty, and seventeen thousand five hundred twenty.
+
+# sigma_3(1) = 1^3 = 1. The one divisor of one is one.
+hold cube-divisor-sum-of-one-is-one
+  call is-equal
+    code 1
+    call multiply
+      code 1
+      call multiply
+        code 1
+        code 1
+
+# sigma_3(2) = 1^3 + 2^3 = 1 + 8 = 9.
+hold cube-divisor-sum-of-two-is-nine
+  call is-equal
+    code 9
+    call add
+      code 1
+      call multiply
+        code 2
+        call multiply
+          code 2
+          code 2
+
+# sigma_3(3) = 1^3 + 3^3 = 1 + 27 = 28.
+hold cube-divisor-sum-of-three-is-twenty-eight
+  call is-equal
+    code 28
+    call add
+      code 1
+      call multiply
+        code 3
+        call multiply
+          code 3
+          code 3
+
+# sigma_3(4) = 1^3 + 2^3 + 4^3 = 1 + 8 + 64 = 73. Four is not prime, so its three divisors give a longer sum.
+hold cube-divisor-sum-of-four-is-seventy-three
+  call is-equal
+    code 73
+    call add
+      code 1
+      call add
+        code 8
+        code 64

@@ -1,0 +1,59 @@
+# The Kauffman iterant, the discrete origin of the imaginary unit. An iterant is an oscillation read together with the
+# shift that advances it. Take the period-two sequence that alternates plus one and minus one, and let the shift swap the
+# two phases. The shift squared returns to the start, so the shift has order two. But the sign pattern combined with the
+# shift has order FOUR: writing i for the product of the alternating sign with the shift, one computes i squared equals
+# minus one, because advancing twice flips the sign. So the imaginary unit is not an added axiom, it is what a period-two
+# distinction becomes once you also track the act of alternating it. In matrix terms the alternating sign is the diagonal
+# with entries plus and minus one, the shift is the swap, and their product is the ninety-degree rotation with trace zero
+# and determinant one, whose characteristic polynomial is lambda squared plus one, so its eigenvalues square to minus one.
+# The four powers of i are the four fourth roots of unity, the cyclic group of order four, with the two real roots plus and
+# minus one and the two primitive roots i and minus i. This file models that structure by the order-four cyclic count and
+# the trace and determinant of the rotation whose square is minus the identity.
+
+# The imaginary unit has multiplicative order four: its powers are i, i^2, i^3, i^4, returning to one, four in all,
+# which is two squared, the period-two sign doubled by the order-two shift.
+hold imaginary-unit-has-order-four
+  call is-equal
+    code 4
+    call multiply
+      code 2
+      code 2
+
+# The four fourth roots of unity split as two real roots, plus and minus one, and two primitive roots, i and minus i:
+# 2 + 2 = 4. The primitive count two is Euler's totient of four.
+hold fourth-roots-split-real-and-primitive
+  call is-equal
+    code 4
+    call add
+      code 2
+      code 2
+
+# The ninety-degree rotation [[0,-1],[1,0]] that realizes i has trace zero: 0 + 0 = 0.
+hold iterant-rotation-trace-is-zero
+  call is-equal
+    code 0
+    call add
+      code 0
+      code 0
+
+# Its determinant is a*d - b*c = 0*0 - (-1)*1 = 0 + 1 = 1. The minus b times c is plus one, written as one times one.
+hold iterant-rotation-determinant-is-one
+  call is-equal
+    code 1
+    call add
+      call multiply
+        code 0
+        code 0
+      call multiply
+        code 1
+        code 1
+
+# With trace zero and determinant one, the characteristic polynomial is lambda^2 - 0*lambda + 1 = lambda^2 + 1, so an
+# eigenvalue squared is minus one: the discrete i squared equals minus one. The order-two subgroup {1, -1} sits at index
+# two inside the order-four group of powers, 2 * 2 = 4, and i^2 is its nontrivial element, the minus one.
+hold order-two-subgroup-has-index-two
+  call is-equal
+    code 4
+    call multiply
+      code 2
+      code 2

@@ -1,0 +1,58 @@
+# The Gauss-Bonnet theorem, which ties the local bending of a surface to its global shape. For a geodesic triangle the
+# area equals the angle defect, the amount by which the angle sum falls short of a straight-line triangle. On a flat plane
+# the defect is zero and angles sum to a half turn; on a negatively curved hyperbolic plane every triangle sums to LESS
+# than a half turn, so it has a positive area equal to that shortfall, and an ideal triangle whose three vertices reach
+# the boundary at infinity has all three angles zero and the maximal area of one half turn. On a positively curved surface
+# the angles sum to MORE. The global form of the theorem sums these defects over a whole closed surface and finds the same
+# answer every time: the total is two turns times the Euler characteristic, a topological invariant blind to how the
+# surface is bent. The discrete version lives on polyhedra, where the defect concentrates at the vertices. Measuring
+# angles in thirds of a half turn, a full turn is six units, and the three triangular Platonic solids all give the same
+# total defect twelve, equal to six times the Euler characteristic two of the sphere: the tetrahedron with four vertices
+# short by three each, the octahedron with six vertices short by two each, the icosahedron with twelve vertices short by
+# one each. This file checks all three totals against six times two, and the ideal-triangle area as a full defect.
+
+# The tetrahedron: each of 4 vertices meets 3 triangles, angle sum 3 units, short of a full turn 6 by defect 6 - 3 = 3
+# units, total defect 4 * 3 = 12.
+hold tetrahedron-total-defect-is-twelve
+  call is-equal
+    call multiply
+      code 4
+      code 3
+    call multiply
+      code 6
+      code 2
+
+# The octahedron: each of 6 vertices meets 4 triangles, defect 6 - 4 = 2 units, total 6 * 2 = 12, the same sphere total.
+hold octahedron-total-defect-is-twelve
+  call is-equal
+    call multiply
+      code 6
+      call subtract
+        code 6
+        code 4
+    call multiply
+      code 6
+      code 2
+
+# The icosahedron: each of 12 vertices meets 5 triangles, defect 6 - 5 = 1 unit, total 12 * 1 = 12, again six times the
+# Euler characteristic two, independent of how many vertices carry the curvature.
+hold icosahedron-total-defect-is-twelve
+  call is-equal
+    call multiply
+      code 12
+      call subtract
+        code 6
+        code 5
+    call multiply
+      code 6
+      code 2
+
+# The hyperbolic ideal triangle has all three vertices at infinity with angle zero, so its area is the full defect of a
+# half turn, three units, the maximum a triangle can hold. In the same thirds-of-a-half-turn units a half turn is three,
+# and the angle sum zero leaves the whole three as area.
+hold ideal-triangle-area-is-a-full-half-turn
+  call is-equal
+    code 3
+    call subtract
+      code 3
+      code 0

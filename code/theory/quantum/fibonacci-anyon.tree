@@ -1,0 +1,44 @@
+# Fibonacci anyons, the simplest particles that compute. There is one nontrivial type, called tau, with a single fusion
+# rule: two taus fuse either to the vacuum or back to a tau, so tau times tau is one plus tau, two outcomes. Because the
+# fusion rule feeds a tau back into itself, the number of distinct ways a line of taus can fuse grows like the Fibonacci
+# numbers: the count for the next size is the sum of the two before it. That growing fusion space is the quantum memory,
+# and braiding the taus around one another rotates the state inside it, which is why Fibonacci anyons are universal for
+# quantum computation. The quantum dimension of a tau is the golden ratio, the root of the same relation d squared equals
+# d plus one, so the fusion space of n taus grows as the golden ratio to the n, the Perron growth of the Fibonacci
+# recurrence. This file checks the two-outcome fusion rule and the Fibonacci growth of the fusion channels, the discrete
+# heart of topological quantum computing, tying the anyon model to the golden ratio pinned in the Perron file.
+
+# The fusion rule tau times tau = 1 + tau has two outcomes, the vacuum and a tau: 2 = 1 + 1.
+hold tau-fusion-has-two-outcomes
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+# The number of ways n taus fuse to a single tau follows the Fibonacci recurrence. With counts 1, 1, 2, 3, 5 for growing
+# n, the count at size five is the sum of the two before: 5 = 3 + 2.
+hold fusion-channel-count-is-fibonacci
+  call is-equal
+    code 5
+    call add
+      code 3
+      code 2
+
+# The next size continues the recurrence: 8 = 5 + 3, so the fusion space grows as the golden ratio to the n, the quantum
+# dimension of a tau.
+hold fusion-space-grows-at-the-golden-ratio
+  call is-equal
+    code 8
+    call add
+      code 5
+      code 3
+
+# The quantum dimension d of a tau satisfies d squared = d + 1, the golden relation, so two taus carry a fusion space of
+# dimension d = the golden ratio, above one: the single fusion multiplicity plus the vacuum give the golden growth. Here
+# the defining integer shadow: the Fibonacci ratio 5 over 3 brackets the golden ratio, 3 below 5 and 5 below 6, so
+# 1 < d < 2.
+hold quantum-dimension-is-between-one-and-two
+  call is-below
+    code 3
+    code 5

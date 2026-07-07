@@ -1,0 +1,92 @@
+# The Coxeter number and the arithmetic that forces the dimensions of the exceptional Lie algebras. Every simple Lie
+# algebra has a rank, the number of simple roots, and a Coxeter number, the order of the product of the simple
+# reflections, and these two integers fix almost everything. The count of roots is exactly the rank times the Coxeter
+# number, and the dimension of the algebra is the roots plus the rank, so the dimension is the rank times the Coxeter
+# number plus one. This is why the special numbers of the substrate are not free: the twenty-four roots of D4 are four
+# times its Coxeter number six, the two hundred forty roots of E8 are eight times its Coxeter number thirty, and E8's
+# dimension two hundred forty-eight is eight times thirty-one. The whole exceptional chain falls out of the same identity:
+# F4 has forty-eight roots and dimension fifty-two, E6 seventy-two and seventy-eight, E7 one hundred twenty-six and one
+# hundred thirty-three, E8 two hundred forty and two hundred forty-eight. The reflection group orders follow too: the F4
+# Weyl group has eleven hundred fifty-two elements, the order that governs the twenty-four-cell's symmetry, and the D4
+# Weyl group has one hundred ninety-two. This file checks the root counts, the dimensions, and these two Weyl orders.
+
+# D4: rank 4, Coxeter number 6, so 4 * 6 = 24 roots, the twenty-four minimal vectors of the D4 lattice and the vertices
+# of the twenty-four-cell.
+hold d-four-root-count-is-rank-times-coxeter
+  call is-equal
+    code 24
+    call multiply
+      code 4
+      code 6
+
+# D4 dimension is roots plus rank: 24 + 4 = 28, the dimension of so(8).
+hold d-four-dimension-is-twenty-eight
+  call is-equal
+    code 28
+    call add
+      code 24
+      code 4
+
+# F4: rank 4, Coxeter number 12, so 4 * 12 = 48 roots, and dimension 4 * 13 = 52.
+hold f-four-has-forty-eight-roots
+  call is-equal
+    code 48
+    call multiply
+      code 4
+      code 12
+
+hold f-four-dimension-is-rank-times-coxeter-plus-one
+  call is-equal
+    code 52
+    call multiply
+      code 4
+      code 13
+
+# E8: rank 8, Coxeter number 30, so 8 * 30 = 240 roots, the E8 kissing number.
+hold e-eight-has-two-hundred-forty-roots
+  call is-equal
+    code 240
+    call multiply
+      code 8
+      code 30
+
+# E8 dimension is 8 * 31 = 248, the rank times the Coxeter number plus one.
+hold e-eight-dimension-is-rank-times-coxeter-plus-one
+  call is-equal
+    code 248
+    call multiply
+      code 8
+      code 31
+
+# E7: rank 7, Coxeter number 18, roots 7 * 18 = 126, dimension 7 * 19 = 133.
+hold e-seven-has-one-hundred-twenty-six-roots
+  call is-equal
+    code 126
+    call multiply
+      code 7
+      code 18
+
+# E6: rank 6, Coxeter number 12, roots 6 * 12 = 72, dimension 6 * 13 = 78.
+hold e-six-has-seventy-two-roots
+  call is-equal
+    code 72
+    call multiply
+      code 6
+      code 12
+
+# The F4 Weyl group, the symmetry group of the twenty-four-cell, has 1152 = 128 * 9 elements, two to the seventh times
+# three squared.
+hold f-four-weyl-group-order-is-eleven-fifty-two
+  call is-equal
+    code 1152
+    call multiply
+      code 128
+      code 9
+
+# The D4 Weyl group has 192 = 8 * 24 elements.
+hold d-four-weyl-group-order-is-one-ninety-two
+  call is-equal
+    code 192
+    call multiply
+      code 8
+      code 24

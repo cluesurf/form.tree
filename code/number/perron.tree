@@ -1,0 +1,69 @@
+# Perron and Pisot numbers, the algebraic integers that govern growth. A Perron number is a real algebraic integer above
+# one that strictly exceeds the absolute value of every one of its conjugates, so it is the single dominant root that sets
+# the exponential rate of a nonnegative integer recurrence. A Pisot number is the stronger case where every conjugate has
+# absolute value strictly below one, so the powers of the number crowd toward integers. The golden ratio is the smallest
+# Pisot number: it is the root of x squared minus x minus one, its one conjugate is minus one over the golden ratio with
+# absolute value about zero point six one eight, below one, so the golden ratio powers approach the Lucas integers. The
+# defining relation phi squared equals phi plus one turns into the Fibonacci and Lucas recurrences, and those recurrences
+# are what the shells of the substrate grow by. The warp factor of the {3,4,3,4} bulk is a Perron number of degree three,
+# the dominant root of its cone-type transfer matrix, checked in the warp file by exact recurrence; this file checks the
+# golden ratio's Pisot signature by the Lucas recurrence, the Cassini identity, and the companion-matrix trace, so the
+# growth constant is pinned as a determined algebraic integer rather than a fitted decimal.
+
+# The Lucas numbers, the traces of the powers of the golden-ratio companion matrix, obey L(n) = L(n-1) + L(n-2).
+# L(0)=2, L(1)=1, L(2)=3, L(3)=4, L(4)=7, L(5)=11. Here L(2) = L(1) + L(0) = 1 + 2 = 3.
+hold lucas-two-is-three
+  call is-equal
+    code 3
+    call add
+      code 1
+      code 2
+
+# L(4) = L(3) + L(2) = 4 + 3 = 7.
+hold lucas-four-is-seven
+  call is-equal
+    code 7
+    call add
+      code 4
+      code 3
+
+# L(5) = L(4) + L(3) = 7 + 4 = 11.
+hold lucas-five-is-eleven
+  call is-equal
+    code 11
+    call add
+      code 7
+      code 4
+
+# The companion matrix [[1,1],[1,0]] has trace one, and its square [[2,1],[1,1]] has trace three, which is L(2). The trace
+# of the n-th power is the n-th Lucas number, the sum of the n-th powers of the golden ratio and its conjugate.
+hold companion-square-trace-is-lucas-two
+  call is-equal
+    code 3
+    call add
+      code 2
+      code 1
+
+# Cassini at an even index keeps every term nonnegative: F(5) F(3) - F(4)^2 = 5 * 2 - 9 = 1. With F(3)=2, F(4)=3, F(5)=5.
+# The determinant of the golden-ratio companion matrix is minus one, so its power determinants are plus or minus one, and
+# this exact integer one is the signature of a Pisot unit.
+hold cassini-at-index-four-is-one
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 5
+        code 2
+      call multiply
+        code 3
+        code 3
+
+# The Lucas number is the sum of the two flanking Fibonacci numbers: L(n) = F(n-1) + F(n+1). Here L(4) = F(3) + F(5) =
+# 2 + 5 = 7. This ties the trace sequence (Lucas) to the entry sequence (Fibonacci) of the same golden-ratio matrix, both
+# growing at the golden ratio because it is the dominant Perron root, its conjugate too small to alter the integer values.
+hold lucas-four-is-flanking-fibonacci-sum
+  call is-equal
+    code 7
+    call add
+      code 2
+      code 5

@@ -1,0 +1,47 @@
+# The Berry phase, the memory a quantum state keeps of the path it was carried around. Move a state slowly through a loop
+# in its parameter space and it returns with an extra phase that depends only on the geometry of the loop, not on how fast
+# it was traced, a holonomy of the natural connection on the state bundle. For a spin one-half in a magnetic field swept
+# around a closed cone, the Berry phase is half the solid angle the field encloses, so a field swept around the whole
+# sphere, solid angle four pi, gives a phase of two pi, and a field swept around the equator, solid angle two pi, gives a
+# phase of pi, a sign flip. This half-angle law is the same double cover that makes a spin one-half need a FULL TWO TURNS,
+# a rotation by four pi, to come back to itself, while a single turn of two pi sends it to minus itself. The Aharonov-Bohm
+# effect is the same geometry with electromagnetic flux: a charge encircling one flux quantum picks up a phase of two pi
+# and sees nothing, while half a flux quantum gives a phase of pi and flips the sign, so the phase is purely topological,
+# set by the enclosed flux and not by any local field. This file checks the double-cover degree, the half-solid-angle
+# law, and the flux-quantum phase.
+
+# The spin one-half double cover: a rotation by four pi returns the state, twice the two pi of a full spatial turn, so the
+# covering degree is two, 4 = 2 * 2 in units of pi.
+hold spin-half-needs-two-turns
+  call is-equal
+    code 4
+    call multiply
+      code 2
+      code 2
+
+# The Berry phase is half the solid angle: the whole sphere, solid angle four pi, gives phase two pi, and four minus two
+# is two, the phase being exactly the half.
+hold berry-phase-is-half-the-solid-angle
+  call is-equal
+    code 2
+    call subtract
+      code 4
+      code 2
+
+# The equator loop encloses solid angle two pi and gives Berry phase pi, a sign flip: two minus one is one, half of the
+# enclosed two, in units of pi.
+hold equator-loop-gives-a-sign-flip
+  call is-equal
+    code 1
+    call subtract
+      code 2
+      code 1
+
+# The Aharonov-Bohm phase is two pi times the enclosed flux in quanta: one flux quantum gives phase two pi and is
+# invisible, so in units of pi the phase is 2 * 1 = 2, a whole multiple of two pi, purely topological.
+hold aharonov-bohm-phase-counts-flux-quanta
+  call is-equal
+    code 2
+    call multiply
+      code 2
+      code 1

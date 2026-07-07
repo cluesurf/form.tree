@@ -1,0 +1,46 @@
+# The density matrix, the full description of a quantum state that may be uncertain. A pure state is a single ray, but a
+# state entangled with something outside, or drawn from a classical mixture, is described by a density matrix, a positive
+# operator of trace one whose eigenvalues are the probabilities of its pure pieces. For a single qubit the state is a
+# point in the Bloch ball: pure states sit on the surface at radius one, mixed states inside, and the maximally mixed
+# state, knowing nothing, sits at the center at radius zero. The purity, the trace of the square of the density matrix,
+# measures how pure the state is: it is one for a pure state and one over the dimension for the maximally mixed one, so one
+# half for a qubit. Tracing out half of a Bell pair leaves exactly this maximally mixed qubit, which is why an entangled
+# whole can be pure while each part is completely uncertain, the same fact the mutual-information and wormhole files count
+# from the other side. This file checks the trace, the purity ordering between pure and mixed, and the Bloch radius at the
+# two extremes, working in scaled integer units.
+
+# The maximally mixed qubit has two eigenvalues each one half, summing to the trace one: in half-units, 1 + 1 = 2, two
+# halves making the whole.
+hold density-matrix-trace-is-one
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+# Purity orders pure above mixed: a pure state has purity one, the maximally mixed qubit one half, so in quarter-units the
+# pure four is above the mixed two.
+hold pure-is-purer-than-mixed
+  call is-above
+    code 4
+    code 2
+
+# The Bloch radius squared is twice the purity minus one: a pure state at purity one has radius squared 2*1 - 1 = 1, so it
+# sits on the surface of the Bloch ball at radius one.
+hold pure-state-sits-on-the-bloch-surface
+  call is-equal
+    code 1
+    call subtract
+      call multiply
+        code 2
+        code 1
+      code 1
+
+# The maximally mixed qubit has purity one half, so radius squared is 2*(one half) - 1 = 1 - 1 = 0, the center of the
+# ball, complete uncertainty, exactly what tracing out half a Bell pair leaves.
+hold maximally-mixed-state-is-the-center
+  call is-equal
+    code 0
+    call subtract
+      code 1
+      code 1

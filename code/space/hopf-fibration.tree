@@ -1,0 +1,43 @@
+# The Hopf fibrations, the four ways a sphere fibers over a smaller sphere, one for each division algebra. Over the
+# complex numbers the three-sphere fibers over the two-sphere with circle fibers, and this is the geometry of a single
+# qubit: the two-sphere is the Bloch sphere of states and the circle is the unobservable phase. Over the quaternions the
+# seven-sphere fibers over the four-sphere with three-sphere fibers, and over the octonions the fifteen-sphere fibers over
+# the eight-sphere with seven-sphere fibers. Each is the unit sphere of a division algebra of dimension d fibering over
+# the projective line, with total dimension two d minus one, fiber dimension d minus one, and base dimension d, so the
+# fiber and base dimensions add to the total. These four, and only these four, carry a map of Hopf invariant one, the
+# Adams theorem that pins the division-algebra dimensions one, two, four and eight to a topological fact. This file checks
+# the dimension bookkeeping of the four fibrations and the fiber-plus-base identity.
+
+# The complex Hopf fibration: the 3-sphere over the 2-sphere with 1-sphere fibers, 3 = 1 + 2, and the total is 2*2 - 1 = 3
+# for the division-algebra dimension d = 2.
+hold complex-hopf-total-is-three
+  call is-equal
+    code 3
+    call add
+      code 1
+      code 2
+
+# The quaternionic Hopf fibration: the 7-sphere over the 4-sphere with 3-sphere fibers, 7 = 3 + 4, total 2*4 - 1 = 7.
+hold quaternionic-hopf-total-is-seven
+  call is-equal
+    code 7
+    call add
+      code 3
+      code 4
+
+# The octonionic Hopf fibration: the 15-sphere over the 8-sphere with 7-sphere fibers, 15 = 7 + 8, total 2*8 - 1 = 15.
+hold octonionic-hopf-total-is-fifteen
+  call is-equal
+    code 15
+    call add
+      code 7
+      code 8
+
+# The fiber dimension is one below the base dimension in every case, the parallelizable-sphere fiber: for the octonionic
+# fibration the fiber 7 = 8 - 1, so the fiber is the largest parallelizable sphere over the eight-dimensional base.
+hold hopf-fiber-is-one-below-the-base
+  call is-equal
+    code 7
+    call subtract
+      code 8
+      code 1

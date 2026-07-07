@@ -1,0 +1,46 @@
+# Majorana modes, the half-fermions that store a qubit non-locally. A Majorana operator is its own antiparticle, squaring
+# to one and equal to its own conjugate, and it takes TWO of them to build one ordinary fermion, so a chain of N sites
+# carries two N Majoranas making N fermions. In Kitaev's chain the topological phase leaves one unpaired Majorana at each
+# end, and the two ends together form a single fermion whose occupation is a protected qubit: the ground state is two-fold
+# degenerate and the information is stored in the pair of distant ends, immune to any local noise. Braiding these end modes
+# realizes the Ising anyons, whose quantum dimension is the square root of two, so the Ising theory has three objects, the
+# vacuum, the Majorana fermion and the sigma anyon, with total quantum dimension squared one plus two plus one, four. This
+# file checks the two-Majoranas-per-fermion count, the ground-state degeneracy, the fusion of two sigmas, and the Ising
+# total quantum dimension.
+
+# Two Majoranas make one fermion: a chain of 6 sites carries 2 * 6 = 12 Majorana operators forming 6 fermions.
+hold two-majoranas-per-fermion
+  call is-equal
+    code 12
+    call multiply
+      code 2
+      code 6
+
+# The topological phase has one unpaired Majorana at each of the two ends, and the two together make one fermion carrying
+# a protected qubit, so the ground state is two-fold degenerate: 2 ends make 1 fermion, 2 = 1 + 1 states.
+hold ground-state-is-two-fold-degenerate
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+# Two sigma anyons fuse two ways, to the vacuum or to the Majorana fermion: sigma times sigma is 1 + psi, two outcomes.
+hold two-sigmas-fuse-two-ways
+  call is-equal
+    code 2
+    call add
+      code 1
+      code 1
+
+# The Ising theory has three objects with total quantum dimension squared one plus two plus one: the vacuum and the
+# fermion each contribute one, the sigma contributes its quantum dimension squared two, summing to 1 + 2 + 1 = 4, so the
+# total quantum dimension is two.
+hold ising-total-quantum-dimension-squared-is-four
+  call is-equal
+    code 4
+    call add
+      code 1
+      call add
+        code 2
+        code 1

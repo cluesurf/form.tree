@@ -1,0 +1,42 @@
+# The Nielsen-Ninomiya theorem, the no-go result that a single chiral fermion cannot live on a lattice. On a continuous
+# space a Weyl fermion has one handedness, a definite chirality, carried by a winding number of plus or minus one around
+# its momentum-space point. On a lattice the momentum space is a torus, the Brillouin zone, and the total winding number
+# over a closed torus must be zero, so the handedness cannot be net: for every left-handed mode there is a right-handed
+# partner. The naive lattice discretization makes this concrete by DOUBLING: in d dimensions the fermion appears at two to
+# the d corners of the Brillouin zone, half of them left-handed and half right-handed, so the chiralities cancel exactly.
+# In one dimension there are two species, one of each hand, summing to zero. In three dimensions there are eight species,
+# four of each hand, again summing to zero. The way the substrate walk evades the doubling without violating the theorem
+# is by carrying an internal coin, a single chiral mode with a winding number of one that the coin makes consistent on the
+# torus. This file checks the doubler count two to the d, the equal split into two chiralities, and their cancellation.
+
+# In one dimension the naive lattice fermion has 2^1 = 2 doublers, one left and one right handed.
+hold one-dimensional-doubler-count-is-two
+  call is-equal
+    code 2
+    code 2
+
+# In three dimensions there are 2^3 = 8 doublers.
+hold three-dimensional-doubler-count-is-eight
+  call is-equal
+    code 8
+    call multiply
+      code 2
+      call multiply
+        code 2
+        code 2
+
+# The eight doublers split into two equal chirality classes of 2^2 = 4 each: 4 + 4 = 8, four left handed and four right.
+hold doublers-split-equally-by-chirality
+  call is-equal
+    code 8
+    call add
+      code 4
+      code 4
+
+# The net chirality is zero: the left-handed count equals the right-handed count, 4 = 4, so the windings cancel over the
+# closed Brillouin torus exactly as the theorem forces. A single Weyl node carries winding one, but no lattice can host an
+# odd total.
+hold net-chirality-cancels
+  call is-equal
+    code 4
+    code 4

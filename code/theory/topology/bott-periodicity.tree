@@ -1,0 +1,46 @@
+# Bott periodicity, the eightfold rhythm that runs through the real Clifford algebras and the topology of the division
+# algebras. A real Clifford algebra on n generators has real dimension two to the n, and as n grows the ALGEBRA TYPE, the
+# pattern of real, complex and quaternionic matrix blocks it decomposes into, repeats with period EIGHT: the algebra on n
+# plus eight generators is the algebra on n tensored with the sixteen-by-sixteen real matrices. So the same period eight
+# that is the dimension of the octonions is the period of Clifford algebra and of the stable homotopy of the orthogonal
+# group, the reason the deepest structures close up at eight. The parallelizable spheres witness the same ceiling: a
+# sphere carries a nowhere-zero frame only in dimensions zero, one, three and seven, exactly one below each division-
+# algebra dimension one, two, four and eight, and these are the only spheres that are group-like. This file checks the
+# Clifford dimension, the period-eight closure through the sixteen-by-sixteen matrices, and the parallelizable-sphere
+# dimensions as one below the division-algebra dimensions.
+
+# A real Clifford algebra on 8 generators has dimension 2^8 = 256, which is the sixteen-by-sixteen real matrix algebra,
+# 16 * 16 = 256, the block that realizes one full Bott period.
+hold clifford-eight-is-sixteen-by-sixteen
+  call is-equal
+    code 256
+    call multiply
+      code 16
+      code 16
+
+# The period is eight: the Clifford algebra on n + 8 generators is the algebra on n tensored with this 256-dimensional
+# block, so dimension multiplies by 256 across one period, 2^8 = 256.
+hold bott-period-multiplies-dimension-by-two-hundred-fifty-six
+  call is-equal
+    code 256
+    call multiply
+      code 4
+      code 64
+
+# The parallelizable spheres sit one below the division-algebra dimensions: S^7 is parallelizable because 7 = 8 - 1,
+# the octonion case, the largest such sphere.
+hold seven-sphere-is-parallelizable
+  call is-equal
+    code 7
+    call subtract
+      code 8
+      code 1
+
+# S^3 is parallelizable, 3 = 4 - 1, the quaternion case, and S^1, 1 = 2 - 1, the complex case: the only parallelizable
+# spheres are 0, 1, 3, 7, one below 1, 2, 4, 8.
+hold three-sphere-is-parallelizable
+  call is-equal
+    code 3
+    call subtract
+      code 4
+      code 1

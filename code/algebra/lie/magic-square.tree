@@ -1,0 +1,109 @@
+# The Freudenthal-Tits magic square and the Barton-Sudbery formula for the exceptional Lie algebras. The magic square
+# assigns a Lie algebra to each pair of the four normed division algebras, the reals, complexes, quaternions and
+# octonions, of dimensions one, two, four and eight. The octonion row is the exceptional series: pairing the octonions
+# with the reals gives F4 of dimension fifty-two, with the complexes gives E6 of dimension seventy-eight, with the
+# quaternions gives E7 of dimension one hundred thirty-three, and with the octonions themselves gives E8 of dimension two
+# hundred forty-eight. Barton and Sudbery gave one formula that produces every entry: the dimension is the triality
+# algebra of the first factor plus the triality algebra of the second plus three times the product of the two dimensions.
+# The triality algebras are zero for the reals, two for the complexes, nine for the quaternions, and twenty-eight for the
+# octonions, this last being the dimension of so(8), the rotation algebra whose triality symmetry is the source of the
+# whole construction. So the four exceptional dimensions are not free parameters: each is forced by the same short formula
+# from the division-algebra dimensions, and this file checks all four, the triality dimensions, and the Freudenthal
+# grading chain that nests F4 inside E6 inside E7 inside E8.
+
+# The octonion triality algebra is so(8), dimension twenty-eight, which is eight choose two: 28 * 2 = 8 * 7 = 56.
+hold octonion-triality-is-so-eight
+  call is-equal
+    call multiply
+      code 28
+      code 2
+    call multiply
+      code 8
+      code 7
+
+# F4 = tri(R) + tri(O) + 3 * dim(R) * dim(O) = 0 + 28 + 3 * 1 * 8 = 0 + 28 + 24 = 52.
+hold f-four-dimension-is-fifty-two
+  call is-equal
+    code 52
+    call add
+      code 0
+      call add
+        code 28
+        call multiply
+          code 3
+          call multiply
+            code 1
+            code 8
+
+# E6 = tri(C) + tri(O) + 3 * dim(C) * dim(O) = 2 + 28 + 3 * 2 * 8 = 2 + 28 + 48 = 78.
+hold e-six-dimension-is-seventy-eight
+  call is-equal
+    code 78
+    call add
+      code 2
+      call add
+        code 28
+        call multiply
+          code 3
+          call multiply
+            code 2
+            code 8
+
+# E7 = tri(H) + tri(O) + 3 * dim(H) * dim(O) = 9 + 28 + 3 * 4 * 8 = 9 + 28 + 96 = 133.
+hold e-seven-dimension-is-one-hundred-thirty-three
+  call is-equal
+    code 133
+    call add
+      code 9
+      call add
+        code 28
+        call multiply
+          code 3
+          call multiply
+            code 4
+            code 8
+
+# E8 = tri(O) + tri(O) + 3 * dim(O) * dim(O) = 28 + 28 + 3 * 8 * 8 = 28 + 28 + 192 = 248.
+hold e-eight-dimension-is-two-hundred-forty-eight
+  call is-equal
+    code 248
+    call add
+      code 28
+      call add
+        code 28
+        call multiply
+          code 3
+          call multiply
+            code 8
+            code 8
+
+# The Freudenthal grading of E6 over F4: E6 = F4 plus the twenty-six of the exceptional Jordan algebra, 52 + 26 = 78.
+hold e-six-is-f-four-plus-twenty-six
+  call is-equal
+    code 78
+    call add
+      code 52
+      code 26
+
+# The Freudenthal grading of E7 over E6: E7 = E6 plus two copies of the twenty-seven plus one singlet, 78 + 54 + 1 = 133.
+hold e-seven-is-e-six-plus-two-twenty-sevens-and-a-singlet
+  call is-equal
+    code 133
+    call add
+      code 78
+      call add
+        code 54
+        code 1
+
+# The grading of E8 over E7: E8 = E7 plus the su(2) triple plus the (fifty-six, two), 133 + 3 + 112 = 248, with 112 the
+# fifty-six times two of the E7 minuscule representation paired with the su(2) doublet.
+hold e-eight-is-e-seven-plus-su-two-plus-the-fifty-six-doublet
+  call is-equal
+    code 248
+    call add
+      code 133
+      call add
+        code 3
+        call multiply
+          code 56
+          code 2
