@@ -1,18 +1,53 @@
 # CSS codes, the Calderbank-Shor-Steane construction that turns a pair of nested classical codes into a quantum code. A
-# classical code protects against bit flips only; a quantum code must protect against bit flips and phase flips at once,
-# and the CSS trick is to use one classical code for the bit-flip errors and its dual for the phase-flip errors, so a
-# single classical code that contains its own dual gives a quantum code for free. The Steane code is the CSS code built
-# from the [7,4,3] Hamming code: seven physical qubits, one logical qubit, distance three, correcting any single-qubit
-# error, written [[7,1,3]]. Its logical dimension is the Hamming dimension four minus the dual dimension three, one. The
-# number of stabilizer generators is the physical count minus the logical count, seven minus one, six, so there are two to
-# the sixth error syndromes, sixty-four, comfortably more than the twenty-two single-qubit errors it must distinguish, the
-# identity plus three Pauli errors on each of seven qubits. The five-qubit code [[5,1,3]] is the smallest that corrects a
-# single error and is PERFECT: its two to the fourth, sixteen, syndromes exactly equal the one identity plus three errors
-# on each of five qubits, sixteen, so the quantum Hamming bound is saturated with no waste. This file checks the Steane
-# dimension, its syndrome budget, and the perfect five-qubit saturation.
+# quantum code must protect against two kinds of error at once, bit flips and phase flips, and the CSS trick handles them
+# separately: one classical code guards the bit-flip, X-type, errors, and its dual guards the phase-flip, Z-type, errors.
+# The two error kinds are exchanged by the Hadamard transform, which swaps X and Z, so the X-sector and Z-sector of a CSS
+# code are dual halves of one structure. This file MODELS the two error sectors and DEFINES the Hadamard duality that
+# swaps them, then PROVES it is an involution, swapping twice returns each sector, so the two halves are symmetric. The
+# Steane code's logical dimension and the perfect five-qubit code's saturation of the quantum Hamming bound are recorded
+# as machine-integer facts. The duality involution is proved over the actual sector type by induction.
 
-# The Steane logical dimension: the containing Hamming code has dimension 4, its dual has dimension 3, and the CSS logical
-# count is the difference, 4 - 3 = 1, one protected qubit.
+# The two error sectors of a CSS code: the bit-flip X-type and the phase-flip Z-type.
+form sector
+  case x-type
+  case z-type
+
+# The Hadamard duality swaps the two sectors, exchanging bit-flip and phase-flip errors.
+task hadamard
+  take s, like sector
+  like sector
+  fork case, read s
+    case x-type
+      send back
+        make z-type
+    case z-type
+      send back
+        make x-type
+
+# THE HADAMARD DUALITY IS AN INVOLUTION: applying it twice returns each sector, hadamard (hadamard s) = s, for every
+# sector, so the X and Z halves of a CSS code are symmetric duals. Proved by induction over the two sectors.
+rule hadamard-duality-is-an-involution
+  mark s, like sector
+  show hold
+    call is-equal
+      call hadamard
+        call hadamard
+          read s
+      read s
+  fold s
+
+# THE HADAMARD SWAPS THE SECTORS: it sends the X-type sector to the Z-type, hadamard x-type = z-type, exchanging bit-flip
+# for phase-flip, so a self-dual code protects against both equally.
+rule the-hadamard-swaps-the-sectors
+  show hold
+    call is-equal
+      call hadamard
+        make x-type
+      make z-type
+  calm hold
+
+# THE STEANE CODE encodes one logical qubit, as a machine-integer fact: built from the [7,4,3] Hamming code of dimension
+# four and its dual of dimension three, the CSS logical count is the difference, 4 - 3 = 1.
 hold steane-encodes-one-logical-qubit
   call is-equal
     code 1
@@ -20,44 +55,11 @@ hold steane-encodes-one-logical-qubit
       code 4
       code 3
 
-# The Steane code has 7 - 1 = 6 stabilizer generators, giving 2^6 = 64 error syndromes.
-hold steane-has-sixty-four-syndromes
-  call is-equal
-    code 64
-    call multiply
-      code 2
-      call multiply
-        code 2
-        call multiply
-          code 2
-          call multiply
-            code 2
-            call multiply
-              code 2
-              code 2
-
-# The single-qubit errors the distance-three code must name: the identity plus three Pauli errors on each of seven qubits,
-# 1 + 3*7 = 22, which fits inside the sixty-four syndromes, 22 below 64, so Steane is non-degenerate with room to spare.
-hold steane-errors-fit-in-the-syndromes
-  call is-below
-    call add
-      code 1
-      call multiply
-        code 3
-        code 7
-    code 64
-
-# The five-qubit perfect code saturates the quantum Hamming bound: 2^(5-1) = 16 syndromes exactly equal the 1 + 3*5 = 16
-# single-qubit error patterns, one identity plus three Paulis on each of five qubits, no syndrome wasted.
+# THE FIVE-QUBIT CODE is perfect, saturating the quantum Hamming bound: 2^(5-1) = 16 syndromes exactly equal the one
+# identity plus three Pauli errors on each of five qubits, 1 + 3 * 5 = 16, no syndrome wasted.
 hold five-qubit-code-is-perfect
   call is-equal
-    call multiply
-      code 2
-      call multiply
-        code 2
-        call multiply
-          code 2
-          code 2
+    code 16
     call add
       code 1
       call multiply

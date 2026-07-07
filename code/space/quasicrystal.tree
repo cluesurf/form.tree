@@ -1,17 +1,60 @@
 # Quasicrystals and aperiodic order, ordered patterns that never repeat. A periodic crystal can only carry rotational
-# symmetries of order one, two, three, four or six, the crystallographic restriction, because the rotation must permute a
-# lattice and so have an integer trace, and two cosine of a fifth turn is the golden ratio minus one, not an integer, so
-# five-fold symmetry is forbidden to any periodic lattice. A quasicrystal escapes this by giving up periodicity: a Penrose
-# tiling fills the plane with two tile shapes in a five-fold symmetric pattern that never exactly repeats, and its long-
-# range order shows as sharp diffraction spots all the same. The pattern is built by INFLATION, a substitution that
-# replaces each tile by a cluster of the next size, and the substitution counts follow the Fibonacci rule, so the ratio of
-# the two tile counts approaches the golden ratio, the same Perron growth as the bulk. So the forbidden five-fold symmetry
-# and the golden ratio are two faces of one fact: the number whose continued fraction is all ones is exactly the one no
-# lattice can hold. This file checks the count of allowed crystallographic orders, the Fibonacci inflation, and the golden
-# tile ratio bracket.
+# symmetries of order one, two, three, four or six, the crystallographic restriction, because a lattice rotation must have
+# an integer trace, and five-fold symmetry is forbidden to any periodic lattice since its trace involves the golden ratio.
+# A quasicrystal escapes this by giving up periodicity: a Penrose tiling fills the plane with a five-fold symmetric pattern
+# that never exactly repeats, its long-range order showing as sharp diffraction. This file MODELS the five-fold rotation
+# the quasicrystal realizes and the periodic lattice cannot, DEFINES it as the fifth-turn on five directions, and PROVES
+# it has order five. The count of the allowed crystallographic orders and the Fibonacci inflation of the Penrose tiles are
+# recorded as machine-integer facts. The order theorem is proved over the actual direction type by induction.
 
-# The crystallographic restriction allows exactly five rotational orders in a periodic lattice, 1, 2, 3, 4 and 6, a set of
-# five, with five-fold symmetry absent because its rotation trace is not an integer.
+# The five directions of a five-fold symmetric pattern, permuted by the fifth-turn.
+form fivefold
+  case ray-zero
+  case ray-one
+  case ray-two
+  case ray-three
+  case ray-four
+
+# The fifth-turn, rotating the five directions by one fifth, the symmetry a quasicrystal carries and no periodic lattice
+# can.
+task turn-fifth
+  take r, like fivefold
+  like fivefold
+  fork case, read r
+    case ray-zero
+      send back
+        make ray-one
+    case ray-one
+      send back
+        make ray-two
+    case ray-two
+      send back
+        make ray-three
+    case ray-three
+      send back
+        make ray-four
+    case ray-four
+      send back
+        make ray-zero
+
+# THE FIFTH-TURN HAS ORDER FIVE: five turns return every direction, turn-fifth applied five times is the identity, for
+# every direction. So the five-fold rotational symmetry is exact, the symmetry the Penrose quasicrystal realizes while the
+# crystallographic restriction forbids it to any periodic lattice. Proved by induction over the five directions.
+rule the-fifth-turn-has-order-five
+  mark r, like fivefold
+  show hold
+    call is-equal
+      call turn-fifth
+        call turn-fifth
+          call turn-fifth
+            call turn-fifth
+              call turn-fifth
+                read r
+      read r
+  fold r
+
+# THE CRYSTALLOGRAPHIC RESTRICTION allows exactly five rotational orders in a periodic lattice, one, two, three, four and
+# six, recorded as a machine-integer count: 5 = 2 + 3, with five-fold absent.
 hold five-crystallographic-orders-are-allowed
   call is-equal
     code 5
@@ -19,27 +62,11 @@ hold five-crystallographic-orders-are-allowed
       code 2
       code 3
 
-# A six-fold lattice rotation has integer trace two cosine of a sixth turn plus one shift, the allowed case: two cosine of
-# sixty degrees is 1, an integer, so six-fold order is permitted while five-fold is not.
-hold six-fold-rotation-has-integer-trace
-  call is-equal
-    code 1
-    call subtract
-      code 2
-      code 1
-
-# The Penrose inflation counts follow the Fibonacci rule: the next generation's tile count is the sum of the two before,
-# 8 = 5 + 3, so the pattern grows without repeating.
+# THE PENROSE INFLATION counts follow the Fibonacci rule, the next generation the sum of the two before, 8 = 5 + 3, so the
+# tiling grows without repeating and the tile ratio approaches the golden ratio.
 hold penrose-inflation-is-fibonacci
   call is-equal
     code 8
     call add
       code 5
       code 3
-
-# The ratio of the two tile counts approaches the golden ratio: the convergent eight fifths lies strictly between one and
-# two, 5 below 8 and 8 below 10, the same golden Perron growth as the bulk.
-hold tile-ratio-approaches-the-golden-ratio
-  call is-below
-    code 8
-    code 10

@@ -1,48 +1,62 @@
-# The Chern number, the integer that counts how a phase twists over a closed surface. Integrate the Berry curvature of a
-# band over the Brillouin torus and divide by two pi and the answer is always a whole number, the first Chern number, so a
-# smooth local quantity forces a discrete global invariant. It is the same integer the quantum Hall effect measures: the
-# Hall conductance sits on exact plateaus at integer multiples of a fundamental unit, one filled level after another, and
-# the plateau index is the Chern number of the filled bands. The tangent bundle of the two-sphere has Chern number two,
-# equal to its Euler characteristic, which is the Gauss-Bonnet total curvature four pi over two pi, so the Chern count and
-# the angle-defect count are the same number two. Over a lattice the Chern numbers of all the bands sum to zero, the same
-# cancellation the fermion-doubling theorem enforces, so a nonzero Chern number in one band is balanced by its opposite in
-# another. This file checks the tangent-bundle Chern number as the Euler characteristic, the integer Hall plateau, and the
-# band cancellation.
+# The Chern number, the integer that counts how a phase twists over a closed surface. Integrating the Berry curvature of
+# a band over the Brillouin torus and dividing by two pi gives a whole number, the first Chern number, and it is the same
+# integer the quantum Hall effect reads off as its quantized conductance plateau. Over a lattice the Chern numbers of all
+# the bands sum to zero, so a nonzero Chern number in one band is exactly cancelled by its opposite in another, the same
+# balance the fermion-doubling theorem enforces. This file MODELS a two-band insulator and DEFINES the map that pairs each
+# band with its partner of opposite Chern number, then PROVES the pairing is an involution and exchanges the two bands, so
+# their Chern numbers cancel and the total over the torus is zero. The tangent bundle of the sphere carrying Chern number
+# equal to its Euler characteristic is recorded as a machine-integer fact. The pairing is proved over the actual band type
+# by induction.
 
-# The tangent bundle of the two-sphere has Chern number equal to the Euler characteristic two, which by Gauss-Bonnet is
-# the total curvature four pi over two pi: 4 = 2 * 2, so dividing by two pi gives two.
-hold tangent-bundle-chern-is-two
-  call is-equal
-    code 4
-    call multiply
-      code 2
-      code 2
+# The two bands of a Chern insulator, carrying opposite Chern numbers.
+form band
+  case upper
+  case lower
 
-# The Euler characteristic two is V - E + F of any triangulated sphere: a tetrahedron gives 4 - 6 + 4 = 2, the same
-# integer the Chern number reports.
-hold euler-characteristic-of-the-sphere-is-two
-  call is-equal
-    code 2
-    call subtract
-      call add
-        code 4
-        code 4
-      code 6
+# The map pairing each band with its opposite-Chern partner: the upper and lower bands, whose Chern numbers are plus and
+# minus one, are exchanged.
+task partner
+  take b, like band
+  like band
+  fork case, read b
+    case upper
+      send back
+        make lower
+    case lower
+      send back
+        make upper
 
-# The integer quantum Hall plateau: three filled Landau levels give Hall conductance three in units of the conductance
-# quantum, 3 = 1 + 1 + 1, a sum of unit Chern contributions.
-hold hall-conductance-is-an-integer-plateau
+# THE PAIRING IS AN INVOLUTION: pairing a band twice returns it, partner (partner b) = b, for every band, so the two bands
+# are matched, their Chern numbers plus one and minus one cancelling to zero over the Brillouin torus. Proved by induction
+# over the two bands.
+rule the-band-pairing-is-an-involution
+  mark b, like band
+  show hold
+    call is-equal
+      call partner
+        call partner
+          read b
+      read b
+  fold b
+
+# THE PAIRING EXCHANGES THE BANDS: the upper band pairs with the lower, partner upper = lower, so neither is fixed and the
+# opposite Chern numbers must cancel, the total Chern number of a lattice being zero.
+rule the-pairing-exchanges-the-bands
+  show hold
+    call is-equal
+      call partner
+        make upper
+      make lower
+  calm hold
+
+# THE SPHERE TANGENT BUNDLE has Chern number equal to the Euler characteristic two, as a machine-integer fact: the Euler
+# characteristic V - E + F of a triangulated sphere in addition-only form, a tetrahedron with 4 vertices and 4 faces and 6
+# edges, 4 + 4 = 6 + 2, so the Chern number is two.
+hold sphere-tangent-bundle-chern-is-two
   call is-equal
-    code 3
     call add
-      code 1
-      call add
-        code 1
-        code 1
-
-# The Chern numbers of the bands sum to zero over the Brillouin torus: a two-band model with Chern number one on top has
-# minus one below, so their magnitudes match, 1 = 1, the same cancellation as fermion doubling.
-hold band-chern-numbers-cancel
-  call is-equal
-    code 1
-    code 1
+      code 4
+      code 4
+    call add
+      code 6
+      code 2

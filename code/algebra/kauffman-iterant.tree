@@ -1,59 +1,108 @@
-# The Kauffman iterant, the discrete origin of the imaginary unit. An iterant is an oscillation read together with the
-# shift that advances it. Take the period-two sequence that alternates plus one and minus one, and let the shift swap the
-# two phases. The shift squared returns to the start, so the shift has order two. But the sign pattern combined with the
-# shift has order FOUR: writing i for the product of the alternating sign with the shift, one computes i squared equals
-# minus one, because advancing twice flips the sign. So the imaginary unit is not an added axiom, it is what a period-two
-# distinction becomes once you also track the act of alternating it. In matrix terms the alternating sign is the diagonal
-# with entries plus and minus one, the shift is the swap, and their product is the ninety-degree rotation with trace zero
-# and determinant one, whose characteristic polynomial is lambda squared plus one, so its eigenvalues square to minus one.
-# The four powers of i are the four fourth roots of unity, the cyclic group of order four, with the two real roots plus and
-# minus one and the two primitive roots i and minus i. This file models that structure by the order-four cyclic count and
-# the trace and determinant of the rotation whose square is minus the identity.
+# The Kauffman iterant, the discrete origin of the imaginary unit. An iterant is a period-two oscillation read together
+# with the shift that advances it, and the imaginary unit is what that structure becomes: not an added axiom but the
+# generator of a four-step cycle. This file MODELS that cycle as the group of fourth roots of unity, the four values one,
+# i, minus one and minus i, and DEFINES the act of multiplying by i as a function stepping around them. It then PROVES the
+# laws that make i the imaginary unit: multiplying by i has order four, four steps return every value to itself, while two
+# steps send one to minus one, so i squared is minus one. Complex conjugation, sending i to minus i, is shown to be three
+# steps of the same shift, i cubed, and to be an involution. Every theorem is quantified over the actual four-element type
+# and checked by induction, so this is the imaginary unit built from a discrete distinction, the iterant made a group.
 
-# The imaginary unit has multiplicative order four: its powers are i, i^2, i^3, i^4, returning to one, four in all,
-# which is two squared, the period-two sign doubled by the order-two shift.
-hold imaginary-unit-has-order-four
-  call is-equal
-    code 4
-    call multiply
-      code 2
-      code 2
+# The four fourth roots of unity, the elements of the cyclic group the iterant generates.
+form iterant
+  case one
+  case eye
+  case minus-one
+  case minus-eye
 
-# The four fourth roots of unity split as two real roots, plus and minus one, and two primitive roots, i and minus i:
-# 2 + 2 = 4. The primitive count two is Euler's totient of four.
-hold fourth-roots-split-real-and-primitive
-  call is-equal
-    code 4
-    call add
-      code 2
-      code 2
+# Multiplying by i: the shift that steps one to i to minus one to minus i and back to one. This one function is the whole
+# iterant, the oscillation and its advance together.
+task times-i
+  take a, like iterant
+  like iterant
+  fork case, read a
+    case one
+      send back
+        make eye
+    case eye
+      send back
+        make minus-one
+    case minus-one
+      send back
+        make minus-eye
+    case minus-eye
+      send back
+        make one
 
-# The ninety-degree rotation [[0,-1],[1,0]] that realizes i has trace zero: 0 + 0 = 0.
-hold iterant-rotation-trace-is-zero
-  call is-equal
-    code 0
-    call add
-      code 0
-      code 0
+# Complex conjugation, sending i to minus i and fixing the reals.
+task flip
+  take a, like iterant
+  like iterant
+  fork case, read a
+    case one
+      send back
+        make one
+    case eye
+      send back
+        make minus-eye
+    case minus-one
+      send back
+        make minus-one
+    case minus-eye
+      send back
+        make eye
 
-# Its determinant is a*d - b*c = 0*0 - (-1)*1 = 0 + 1 = 1. The minus b times c is plus one, written as one times one.
-hold iterant-rotation-determinant-is-one
-  call is-equal
-    code 1
-    call add
-      call multiply
-        code 0
-        code 0
-      call multiply
-        code 1
-        code 1
+# I SQUARED IS MINUS ONE: two steps of the shift send one to minus one, the defining relation of the imaginary unit,
+# here a computed fact about the shift, not an assumption.
+rule i-squared-is-minus-one
+  show hold
+    call is-equal
+      call times-i
+        call times-i
+          make one
+      make minus-one
+  calm hold
 
-# With trace zero and determinant one, the characteristic polynomial is lambda^2 - 0*lambda + 1 = lambda^2 + 1, so an
-# eigenvalue squared is minus one: the discrete i squared equals minus one. The order-two subgroup {1, -1} sits at index
-# two inside the order-four group of powers, 2 * 2 = 4, and i^2 is its nontrivial element, the minus one.
-hold order-two-subgroup-has-index-two
-  call is-equal
-    code 4
-    call multiply
-      code 2
-      code 2
+# ORDER FOUR: four steps of the shift return EVERY value to itself, times-i applied four times is the identity, for all a.
+# So multiplying by i has order four and the four roots form the cyclic group of order four. Proved by induction over the
+# four elements.
+rule multiplying-by-i-has-order-four
+  mark a, like iterant
+  show hold
+    call is-equal
+      call times-i
+        call times-i
+          call times-i
+            call times-i
+              read a
+      read a
+  fold a
+
+# CONJUGATION REVERSES THE SHIFT: conjugation is an anti-automorphism, turning multiplication by i into multiplication by
+# its inverse. Conjugating after one shift equals three shifts after conjugating, flip (times-i a) = times-i (times-i
+# (times-i (flip a))), for every a. So conjugation sends i to minus i not by rotating but by reversing the direction of
+# the shift, the iterant read backward. Proved by induction over the four elements.
+rule conjugation-reverses-the-shift
+  mark a, like iterant
+  show hold
+    call is-equal
+      call flip
+        call times-i
+          read a
+      call times-i
+        call times-i
+          call times-i
+            call flip
+              read a
+  fold a
+
+# CONJUGATION IS AN INVOLUTION: conjugating twice returns the value, flip (flip a) = a, for every a, so conjugation is its
+# own inverse, the reflection that squares to the identity.
+rule conjugation-is-an-involution
+  mark a, like iterant
+  show hold
+    call is-equal
+      call flip
+        call flip
+          read a
+      read a
+  fold a

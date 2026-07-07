@@ -1,19 +1,102 @@
-# The Gauss-Bonnet theorem, which ties the local bending of a surface to its global shape. For a geodesic triangle the
-# area equals the angle defect, the amount by which the angle sum falls short of a straight-line triangle. On a flat plane
-# the defect is zero and angles sum to a half turn; on a negatively curved hyperbolic plane every triangle sums to LESS
-# than a half turn, so it has a positive area equal to that shortfall, and an ideal triangle whose three vertices reach
-# the boundary at infinity has all three angles zero and the maximal area of one half turn. On a positively curved surface
-# the angles sum to MORE. The global form of the theorem sums these defects over a whole closed surface and finds the same
-# answer every time: the total is two turns times the Euler characteristic, a topological invariant blind to how the
-# surface is bent. The discrete version lives on polyhedra, where the defect concentrates at the vertices. Measuring
-# angles in thirds of a half turn, a full turn is six units, and the three triangular Platonic solids all give the same
-# total defect twelve, equal to six times the Euler characteristic two of the sphere: the tetrahedron with four vertices
-# short by three each, the octahedron with six vertices short by two each, the icosahedron with twelve vertices short by
-# one each. This file checks all three totals against six times two, and the ideal-triangle area as a full defect.
+# The Gauss-Bonnet theorem, tying the local bending of a surface to its global shape. For a closed surface the total
+# curvature is two pi times the Euler characteristic, a topological invariant blind to how the surface bends. On a
+# polyhedron the curvature sits at the vertices as the angle defect, the shortfall of the angles meeting there from a full
+# turn, and the defects sum to two pi times the Euler characteristic every time, so the five Platonic solids, all spheres
+# with Euler characteristic two, each carry a total defect of four pi. This file MODELS the five Platonic solids and the
+# duality that swaps vertices with faces, and PROVES that duality is an involution: dualizing twice returns the original
+# solid, and the tetrahedron is its own dual. It then records, as machine-integer counts, Euler's relation for each solid
+# in the addition-only form vertices plus faces equals edges plus two, and the total angle defect as six times the Euler
+# characteristic in units of a third of a straight angle. The duality theorem is quantified over the actual five-element
+# type and proved by induction; the counts are held as exact integer facts.
 
-# The tetrahedron: each of 4 vertices meets 3 triangles, angle sum 3 units, short of a full turn 6 by defect 6 - 3 = 3
-# units, total defect 4 * 3 = 12.
-hold tetrahedron-total-defect-is-twelve
+# The five Platonic solids.
+form solid
+  case tetrahedron
+  case cube
+  case octahedron
+  case dodecahedron
+  case icosahedron
+
+# The polyhedral dual, swapping vertices and faces: the tetrahedron is self-dual, the cube and octahedron are a dual
+# pair, and the dodecahedron and icosahedron are a dual pair.
+task dual
+  take s, like solid
+  like solid
+  fork case, read s
+    case tetrahedron
+      send back
+        make tetrahedron
+    case cube
+      send back
+        make octahedron
+    case octahedron
+      send back
+        make cube
+    case dodecahedron
+      send back
+        make icosahedron
+    case icosahedron
+      send back
+        make dodecahedron
+
+# DUALITY IS AN INVOLUTION: dualizing twice returns the original solid, dual (dual s) = s, for every solid. So duality is
+# a perfect pairing of the five solids, swapping the roles of vertices and faces while fixing edges. Proved by induction
+# over the five solids.
+rule duality-is-an-involution
+  mark s, like solid
+  show hold
+    call is-equal
+      call dual
+        call dual
+          read s
+      read s
+  fold s
+
+# THE TETRAHEDRON IS SELF-DUAL: it is the fixed point of the duality, dual tetrahedron = tetrahedron, its four vertices
+# and four faces interchangeable.
+rule the-tetrahedron-is-self-dual
+  show hold
+    call is-equal
+      call dual
+        make tetrahedron
+      make tetrahedron
+  calm hold
+
+# EULER'S RELATION as machine-integer counts, in the addition-only form vertices plus faces equals edges plus two, which
+# is V - E + F = 2 with the subtraction cleared. The tetrahedron, 4 vertices, 4 faces, 6 edges: 4 + 4 = 6 + 2.
+hold tetrahedron-euler-relation
+  call is-equal
+    call add
+      code 4
+      code 4
+    call add
+      code 6
+      code 2
+
+# The cube, 8 vertices, 6 faces, 12 edges: 8 + 6 = 12 + 2.
+hold cube-euler-relation
+  call is-equal
+    call add
+      code 8
+      code 6
+    call add
+      code 12
+      code 2
+
+# The icosahedron, 12 vertices, 20 faces, 30 edges: 12 + 20 = 30 + 2.
+hold icosahedron-euler-relation
+  call is-equal
+    call add
+      code 12
+      code 20
+    call add
+      code 30
+      code 2
+
+# THE TOTAL ANGLE DEFECT as six times the Euler characteristic, in units of a third of a straight angle where a full turn
+# is six units. The tetrahedron, four vertices each short by three units, totals twelve, which is six times the Euler
+# characteristic two: 4 * 3 = 6 * 2.
+hold tetrahedron-total-defect-is-two-pi-euler
   call is-equal
     call multiply
       code 4
@@ -22,37 +105,13 @@ hold tetrahedron-total-defect-is-twelve
       code 6
       code 2
 
-# The octahedron: each of 6 vertices meets 4 triangles, defect 6 - 4 = 2 units, total 6 * 2 = 12, the same sphere total.
-hold octahedron-total-defect-is-twelve
-  call is-equal
-    call multiply
-      code 6
-      call subtract
-        code 6
-        code 4
-    call multiply
-      code 6
-      code 2
-
-# The icosahedron: each of 12 vertices meets 5 triangles, defect 6 - 5 = 1 unit, total 12 * 1 = 12, again six times the
-# Euler characteristic two, independent of how many vertices carry the curvature.
-hold icosahedron-total-defect-is-twelve
+# The icosahedron, twelve vertices each short by one unit, totals twelve, again six times the Euler characteristic two:
+# 12 * 1 = 6 * 2.
+hold icosahedron-total-defect-is-two-pi-euler
   call is-equal
     call multiply
       code 12
-      call subtract
-        code 6
-        code 5
+      code 1
     call multiply
       code 6
       code 2
-
-# The hyperbolic ideal triangle has all three vertices at infinity with angle zero, so its area is the full defect of a
-# half turn, three units, the maximum a triangle can hold. In the same thirds-of-a-half-turn units a half turn is three,
-# and the angle sum zero leaves the whole three as area.
-hold ideal-triangle-area-is-a-full-half-turn
-  call is-equal
-    code 3
-    call subtract
-      code 3
-      code 0

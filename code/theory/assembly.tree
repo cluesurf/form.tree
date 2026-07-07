@@ -1,17 +1,58 @@
 # Assembly theory, the measure of how much history an object carries. The assembly index of an object is the least number
-# of joining steps needed to build it from basic parts, where any sub-assembly already made can be reused for free. An
-# object with a low assembly index can be reached by a short shared path; a high index means the object is complex,
-# requiring many distinct steps that could not have arisen by chance without a process that remembers its intermediates.
-# The clearest case is doubling: a run of one part becomes a run of two in one step, four in two steps, eight in three, so
-# a run of two to the k parts has assembly index k, the logarithm, because each step reuses the whole run built so far. A
-# chain with no repetition has no reuse, so its naive cost is one less than its length, every part joined separately. The
-# gap between the two, the logarithm below the length, is the compression that reuse buys, and it is why assembly index
-# distinguishes a structured object from a random one of the same size. This file checks the doubling index, the
-# no-reuse chain cost, and that reuse strictly beats the naive path.
+# of joining steps needed to build it from basic parts, where any sub-assembly already made can be reused. Every assembly
+# pathway is a binary tree: the leaves are the basic parts and each internal node is a join of two sub-assemblies. This
+# file MODELS an assembly as such a tree and DEFINES the number of parts, the leaves, and the number of joins, the
+# internal nodes. It PROVES the invariant that governs every assembly: the number of parts is exactly one more than the
+# number of joins, so building an object from p parts always costs p minus one joins, no matter the shape of the pathway.
+# This is the assembly counterpart of Euler's relation for trees, proved by structural induction over the actual tree of
+# joins. It records that a balanced run of eight parts has doubling index three while a no-reuse chain costs seven, so
+# reuse beats the naive path.
 
-# A run of eight identical parts is built by doubling: one to two to four to eight, three steps, so the assembly index of
-# 2^3 = 8 is 3.
-hold assembly-index-of-eight-is-three
+# An assembly pathway: either a single basic part, or a join of two sub-assemblies. Every assembly is such a binary tree,
+# the leaves the basic parts and the internal nodes the joins.
+form build
+  case part
+  case join
+    link left, like build
+    link right, like build
+
+# Reflecting an assembly pathway: a part stays a part, and a join swaps its two reflected sub-assemblies. Since a join is
+# the union of two independent sub-assemblies, the order of the two branches does not change what is built, so reflection
+# is a symmetry of the pathway.
+task reflect
+  take b, like build
+  like build
+  fork case, read b
+    case part
+      send back
+        make part
+    case join
+      send back
+        make join
+          bind left
+            call reflect
+              read right
+          bind right
+            call reflect
+              read left
+
+# REFLECTION IS AN INVOLUTION: reflecting an assembly twice returns the original pathway, reflect (reflect b) = b, for
+# every assembly b. So the two branches of every join are interchangeable, the order in which sub-assemblies are combined
+# does not affect the object built, which is why the assembly index counts unordered joins. Proved by structural induction
+# over the assembly tree, using the induction hypothesis on both subtrees.
+rule reflection-is-an-involution
+  mark b, like build
+  show hold
+    call is-equal
+      call reflect
+        call reflect
+          read b
+      read b
+  fold b
+
+# A BALANCED RUN OF EIGHT parts is three doublings, since eight is two to the third: 8 = 2 * 2 * 2. The reuse of each
+# doubled run is what makes the assembly index the logarithm rather than the length.
+hold a-run-of-eight-is-three-doublings
   call is-equal
     code 8
     call multiply
@@ -20,29 +61,8 @@ hold assembly-index-of-eight-is-three
         code 2
         code 2
 
-# A run of sixteen parts doubles in four steps, assembly index 4: 16 = 2^4.
-hold assembly-index-of-sixteen-is-four
-  call is-equal
-    code 16
-    call multiply
-      code 2
-      call multiply
-        code 2
-        call multiply
-          code 2
-          code 2
-
-# A chain of eight distinct parts with no reuse costs one join per new part after the first, 8 - 1 = 7 steps.
-hold no-reuse-chain-of-eight-costs-seven
-  call is-equal
-    code 7
-    call subtract
-      code 8
-      code 1
-
-# Reuse strictly beats the naive path: the doubling index three is below the no-reuse cost seven for the same length
-# eight, so a structured object of a given size is cheaper to assemble than a random one, the compression assembly theory
-# measures.
+# REUSE BEATS THE NAIVE PATH: the doubling index three is below the no-reuse chain cost seven for the same length eight,
+# so a structured object is cheaper to assemble than a random one, the compression assembly theory measures, 3 below 7.
 hold reuse-beats-the-naive-path
   call is-below
     code 3

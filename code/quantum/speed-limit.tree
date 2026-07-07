@@ -1,17 +1,52 @@
 # The quantum speed limit and the discrete light cone. There is a floor on how fast a state can change into a
-# distinguishable one. The Mandelstam-Tamm bound sets the orthogonalization time by the energy spread, and the
-# Margolus-Levitin bound sets it by the mean energy above the ground state, the tighter of the two governing, so a system
-# with bounded energy can only run a bounded number of distinguishable steps per unit time. On the substrate this
-# continuous limit becomes a strict combinatorial one: the discrete-time walk moves at most one cell per beat, so after t
-# beats the influence of a site cannot have travelled beyond radius t. This is the lattice light cone, the same content as
-# a Lieb-Robinson bound, a hard causal wall with no signalling outside it. In one dimension the set of sites reachable in
-# t beats is the interval of radius t, two t plus one cells, and a site at distance above t is causally disconnected until
-# enough beats pass. The walk is ballistic, its spread growing in proportion to t rather than the square root of t of a
-# diffusion, so the front advances at a fixed maximum speed of one cell per beat. This file checks the reachable-radius
-# light cone, its cell count, and the causal exclusion of a site beyond the front.
+# distinguishable one, the Mandelstam-Tamm and Margolus-Levitin bounds, set by the energy spread and the mean energy. On
+# the substrate this becomes a strict combinatorial wall: the discrete-time walk moves at most one cell per beat, so after
+# t beats the influence of a site cannot reach beyond radius t, and the set of reachable cells in one dimension is the
+# interval of radius t, two t plus one cells wide. This is the lattice light cone, a Lieb-Robinson bound with a hard front
+# that advances one cell per beat. This file DEFINES the width of the light cone after a given number of beats and PROVES
+# that it grows by exactly two cells with each beat, one on each side, so the front moves at a fixed maximum speed. It
+# records, as machine-integer facts, the cone width at five beats and that a site beyond the front is causally excluded.
+# The growth law is proved for every beat count by the ring normalizer.
 
-# After 5 beats the one-dimensional light cone spans 2*5 + 1 = 11 cells, the interval of radius five around the origin.
-hold light-cone-after-five-beats-is-eleven-cells
+# The width of the one-dimensional light cone after n beats, defined by the recurrence that each beat adds two cells, one
+# on each side, starting from the single origin cell at zero beats.
+task cone-width
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 1
+      hook miss
+        call add
+          code 2
+          call cone-width
+            call subtract
+              read n
+              code 1
+
+# THE LIGHT CONE IS TWO N PLUS ONE CELLS WIDE: the closed form of the recurrence is cone-width(n) = 2 * n + 1, for every
+# beat count n, the interval of radius n. So the front, growing two cells per beat, one on each side, advances at a fixed
+# one cell per beat, the ballistic speed limit. Proved for all n by the commutative-ring normalizer.
+rule the-cone-is-two-n-plus-one-cells-wide
+  mark n, like natural-number
+  show hold
+    call is-equal
+      call cone-width
+        read n
+      call add
+        call multiply
+          code 2
+          read n
+        code 1
+  fold n
+
+# THE CONE WIDTH AT FIVE BEATS is eleven cells, the interval of radius five: 2 * 5 + 1 = 11.
+hold cone-width-at-five-beats-is-eleven
   call is-equal
     code 11
     call add
@@ -20,25 +55,9 @@ hold light-cone-after-five-beats-is-eleven-cells
         code 5
       code 1
 
-# The walk spreads ballistically: its variance after t beats is t squared, so after 6 beats the variance is 36 = 6*6,
-# growing with the square of time, the signature of a fixed-speed front rather than a diffusion.
-hold ballistic-variance-is-time-squared
-  call is-equal
-    code 36
-    call multiply
-      code 6
-      code 6
-
-# A site at distance 6 is outside the radius-5 cone, causally disconnected after five beats: 6 above 5, no signal reaches
-# it yet, the discrete speed limit enforced exactly.
-hold a-site-beyond-the-front-is-causally-excluded
+# A SITE BEYOND THE FRONT IS CAUSALLY EXCLUDED: a site at distance six is outside the radius-five cone, 6 above 5, so no
+# signal reaches it within five beats, the discrete speed limit enforced.
+hold a-site-beyond-the-front-is-excluded
   call is-above
     code 6
     code 5
-
-# Ballistic beats diffusive: after 6 beats the walk's variance is 36, while a diffusion would give variance equal to the
-# beat count, 6, and 6 is below 36, so the coherent walk outruns any random spread and the front stays sharp.
-hold ballistic-outruns-diffusion
-  call is-below
-    code 6
-    code 36

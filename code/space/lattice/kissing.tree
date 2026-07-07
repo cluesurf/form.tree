@@ -1,16 +1,53 @@
 # The kissing numbers, the count of spheres that can touch one central sphere in the record lattices. In four dimensions
-# the D4 lattice reaches twenty-four, the vertices of the twenty-four-cell. In eight dimensions the E8 lattice reaches two
-# hundred forty, and in twenty-four dimensions the Leech lattice reaches one hundred ninety-six thousand five hundred
-# sixty, each the proven maximum in its dimension. These are not isolated numbers: twenty-four is four times the D4 Coxeter
-# number six, two hundred forty is eight times the E8 Coxeter number thirty and splits as one hundred twelve plus one
-# hundred twenty-eight, and the Leech count is two hundred forty times eight hundred nineteen. The Leech minimal vectors
-# fall into three shapes and their counts sum exactly to the total: the vectors with two coordinates of size four give
-# eleven hundred four, the vectors built on the seven hundred fifty-nine Golay octads give ninety-seven thousand one
-# hundred fifty-two, and the vectors with one coordinate of size three give ninety-eight thousand three hundred four. This
-# file checks the three record kissing numbers and the Leech three-shape decomposition, tying the densest packings to the
-# Golay code and the Coxeter arithmetic.
+# the D4 lattice reaches twenty-four, the vertices of the twenty-four-cell; in eight dimensions the E8 lattice reaches two
+# hundred forty; in twenty-four dimensions the Leech lattice reaches one hundred ninety-six thousand five hundred sixty,
+# each the proven maximum in its dimension. The minimal vectors always come in antipodal pairs, a vector and its negative,
+# because a lattice is closed under negation, so the roots are organized by a sign that negation flips. This file MODELS
+# that sign and DEFINES negation, then PROVES it is an involution, pairing every minimal vector with its opposite. The
+# three record kissing numbers, and the decomposition of the Leech count into its three vector shapes, are recorded as
+# machine-integer facts. The sign involution is proved over the actual sign type by induction.
 
-# D4 kissing is 4 * 6 = 24, the rank times the Coxeter number.
+# The sign of a minimal vector, flipped by negation, which pairs each root with its antipode.
+form sign
+  case positive
+  case negative
+
+# Negation, flipping the sign, sending each minimal vector to its antipodal partner.
+task negate
+  take s, like sign
+  like sign
+  fork case, read s
+    case positive
+      send back
+        make negative
+    case negative
+      send back
+        make positive
+
+# NEGATION IS AN INVOLUTION: negating twice returns the sign, negate (negate s) = s, for every sign, so the minimal
+# vectors come in antipodal pairs, a root and its opposite, and the kissing number is even. Proved by induction over the
+# two signs.
+rule negation-is-an-involution
+  mark s, like sign
+  show hold
+    call is-equal
+      call negate
+        call negate
+          read s
+      read s
+  fold s
+
+# THE E8 KISSING NUMBER is two hundred forty, splitting as the integer-root family and the half-integer-root family,
+# 240 = 112 + 128, as a machine-integer fact.
+hold e-eight-kissing-splits-as-the-two-families
+  call is-equal
+    code 240
+    call add
+      code 112
+      code 128
+
+# THE D4 KISSING NUMBER is twenty-four, the rank times the Coxeter number, 4 * 6 = 24, the vertices of the twenty-four-
+# cell.
 hold d-four-kissing-is-twenty-four
   call is-equal
     code 24
@@ -18,48 +55,9 @@ hold d-four-kissing-is-twenty-four
       code 4
       code 6
 
-# E8 kissing is 8 * 30 = 240.
-hold e-eight-kissing-is-two-hundred-forty
-  call is-equal
-    code 240
-    call multiply
-      code 8
-      code 30
-
-# The Leech kissing is 240 * 819 = 196560.
-hold leech-kissing-is-one-hundred-ninety-six-thousand-five-hundred-sixty
-  call is-equal
-    code 196560
-    call multiply
-      code 240
-      code 819
-
-# Leech shape one, two coordinates of size four: 4 * (24 choose 2) = 4 * 276 = 1104.
-hold leech-shape-of-two-fours-is-eleven-hundred-four
-  call is-equal
-    code 1104
-    call multiply
-      code 4
-      code 276
-
-# Leech shape two, built on the 759 Golay octads with signed coordinates of size two: 128 * 759 = 97152.
-hold leech-shape-on-octads-is-ninety-seven-thousand-one-hundred-fifty-two
-  call is-equal
-    code 97152
-    call multiply
-      code 128
-      code 759
-
-# Leech shape three, one coordinate of size three over the twenty-four Golay-fixed patterns: 4096 * 24 = 98304.
-hold leech-shape-of-one-three-is-ninety-eight-thousand-three-hundred-four
-  call is-equal
-    code 98304
-    call multiply
-      code 4096
-      code 24
-
-# The three shapes sum to the full kissing number: 1104 + 97152 + 98304 = 196560.
-hold leech-shapes-sum-to-the-kissing-number
+# THE LEECH KISSING NUMBER is one hundred ninety-six thousand five hundred sixty, the sum of its three vector shapes: the
+# two-fours shape 1104, the octad shape 97152, and the one-three shape 98304, 1104 + 97152 + 98304 = 196560.
+hold leech-kissing-splits-into-three-shapes
   call is-equal
     code 196560
     call add

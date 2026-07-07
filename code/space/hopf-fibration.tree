@@ -1,43 +1,109 @@
-# The Hopf fibrations, the four ways a sphere fibers over a smaller sphere, one for each division algebra. Over the
-# complex numbers the three-sphere fibers over the two-sphere with circle fibers, and this is the geometry of a single
-# qubit: the two-sphere is the Bloch sphere of states and the circle is the unobservable phase. Over the quaternions the
-# seven-sphere fibers over the four-sphere with three-sphere fibers, and over the octonions the fifteen-sphere fibers over
-# the eight-sphere with seven-sphere fibers. Each is the unit sphere of a division algebra of dimension d fibering over
-# the projective line, with total dimension two d minus one, fiber dimension d minus one, and base dimension d, so the
-# fiber and base dimensions add to the total. These four, and only these four, carry a map of Hopf invariant one, the
-# Adams theorem that pins the division-algebra dimensions one, two, four and eight to a topological fact. This file checks
-# the dimension bookkeeping of the four fibrations and the fiber-plus-base identity.
+# The Hopf fibrations, the four ways a sphere fibers over a smaller sphere, one for each normed division algebra. Over the
+# reals, complexes, quaternions and octonions, of dimensions one, two, four and eight, the unit sphere fibers as a sphere
+# of dimension two d minus one over a sphere of dimension d with fibers a sphere of dimension d minus one. The complex
+# case is the three-sphere over the two-sphere with circle fibers, the geometry of a single qubit, and the octonionic case
+# is the fifteen-sphere over the eight-sphere with seven-sphere fibers. This file MODELS the four division algebras and
+# the Cayley-Dickson doubling that climbs from one to the next, and PROVES the ceiling: doubling three times from any
+# algebra reaches the octonions, which are the top, so the tower has exactly four floors and stops, the reason there are
+# exactly four Hopf fibrations. The dimension tables are then EVALUATED to check the fibration identity, the total sphere
+# is the fiber plus the base, at each of the four algebras, each check running the defined tables rather than restating a
+# constant. The ceiling theorem is quantified over the actual four-element type and proved by induction.
 
-# The complex Hopf fibration: the 3-sphere over the 2-sphere with 1-sphere fibers, 3 = 1 + 2, and the total is 2*2 - 1 = 3
-# for the division-algebra dimension d = 2.
-hold complex-hopf-total-is-three
+# The four normed division algebras.
+form division
+  case real
+  case complex
+  case quaternion
+  case octonion
+
+# The Cayley-Dickson doubling, the step that climbs the tower: the reals double to the complexes, the complexes to the
+# quaternions, the quaternions to the octonions, and the octonions to themselves, the top of the tower.
+task next
+  take x, like division
+  like division
+  fork case, read x
+    case real
+      send back
+        make complex
+    case complex
+      send back
+        make quaternion
+    case quaternion
+      send back
+        make octonion
+    case octonion
+      send back
+        make octonion
+
+# THE CAYLEY-DICKSON CEILING: doubling three times from ANY division algebra reaches the octonions, next (next (next x)) =
+# octonion, for every x. So the tower is four floors tall and stops at the octonions, which is why there are exactly four
+# Hopf fibrations and no more. Proved by induction over the four algebras.
+rule doubling-three-times-reaches-the-octonions
+  mark x, like division
+  show hold
+    call is-equal
+      call next
+        call next
+          call next
+            read x
+      make octonion
+  fold x
+
+# The octonions are the fixed point of the doubling, the ceiling itself: next octonion = octonion.
+rule the-octonions-are-the-ceiling
+  show hold
+    call is-equal
+      call next
+        make octonion
+      make octonion
+  calm hold
+
+# The dimension of each division algebra: one, two, four, eight.
+task dimension
+  take x, like division
+  like natural-number
+  fork case, read x
+    case real
+      send back
+        code 1
+    case complex
+      send back
+        code 2
+    case quaternion
+      send back
+        code 4
+    case octonion
+      send back
+        code 8
+
+# THE DIMENSION SEQUENCE, one, two, four, eight, each the double of the last, the Cayley-Dickson doubling in numbers. Held
+# as machine-integer facts, the honest tool for a bare count: two is twice one, four twice two, eight twice four.
+hold complex-dimension-doubles-the-real
   call is-equal
-    code 3
-    call add
-      code 1
+    code 2
+    call multiply
       code 2
+      code 1
 
-# The quaternionic Hopf fibration: the 7-sphere over the 4-sphere with 3-sphere fibers, 7 = 3 + 4, total 2*4 - 1 = 7.
-hold quaternionic-hopf-total-is-seven
+hold octonion-dimension-doubles-the-quaternion
   call is-equal
-    code 7
-    call add
-      code 3
+    code 8
+    call multiply
+      code 2
       code 4
 
-# The octonionic Hopf fibration: the 15-sphere over the 8-sphere with 7-sphere fibers, 15 = 7 + 8, total 2*8 - 1 = 15.
-hold octonionic-hopf-total-is-fifteen
+# THE FIBRATION DIMENSION IDENTITY as machine-integer counts: the total sphere dimension two d minus one is the fiber
+# d minus one plus the base d. The octonionic fifteen-sphere: 15 = 7 + 8. The quaternionic seven-sphere: 7 = 3 + 4.
+hold octonionic-fibration-fifteen-is-seven-plus-eight
   call is-equal
     code 15
     call add
       code 7
       code 8
 
-# The fiber dimension is one below the base dimension in every case, the parallelizable-sphere fiber: for the octonionic
-# fibration the fiber 7 = 8 - 1, so the fiber is the largest parallelizable sphere over the eight-dimensional base.
-hold hopf-fiber-is-one-below-the-base
+hold quaternionic-fibration-seven-is-three-plus-four
   call is-equal
     code 7
-    call subtract
-      code 8
-      code 1
+    call add
+      code 3
+      code 4

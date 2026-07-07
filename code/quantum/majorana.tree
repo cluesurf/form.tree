@@ -1,46 +1,165 @@
-# Majorana modes, the half-fermions that store a qubit non-locally. A Majorana operator is its own antiparticle, squaring
-# to one and equal to its own conjugate, and it takes TWO of them to build one ordinary fermion, so a chain of N sites
-# carries two N Majoranas making N fermions. In Kitaev's chain the topological phase leaves one unpaired Majorana at each
-# end, and the two ends together form a single fermion whose occupation is a protected qubit: the ground state is two-fold
-# degenerate and the information is stored in the pair of distant ends, immune to any local noise. Braiding these end modes
-# realizes the Ising anyons, whose quantum dimension is the square root of two, so the Ising theory has three objects, the
-# vacuum, the Majorana fermion and the sigma anyon, with total quantum dimension squared one plus two plus one, four. This
-# file checks the two-Majoranas-per-fermion count, the ground-state degeneracy, the fusion of two sigmas, and the Ising
-# total quantum dimension.
+# Majorana modes and the Ising fusion ring. A Majorana operator is its own antiparticle, and braiding the unpaired
+# Majorana modes at the ends of a Kitaev chain realizes the Ising anyons, the three objects of the Ising theory: the
+# vacuum, the Majorana fermion psi, and the sigma anyon that a Majorana zero mode carries. Their fusion is the Ising rule:
+# the fermion is its own inverse, psi times psi is the vacuum, fusing psi with sigma gives sigma back, and two sigmas fuse
+# to either the vacuum or the fermion, sigma times sigma is one plus psi. This file DEFINES those fusion multiplicities as
+# a function on the three labels and PROVES the ring laws: the vacuum is a unit, fusion is commutative, and the Majorana
+# fermion squares to the vacuum, which is exactly the statement that a Majorana is its own antiparticle. Every theorem is
+# quantified over the actual three-element anyon type and checked by induction.
 
-# Two Majoranas make one fermion: a chain of 6 sites carries 2 * 6 = 12 Majorana operators forming 6 fermions.
-hold two-majoranas-per-fermion
-  call is-equal
-    code 12
-    call multiply
-      code 2
-      code 6
+# The three Ising anyons: the vacuum, the Majorana fermion psi, and the sigma anyon of a Majorana zero mode.
+form ising
+  case vacuum
+  case psi
+  case sigma
 
-# The topological phase has one unpaired Majorana at each of the two ends, and the two together make one fermion carrying
-# a protected qubit, so the ground state is two-fold degenerate: 2 ends make 1 fermion, 2 = 1 + 1 states.
-hold ground-state-is-two-fold-degenerate
-  call is-equal
-    code 2
-    call add
-      code 1
-      code 1
+# The Kronecker delta on Ising anyons, one when the labels agree.
+task same-ising
+  take b, like ising
+  take c, like ising
+  like natural-number
+  fork case, read b
+    case vacuum
+      fork case, read c
+        case vacuum
+          send back
+            code 1
+        case psi
+          send back
+            code 0
+        case sigma
+          send back
+            code 0
+    case psi
+      fork case, read c
+        case vacuum
+          send back
+            code 0
+        case psi
+          send back
+            code 1
+        case sigma
+          send back
+            code 0
+    case sigma
+      fork case, read c
+        case vacuum
+          send back
+            code 0
+        case psi
+          send back
+            code 0
+        case sigma
+          send back
+            code 1
 
-# Two sigma anyons fuse two ways, to the vacuum or to the Majorana fermion: sigma times sigma is 1 + psi, two outcomes.
-hold two-sigmas-fuse-two-ways
-  call is-equal
-    code 2
-    call add
-      code 1
-      code 1
-
-# The Ising theory has three objects with total quantum dimension squared one plus two plus one: the vacuum and the
-# fermion each contribute one, the sigma contributes its quantum dimension squared two, summing to 1 + 2 + 1 = 4, so the
-# total quantum dimension is two.
-hold ising-total-quantum-dimension-squared-is-four
-  call is-equal
-    code 4
-    call add
-      code 1
-      call add
-        code 2
+# One when c is not sigma, the multiplicity of c in sigma times sigma, which is the vacuum plus psi.
+task not-sigma
+  take c, like ising
+  like natural-number
+  fork case, read c
+    case vacuum
+      send back
         code 1
+    case psi
+      send back
+        code 1
+    case sigma
+      send back
+        code 0
+
+# The Ising fusion multiplicity: how many times c appears in a times b, the structure constants of the Ising ring.
+task combine
+  take a, like ising
+  take b, like ising
+  take c, like ising
+  like natural-number
+  fork case, read a
+    case vacuum
+      send back
+        call same-ising
+          read b
+          read c
+    case psi
+      fork case, read b
+        case vacuum
+          send back
+            call same-ising
+              make psi
+              read c
+        case psi
+          send back
+            call same-ising
+              make vacuum
+              read c
+        case sigma
+          send back
+            call same-ising
+              make sigma
+              read c
+    case sigma
+      fork case, read b
+        case vacuum
+          send back
+            call same-ising
+              make sigma
+              read c
+        case psi
+          send back
+            call same-ising
+              make sigma
+              read c
+        case sigma
+          send back
+            call not-sigma
+              read c
+
+# THE VACUUM IS A UNIT: fusing the vacuum with any anyon b returns exactly b, combine(vacuum, b, c) = same-ising(b, c),
+# for all b and c. Proved by induction over the anyon labels.
+rule vacuum-is-the-fusion-unit
+  mark b, like ising
+  mark c, like ising
+  show hold
+    call is-equal
+      call combine
+        make vacuum
+        read b
+        read c
+      call same-ising
+        read b
+        read c
+  fold b, c
+
+# FUSION IS COMMUTATIVE: the multiplicity is unchanged when the two factors are swapped, combine(a, b, c) = combine(b, a,
+# c), for all a, b and c. Proved by simultaneous induction over the three anyon labels, the full twenty-seven-case grid.
+rule fusion-is-commutative
+  mark a, like ising
+  mark b, like ising
+  mark c, like ising
+  show hold
+    call is-equal
+      call combine
+        read a
+        read b
+        read c
+      call combine
+        read b
+        read a
+        read c
+  fold a, b, c
+
+# THE MAJORANA IS ITS OWN ANTIPARTICLE: the fermion psi fused with itself gives the vacuum, combine(psi, psi, c) =
+# same-ising(vacuum, c), for all c, so psi times psi is one. This is the defining property of a Majorana, that it is its
+# own antiparticle. Proved by induction over the third label.
+rule the-majorana-is-its-own-antiparticle
+  mark c, like ising
+  show hold
+    call is-equal
+      call combine
+        make psi
+        make psi
+        read c
+      call same-ising
+        make vacuum
+        read c
+  fold c

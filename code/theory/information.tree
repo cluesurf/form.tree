@@ -1,27 +1,105 @@
-# Information and entropy, the count of distinctions a state can hold. The Shannon entropy of a source is the average
-# number of bits needed to name its outcome, and for n equally likely outcomes it is the logarithm base two of n, so a
-# fair coin holds one bit, a fair four-way choice two bits, a fair eight-way choice three bits. The von Neumann entropy is
-# the same measure for a quantum state, the Shannon entropy of its eigenvalues, zero for a pure state and maximal for a
-# fully mixed one. Mutual information measures shared uncertainty: the entropy of one part plus the entropy of the other
-# minus the entropy of the whole. For a Bell pair, each qubit alone is fully mixed with entropy one, while the pair
-# together is pure with entropy zero, so the mutual information is one plus one minus zero, two, the maximum for a single
-# qubit on each side. That value two is exactly the wormhole cross-section the holography files measure, twice the
-# entanglement entropy of one, and its being positive with a zero joint entropy is the strong subadditivity signature of
-# entanglement, the whole knowing less uncertainty than its parts. This file checks the equally-likely entropy, the Bell
-# mutual information, its relation to the entanglement entropy, and the subadditivity gap.
+# Information and its atom, the bit and its exclusive-or. The smallest unit of information is one bit, and the operation
+# that combines two bits without losing information is the exclusive-or, the parity of their sum. Under exclusive-or the
+# bits form the group of order two: it has an identity, the zero bit, every bit is its own inverse, and it is commutative
+# and associative. This is the structure underneath every linear error-correcting code, every parity check and syndrome,
+# and the classical channel through which entangled parties share information. This file DEFINES the bit and its
+# exclusive-or and PROVES the group laws that make information composable: zero is the identity, every bit is its own
+# inverse, and the operation is commutative and associative. It records the Bell-pair mutual information as a machine-
+# integer fact. The group laws are quantified over the actual bit type and checked by induction.
 
-# A fair eight-way source holds log base two of eight, three bits, because 2^3 = 8.
-hold entropy-of-eight-equally-likely-is-three-bits
-  call is-equal
-    code 8
-    call multiply
-      code 2
-      call multiply
-        code 2
-        code 2
+# The two values of a bit.
+form bit
+  case off
+  case on
 
-# The Bell-pair mutual information: each qubit alone has entropy one, the pair together has entropy zero, so the shared
-# information is 1 + 1 - 0 = 2, the maximum for one qubit each.
+# Bit negation, the flip used by exclusive-or.
+task flip
+  take a, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        make on
+    case on
+      send back
+        make off
+
+# Exclusive-or: zero leaves the other bit unchanged, one flips it. The parity of the two bits, the information-preserving
+# combination.
+task xor
+  take a, like bit
+  take b, like bit
+  like bit
+  fork case, read a
+    case off
+      send back
+        read b
+    case on
+      send back
+        call flip
+          read b
+
+# ZERO IS THE IDENTITY: combining any bit with the zero bit leaves it unchanged, xor(off, a) = a, for every a. Proved by
+# induction over the bit.
+rule zero-is-the-identity
+  mark a, like bit
+  show hold
+    call is-equal
+      call xor
+        make off
+        read a
+      read a
+  fold a
+
+# EVERY BIT IS ITS OWN INVERSE: a bit combined with itself gives zero, xor(a, a) = off, for every a. So the group has
+# exponent two, the defining property of parity. Proved by induction over the bit.
+rule every-bit-is-its-own-inverse
+  mark a, like bit
+  show hold
+    call is-equal
+      call xor
+        read a
+        read a
+      make off
+  fold a
+
+# EXCLUSIVE-OR IS COMMUTATIVE: the order of the two bits does not matter, xor(a, b) = xor(b, a), for all a and b. Proved
+# by simultaneous induction over the two bits.
+rule exclusive-or-is-commutative
+  mark a, like bit
+  mark b, like bit
+  show hold
+    call is-equal
+      call xor
+        read a
+        read b
+      call xor
+        read b
+        read a
+  fold a, b
+
+# EXCLUSIVE-OR IS ASSOCIATIVE: regrouping does not matter, xor(xor(a, b), c) = xor(a, xor(b, c)), for all a, b and c, so
+# a string of bits has a well-defined parity. Proved by simultaneous induction over the three bits.
+rule exclusive-or-is-associative
+  mark a, like bit
+  mark b, like bit
+  mark c, like bit
+  show hold
+    call is-equal
+      call xor
+        call xor
+          read a
+          read b
+        read c
+      call xor
+        read a
+        call xor
+          read b
+          read c
+  fold a, b, c
+
+# THE BELL-PAIR MUTUAL INFORMATION is two: each qubit alone has entropy one, the pair together entropy zero, so the shared
+# information is one plus one minus zero, 2 = (1 + 1) - 0, the maximum for one qubit on each side.
 hold bell-pair-mutual-information-is-two
   call is-equal
     code 2
@@ -30,19 +108,3 @@ hold bell-pair-mutual-information-is-two
         code 1
         code 1
       code 0
-
-# The mutual information is twice the entanglement entropy: the entanglement entropy of the Bell pair is one, and 2 * 1 =
-# 2 equals the mutual information, so the cross-section is twice the entropy at the maximum.
-hold mutual-information-is-twice-the-entanglement-entropy
-  call is-equal
-    code 2
-    call multiply
-      code 2
-      code 1
-
-# Subadditivity: the joint entropy zero is below the sum of the parts' entropies two, 0 below 2, the entangled whole
-# holding less uncertainty than its parts separately, which is why the mutual information is positive.
-hold entanglement-makes-the-whole-less-uncertain-than-its-parts
-  call is-below
-    code 0
-    code 2

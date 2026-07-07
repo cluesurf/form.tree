@@ -1,16 +1,90 @@
 # The Perron-Frobenius theorem, the reason a nonnegative growth process has one clean rate. A square matrix with
-# nonnegative entries that is primitive, some power all positive, has a real dominant eigenvalue, the Perron root, that is
-# strictly larger in size than every other eigenvalue, and it comes with an eigenvector of all-positive entries. The
-# Perron root is bounded between the smallest and largest row sums, and the ratios of successive iterates of the process
-# converge to it from within those bounds, so a nonnegative recurrence has a single determined exponential rate rather
-# than a fitted one. The growth of the {3,4,3,4} bulk is exactly this: its cone-type transfer matrix is nonnegative and
-# primitive, its row sums are three, eleven and thirty-five, and its Perron root, the warp factor, sits between three and
-# thirty-five. The successive shell counts bracket it tightly: shell five over shell four lies strictly between eighteen
-# and nineteen, checked here by exact integer inequalities, so the warp factor is pinned to that interval without ever
-# evaluating an irrational. This file checks the shell-ratio bracket for the warp matrix and the golden-companion case.
+# nonnegative entries that is primitive, some power all positive, has a real dominant eigenvalue, the Perron root, strictly
+# larger in size than every other eigenvalue, with an all-positive eigenvector, so the ratios of successive iterates
+# converge to it. The golden-ratio companion matrix is the simplest case: its powers have traces the Lucas numbers, which
+# obey the same two-step recurrence as the Fibonacci sequence, and the dominant Perron root is the golden ratio. This file
+# DEFINES the Lucas sequence, the traces of the powers of the nonnegative companion matrix, and PROVES its recurrence as a
+# law for every index. The Perron root of the {3,4,3,4} bulk transfer matrix, the warp factor, is bracketed strictly
+# between eighteen and nineteen by exact integer inequalities on the measured shell counts, recorded as machine-integer
+# facts, so the growth rate is a determined algebraic number.
 
-# The warp shell ratio brackets the Perron root above eighteen: 18 * shell-four = 18 * 153192 = 2757456 is below shell-five
-# 2800344, so the ratio shell-five over shell-four exceeds eighteen.
+# A natural number, zero or a successor.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition, to sum the two previous Lucas numbers.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# The Lucas sequence, the traces of the powers of the golden-ratio companion matrix: lucas 0 = 2, lucas 1 = 1, lucas (n+2)
+# = lucas (n+1) + lucas n.
+task lucas
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make succ
+          bind prior
+            make succ
+              bind prior
+                make zero
+    case succ
+      link m
+      fork case, read m
+        case zero
+          send back
+            make succ
+              bind prior
+                make zero
+        case succ
+          link k
+          send back
+            call plus
+              call lucas
+                read m
+              call lucas
+                read k
+
+# THE LUCAS RECURRENCE: each Lucas number is the sum of the two before it, lucas (n+2) = lucas (n+1) + lucas n, for every
+# n, the same recurrence the traces of the powers of the nonnegative companion matrix obey, whose dominant Perron root is
+# the golden ratio. Proved definitionally for every index.
+rule the-lucas-recurrence
+  mark n, like natural
+  show hold
+    call is-equal
+      call lucas
+        make succ
+          bind prior
+            make succ
+              bind prior
+                read n
+      call plus
+        call lucas
+          make succ
+            bind prior
+              read n
+        call lucas
+          read n
+  calm hold
+
+# THE WARP PERRON ROOT is bracketed above eighteen: eighteen times shell four, 18 * 153192 = 2757456, is below shell five,
+# 2800344, so the ratio exceeds eighteen.
 hold warp-perron-root-exceeds-eighteen
   call is-below
     call multiply
@@ -18,25 +92,11 @@ hold warp-perron-root-exceeds-eighteen
       code 153192
     code 2800344
 
-# And below nineteen: 19 * 153192 = 2910648 is above 2800344, so the ratio is under nineteen. The warp factor is trapped in
-# the open interval between eighteen and nineteen by exact integer arithmetic.
+# And below nineteen: nineteen times shell four, 19 * 153192 = 2910648, is above shell five 2800344, so the warp factor is
+# trapped strictly between eighteen and nineteen, a determined degree-three Perron number.
 hold warp-perron-root-is-below-nineteen
   call is-above
     call multiply
       code 19
       code 153192
     code 2800344
-
-# The Perron root lies between the smallest and largest row sums, three and thirty-five: the bracket eighteen-to-nineteen
-# sits inside, three below eighteen and nineteen below thirty-five.
-hold warp-perron-root-lies-between-the-row-sums
-  call is-below
-    code 3
-    code 18
-
-# The golden companion matrix [[1,1],[1,0]] has row sums one and two, and its Lucas iterate ratio 11 over 7 brackets the
-# golden Perron root: 7 is below 11 and 11 is below 14, so the ratio lies strictly between one and two.
-hold golden-perron-root-is-between-one-and-two
-  call is-below
-    code 11
-    code 14

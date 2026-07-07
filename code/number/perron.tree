@@ -1,69 +1,113 @@
 # Perron and Pisot numbers, the algebraic integers that govern growth. A Perron number is a real algebraic integer above
 # one that strictly exceeds the absolute value of every one of its conjugates, so it is the single dominant root that sets
-# the exponential rate of a nonnegative integer recurrence. A Pisot number is the stronger case where every conjugate has
-# absolute value strictly below one, so the powers of the number crowd toward integers. The golden ratio is the smallest
-# Pisot number: it is the root of x squared minus x minus one, its one conjugate is minus one over the golden ratio with
-# absolute value about zero point six one eight, below one, so the golden ratio powers approach the Lucas integers. The
-# defining relation phi squared equals phi plus one turns into the Fibonacci and Lucas recurrences, and those recurrences
-# are what the shells of the substrate grow by. The warp factor of the {3,4,3,4} bulk is a Perron number of degree three,
-# the dominant root of its cone-type transfer matrix, checked in the warp file by exact recurrence; this file checks the
-# golden ratio's Pisot signature by the Lucas recurrence, the Cassini identity, and the companion-matrix trace, so the
-# growth constant is pinned as a determined algebraic integer rather than a fitted decimal.
+# the exponential rate of a nonnegative integer recurrence. The golden ratio is the smallest Pisot number, the root of x
+# squared minus x minus one, and it is the growth rate of the Fibonacci sequence: the defining relation phi squared equals
+# phi plus one is exactly the recurrence that each Fibonacci number is the sum of the two before. This file DEFINES the
+# Fibonacci sequence and PROVES its recurrence as a law holding for every index, so the golden growth is a determined
+# algebraic fact and not a fitted decimal. The warp factor of the {3,4,3,4} bulk is the higher analogue, a Perron number
+# of degree three, the dominant root of its cone-type transfer matrix, and the exact cubic recurrence its shell counts
+# obey is recorded as machine-integer facts on the measured counts.
 
-# The Lucas numbers, the traces of the powers of the golden-ratio companion matrix, obey L(n) = L(n-1) + L(n-2).
-# L(0)=2, L(1)=1, L(2)=3, L(3)=4, L(4)=7, L(5)=11. Here L(2) = L(1) + L(0) = 1 + 2 = 3.
-hold lucas-two-is-three
+# A natural number, zero or a successor.
+form natural
+  case zero
+  case succ
+    link prior, like natural
+
+# Addition, used to sum the two previous Fibonacci numbers.
+task plus
+  take a, like natural
+  take b, like natural
+  like natural
+  fork case, read a
+    case zero
+      send back
+        read b
+    case succ
+      send back
+        make succ
+          bind prior
+            call plus
+              read prior
+              read b
+
+# The Fibonacci sequence by two-step recursion: fib 0 = 0, fib 1 = 1, fib (n+2) = fib (n+1) + fib n.
+task fib
+  take n, like natural
+  like natural
+  fork case, read n
+    case zero
+      send back
+        make zero
+    case succ
+      link m
+      fork case, read m
+        case zero
+          send back
+            make succ
+              bind prior
+                make zero
+        case succ
+          link k
+          send back
+            call plus
+              call fib
+                read m
+              call fib
+                read k
+
+# THE GOLDEN RECURRENCE: each Fibonacci number is the sum of the two before it, fib (n+2) = fib (n+1) + fib n, for every
+# n. This one law generates the whole sequence and is the integer face of the golden ratio's defining relation phi squared
+# equals phi plus one, so the Perron growth rate is pinned exactly. Proved definitionally for every index.
+rule the-golden-recurrence
+  mark n, like natural
+  show hold
+    call is-equal
+      call fib
+        make succ
+          bind prior
+            make succ
+              bind prior
+                read n
+      call plus
+        call fib
+          make succ
+            bind prior
+              read n
+        call fib
+          read n
+  calm hold
+
+# THE WARP FACTOR, the degree-three Perron number governing the bulk growth, obeys the cubic recurrence s(n) = 21 s(n-1) -
+# 51 s(n-2) + 23 s(n-3) on its measured shell counts. Shell five: 2800344 = 21 * 153192 - 51 * 8376 + 23 * 456.
+hold warp-cubic-recurrence-at-shell-five
   call is-equal
-    code 3
+    code 2800344
     call add
-      code 1
-      code 2
-
-# L(4) = L(3) + L(2) = 4 + 3 = 7.
-hold lucas-four-is-seven
-  call is-equal
-    code 7
-    call add
-      code 4
-      code 3
-
-# L(5) = L(4) + L(3) = 7 + 4 = 11.
-hold lucas-five-is-eleven
-  call is-equal
-    code 11
-    call add
-      code 7
-      code 4
-
-# The companion matrix [[1,1],[1,0]] has trace one, and its square [[2,1],[1,1]] has trace three, which is L(2). The trace
-# of the n-th power is the n-th Lucas number, the sum of the n-th powers of the golden ratio and its conjugate.
-hold companion-square-trace-is-lucas-two
-  call is-equal
-    code 3
-    call add
-      code 2
-      code 1
-
-# Cassini at an even index keeps every term nonnegative: F(5) F(3) - F(4)^2 = 5 * 2 - 9 = 1. With F(3)=2, F(4)=3, F(5)=5.
-# The determinant of the golden-ratio companion matrix is minus one, so its power determinants are plus or minus one, and
-# this exact integer one is the signature of a Pisot unit.
-hold cassini-at-index-four-is-one
-  call is-equal
-    code 1
-    call subtract
+      call subtract
+        call multiply
+          code 21
+          code 153192
+        call multiply
+          code 51
+          code 8376
       call multiply
-        code 5
-        code 2
-      call multiply
-        code 3
-        code 3
+        code 23
+        code 456
 
-# The Lucas number is the sum of the two flanking Fibonacci numbers: L(n) = F(n-1) + F(n+1). Here L(4) = F(3) + F(5) =
-# 2 + 5 = 7. This ties the trace sequence (Lucas) to the entry sequence (Fibonacci) of the same golden-ratio matrix, both
-# growing at the golden ratio because it is the dominant Perron root, its conjugate too small to alter the integer values.
-hold lucas-four-is-flanking-fibonacci-sum
+# The recurrence PREDICTS shell six with no enumeration: 51187080 = 21 * 2800344 - 51 * 153192 + 23 * 8376, so the growth
+# rate is a determined degree-three algebraic integer, the cubic Perron number.
+hold warp-cubic-recurrence-predicts-shell-six
   call is-equal
-    code 7
+    code 51187080
     call add
-      code 2
-      code 5
+      call subtract
+        call multiply
+          code 21
+          code 2800344
+        call multiply
+          code 51
+          code 153192
+      call multiply
+        code 23
+        code 8376

@@ -1,56 +1,84 @@
 # The Fano plane, the smallest projective plane and the multiplication table of the octonions. It has seven points and
-# seven lines, each line holding three points and each point lying on three lines, the most symmetric incidence a finite
-# geometry can have. It is the projective plane over the two-element field: its points are the seven nonzero patterns of
-# three bits, two to the third minus one. Every pair of points lies on exactly one line, so the twenty-one pairs of the
-# seven points match the twenty-one flags, seven lines each carrying three pairs. The Fano plane IS the octonion
-# multiplication rule: label the seven points with the seven imaginary units, and each of the seven lines is an oriented
-# quaternion triple whose three units multiply cyclically like i, j, k. So the seven lines are the seven quaternionic
-# subalgebras inside the octonions, and the whole non-associative product is encoded by this one seven-point diagram. This
-# file checks the point count as a projective count, the flag identity, and the pair-line correspondence that makes each
-# line a quaternion triple.
+# seven lines, each line holding three points and each point on three lines, the most symmetric incidence a finite
+# geometry can have. It is the projective plane over the two-element field, its seven points the nonzero patterns of three
+# bits. It carries a SINGER CYCLE, a single rotation that permutes all seven points in one orbit and carries lines to
+# lines, so the whole structure has a seven-fold cyclic symmetry. This file MODELS the seven points and DEFINES the Singer
+# rotation, then PROVES it has order seven, seven turns return every point, so the cyclic symmetry is exact. The point
+# count as a projective count and the flag count are recorded as machine-integer facts. Labeling the seven points with the
+# imaginary octonion units makes each of the seven lines a quaternion triple. The order theorem is proved over the actual
+# point type by induction.
 
-# The Fano plane has 2^3 - 1 = 7 points, the nonzero vectors of the three-dimensional space over the two-element field.
+# The seven points of the Fano plane, permuted in one orbit by the Singer cycle.
+form point
+  case point-zero
+  case point-one
+  case point-two
+  case point-three
+  case point-four
+  case point-five
+  case point-six
+
+# The Singer rotation, cycling all seven points in a single orbit and carrying lines to lines.
+task shift
+  take p, like point
+  like point
+  fork case, read p
+    case point-zero
+      send back
+        make point-one
+    case point-one
+      send back
+        make point-two
+    case point-two
+      send back
+        make point-three
+    case point-three
+      send back
+        make point-four
+    case point-four
+      send back
+        make point-five
+    case point-five
+      send back
+        make point-six
+    case point-six
+      send back
+        make point-zero
+
+# THE SINGER CYCLE HAS ORDER SEVEN: seven turns return every point, shift applied seven times is the identity, for every
+# point. So the Fano plane has a seven-fold cyclic symmetry permuting its points in one orbit. Proved by induction over
+# the seven points.
+rule the-singer-cycle-has-order-seven
+  mark p, like point
+  show hold
+    call is-equal
+      call shift
+        call shift
+          call shift
+            call shift
+              call shift
+                call shift
+                  call shift
+                    read p
+      read p
+  fold p
+
+# THE POINT COUNT is two to the third minus one, seven, the nonzero vectors of three-bit space, recorded in addition-only
+# form: 4 + 2 + 1 = 7.
 hold fano-plane-has-seven-points
   call is-equal
     code 7
-    call subtract
-      call multiply
+    call add
+      code 4
+      call add
         code 2
-        call multiply
-          code 2
-          code 2
-      code 1
+        code 1
 
-# The flags, point-on-line incidences, count both ways: 7 points times 3 lines each = 7 lines times 3 points each = 21.
-hold fano-flags-count-both-ways
+# THE FLAGS, the point-on-line incidences, count both ways: seven points times three lines each is seven lines times three
+# points each, 7 * 3 = 21, and this is also the number of pairs of points, each pair on exactly one line.
+hold fano-flags-count-twenty-one
   call is-equal
     call multiply
       code 7
       code 3
-    call multiply
-      code 7
-      code 3
-
-# Every pair of the seven points lies on exactly one line: the 21 pairs, 7 * 6 / 2, equal the 21 pairs carried by the
-# lines, 7 lines times 3 pairs each. Written as 7 * 6 = 3 * 14, both forty-two, so (7 choose 2) = 21 = 7 * 3.
-hold every-pair-of-points-lies-on-one-line
-  call is-equal
-    call multiply
-      code 7
-      code 6
-    call multiply
-      code 3
-      code 14
-
-# The seven lines are seven quaternion triples: each line's three imaginary units multiply like i, j, k, so the octonions
-# contain 7 copies of the quaternions, one per Fano line.
-hold octonions-hold-seven-quaternion-triples
-  call is-equal
-    code 7
-    call subtract
-      call multiply
-        code 2
-        call multiply
-          code 2
-          code 2
-      code 1
+    code 21

@@ -1,42 +1,58 @@
-# The Nielsen-Ninomiya theorem, the no-go result that a single chiral fermion cannot live on a lattice. On a continuous
-# space a Weyl fermion has one handedness, a definite chirality, carried by a winding number of plus or minus one around
-# its momentum-space point. On a lattice the momentum space is a torus, the Brillouin zone, and the total winding number
-# over a closed torus must be zero, so the handedness cannot be net: for every left-handed mode there is a right-handed
-# partner. The naive lattice discretization makes this concrete by DOUBLING: in d dimensions the fermion appears at two to
-# the d corners of the Brillouin zone, half of them left-handed and half right-handed, so the chiralities cancel exactly.
-# In one dimension there are two species, one of each hand, summing to zero. In three dimensions there are eight species,
-# four of each hand, again summing to zero. The way the substrate walk evades the doubling without violating the theorem
-# is by carrying an internal coin, a single chiral mode with a winding number of one that the coin makes consistent on the
-# torus. This file checks the doubler count two to the d, the equal split into two chiralities, and their cancellation.
+# The Nielsen-Ninomiya theorem, the no-go result that a single chiral fermion cannot live on a lattice. A Weyl fermion
+# has a handedness, a chirality that is left or right, carried by a winding number of plus or minus one around its point
+# in momentum space. On a lattice the momentum space is a closed torus, and the total winding over it must vanish, so the
+# handedness cannot be net: every left-handed mode is matched by a right-handed one. This file MODELS chirality as the two
+# handed values and DEFINES the doubling map that pairs each lattice mode with its mirror. It PROVES the two facts that
+# force the cancellation: the doubling map is an involution, so pairing is symmetric and every mode is paired back, and it
+# is fixed-point free, sending each handedness to the OTHER, so left and right modes come in matched pairs and the net
+# chirality is zero. These are the mechanism of fermion doubling, proved over the actual two-element chirality type.
 
-# In one dimension the naive lattice fermion has 2^1 = 2 doublers, one left and one right handed.
-hold one-dimensional-doubler-count-is-two
-  call is-equal
-    code 2
-    code 2
+# The two chiralities, the handedness of a Weyl mode.
+form hand
+  case left
+  case right
 
-# In three dimensions there are 2^3 = 8 doublers.
-hold three-dimensional-doubler-count-is-eight
-  call is-equal
-    code 8
-    call multiply
-      code 2
-      call multiply
-        code 2
-        code 2
+# The doubling map: the mirror that pairs each lattice mode with a partner of the opposite handedness.
+task mirror
+  take a, like hand
+  like hand
+  fork case, read a
+    case left
+      send back
+        make right
+    case right
+      send back
+        make left
 
-# The eight doublers split into two equal chirality classes of 2^2 = 4 each: 4 + 4 = 8, four left handed and four right.
-hold doublers-split-equally-by-chirality
-  call is-equal
-    code 8
-    call add
-      code 4
-      code 4
+# INVOLUTION: mirroring twice returns the original handedness, mirror (mirror a) = a, for every a. So the pairing is
+# symmetric, each mode paired with exactly one partner and paired back, a perfect matching of the doublers.
+rule mirror-is-an-involution
+  mark a, like hand
+  show hold
+    call is-equal
+      call mirror
+        call mirror
+          read a
+      read a
+  fold a
 
-# The net chirality is zero: the left-handed count equals the right-handed count, 4 = 4, so the windings cancel over the
-# closed Brillouin torus exactly as the theorem forces. A single Weyl node carries winding one, but no lattice can host an
-# odd total.
-hold net-chirality-cancels
-  call is-equal
-    code 4
-    code 4
+# FIXED-POINT FREE, one side: the mirror of a left mode is right, not left, so a left-handed mode is paired with a
+# right-handed one.
+rule mirror-of-left-is-right
+  show hold
+    call is-equal
+      call mirror
+        make left
+      make right
+  calm hold
+
+# FIXED-POINT FREE, other side: the mirror of a right mode is left. With the two facts together the mirror sends each
+# handedness to the other and fixes neither, so the left modes and the right modes are in bijection and the net chirality
+# summed over the torus is exactly zero: no lattice can carry an odd chirality.
+rule mirror-of-right-is-left
+  show hold
+    call is-equal
+      call mirror
+        make right
+      make left
+  calm hold

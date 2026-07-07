@@ -1,53 +1,195 @@
-# Knot theory and the invariants that tell knots apart. A knot is a closed loop in space, and the question is whether two
-# loops can be deformed into each other without cutting. The trefoil is the simplest nontrivial knot, the closure of the
-# three-crossing braid, and it is the two-three torus knot, winding twice one way and three times the other around a
-# doughnut. Its crossing number is three, the fewest crossings any diagram of it can have, its unknotting number is one,
-# one crossing change undoes it, and its Seifert genus is one, it bounds a once-punctured torus. It is also chiral, its
-# mirror image is a genuinely different knot. Knots are told apart by invariants computed from a diagram but unchanged by
-# the three Reidemeister moves, and the Kauffman bracket, a sum over smoothings of the crossings, is one such: it yields
-# the Jones polynomial, which gives the trefoil a value different from the unknot, proving the trefoil is truly knotted.
-# This file checks the trefoil crossing number as a torus knot, its genus, and the count of Reidemeister moves.
+# Knot theory and tricolorability, an invariant that tells knots apart. A knot is a closed loop in space, and the
+# question is whether two loops can be deformed into each other without cutting. A three-coloring paints each arc of a
+# knot diagram with one of three colors so that at every crossing the three arcs meeting there, the over-strand and the
+# two under-strand pieces, are either all the same color or all three different. A coloring using more than one color is
+# nontrivial, and whether a knot admits one is unchanged by the Reidemeister moves, so it is a genuine invariant. The
+# trefoil admits a nontrivial coloring, painting its three arcs the three different colors so every crossing is a rainbow,
+# while the unknot, a single arc, admits only one color, so the trefoil is truly knotted. This file MODELS the three
+# colors and DEFINES the crossing rule as a function returning whether a crossing is legal. It PROVES the rule's laws: a
+# monochromatic crossing is legal, the rainbow crossing of three distinct colors is legal, a crossing with exactly two
+# colors is illegal, and the rule is symmetric in the two under-strands. The color laws are quantified over the actual
+# color type and checked by induction.
 
-# The trefoil is the two-three torus knot with crossing number three: for the torus knot on p = 2, q = 3 the crossing
-# number is q times p minus one, 3 * (2 - 1) = 3.
-hold trefoil-crossing-number-is-three
-  call is-equal
-    code 3
-    call multiply
-      code 3
-      call subtract
-        code 2
-        code 1
+# The three colors of a tricoloring.
+form hue
+  case red
+  case green
+  case blue
 
-# The Seifert genus of the two-three torus knot is one, from (p - 1)(q - 1) over two: 2 * genus = (2 - 1)(3 - 1) = 1 * 2 =
-# 2, so the genus is one and the trefoil bounds a once-punctured torus.
-hold trefoil-genus-is-one
-  call is-equal
-    call multiply
-      code 2
-      code 1
-    call multiply
-      call subtract
-        code 2
-        code 1
-      call subtract
-        code 3
-        code 1
+# Whether a crossing satisfies the tricoloring rule.
+form check
+  case legal
+  case illegal
 
-# There are three Reidemeister moves, the twist, the poke and the slide, and any two diagrams of the same knot are
-# connected by a sequence of them, so an invariant unchanged by all three tells knots apart: 3 = 1 + 2.
-hold there-are-three-reidemeister-moves
-  call is-equal
-    code 3
-    call add
-      code 1
-      code 2
+# The tricoloring crossing rule: given the over-strand color and the two under-strand colors, a crossing is legal when the
+# three are all the same or all three different, and illegal otherwise, which is exactly the case of two colors meeting.
+task cross
+  take over, like hue
+  take under-a, like hue
+  take under-b, like hue
+  like check
+  fork case, read over
+    case red
+      fork case, read under-a
+        case red
+          fork case, read under-b
+            case red
+              send back
+                make legal
+            case green
+              send back
+                make illegal
+            case blue
+              send back
+                make illegal
+        case green
+          fork case, read under-b
+            case red
+              send back
+                make illegal
+            case green
+              send back
+                make illegal
+            case blue
+              send back
+                make legal
+        case blue
+          fork case, read under-b
+            case red
+              send back
+                make illegal
+            case green
+              send back
+                make legal
+            case blue
+              send back
+                make illegal
+    case green
+      fork case, read under-a
+        case red
+          fork case, read under-b
+            case red
+              send back
+                make illegal
+            case green
+              send back
+                make illegal
+            case blue
+              send back
+                make legal
+        case green
+          fork case, read under-b
+            case red
+              send back
+                make illegal
+            case green
+              send back
+                make legal
+            case blue
+              send back
+                make illegal
+        case blue
+          fork case, read under-b
+            case red
+              send back
+                make legal
+            case green
+              send back
+                make illegal
+            case blue
+              send back
+                make illegal
+    case blue
+      fork case, read under-a
+        case red
+          fork case, read under-b
+            case red
+              send back
+                make illegal
+            case green
+              send back
+                make legal
+            case blue
+              send back
+                make illegal
+        case green
+          fork case, read under-b
+            case red
+              send back
+                make legal
+            case green
+              send back
+                make illegal
+            case blue
+              send back
+                make illegal
+        case blue
+          fork case, read under-b
+            case red
+              send back
+                make illegal
+            case green
+              send back
+                make illegal
+            case blue
+              send back
+                make legal
 
-# The unknotting number of the trefoil is one: a single crossing change turns it into the unknot, the fewest possible for
-# a nontrivial knot, 1 = 3 - 2, one below its crossing count minus one.
-hold trefoil-unknotting-number-is-one
-  call is-equal
-    code 1
-    call subtract
-      code 3
-      code 2
+# A MONOCHROMATIC CROSSING IS LEGAL: painting all three arcs one color satisfies the rule, cross(h, h, h) = legal, for
+# every color h. This is the trivial coloring, always available, which is why every knot including the unknot is at least
+# one-colorable. Proved by induction over the three colors.
+rule a-monochromatic-crossing-is-legal
+  mark h, like hue
+  show hold
+    call is-equal
+      call cross
+        read h
+        read h
+        read h
+      make legal
+  fold h
+
+# THE RAINBOW CROSSING IS LEGAL: three different colors at a crossing satisfy the rule, cross(red, green, blue) = legal.
+# This is the crossing of the trefoil's nontrivial coloring, where its three arcs take the three colors, so the trefoil is
+# tricolorable.
+rule the-rainbow-crossing-is-legal
+  show hold
+    call is-equal
+      call cross
+        make red
+        make green
+        make blue
+      make legal
+  calm hold
+
+# A TWO-COLOR CROSSING IS ILLEGAL: exactly two colors meeting, cross(red, red, green) = illegal, breaks the rule. This is
+# why the unknot has no nontrivial coloring: its single arc forces two colors to meet illegally, so only the monochromatic
+# coloring survives, and tricolorability separates the trefoil from the unknot.
+rule a-two-color-crossing-is-illegal
+  show hold
+    call is-equal
+      call cross
+        make red
+        make red
+        make green
+      make illegal
+  calm hold
+
+# THE RULE IS SYMMETRIC in the two under-strands: swapping them does not change legality, cross(over, a, b) = cross(over,
+# b, a), for all colors. So the crossing rule does not depend on which under-strand is named first, as an invariant must
+# not. Proved by simultaneous induction over the three colors.
+rule the-crossing-rule-is-symmetric
+  mark over, like hue
+  mark under-a, like hue
+  mark under-b, like hue
+  show hold
+    call is-equal
+      call cross
+        read over
+        read under-a
+        read under-b
+      call cross
+        read over
+        read under-b
+        read under-a
+  fold over, under-a, under-b

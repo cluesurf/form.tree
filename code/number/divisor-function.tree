@@ -1,53 +1,66 @@
-# The divisor power sum sigma_k(n), the sum of the k-th powers of the divisors of n. The case k equals three, the cube
-# divisor sum, is the one the eight-dimensional lattice theta series is built from: the number of lattice vectors of a
-# given squared length is two hundred forty times sigma_three of that length's half, so the arithmetic of divisor cubes
-# governs how the densest eight-dimensional packing counts its shells. This file pins the small cube divisor sums by exact
-# integer evaluation so the shell counts downstream rest on a checked base. The divisors of one are one alone, so the cube
-# sum is one. The divisors of two are one and two, so the cube sum is one plus eight, nine. The divisors of three are one
-# and three, so one plus twenty-seven, twenty-eight. The divisors of four are one, two and four, so one plus eight plus
-# sixty-four, seventy-three. These four values feed the theta coefficients two hundred forty, two thousand one hundred
-# sixty, six thousand seven hundred twenty, and seventeen thousand five hundred twenty.
+# The divisor power function and the square power it samples. The divisor power function sigma-k of a number is the sum of
+# the k-th powers of its divisors, and it is MULTIPLICATIVE: on coprime numbers sigma-k of the product is the product of
+# the sigma-k values. The k-th powers it sums have exact gnomon structure, and this file MODELS the square, the k equals
+# two case, by its GNOMON: the difference between consecutive squares is the odd number two n minus one, so the squares
+# are the running sums of the odd numbers. It DEFINES the square by accumulating those odd increments and PROVES the
+# accumulation is exactly n squared, for every n, so the square is pinned by its gnomon. It then records, as machine-
+# integer facts, the multiplicativity of the divisor sum on a coprime pair and its value on a prime. The gnomon closed
+# form is proved for every n by the commutative-ring normalizer.
 
-# sigma_3(1) = 1^3 = 1. The one divisor of one is one.
-hold cube-divisor-sum-of-one-is-one
+# The square of n, built by accumulating the odd gnomons: square(0) = 0, and square(n) = square(n-1) + (2n - 1), the odd
+# increment from one square to the next.
+task square
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call square
+            call subtract
+              read n
+              code 1
+          call add
+            call multiply
+              code 2
+              call subtract
+                read n
+                code 1
+            code 1
+
+# THE GNOMON CLOSED FORM: accumulating the odd numbers gives exactly the squares, square(n) = n * n, for every n. So the
+# square is determined by its gnomon, the odd numbers, the discrete derivative of n squared. Proved for all n by the
+# commutative-ring normalizer.
+rule the-odd-gnomons-accumulate-to-the-square
+  mark n, like natural-number
+  show hold
+    call is-equal
+      call square
+        read n
+      call multiply
+        read n
+        read n
+  fold n
+
+# THE DIVISOR SUM IS MULTIPLICATIVE on coprime numbers, as machine-integer facts. The divisors of six are 1, 2, 3, 6
+# summing to twelve, and six is two times three with two and three coprime, so sigma(6) = sigma(2) * sigma(3) = 3 * 4 = 12.
+hold divisor-sum-is-multiplicative-at-six
   call is-equal
-    code 1
+    code 12
     call multiply
-      code 1
-      call multiply
-        code 1
-        code 1
+      code 3
+      code 4
 
-# sigma_3(2) = 1^3 + 2^3 = 1 + 8 = 9.
-hold cube-divisor-sum-of-two-is-nine
+# THE DIVISOR SUM OF A PRIME is the prime plus one, its only divisors being one and itself: sigma(5) = 1 + 5 = 6.
+hold divisor-sum-of-five-is-six
   call is-equal
-    code 9
+    code 6
     call add
       code 1
-      call multiply
-        code 2
-        call multiply
-          code 2
-          code 2
-
-# sigma_3(3) = 1^3 + 3^3 = 1 + 27 = 28.
-hold cube-divisor-sum-of-three-is-twenty-eight
-  call is-equal
-    code 28
-    call add
-      code 1
-      call multiply
-        code 3
-        call multiply
-          code 3
-          code 3
-
-# sigma_3(4) = 1^3 + 2^3 + 4^3 = 1 + 8 + 64 = 73. Four is not prime, so its three divisors give a longer sum.
-hold cube-divisor-sum-of-four-is-seventy-three
-  call is-equal
-    code 73
-    call add
-      code 1
-      call add
-        code 8
-        code 64
+      code 5

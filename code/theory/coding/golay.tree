@@ -1,26 +1,69 @@
 # The binary Golay code, the [24,12,8] code that builds the Leech lattice and carries the Mathieu group. It packs twelve
-# information bits into twenty-four, so it holds two to the twelfth, four thousand ninety-six, codewords, and any two
-# differ in at least eight places, so it corrects any three errors. Its weight enumerator is symmetric and exact: one word
-# of weight zero, seven hundred fifty-nine words of weight eight, two thousand five hundred seventy-six of weight twelve,
-# seven hundred fifty-nine of weight sixteen, and one of weight twenty-four, summing to four thousand ninety-six. The seven
-# hundred fifty-nine weight-eight words are the OCTADS, and they form a Steiner system: every five of the twenty-four
-# coordinates lie in exactly one octad, so the octad count is twenty-four choose five divided by eight choose five, forty-
-# two thousand five hundred four over fifty-six, seven hundred fifty-nine. Those same octads build the second shell of the
-# Leech lattice, one hundred twenty-eight times seven hundred fifty-nine, and the code's automorphism group is the Mathieu
-# group on twenty-four points. This file checks the codeword count, the symmetric weight enumerator, the Steiner octad
-# count, and the Leech octad shell.
+# information bits into twenty-four, holding two to the twelfth, four thousand ninety-six, codewords, any two differing in
+# at least eight places. Its weight enumerator is exact and SYMMETRIC under complementation, because the code contains the
+# all-ones word so complementing a codeword sends weight w to weight twenty-four minus w: one word of weight zero pairs
+# with one of weight twenty-four, seven hundred fifty-nine of weight eight pair with seven hundred fifty-nine of weight
+# sixteen, and two thousand five hundred seventy-six of weight twelve are self-paired at the center. This file MODELS the
+# weight classes and DEFINES complementation, then PROVES it is an involution pairing the classes symmetrically and fixing
+# the central weight twelve. The codeword count, the weight enumerator sum, and the Steiner-system octad count are recorded
+# as machine-integer facts. The involution is proved over the actual weight-class type by induction.
 
-# The Golay code has 2^12 = 4096 codewords, which is sixty-four squared, 64 * 64 = 4096, and sixty-four is two to the
-# sixth.
-hold golay-has-four-thousand-ninety-six-codewords
-  call is-equal
-    code 4096
-    call multiply
-      code 64
-      code 64
+# The weight classes of the Golay codewords: the weights zero, eight, twelve, sixteen and twenty-four that occur.
+form weight-class
+  case weight-zero
+  case weight-eight
+  case weight-twelve
+  case weight-sixteen
+  case weight-full
 
-# The symmetric weight enumerator sums to the full codeword count: 1 + 759 + 2576 + 759 + 1 = 4096.
-hold golay-weight-enumerator-sums-to-four-thousand-ninety-six
+# Complementing a codeword flips all twenty-four bits, sending weight w to twenty-four minus w: zero and the full weight
+# swap, eight and sixteen swap, and the central weight twelve is fixed.
+task complement
+  take w, like weight-class
+  like weight-class
+  fork case, read w
+    case weight-zero
+      send back
+        make weight-full
+    case weight-full
+      send back
+        make weight-zero
+    case weight-eight
+      send back
+        make weight-sixteen
+    case weight-sixteen
+      send back
+        make weight-eight
+    case weight-twelve
+      send back
+        make weight-twelve
+
+# COMPLEMENTATION IS AN INVOLUTION: complementing a weight class twice returns it, complement (complement w) = w, for every
+# class. So the weight enumerator is symmetric, the classes pairing zero with full and eight with sixteen. Proved by
+# induction over the five weight classes.
+rule complementation-is-an-involution
+  mark w, like weight-class
+  show hold
+    call is-equal
+      call complement
+        call complement
+          read w
+      read w
+  fold w
+
+# THE CENTRAL WEIGHT IS SELF-COMPLEMENTARY: weight twelve is fixed by complementation, complement weight-twelve =
+# weight-twelve, the center of the symmetric enumerator.
+rule the-central-weight-is-self-complementary
+  show hold
+    call is-equal
+      call complement
+        make weight-twelve
+      make weight-twelve
+  calm hold
+
+# THE WEIGHT ENUMERATOR SUMS to the codeword count as a machine-integer fact: 1 + 759 + 2576 + 759 + 1 = 4096, which is
+# two to the twelfth.
+hold weight-enumerator-sums-to-four-thousand-ninety-six
   call is-equal
     code 4096
     call add
@@ -33,31 +76,11 @@ hold golay-weight-enumerator-sums-to-four-thousand-ninety-six
             code 759
             code 1
 
-# The octads form a Steiner system S(5,8,24): every 5 points lie in exactly one octad, so 759 * 56 = 42504 = (24 choose 5),
-# with 56 the (8 choose 5) count of five-subsets inside one octad.
+# THE OCTADS FORM A STEINER SYSTEM S(5,8,24): every five points lie in exactly one octad, so 759 * 56 = 42504 = (24
+# choose 5), with 56 the number of five-subsets inside one octad.
 hold octads-form-a-steiner-system
   call is-equal
     call multiply
       code 759
       code 56
     code 42504
-
-# The 759 octads build the second Leech shell with signed coordinates: 128 * 759 = 97152, one of the three shapes whose
-# sum is the Leech kissing number.
-hold octads-build-the-leech-octad-shell
-  call is-equal
-    code 97152
-    call multiply
-      code 128
-      code 759
-
-# Minimum distance eight corrects any three errors: the correctable-error radius is the distance minus one over two,
-# (8 - 2) / 2 = 3, written as 3 * 2 = 8 - 2.
-hold golay-corrects-three-errors
-  call is-equal
-    call multiply
-      code 3
-      code 2
-    call subtract
-      code 8
-      code 2

@@ -1,47 +1,97 @@
-# The Berry phase, the memory a quantum state keeps of the path it was carried around. Move a state slowly through a loop
-# in its parameter space and it returns with an extra phase that depends only on the geometry of the loop, not on how fast
-# it was traced, a holonomy of the natural connection on the state bundle. For a spin one-half in a magnetic field swept
-# around a closed cone, the Berry phase is half the solid angle the field encloses, so a field swept around the whole
-# sphere, solid angle four pi, gives a phase of two pi, and a field swept around the equator, solid angle two pi, gives a
-# phase of pi, a sign flip. This half-angle law is the same double cover that makes a spin one-half need a FULL TWO TURNS,
-# a rotation by four pi, to come back to itself, while a single turn of two pi sends it to minus itself. The Aharonov-Bohm
-# effect is the same geometry with electromagnetic flux: a charge encircling one flux quantum picks up a phase of two pi
-# and sees nothing, while half a flux quantum gives a phase of pi and flips the sign, so the phase is purely topological,
-# set by the enclosed flux and not by any local field. This file checks the double-cover degree, the half-solid-angle
-# law, and the flux-quantum phase.
+# The Berry phase and the spin one-half double cover. Carry a quantum state slowly around a loop and it returns with a
+# geometric phase set by the loop, a holonomy. For a spin one-half the phase is half the angle turned, so a physical
+# rotation by a quarter turn advances the spinor by an eighth of a full phase cycle, an eighth root of unity. This file
+# MODELS the spinor phase as the eight-element cycle of those eighth roots and DEFINES the quarter-turn as the step around
+# it. It then PROVES the double cover: eight quarter-turns, a physical rotation by two full turns of four pi, return the
+# spinor to itself, while four quarter-turns, a single physical turn of two pi, send it not home but to the opposite phase,
+# the minus-one. So a spin one-half needs TWO full rotations to come back, and one rotation flips its sign, the defining
+# fact of a spinor and the reason fermions are what they are. The minus-one phase is shown to square to the identity.
+# Every theorem is quantified over the actual eight-element phase type and checked by induction.
 
-# The spin one-half double cover: a rotation by four pi returns the state, twice the two pi of a full spatial turn, so the
-# covering degree is two, 4 = 2 * 2 in units of pi.
-hold spin-half-needs-two-turns
-  call is-equal
-    code 4
-    call multiply
-      code 2
-      code 2
+# The eight spinor phases, the eighth roots of unity a spin one-half passes through as it is rotated. Phase turn-zero is
+# plus one, turn-four is minus one, the halfway phase reached after a single physical rotation.
+form spinor
+  case turn-zero
+  case turn-one
+  case turn-two
+  case turn-three
+  case turn-four
+  case turn-five
+  case turn-six
+  case turn-seven
 
-# The Berry phase is half the solid angle: the whole sphere, solid angle four pi, gives phase two pi, and four minus two
-# is two, the phase being exactly the half.
-hold berry-phase-is-half-the-solid-angle
-  call is-equal
-    code 2
-    call subtract
-      code 4
-      code 2
+# A physical quarter turn advances the spinor phase by one eighth, stepping around the eight roots.
+task quarter
+  take a, like spinor
+  like spinor
+  fork case, read a
+    case turn-zero
+      send back
+        make turn-one
+    case turn-one
+      send back
+        make turn-two
+    case turn-two
+      send back
+        make turn-three
+    case turn-three
+      send back
+        make turn-four
+    case turn-four
+      send back
+        make turn-five
+    case turn-five
+      send back
+        make turn-six
+    case turn-six
+      send back
+        make turn-seven
+    case turn-seven
+      send back
+        make turn-zero
 
-# The equator loop encloses solid angle two pi and gives Berry phase pi, a sign flip: two minus one is one, half of the
-# enclosed two, in units of pi.
-hold equator-loop-gives-a-sign-flip
-  call is-equal
-    code 1
-    call subtract
-      code 2
-      code 1
+# THE DOUBLE COVER: eight quarter turns, a rotation by two full turns of four pi, return every spinor phase to itself,
+# quarter applied eight times is the identity, for all a. So the spinor has period four pi, not two pi. Proved by
+# induction over the eight phases.
+rule spinor-returns-after-two-full-rotations
+  mark a, like spinor
+  show hold
+    call is-equal
+      call quarter
+        call quarter
+          call quarter
+            call quarter
+              call quarter
+                call quarter
+                  call quarter
+                    call quarter
+                      read a
+      read a
+  fold a
 
-# The Aharonov-Bohm phase is two pi times the enclosed flux in quanta: one flux quantum gives phase two pi and is
-# invisible, so in units of pi the phase is 2 * 1 = 2, a whole multiple of two pi, purely topological.
-hold aharonov-bohm-phase-counts-flux-quanta
-  call is-equal
-    code 2
-    call multiply
-      code 2
-      code 1
+# ONE ROTATION FLIPS THE SIGN: four quarter turns, a single physical rotation by two pi, send plus one, turn-zero, to
+# minus one, turn-four, not back to itself. This is the spinor sign flip under a two pi rotation, the heart of the double
+# cover.
+rule one-rotation-sends-plus-to-minus
+  show hold
+    call is-equal
+      call quarter
+        call quarter
+          call quarter
+            call quarter
+              make turn-zero
+      make turn-four
+  calm hold
+
+# THE MINUS-ONE SQUARES TO ONE: applying the two pi rotation twice, four quarter turns from minus one, returns to plus
+# one, so minus one times minus one is one, the order-two element at the center of the cover.
+rule the-minus-one-phase-squares-to-one
+  show hold
+    call is-equal
+      call quarter
+        call quarter
+          call quarter
+            call quarter
+              make turn-four
+      make turn-zero
+  calm hold

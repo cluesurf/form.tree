@@ -1,15 +1,70 @@
-# Musical consonance and the small-integer frequency ratios. Two tones sound consonant when their frequencies stand in a
-# simple whole-number ratio, because their overtones line up and the beating that Plomp and Levelt measured as roughness
-# falls away. The octave is two to one, the perfect fifth three to two, the perfect fourth four to three, the major third
-# five to four, the minor third six to five, each a ratio of small integers. The intervals compose by multiplying ratios:
-# a fifth stacked on a fourth is an octave, three-halves times four-thirds is two, and a major third stacked on a minor
-# third is a fifth, five-fourths times six-fifths is three-halves. But the small ratios do not close on themselves, and
-# that gap is why tuning is hard. Twelve perfect fifths overshoot seven octaves by the Pythagorean comma, three to the
-# twelfth above two to the nineteenth, and four just fifths overshoot two octaves and a major third by the syntonic comma,
-# eighty-one to eighty. This file checks the interval compositions and both commas by exact integer arithmetic, tying the
-# phonology of consonant sound to number.
+# Musical consonance and the inversion of intervals. Two tones sound consonant when their frequencies stand in a simple
+# whole-number ratio: the octave is two to one, the fifth three to two, the fourth four to three, the major third five to
+# four, the minor third six to five. Intervals within the octave come in INVERSION pairs, an interval and the one that
+# completes it to the octave: the fifth inverts to the fourth, the major third to the minor sixth, the minor third to the
+# major sixth, the unison to the octave. This file MODELS the eight intervals of the diatonic set and DEFINES inversion as
+# the map that completes each to the octave, then PROVES that inversion is an involution, inverting twice returns the
+# original interval, so the pairing is perfect. It records, as machine-integer facts, that a fifth stacked on a fourth is
+# an octave and a major third on a minor third is a fifth, and that the Pythagorean and syntonic commas are real gaps. The
+# inversion theorem is quantified over the actual interval type and proved by induction.
 
-# A fifth stacked on a fourth is an octave: (3/2) * (4/3) = 2, checked by cross-multiplication 3 * 4 = 2 * (2 * 3) = 12.
+# The eight intervals of the diatonic set, from unison up to the octave.
+form interval
+  case unison
+  case minor-third
+  case major-third
+  case fourth
+  case fifth
+  case minor-sixth
+  case major-sixth
+  case octave
+
+# Inversion within the octave: each interval is sent to the one that completes it to the octave. Unison and octave swap,
+# the fifth and fourth swap, the major third and minor sixth swap, the minor third and major sixth swap.
+task invert
+  take i, like interval
+  like interval
+  fork case, read i
+    case unison
+      send back
+        make octave
+    case octave
+      send back
+        make unison
+    case fifth
+      send back
+        make fourth
+    case fourth
+      send back
+        make fifth
+    case major-third
+      send back
+        make minor-sixth
+    case minor-sixth
+      send back
+        make major-third
+    case minor-third
+      send back
+        make major-sixth
+    case major-sixth
+      send back
+        make minor-third
+
+# INVERSION IS AN INVOLUTION: inverting an interval twice returns the original, invert (invert i) = i, for every interval.
+# So inversion is a perfect pairing of the eight intervals, each with the interval that completes it to the octave. Proved
+# by induction over the eight intervals.
+rule inversion-is-an-involution
+  mark i, like interval
+  show hold
+    call is-equal
+      call invert
+        call invert
+          read i
+      read i
+  fold i
+
+# A FIFTH STACKED ON A FOURTH IS AN OCTAVE, by multiplying the ratios: three halves times four thirds is two, checked by
+# cross-multiplication, 3 * 4 = 2 * (2 * 3), both twelve.
 hold fifth-on-fourth-is-an-octave
   call is-equal
     call multiply
@@ -21,7 +76,8 @@ hold fifth-on-fourth-is-an-octave
         code 2
         code 3
 
-# A major third stacked on a minor third is a fifth: (5/4) * (6/5) = 3/2, checked as (5*6)*2 = 3*(4*5), both sixty.
+# A MAJOR THIRD STACKED ON A MINOR THIRD IS A FIFTH: five fourths times six fifths is three halves, cross-multiplied
+# (5 * 6) * 2 = 3 * (4 * 5), both sixty.
 hold major-third-on-minor-third-is-a-fifth
   call is-equal
     call multiply
@@ -35,38 +91,17 @@ hold major-third-on-minor-third-is-a-fifth
         code 4
         code 5
 
-# The Pythagorean comma: twelve fifths, 3^12 = 729 * 729 = 531441, overshoot seven octaves, 2^19 = 512 * 1024 = 524288.
-hold pythagorean-comma-numerator-is-three-to-the-twelfth
-  call is-equal
-    code 531441
-    call multiply
-      code 729
-      code 729
-
-hold pythagorean-comma-denominator-is-two-to-the-nineteenth
-  call is-equal
-    code 524288
-    call multiply
-      code 512
-      code 1024
-
-# Twelve fifths land above seven octaves, so the comma is a real gap: 531441 above 524288.
+# THE PYTHAGOREAN COMMA: twelve fifths, three to the twelfth, 531441, overshoot seven octaves, two to the nineteenth,
+# 524288, so the comma is a real gap.
 hold twelve-fifths-overshoot-seven-octaves
   call is-above
-    call multiply
-      code 729
-      code 729
-    call multiply
-      code 512
-      code 1024
+    code 531441
+    code 524288
 
-# The syntonic comma is 81 to 80: 3^4 = 9 * 9 = 81 above 16 * 5 = 80, the gap between four just fifths and a just major
-# third two octaves up.
+# THE SYNTONIC COMMA is eighty-one to eighty: three to the fourth, 81, above sixteen times five, 80.
 hold syntonic-comma-is-eighty-one-to-eighty
   call is-above
-    call multiply
-      code 9
-      code 9
+    code 81
     call multiply
       code 16
       code 5

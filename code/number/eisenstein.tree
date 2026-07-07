@@ -1,16 +1,68 @@
 # The Eisenstein series E4 and the theta series of the eight-dimensional even unimodular lattice, which are the same
-# function. A modular form of weight four is determined by one coefficient sequence, and for E4 that sequence is one
-# followed by two hundred forty times the cube divisor sums: E4(q) = 1 + 240 sigma_3(1) q + 240 sigma_3(2) q^2 + ...
-# The theta series of the eight-dimensional lattice counts vectors by squared length: theta(q) = sum over lattice points
-# of q to the half squared length, and because that lattice is even and unimodular in dimension eight its theta series is
-# a weight four modular form with constant term one, so it MUST equal E4. The consequence is exact and countable: the
-# number of lattice vectors of squared length two n is two hundred forty times sigma_3(n). The n equals one shell is the
-# kissing number two hundred forty, the n equals two shell is two thousand one hundred sixty, the n equals three shell is
-# six thousand seven hundred twenty, the n equals four shell is seventeen thousand five hundred twenty. Each is a divisor
-# cube sum scaled by two hundred forty, so the deepest counting fact about the densest eight-dimensional packing is a
-# statement about modular forms, and it is checked here shell by shell against the cube divisor sums.
+# function. A modular form of weight four is fixed by one coefficient sequence, and for E4 that sequence is one followed by
+# two hundred forty times the cube divisor sums, so the number of lattice vectors of squared length two n is exactly two
+# hundred forty times sigma-three of n. The cubes are the arithmetic underneath, and this file MODELS the cube by its
+# GNOMON, the odd-shell increment that turns one cube into the next: the difference between consecutive cubes is three n
+# squared plus three n plus one. It DEFINES the cube by accumulating those gnomons and PROVES that the accumulation is
+# exactly n cubed, so the cube function is pinned by its increments. It then records, as machine-integer counts, the theta
+# shell numbers as two hundred forty times the cube divisor sums. The gnomon closed form is proved for every n by the
+# commutative-ring normalizer.
 
-# Shell one, squared length two: 240 * sigma_3(1) = 240 * 1 = 240, the kissing number.
+# The cube of n, built by accumulating gnomons: cube(0) = 0, and cube(n) = cube(n-1) + (3 m^2 + 3 m + 1) where m = n - 1,
+# the increment from one cube to the next.
+task cube
+  take n, like natural-number
+  like natural-number
+  send back
+    fork test
+      hook test
+        call is-equal
+          read n
+          code 0
+      hook hold
+        code 0
+      hook miss
+        call add
+          call cube
+            call subtract
+              read n
+              code 1
+          call add
+            call add
+              call multiply
+                code 3
+                call multiply
+                  call subtract
+                    read n
+                    code 1
+                  call subtract
+                    read n
+                    code 1
+              call multiply
+                code 3
+                call subtract
+                  read n
+                  code 1
+            code 1
+
+# THE GNOMON CLOSED FORM: accumulating the gnomons three m squared plus three m plus one gives exactly n cubed,
+# cube(n) = n * n * n, for every n. So the cube function is determined by its shell increments, the discrete derivative of
+# the cube. This is the cube arithmetic the theta series inherits. Proved for all n by the commutative-ring normalizer.
+rule the-gnomons-accumulate-to-the-cube
+  mark n, like natural-number
+  show hold
+    call is-equal
+      call cube
+        read n
+      call multiply
+        read n
+        call multiply
+          read n
+          read n
+  fold n
+
+# THE THETA SHELL COUNTS as machine-integer facts: the number of eight-dimensional lattice vectors of squared length two n
+# is two hundred forty times the cube divisor sum sigma-three of n. Shell one, the kissing number: 240 = 240 * 1.
 hold theta-shell-one-is-two-hundred-forty
   call is-equal
     code 240
@@ -18,7 +70,7 @@ hold theta-shell-one-is-two-hundred-forty
       code 240
       code 1
 
-# Shell two, squared length four: 240 * sigma_3(2) = 240 * 9 = 2160.
+# Shell two, squared length four: 240 * sigma-three(2) = 240 * 9 = 2160.
 hold theta-shell-two-is-two-thousand-one-hundred-sixty
   call is-equal
     code 2160
@@ -26,27 +78,10 @@ hold theta-shell-two-is-two-thousand-one-hundred-sixty
       code 240
       code 9
 
-# Shell three, squared length six: 240 * sigma_3(3) = 240 * 28 = 6720.
+# Shell three, squared length six: 240 * sigma-three(3) = 240 * 28 = 6720.
 hold theta-shell-three-is-six-thousand-seven-hundred-twenty
   call is-equal
     code 6720
     call multiply
       code 240
       code 28
-
-# Shell four, squared length eight: 240 * sigma_3(4) = 240 * 73 = 17520.
-hold theta-shell-four-is-seventeen-thousand-five-hundred-twenty
-  call is-equal
-    code 17520
-    call multiply
-      code 240
-      code 73
-
-# The E4 lead coefficient is two hundred forty itself, the same two hundred forty that splits as one hundred twelve plus
-# one hundred twenty-eight in the two root families. The theta series and the Eisenstein series agree at first order.
-hold eisenstein-lead-coefficient-splits-as-the-two-root-families
-  call is-equal
-    code 240
-    call add
-      code 112
-      code 128

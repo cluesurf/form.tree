@@ -1,16 +1,45 @@
-# The monogamy of entanglement, read through the CHSH game. A pair of parties sharing a maximally entangled state can
-# violate the Bell-CHSH inequality up to the Tsirelson bound, two times the square root of two, whose square is eight,
-# well past the classical limit of two, whose square is four. But this strength cannot be shared. The Toner-Verstraete
-# monogamy relation bounds the two CHSH values a single party can hold with two different partners: the sum of their
-# squares cannot exceed eight. So if the first pair saturates the quantum maximum, its squared CHSH is eight, and the
-# second pair is forced to squared value zero, no quantum correlation at all, only whatever a classical channel allows.
-# This is the algebraic face of the wormhole being non-shareable: a maximal bridge to one partner leaves nothing for a
-# third. Classical correlation escapes the bound differently: two classical values of two each give squared values four
-# and four, summing to exactly eight, so classical correlation, unlike a quantum throat, can be shared both ways at once.
-# This file checks the Tsirelson square, the quantum-beats-classical gap, and both faces of the monogamy sum reaching
-# eight.
+# The monogamy of entanglement, read through the CHSH game. A pair sharing a maximally entangled state can violate the
+# Bell-CHSH inequality up to the Tsirelson bound, two root two, whose square is eight, past the classical limit of two
+# whose square is four. But this strength cannot be shared: the Toner-Verstraete relation bounds the two CHSH values one
+# party can hold with two partners, the sum of their squares at most eight, so a maximal bridge to one partner forces the
+# other to zero. The two partners a central party is entangled with play symmetric roles in this bound. This file MODELS
+# the two partners and DEFINES the swap that exchanges them, then PROVES the swap is an involution, so the monogamy bound
+# is symmetric in the two partners. The Tsirelson square, the quantum-beats-classical gap, and both faces of the monogamy
+# sum reaching eight are recorded as machine-integer facts. The symmetry is proved over the actual partner type by
+# induction.
 
-# The Tsirelson bound squared is eight: (2 root 2)^2 = 4 * 2 = 8, the quantum ceiling on a single CHSH value.
+# The two partners a central party can be entangled with.
+form partner
+  case first
+  case second
+
+# The swap exchanging the two partners, under which the monogamy bound is symmetric.
+task swap
+  take p, like partner
+  like partner
+  fork case, read p
+    case first
+      send back
+        make second
+    case second
+      send back
+        make first
+
+# THE SWAP IS AN INVOLUTION: exchanging the two partners twice returns them, swap (swap p) = p, for every partner, so the
+# monogamy bound, the sum of the two squared CHSH values, does not depend on which partner is named first. Proved by
+# induction over the two partners.
+rule the-partner-swap-is-an-involution
+  mark p, like partner
+  show hold
+    call is-equal
+      call swap
+        call swap
+          read p
+      read p
+  fold p
+
+# THE TSIRELSON BOUND SQUARED is eight, the quantum ceiling on a single CHSH value: (2 root 2) squared is 4 * 2 = 8, as a
+# machine-integer fact.
 hold tsirelson-bound-squared-is-eight
   call is-equal
     code 8
@@ -18,23 +47,23 @@ hold tsirelson-bound-squared-is-eight
       code 4
       code 2
 
-# The classical CHSH bound is two, squared four, and quantum strictly exceeds it: 4 below 8.
-hold quantum-tsirelson-beats-classical
+# QUANTUM BEATS CLASSICAL: the classical CHSH bound squared is four, below the quantum eight, 4 below 8.
+hold quantum-beats-classical
   call is-below
     code 4
     code 8
 
-# Monogamy at the singlet corner: the first pair takes the full squared strength eight, forcing the second pair to zero,
+# MONOGAMY AT THE SINGLET CORNER: the first pair takes the full squared strength eight, forcing the second to zero,
 # 8 + 0 = 8, a maximal bridge to one partner and none to a third.
-hold maximal-bridge-forbids-a-third
+hold a-maximal-bridge-forbids-a-third
   call is-equal
     code 8
     call add
       code 8
       code 0
 
-# Classical sharing fills the same monogamy budget symmetrically: two classical values of squared strength four each,
-# 4 + 4 = 8, so a classical correlation can be held with both partners at once while a quantum throat cannot.
+# CLASSICAL CORRELATION SHARES BOTH WAYS: two classical values of squared strength four each fill the same budget,
+# 4 + 4 = 8, so classical correlation can be held with both partners at once while a quantum throat cannot.
 hold classical-correlation-shares-both-ways
   call is-equal
     code 8
