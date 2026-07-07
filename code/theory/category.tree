@@ -1,4 +1,4 @@
-load @cluesurf/form/code/structure/set
+load @term/form/code/structure/set
   find set
 
 # A category: objects and the morphisms (arrows) between them, with morphisms that compose associatively and an

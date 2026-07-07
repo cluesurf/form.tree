@@ -1,4 +1,4 @@
-load @cluesurf/form/code/structure/space/hilbert
+load @term/form/code/structure/space/hilbert
   find hilbert-space
 
 # Quantum theory: the physics of the very small, where states are vectors in a Hilbert space, observables are operators,

@@ -1,4 +1,4 @@
-load @cluesurf/form/code/type/self
+load @term/form/code/type/self
   find self-type
 
 # The booleans, the simplest inductive type, encoded as a self type whose body is its own eliminator. This is the

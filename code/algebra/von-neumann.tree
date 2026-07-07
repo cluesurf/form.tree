@@ -1,4 +1,4 @@
-load @cluesurf/form/code/algebra/c-star
+load @term/form/code/algebra/c-star
   find c-star-algebra
 
 # A von Neumann algebra: a C-star algebra of operators closed in the weak operator topology, the setting for quantum

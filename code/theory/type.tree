@@ -1,4 +1,4 @@
-load @cluesurf/form/code/type/term
+load @term/form/code/type/term
   find term
 
 # Type theory, the foundation of mathematics this library is checked in, an alternative to set theory where the

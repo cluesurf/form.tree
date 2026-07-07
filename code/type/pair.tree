@@ -1,7 +1,7 @@
-load @cluesurf/form/code/type/term
+load @term/form/code/type/term
   find term
 
-load @cluesurf/form/code/type/multiplicity
+load @term/form/code/type/multiplicity
   find multiplicity
 
 # The dependent pair type, the sigma type, the one way the theory forms a type whose second component depends on its

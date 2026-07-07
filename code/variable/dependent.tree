@@ -1,4 +1,4 @@
-load @cluesurf/form/code/type/term
+load @term/form/code/type/term
   find term
 
 # A dependent variable: a variable whose value is determined by others, the output side of a function, the y that

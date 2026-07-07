@@ -1,5 +1,5 @@
 
-deck @cluesurf/form
+deck @term/form
   head <The Seed Math Definition Library>
   mark <0.0.1>
   sort tool

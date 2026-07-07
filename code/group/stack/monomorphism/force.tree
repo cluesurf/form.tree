@@ -1,4 +1,4 @@
-load @cluesurf/form/code/group/monomorphism
+load @term/form/code/group/monomorphism
   find group-monomorphism
 
 # A canonical group embedding: a distinguished injective homomorphism that includes one group into another as a

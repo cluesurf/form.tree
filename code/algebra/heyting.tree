@@ -1,4 +1,4 @@
-load @cluesurf/form/code/theory/lattice
+load @term/form/code/theory/lattice
   find lattice
 
 # A Heyting algebra: a lattice with an implication operation, the algebra of intuitionistic (constructive) logic, where

@@ -1,7 +1,7 @@
-load @cluesurf/form/code/structure/monoid
+load @term/form/code/structure/monoid
   find monoid
 
-load @cluesurf/form/code/structure/function/binary
+load @term/form/code/structure/function/binary
   find binary-function
 
 # Associative computation: computing by an associative operation, where the grouping of the work does not change the

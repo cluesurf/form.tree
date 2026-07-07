@@ -1,4 +1,4 @@
-load @cluesurf/form/code/group/homomorphism
+load @term/form/code/group/homomorphism
   find group-homomorphism
 
 # A group epimorphism: a surjective homomorphism, one whose image is the whole target, so the target is a quotient of

@@ -1,4 +1,4 @@
-load @cluesurf/form/code/manifold/riemannian
+load @term/form/code/manifold/riemannian
   find riemannian-manifold
 
 # The Levi-Civita connection: on a Riemannian manifold, the unique way to differentiate vector fields that is

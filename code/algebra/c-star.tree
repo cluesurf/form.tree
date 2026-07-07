@@ -1,4 +1,4 @@
-load @cluesurf/form/code/algebra/banach
+load @term/form/code/algebra/banach
   find banach-algebra
 
 # A C-star algebra: a Banach algebra with an involution (a conjugate-transpose) satisfying the C-star identity, the norm

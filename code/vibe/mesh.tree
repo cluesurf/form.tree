@@ -5,7 +5,7 @@
 # each shell strictly larger than the last, room opening faster than flat space, the growth that gives feeling room to
 # branch. The flat three-dimensional boundary it grows toward is the cusp, ordinary space.
 
-load @cluesurf/form/code/vibe/site
+load @term/form/code/vibe/site
   find way
   find opposite
 

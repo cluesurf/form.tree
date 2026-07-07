@@ -1,4 +1,4 @@
-load @cluesurf/form/code/structure/set
+load @term/form/code/structure/set
   find set
 
 # A finite automaton: the simplest machine, a finite set of states reading an input symbol by symbol, jumping between

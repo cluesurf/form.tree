@@ -1,7 +1,7 @@
-load @cluesurf/form/code/structure/set
+load @term/form/code/structure/set
   find set
 
-load @cluesurf/form/code/computation/sitdac
+load @term/form/code/computation/sitdac
   find sitdac-machine
 
 # Responders: the cells whose record matched the broadcast query, the ones that raise their hands. A search produces a

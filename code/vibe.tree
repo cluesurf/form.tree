@@ -1,25 +1,25 @@
-load @cluesurf/form/code/vibe/mesh
+load @term/form/code/vibe/mesh
   find mesh
 
-load @cluesurf/form/code/vibe/dock
+load @term/form/code/vibe/dock
   find dock
 
-load @cluesurf/form/code/vibe/site
+load @term/form/code/vibe/site
   find site
 
-load @cluesurf/form/code/vibe/tone
+load @term/form/code/vibe/tone
   find tone
 
-load @cluesurf/form/code/vibe/lean
+load @term/form/code/vibe/lean
   find lean
 
-load @cluesurf/form/code/vibe/knit
+load @term/form/code/vibe/knit
   find knit
 
-load @cluesurf/form/code/vibe/wake
+load @term/form/code/vibe/wake
   find wake
 
-load @cluesurf/form/code/vibe/beat
+load @term/form/code/vibe/beat
   find beat
 
 # The base of Vibe Theory: the eight elements that make up the whole model, and nothing else. Three give the where, the mesh and its docks and their sites. Two give the what, the tone and its lean. Two give the how, the knit that moves the state and the wake that grows the space. One gives the when, the beat. The keystone is the pinch-point. Reversibility caps the dimension at eight from above, the one-substance demand fixes it at eight from below, the octonions are forced, their rotation gives four-dimensional spacetime and the 24-cell, and the 24-cell is the dock. The base is forced from one premise.

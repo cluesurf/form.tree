@@ -8,7 +8,7 @@
 # ranks are kept local because cross-file casing on an imported inductive type is not yet supported, so the order's proof
 # must live where its constructors do; this is the lean's own statement of the same order tone carries.
 
-load @cluesurf/form/code/atom/flag
+load @term/form/code/atom/flag
   find flag
   find either
 

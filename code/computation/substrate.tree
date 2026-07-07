@@ -1,4 +1,4 @@
-load @cluesurf/form/code/automaton/cellular
+load @term/form/code/automaton/cellular
   find cellular-automaton
 
 # The substrate as a computer: the mesh, a hyperbolic cellular automaton, is itself a universal computer. Each cell

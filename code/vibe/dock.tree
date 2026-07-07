@@ -4,7 +4,7 @@
 # two tones, a value the law never creates or destroys. The vacuum dock (all sites at peace) is proved neutral, and the
 # charge is proved symmetric (independent of which way the line is read), the seed of the dock's charge conservation.
 
-load @cluesurf/form/code/vibe/tone
+load @term/form/code/vibe/tone
   find tone
   find tally
 

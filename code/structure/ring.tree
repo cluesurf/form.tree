@@ -1,10 +1,10 @@
-load @cluesurf/form/code/structure/set
+load @term/form/code/structure/set
   find set
 
-load @cluesurf/form/code/structure/function/binary
+load @term/form/code/structure/function/binary
   find binary-function
 
-load @cluesurf/form/code/structure/function/unary
+load @term/form/code/structure/function/unary
   find unary-function
 
 # A ring: a set with two operations, an addition that makes it an abelian group and a multiplication that is

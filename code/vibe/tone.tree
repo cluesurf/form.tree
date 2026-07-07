@@ -1,5 +1,5 @@
 # The tone, the quality of a vibe's experience, the first base element. It is the ternary value with three cases: a low value, a middle value, and a high value. Three is forced. The smallest usable alphabet needs a resting middle value and a mirror that swaps the two sides, and the three-case set is the smallest with both.
-load @cluesurf/form/code/atom/flag
+load @term/form/code/atom/flag
   find flag
   find either
 
